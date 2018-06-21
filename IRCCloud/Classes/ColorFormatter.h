@@ -29,7 +29,7 @@
 
 #define FONT_MIN 10
 #define FONT_MAX 24
-#define FONT_SIZE MIN(FONT_MAX, MAX(FONT_MIN, [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"]))
+#define FONT_SIZE MIN(FONT_MAX, MAX(FONT_MIN, ceilf([[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"])))
 #define MESSAGE_LINE_SPACING 2
 #define MESSAGE_LINE_PADDING 4
 

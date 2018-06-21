@@ -2119,7 +2119,7 @@ NSArray *_sortedChannels;
                     return;
                 } else if([messageString hasPrefix:@"/fontsize "]) {
                     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:
-                                                                      MIN(FONT_MAX, MAX(FONT_MIN, [[messageString substringFromIndex:10] intValue]))
+                                                                      MIN(FONT_MAX, MAX(FONT_MIN, ceilf([[messageString substringFromIndex:10] intValue])))
                                                                       ]
                                                               forKey:@"fontSize"];
                     if([ColorFormatter shouldClearFontCache]) {

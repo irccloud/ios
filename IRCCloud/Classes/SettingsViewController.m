@@ -556,7 +556,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
         [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
         [[NSUserDefaults standardUserDefaults] setBool:_tabletMode.on forKey:@"tabletMode"];
-        [[NSUserDefaults standardUserDefaults] setFloat:_fontSize.value forKey:@"fontSize"];
+        [[NSUserDefaults standardUserDefaults] setFloat:ceilf(_fontSize.value) forKey:@"fontSize"];
         [[NSUserDefaults standardUserDefaults] setBool:!_oneLine.isOn forKey:@"chat-oneline"];
         [[NSUserDefaults standardUserDefaults] setBool:!_noRealName.isOn forKey:@"chat-norealname"];
         [[NSUserDefaults standardUserDefaults] setBool:!_timeLeft.isOn forKey:@"time-left"];
