@@ -2272,7 +2272,7 @@ extern UIImage *__socketClosedBackgroundImage;
             cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
             [cell setNeedsLayout];
             [cell layoutIfNeeded];
-            e.height = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+            e.height = ceilf([cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height);
         }
         return e.height;
     }
