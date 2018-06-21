@@ -219,7 +219,7 @@
                 uint64_t len;
                 memcpy(&len, &buffer[index], sizeof(len));
                 index += sizeof(len);
-                dataLength = CFSwapInt64(len);
+                dataLength = (NSUInteger)CFSwapInt64(len);
             }
             
             //if applicable, set mask value
@@ -293,14 +293,14 @@
     {
         byte |= (126 & 0xFF);
         [temp appendBytes:&byte length:1];
-        short shortLength = htons(fullPayloadLength & 0xFFFF);
+        short shortLength = CFSwapInt16(fullPayloadLength & 0xFFFF);
         [temp appendBytes:&shortLength length:2];
     }
     else if (fullPayloadLength <= UINT64_MAX)
     {
         byte |= (127 & 0xFF);
         [temp appendBytes:&byte length:1];
-        unsigned long long longLength = htonll(fullPayloadLength);
+        unsigned long long longLength = CFSwapInt64(fullPayloadLength);
         [temp appendBytes:&longLength length:8];
     }
     
