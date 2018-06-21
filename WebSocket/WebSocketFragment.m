@@ -121,6 +121,7 @@
         if (self.hasMask)
         {
             self.payloadData = [self unmask:self.mask data:aData range:NSMakeRange(payloadStart, payloadLength)];
+            self.mask = 0;
         }
         else
         {
