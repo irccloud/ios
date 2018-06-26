@@ -3103,7 +3103,11 @@ extern UIImage *__socketClosedBackgroundImage;
                     NSString *extension = [e.entities objectForKey:@"extension"];
                     if(!extension.length)
                         extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-                    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]]];
+                    if([[[e.entities objectForKey:@"name"] lowercaseString] hasSuffix:extension.lowercaseString]) {
+                        [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [e.entities objectForKey:@"name"]]]];
+                    } else {
+                        [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]]];
+                    }
                 } else {
                     [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[e.entities objectForKey:@"url"]];
                 }
