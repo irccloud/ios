@@ -728,6 +728,20 @@
 			remoteGlobalIDString = 221D4B9A1E23EB4900D403E6;
 			remoteInfo = "NotificationService Enterprise";
 		};
+		22322CC920E549AA00AC54CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22DE05B118D8CA0700590FC3;
+			remoteInfo = GitRevision;
+		};
+		22322CCB20E549B100AC54CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 228A056416D3DABA0029769C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 22DE05B118D8CA0700590FC3;
+			remoteInfo = GitRevision;
+		};
 		224589C91DCA19BB00D3110A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 228A056416D3DABA0029769C /* Project object */;
@@ -1984,6 +1998,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				22322CCA20E549AA00AC54CD /* PBXTargetDependency */,
 			);
 			name = NotificationService;
 			productName = NotificationService;
@@ -2001,6 +2016,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				22322CCC20E549B100AC54CD /* PBXTargetDependency */,
 			);
 			name = "NotificationService Enterprise";
 			productName = NotificationService;
@@ -2998,6 +3014,16 @@
 			isa = PBXTargetDependency;
 			target = 221D4B9A1E23EB4900D403E6 /* NotificationService Enterprise */;
 			targetProxy = 221D4BA81E23F0FC00D403E6 /* PBXContainerItemProxy */;
+		};
+		22322CCA20E549AA00AC54CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22DE05B118D8CA0700590FC3 /* GitRevision */;
+			targetProxy = 22322CC920E549AA00AC54CD /* PBXContainerItemProxy */;
+		};
+		22322CCC20E549B100AC54CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 22DE05B118D8CA0700590FC3 /* GitRevision */;
+			targetProxy = 22322CCB20E549B100AC54CD /* PBXContainerItemProxy */;
 		};
 		224589CA1DCA19BB00D3110A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;

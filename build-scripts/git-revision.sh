@@ -24,3 +24,4 @@ touch $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist
 touch $PROJECT_DIR/IRCCloud/IRCCloud-Enterprise-Info.plist
 touch $PROJECT_DIR/ShareExtension/Info.plist
 touch $PROJECT_DIR/ShareExtension/Info-Enterprise.plist
+touch $PROJECT_DIR/NotificationService/Info.plist

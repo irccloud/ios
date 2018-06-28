@@ -1168,6 +1168,25 @@ NSArray *_sortedChannels;
                 [self presentViewController:nc animated:YES completion:nil];
             }
             break;
+        case kIRCEventChanFilterList:
+            o = notification.object;
+            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"g" param:@"list" placeholder:@"No channel filter patterns." bid:_buffer.bid];
+                cmltv.event = o;
+                cmltv.data = [o objectForKey:@"list"];
+                cmltv.mask = @"pattern";
+                cmltv.navigationItem.title = [NSString stringWithFormat:@"Channel filter for %@", [o objectForKey:@"channel"]];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                if(self.presentedViewController)
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                [self presentViewController:nc animated:YES completion:nil];
+            }
+            break;
         case kIRCEventListResponseFetching:
             o = notification.object;
             if(o.cid == _buffer.cid) {

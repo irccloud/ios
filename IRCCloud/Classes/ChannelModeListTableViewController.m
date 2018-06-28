@@ -199,7 +199,10 @@
     } else {
         msg = [msg stringByAppendingString:@"less than a minute ago"];
     }
-    return [msg stringByAppendingFormat:@" by %@", [row objectForKey:@"usermask"]];
+    if([row objectForKey:@"author"])
+        return [msg stringByAppendingFormat:@" by %@", [row objectForKey:@"author"]];
+    else
+        return [msg stringByAppendingFormat:@" by %@", [row objectForKey:@"usermask"]];
 }
 
 #pragma mark - Table view data source

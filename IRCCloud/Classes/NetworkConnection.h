@@ -96,6 +96,7 @@ typedef enum {
     kIRCEventTraceResponse,
     kIRCEventLogExportFinished,
     kIRCEventAvatarChange,
+    kIRCEventChanFilterList,
     kIRCEventAuthFailure,
     kIRCEventAlert,
     kIRCEventRefresh
