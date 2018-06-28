@@ -340,6 +340,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
         if([[result objectForKey:@"success"] boolValue]) {
+            if(_cid == -1)
+                ((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController.cidToOpen = [[result objectForKey:@"cid"] intValue];
             if(self.presentingViewController) {
                 [self.tableView endEditing:YES];
                 [self dismissViewControllerAnimated:YES completion:nil];

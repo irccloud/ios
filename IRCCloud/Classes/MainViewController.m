@@ -1406,7 +1406,7 @@ NSArray *_sortedChannels;
                 [self bufferSelected:b.bid];
                 _bufferToOpen = nil;
                 _cidToOpen = -1;
-            } else if([b.type isEqualToString:@"console"] || (_cidToOpen == b.cid && _bufferToOpen == nil)) {
+            } else if(_cidToOpen == b.cid && _bufferToOpen == nil) {
                 [self bufferSelected:b.bid];
             }
             break;
@@ -2809,8 +2809,10 @@ NSArray *_sortedChannels;
             }
             _incomingDraft = nil;
         }
-        _cidToOpen = -1;
-        _bidToOpen = -1;
+        if(_buffer.cid == _cidToOpen)
+            _cidToOpen = -1;
+        if(_buffer.bid == _bidToOpen)
+            _bidToOpen = -1;
         _eidToOpen = -1;
         _bufferToOpen = nil;
         CLS_LOG(@"BID selected: cid%i bid%i", _buffer.cid, bid);
