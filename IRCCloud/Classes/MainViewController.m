@@ -3020,7 +3020,7 @@ NSArray *_sortedChannels;
                 } else if([type isEqualToString:@"connecting_restricted"]) {
                     _serverStatus.text = [EventsDataSource reason:reason];
                     if([_serverStatus.text isEqualToString:reason])
-                        reason = @"You can’t connect to this server with a free account.";
+                        _serverStatus.text = @"You can’t connect to this server with a free account.";
                 } else if([type isEqualToString:@"connection_blocked"]) {
                     _serverStatus.text = @"Disconnected - Connections to this server have been blocked";
                 } else {
