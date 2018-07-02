@@ -51,7 +51,7 @@
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGContextSaveGState(ctx);
     CGContextAddEllipseInRect(ctx, rect);
-    CGContextSetFillColor(ctx, CGColorGetComponents([[UIColor redColor] CGColor]));
+    CGContextSetFillColorWithColor(ctx, [[UIColor redColor] CGColor]);
     CGContextFillPath(ctx);
     CGContextRestoreGState(ctx);
     CGContextSaveGState(ctx);
