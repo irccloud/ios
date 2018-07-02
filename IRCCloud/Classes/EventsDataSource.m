@@ -441,14 +441,15 @@
                 NSArray *lines = [object objectForKey:@"lines"];
                 event.from = @"";
                 if([lines count]) {
-                    if([[object objectForKey:@"start"] length])
-                        event.msg = [[object objectForKey:@"start"] stringByAppendingString:@"\n"];
-                    else
-                        event.msg = @"";
+                    NSMutableString *motd = [[NSMutableString alloc] init];
+                    if([[object objectForKey:@"start"] length]) {
+                        [motd appendFormat:@"%@\n", [object objectForKey:@"start"]];
+                    }
                     
                     for(NSString *line in lines) {
-                        event.msg = [event.msg stringByAppendingFormat:@"%@\n", line];
+                        [motd appendFormat:@"%@\n", line];
                     }
+                    event.msg = motd;
                 }
             }
             event.bgColor = [UIColor selfBackgroundColor];
