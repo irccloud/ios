@@ -3222,6 +3222,7 @@ NSArray *_sortedChannels;
     }
     _eventActivity.alpha = 1;
     [_eventActivity startAnimating];
+    [self.slidingViewController resetTopView];
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;

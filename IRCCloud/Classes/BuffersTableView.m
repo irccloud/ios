@@ -135,6 +135,8 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
 	[super layoutSubviews];
 	
     CGRect frame = [self.contentView bounds];
+    frame.origin.x += _borderInset;
+    frame.size.width -= _borderInset;
     _border.frame = CGRectMake(frame.origin.x - _borderInset, frame.origin.y, 6 + _borderInset, frame.size.height);
     frame.size.width -= 8;
     if(_type == TYPE_SERVER) {
