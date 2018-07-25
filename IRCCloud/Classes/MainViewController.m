@@ -3180,7 +3180,7 @@ NSArray *_sortedChannels;
     }
     _buffersView.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
     CGRect frame = _titleView.frame;
-    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         frame.size.height = (size.width > size.height)?24:40;
         _topicLabel.alpha = (size.width > size.height)?0:1;
     }
