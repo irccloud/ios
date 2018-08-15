@@ -69,10 +69,11 @@ static NSData *getPublicKeyDataFromCertificate_unified(SecCertificateRef certifi
     SecKeyRef publicKey;
     SecTrustRef tempTrust;
     SecPolicyRef policy = SecPolicyCreateBasicX509();
+    SecTrustResultType result;
     
     // Get a public key reference from the certificate
     SecTrustCreateWithCertificates(certificate, policy, &tempTrust);
-    SecTrustEvaluate(tempTrust, NULL);
+    SecTrustEvaluate(tempTrust, &result);
     publicKey = SecTrustCopyPublicKey(tempTrust);
     CFRelease(policy);
     CFRelease(tempTrust);
@@ -104,10 +105,11 @@ static NSData *getPublicKeyDataFromCertificate_legacy_ios(SecCertificateRef cert
     SecKeyRef publicKey;
     SecTrustRef tempTrust;
     SecPolicyRef policy = SecPolicyCreateBasicX509();
-    
+    SecTrustResultType result;
+
     // Get a public key reference from the certificate
     SecTrustCreateWithCertificates(certificate, policy, &tempTrust);
-    SecTrustEvaluate(tempTrust, NULL);
+    SecTrustEvaluate(tempTrust, &result);
     publicKey = SecTrustCopyPublicKey(tempTrust);
     CFRelease(policy);
     CFRelease(tempTrust);

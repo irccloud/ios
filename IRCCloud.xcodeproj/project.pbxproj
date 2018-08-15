@@ -2460,13 +2460,15 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
+			inputFileListPaths = (
+			);
 			inputPaths = (
 			);
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "$SRCROOT/build-scripts/git-revision.sh";
+			shellScript = "$SRCROOT/build-scripts/git-revision.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
