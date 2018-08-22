@@ -416,6 +416,17 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)refresh {
+    CGRect frame = CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22);
+    _server.frame = frame;
+    _port.frame = frame;
+    _nickname.frame = frame;
+    _realname.frame = frame;
+    _nspass.frame = frame;
+    _serverpass.frame = frame;
+    _network.frame = frame;
+    _commands.frame = frame;
+    _channels.frame = frame;
+
     if(_url) {
         int port = [_url.port intValue];
         int ssl = [_url.scheme hasSuffix:@"s"]?1:0;
@@ -532,7 +543,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _network = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _network = [[UITextField alloc] initWithFrame:CGRectZero];
     _network.placeholder = @"Network";
     _network.text = @"";
     _network.textAlignment = NSTextAlignmentRight;
@@ -544,7 +555,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _network.returnKeyType = UIReturnKeyDone;
     _network.delegate = self;
     
-    _server = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _server = [[UITextField alloc] initWithFrame:CGRectZero];
     _server.placeholder = @"irc.example.net";
     _server.text = @"";
     _server.textAlignment = NSTextAlignmentRight;
@@ -556,7 +567,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _server.returnKeyType = UIReturnKeyDone;
     _server.delegate = self;
     
-    _port = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _port = [[UITextField alloc] initWithFrame:CGRectZero];
     _port.text = @"6667";
     _port.textAlignment = NSTextAlignmentRight;
     _port.textColor = [UITableViewCell appearance].detailTextLabelColor;
@@ -566,7 +577,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     _ssl = [[UISwitch alloc] init];
     
-    _nickname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _nickname = [[UITextField alloc] initWithFrame:CGRectZero];
     _nickname.text = @"";
     _nickname.textAlignment = NSTextAlignmentRight;
     _nickname.textColor = [UITableViewCell appearance].detailTextLabelColor;
@@ -582,7 +593,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
             _nickname.text = [[name substringToIndex:range.location] lowercaseString];
     }
     
-    _realname = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _realname = [[UITextField alloc] initWithFrame:CGRectZero];
     _realname.text = @"";
     _realname.textAlignment = NSTextAlignmentRight;
     _realname.textColor = [UITableViewCell appearance].detailTextLabelColor;
@@ -596,7 +607,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         _realname.text = name;
     }
     
-    _nspass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _nspass = [[UITextField alloc] initWithFrame:CGRectZero];
     _nspass.text = @"";
     _nspass.textAlignment = NSTextAlignmentRight;
     _nspass.textColor = [UITableViewCell appearance].detailTextLabelColor;
@@ -608,7 +619,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     _nspass.delegate = self;
     _nspass.secureTextEntry = YES;
 
-    _serverpass = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22)];
+    _serverpass = [[UITextField alloc] initWithFrame:CGRectZero];
     _serverpass.text = @"";
     _serverpass.textAlignment = NSTextAlignmentRight;
     _serverpass.textColor = [UITableViewCell appearance].detailTextLabelColor;
@@ -667,6 +678,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
         unverified.frame = CGRectMake(0,0,self.tableView.bounds.size.width,size.height + 12);
         self.tableView.tableHeaderView = unverified;
     }
+    
+    [self refresh];
 }
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
