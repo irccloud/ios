@@ -1656,6 +1656,7 @@ extern UIImage *__socketClosedBackgroundImage;
     [_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
     _scrollTimer = nil;
     if(_data.count) {
+        [_tableView reloadData];
         [_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
             [self scrollViewDidScroll:_tableView];
