@@ -541,49 +541,6 @@
         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
-#ifdef FB_ACCESS_TOKEN
-    } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && [url.host.lowercaseString hasSuffix:@"facebook.com"] && ([url.path.lowercaseString isEqualToString:@"/video.php"] || (url.pathComponents.count > 3 && [url.pathComponents[2] isEqualToString:@"videos"]))) {
-        NSString *videoID = nil;
-        
-        if([url.path.lowercaseString isEqualToString:@"/video.php"]) {
-            for(NSString *p in [url.query componentsSeparatedByString:@"&"]) {
-                if([p hasPrefix:@"v="]) {
-                    videoID = [p substringFromIndex:2];
-                    break;
-                } else if([p hasPrefix:@"id="]) {
-                    videoID = [p substringFromIndex:3];
-                    break;
-                }
-            }
-        } else {
-            videoID = url.pathComponents[3];
-        }
-
-        if(videoID) {
-            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://graph.facebook.com/v2.2/%@?fields=source&access_token=%s", videoID, FB_ACCESS_TOKEN]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
-            [request setHTTPShouldHandleCookies:NO];
-            
-            [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
-                if (error) {
-                    NSLog(@"Error fetching Facebook. Error %li : %@", (long)error.code, error.userInfo);
-                    [self openWebpage:url];
-                } else {
-                    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-                    
-                    if([[dict objectForKey:@"source"] length]) {
-                        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-                        AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
-                        player.player = [[AVPlayer alloc] initWithURL:[NSURL URLWithString:[dict objectForKey:@"source"]]];
-                        [mainViewController presentViewController:player animated:YES completion:nil];
-                        [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
-                    } else {
-                        NSLog(@"Facebook failure %@", dict);
-                        [self openWebpage:url];
-                    }
-                }
-            }];
-        }
-#endif
     } else {
         [self openWebpage:url];
     }
