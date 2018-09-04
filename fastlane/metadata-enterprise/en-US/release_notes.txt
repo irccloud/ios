@@ -1,6 +1,6 @@
-• This release fixes some crashes from 4.3
-• Added an option to colourise mentions
-• Fixed per-channel collapse join/part/quit setting
-• Fixed pasting images from the clipboard
-• Removed gap between text area and software keyboard on iPhone X
+• Added a setting on iPad for hiding the members list
+• Improved the layout in landscape mode on iPhone 6+ and iPhone X
+• Fixed an issue that could cause the app to disconnect when receiving a large amount of data
+• Mentions now appear in the correct position on lines containing quote formatting
+• Timestamps are now properly aligned when shown on the left
 • Stability improvements and minor fixes
