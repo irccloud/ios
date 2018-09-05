@@ -971,6 +971,8 @@ NSArray *_sortedChannels;
                         msg = [o objectForKey:@"msg"];
                 }
                 msg = [msg stringByAppendingString:@"\n"];
+                if(!msg)
+                    msg = @"\n";
                 if(tv) {
                     [tv appendText:msg];
                 } else {
