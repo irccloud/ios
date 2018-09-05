@@ -31,33 +31,56 @@
     return self;
 }
 
+- (id)initWithText:(NSString *)text {
+    self = [super init];
+    if(self) {
+        _text = text;
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
+    }
+    return self;
+}
+
 - (void)appendData:(NSArray *)data {
     _data = [_data arrayByAddingObjectsFromArray:data];
     [self refresh];
 }
+
+-(void)appendText:(NSString *)text {
+    if(_text)
+        _text = [_text stringByAppendingString:text];
+    else
+        _text = text;
+    
+    [self refresh];
+}
+
 
 - (void)doneButtonPressed:(id)sender {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)refresh {
-    NSMutableString *text = [[NSMutableString alloc] init];
-    
-    if(_data.count) {
-        for(id item in _data) {
-            NSString *s;
-            if([item isKindOfClass:[NSString class]]) {
-                s = item;
-            } else if([item isKindOfClass:[NSArray class]]) {
-                s = [(NSArray *)item componentsJoinedByString:@"\t"];
-            } else {
-                s = [item description];
+    NSString *text = _text;
+    if(!text) {
+        NSMutableString *mutableText = [[NSMutableString alloc] init];
+        
+        if(_data.count) {
+            for(id item in _data) {
+                NSString *s;
+                if([item isKindOfClass:[NSString class]]) {
+                    s = item;
+                } else if([item isKindOfClass:[NSArray class]]) {
+                    s = [(NSArray *)item componentsJoinedByString:@"\t"];
+                } else {
+                    s = [item description];
+                }
+                [mutableText appendFormat:@"%@\n", s];
             }
-            [text appendFormat:@"%@\n", s];
+        } else {
+            if(_placeholder)
+                [mutableText appendString:_placeholder];
         }
-    } else {
-        if(_placeholder)
-            [text appendString:_placeholder];
+        text = mutableText;
     }
     
     NSArray *links;

@@ -969,7 +969,7 @@ volatile BOOL __socketPaused = NO;
                                 @"wallops", @"logged_in_as", @"sasl_fail", @"sasl_too_long", @"sasl_aborted", @"sasl_already",
                                 @"you_are_operator", @"btn_metadata_set", @"sasl_success", @"version", @"channel_name_change",
                                 @"cap_ls", @"cap_list", @"cap_new", @"cap_del", @"cap_req",@"cap_ack",@"cap_nak",@"cap_raw",@"cap_invalid",
-                                @"help_topics_start", @"help_topics", @"help_topics_end", @"helphdr", @"helpop", @"helptlr", @"helphlp", @"helpfwd", @"helpign",
+                                @"help_topics_start", @"help_topics", @"help_topics_end", @"helphdr", @"helpop", @"helptlr", @"helphlp", @"helpfwd", @"helpign", @"help",
                                 @"newsflash", @"invited", @"server_snomask", @"codepage", @"logged_out", @"nick_locked", @"info_response", @"generic_server_info",
                                 @"unknown_umode", @"bad_ping", @"cap_raw", @"rehashed_config", @"knock", @"bad_channel_mask", @"kill_deny",
                                 @"chan_own_priv_needed", @"not_for_halfops", @"chan_forbidden", @"starircd_welcome", @"zurna_motd",

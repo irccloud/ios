@@ -956,136 +956,166 @@ NSArray *_sortedChannels;
             o = notification.object;
             type = o.type;
             
-            if([type isEqualToString:@"invite_only_chan"])
-                msg = [NSString stringWithFormat:@"You need an invitation to join %@", [o objectForKey:@"chan"]];
-            else if([type isEqualToString:@"channel_full"])
-                msg = [NSString stringWithFormat:@"%@ isn't allowing any more members to join.", [o objectForKey:@"chan"]];
-            else if([type isEqualToString:@"banned_from_channel"])
-                msg = [NSString stringWithFormat:@"You've been banned from %@", [o objectForKey:@"chan"]];
-            else if([type isEqualToString:@"invalid_nickchange"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"ban_channel"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"bad_channel_name"])
-                msg = [NSString stringWithFormat:@"Bad channel name: %@", [o objectForKey:@"chan"]];
-            else if([type isEqualToString:@"no_messages_from_non_registered"]) {
-                if([[o objectForKey:@"nick"] length])
-                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
-                else
-                    msg = [o objectForKey:@"msg"];
-            } else if([type isEqualToString:@"not_registered"]) {
-                NSString *first = [o objectForKey:@"first"];
-                if([[o objectForKey:@"rest"] length])
-                    first = [first stringByAppendingString:[o objectForKey:@"rest"]];
-                msg = [NSString stringWithFormat:@"%@: %@", first, [o objectForKey:@"msg"]];
-            } else if([type isEqualToString:@"too_many_channels"])
-                msg = [NSString stringWithFormat:@"Couldn't join %@: %@", [o objectForKey:@"chan"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"too_many_targets"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"description"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"no_such_server"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"server"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"unknown_command"]) {
-                NSString *m = [o objectForKey:@"msg"];
-                if(!m.length)
-                    m = @"Unknown command";
-                msg = [NSString stringWithFormat:@"%@: %@", m, [o objectForKey:@"command"]];
-            } else if([type isEqualToString:@"help_not_found"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"topic"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"accept_exists"])
-                msg = [NSString stringWithFormat:@"%@ %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"accept_not"])
-                msg = [NSString stringWithFormat:@"%@ %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"nick_collision"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"collision"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"nick_too_fast"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"save_nick"])
-                msg = [NSString stringWithFormat:@"%@: %@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"], [o objectForKey:@"new_nick"]];
-            else if([type isEqualToString:@"unknown_mode"])
-                msg = [NSString stringWithFormat:@"Missing mode: %@", [o objectForKey:@"param"]];
-            else if([type isEqualToString:@"user_not_in_channel"])
-                msg = [NSString stringWithFormat:@"%@ is not in %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
-            else if([type isEqualToString:@"need_more_params"])
-                msg = [NSString stringWithFormat:@"Missing parameters for command: %@", [o objectForKey:@"command"]];
-            else if([type isEqualToString:@"chan_privs_needed"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"chan"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"not_on_channel"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"ban_on_chan"])
-                msg = [NSString stringWithFormat:@"You cannot change your nick to %@ while banned on %@", [o objectForKey:@"proposed_nick"], [o objectForKey:@"channel"]];
-            else if([type isEqualToString:@"cannot_send_to_chan"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"user_on_channel"])
-                msg = [NSString stringWithFormat:@"%@ is already a member of %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
-            else if([type isEqualToString:@"nickname_in_use"])
-                msg = [NSString stringWithFormat:@"%@ is already in use", [o objectForKey:@"nick"]];
-            else if([type isEqualToString:@"no_nick_given"])
-                msg = [NSString stringWithFormat:@"No nickname given"];
-            else if([type isEqualToString:@"silence"]) {
-                NSString *mask = [o objectForKey:@"usermask"];
-                if([mask hasPrefix:@"-"])
-                    msg = [NSString stringWithFormat:@"%@ removed from silence list", [mask substringFromIndex:1]];
-                else if([mask hasPrefix:@"+"])
-                    msg = [NSString stringWithFormat:@"%@ added to silence list", [mask substringFromIndex:1]];
-                else
-                    msg = [NSString stringWithFormat:@"Silence list change: %@", mask];
-            } else if([type isEqualToString:@"no_channel_topic"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"time"]) {
-                msg = [o objectForKey:@"time_string"];
-                if([[o objectForKey:@"time_stamp"] length]) {
-                    msg = [msg stringByAppendingFormat:@" (%@)", [o objectForKey:@"time_stamp"]];
+            if([type isEqualToString:@"help"]) {
+                TextTableViewController *tv;
+                if([self.presentedViewController isKindOfClass:UINavigationController.class] && [((UINavigationController *)self.presentedViewController).viewControllers.firstObject isKindOfClass:TextTableViewController.class]) {
+                    tv = ((UINavigationController *)self.presentedViewController).viewControllers.firstObject;
+                    if(![tv.type isEqualToString:type])
+                        tv = nil;
                 }
-                msg = [msg stringByAppendingFormat:@" — %@", [o objectForKey:@"time_server"]];
-            }
-            else if([type isEqualToString:@"blocked_channel"])
-                msg = @"This channel is blocked, you have been disconnected.";
-            else if([type isEqualToString:@"unknown_error"])
-                msg = [NSString stringWithFormat:@"Unknown Error [%@] %@", [o objectForKey:@"command"], [o objectForKey:@"msg"]];
-            else if([type isEqualToString:@"pong"]) {
-                if([o objectForKey:@"origin"])
-                    msg = [NSString stringWithFormat:@"PONG from %@: %@", [o objectForKey:@"origin"], [o objectForKey:@"msg"]];
-                else
-                    msg = [NSString stringWithFormat:@"PONG: %@", [o objectForKey:@"msg"]];
-            }
-            else if([type isEqualToString:@"monitor_full"]) {
-                if([[o objectForKey:@"limit"] respondsToSelector:@selector(intValue)] && [[o objectForKey:@"limit"] intValue])
-                    msg = [NSString stringWithFormat:@"%@: %@ (limit: %i)", [o objectForKey:@"targets"], [o objectForKey:@"msg"], [[o objectForKey:@"limit"] intValue]];
-                else
-                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"targets"], [o objectForKey:@"msg"]];
-            }
-            else if([type isEqualToString:@"mlock_restricted"])
-                msg = [NSString stringWithFormat:@"%@: %@\nMLOCK: %@\nRequested mode change: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"], [o objectForKey:@"mlock"], [o objectForKey:@"mode_change"]];
-            else if([type isEqualToString:@"cannot_do_cmd"]) {
-                if([o objectForKey:@"cmd"])
-                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"cmd"], [o objectForKey:@"msg"]];
+                if(tv) {
+                    [tv appendText:[o objectForKey:@"msg"]];
+                    [tv appendText:@"\n"];
+                } else {
+                    tv = [[TextTableViewController alloc] initWithText:[o objectForKey:@"msg"]];
+                    if([[o objectForKey:@"command"] length])
+                        tv.navigationItem.title = [NSString stringWithFormat:@"HELP For %@", [o objectForKey:@"command"]];
+                    else
+                        tv.navigationItem.title = @"HELP";
+                    tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                    tv.type = type;
+                    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
+                    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    else
+                        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                    if(self.presentedViewController)
+                        [self dismissViewControllerAnimated:NO completion:nil];
+                    [self presentViewController:nc animated:YES completion:nil];
+                }
+            } else {
+                if([type isEqualToString:@"invite_only_chan"])
+                    msg = [NSString stringWithFormat:@"You need an invitation to join %@", [o objectForKey:@"chan"]];
+                else if([type isEqualToString:@"channel_full"])
+                    msg = [NSString stringWithFormat:@"%@ isn't allowing any more members to join.", [o objectForKey:@"chan"]];
+                else if([type isEqualToString:@"banned_from_channel"])
+                    msg = [NSString stringWithFormat:@"You've been banned from %@", [o objectForKey:@"chan"]];
+                else if([type isEqualToString:@"invalid_nickchange"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"ban_channel"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"bad_channel_name"])
+                    msg = [NSString stringWithFormat:@"Bad channel name: %@", [o objectForKey:@"chan"]];
+                else if([type isEqualToString:@"no_messages_from_non_registered"]) {
+                    if([[o objectForKey:@"nick"] length])
+                        msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
+                    else
+                        msg = [o objectForKey:@"msg"];
+                } else if([type isEqualToString:@"not_registered"]) {
+                    NSString *first = [o objectForKey:@"first"];
+                    if([[o objectForKey:@"rest"] length])
+                        first = [first stringByAppendingString:[o objectForKey:@"rest"]];
+                    msg = [NSString stringWithFormat:@"%@: %@", first, [o objectForKey:@"msg"]];
+                } else if([type isEqualToString:@"too_many_channels"])
+                    msg = [NSString stringWithFormat:@"Couldn't join %@: %@", [o objectForKey:@"chan"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"too_many_targets"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"description"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"no_such_server"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"server"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"unknown_command"]) {
+                    NSString *m = [o objectForKey:@"msg"];
+                    if(!m.length)
+                        m = @"Unknown command";
+                    msg = [NSString stringWithFormat:@"%@: %@", m, [o objectForKey:@"command"]];
+                } else if([type isEqualToString:@"help_not_found"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"topic"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"accept_exists"])
+                    msg = [NSString stringWithFormat:@"%@ %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"accept_not"])
+                    msg = [NSString stringWithFormat:@"%@ %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"nick_collision"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"collision"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"nick_too_fast"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"save_nick"])
+                    msg = [NSString stringWithFormat:@"%@: %@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"], [o objectForKey:@"new_nick"]];
+                else if([type isEqualToString:@"unknown_mode"])
+                    msg = [NSString stringWithFormat:@"Missing mode: %@", [o objectForKey:@"param"]];
+                else if([type isEqualToString:@"user_not_in_channel"])
+                    msg = [NSString stringWithFormat:@"%@ is not in %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
+                else if([type isEqualToString:@"need_more_params"])
+                    msg = [NSString stringWithFormat:@"Missing parameters for command: %@", [o objectForKey:@"command"]];
+                else if([type isEqualToString:@"chan_privs_needed"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"chan"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"not_on_channel"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"ban_on_chan"])
+                    msg = [NSString stringWithFormat:@"You cannot change your nick to %@ while banned on %@", [o objectForKey:@"proposed_nick"], [o objectForKey:@"channel"]];
+                else if([type isEqualToString:@"cannot_send_to_chan"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"user_on_channel"])
+                    msg = [NSString stringWithFormat:@"%@ is already a member of %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
+                else if([type isEqualToString:@"nickname_in_use"])
+                    msg = [NSString stringWithFormat:@"%@ is already in use", [o objectForKey:@"nick"]];
+                else if([type isEqualToString:@"no_nick_given"])
+                    msg = [NSString stringWithFormat:@"No nickname given"];
+                else if([type isEqualToString:@"silence"]) {
+                    NSString *mask = [o objectForKey:@"usermask"];
+                    if([mask hasPrefix:@"-"])
+                        msg = [NSString stringWithFormat:@"%@ removed from silence list", [mask substringFromIndex:1]];
+                    else if([mask hasPrefix:@"+"])
+                        msg = [NSString stringWithFormat:@"%@ added to silence list", [mask substringFromIndex:1]];
+                    else
+                        msg = [NSString stringWithFormat:@"Silence list change: %@", mask];
+                } else if([type isEqualToString:@"no_channel_topic"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"time"]) {
+                    msg = [o objectForKey:@"time_string"];
+                    if([[o objectForKey:@"time_stamp"] length]) {
+                        msg = [msg stringByAppendingFormat:@" (%@)", [o objectForKey:@"time_stamp"]];
+                    }
+                    msg = [msg stringByAppendingFormat:@" — %@", [o objectForKey:@"time_server"]];
+                }
+                else if([type isEqualToString:@"blocked_channel"])
+                    msg = @"This channel is blocked, you have been disconnected.";
+                else if([type isEqualToString:@"unknown_error"])
+                    msg = [NSString stringWithFormat:@"Unknown Error [%@] %@", [o objectForKey:@"command"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"pong"]) {
+                    if([o objectForKey:@"origin"])
+                        msg = [NSString stringWithFormat:@"PONG from %@: %@", [o objectForKey:@"origin"], [o objectForKey:@"msg"]];
+                    else
+                        msg = [NSString stringWithFormat:@"PONG: %@", [o objectForKey:@"msg"]];
+                }
+                else if([type isEqualToString:@"monitor_full"]) {
+                    if([[o objectForKey:@"limit"] respondsToSelector:@selector(intValue)] && [[o objectForKey:@"limit"] intValue])
+                        msg = [NSString stringWithFormat:@"%@: %@ (limit: %i)", [o objectForKey:@"targets"], [o objectForKey:@"msg"], [[o objectForKey:@"limit"] intValue]];
+                    else
+                        msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"targets"], [o objectForKey:@"msg"]];
+                }
+                else if([type isEqualToString:@"mlock_restricted"])
+                    msg = [NSString stringWithFormat:@"%@: %@\nMLOCK: %@\nRequested mode change: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"], [o objectForKey:@"mlock"], [o objectForKey:@"mode_change"]];
+                else if([type isEqualToString:@"cannot_do_cmd"]) {
+                    if([o objectForKey:@"cmd"])
+                        msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"cmd"], [o objectForKey:@"msg"]];
+                    else
+                        msg = [o objectForKey:@"msg"];
+                }
+                else if([type isEqualToString:@"cannot_change_chan_mode"]) {
+                    if([o objectForKey:@"mode"])
+                        msg = [NSString stringWithFormat:@"You can't change channel mode: %@; %@", [o objectForKey:@"mode"], [o objectForKey:@"msg"]];
+                    else
+                        msg = [NSString stringWithFormat:@"You can't change channel mode; %@", [o objectForKey:@"msg"]];
+                }
+                else if([type isEqualToString:@"metadata_limit"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"msg"], [o objectForKey:@"target"]];
+                else if([type isEqualToString:@"metadata_targetinvalid"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"msg"], [o objectForKey:@"target"]];
+                else if([type isEqualToString:@"metadata_nomatchingkey"])
+                    msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
+                else if([type isEqualToString:@"metadata_keyinvalid"])
+                    msg = [NSString stringWithFormat:@"Invalid metadata key: %@", [o objectForKey:@"key"]];
+                else if([type isEqualToString:@"metadata_keynotset"])
+                    msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
+                else if([type isEqualToString:@"metadata_keynopermission"])
+                    msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
+                else if([type isEqualToString:@"metadata_toomanysubs"])
+                    msg = [NSString stringWithFormat:@"Metadata key subscription limit reached, keys after and including '%@' are not subscribed", [o objectForKey:@"key"]];
                 else
                     msg = [o objectForKey:@"msg"];
-            }
-            else if([type isEqualToString:@"cannot_change_chan_mode"]) {
-                if([o objectForKey:@"mode"])
-                    msg = [NSString stringWithFormat:@"You can't change channel mode: %@; %@", [o objectForKey:@"mode"], [o objectForKey:@"msg"]];
-                else
-                    msg = [NSString stringWithFormat:@"You can't change channel mode; %@", [o objectForKey:@"msg"]];
-            }
-            else if([type isEqualToString:@"metadata_limit"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"msg"], [o objectForKey:@"target"]];
-            else if([type isEqualToString:@"metadata_targetinvalid"])
-                msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"msg"], [o objectForKey:@"target"]];
-            else if([type isEqualToString:@"metadata_nomatchingkey"])
-                msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
-            else if([type isEqualToString:@"metadata_keyinvalid"])
-                msg = [NSString stringWithFormat:@"Invalid metadata key: %@", [o objectForKey:@"key"]];
-            else if([type isEqualToString:@"metadata_keynotset"])
-                msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
-            else if([type isEqualToString:@"metadata_keynopermission"])
-                msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
-            else if([type isEqualToString:@"metadata_toomanysubs"])
-                msg = [NSString stringWithFormat:@"Metadata key subscription limit reached, keys after and including '%@' are not subscribed", [o objectForKey:@"key"]];
-            else
-                msg = [o objectForKey:@"msg"];
 
-            s = [[ServersDataSource sharedInstance] getServer:o.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [_alertView show];
+                s = [[ServersDataSource sharedInstance] getServer:o.cid];
+                _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [_alertView show];
+            }
             break;
         case kIRCEventStatusChanged:
             [self _updateUserListVisibility];
