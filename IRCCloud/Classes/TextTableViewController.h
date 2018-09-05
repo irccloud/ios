@@ -32,6 +32,5 @@
 -(id)initWithData:(NSArray *)data;
 -(id)initWithText:(NSString *)text;
 -(void)appendData:(NSArray *)data;
--(void)setText:(NSString *)text;
 -(void)appendText:(NSString *)text;
 @end

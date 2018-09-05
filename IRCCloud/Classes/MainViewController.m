@@ -956,22 +956,29 @@ NSArray *_sortedChannels;
             o = notification.object;
             type = o.type;
             
-            if([type isEqualToString:@"help"]) {
+            if([type isEqualToString:@"help"] || [type isEqualToString:@"stats"]) {
                 TextTableViewController *tv;
                 if([self.presentedViewController isKindOfClass:UINavigationController.class] && [((UINavigationController *)self.presentedViewController).viewControllers.firstObject isKindOfClass:TextTableViewController.class]) {
                     tv = ((UINavigationController *)self.presentedViewController).viewControllers.firstObject;
                     if(![tv.type isEqualToString:type])
                         tv = nil;
                 }
+                NSString *msg = [o objectForKey:@"parts"];
+                if([[o objectForKey:@"msg"] length]) {
+                    if(msg.length)
+                        msg = [msg stringByAppendingFormat:@": %@", [o objectForKey:@"msg"]];
+                    else
+                        msg = [o objectForKey:@"msg"];
+                }
+                msg = [msg stringByAppendingString:@"\n"];
                 if(tv) {
-                    [tv appendText:[o objectForKey:@"msg"]];
-                    [tv appendText:@"\n"];
+                    [tv appendText:msg];
                 } else {
-                    tv = [[TextTableViewController alloc] initWithText:[o objectForKey:@"msg"]];
+                    tv = [[TextTableViewController alloc] initWithText:msg];
                     if([[o objectForKey:@"command"] length])
                         tv.navigationItem.title = [NSString stringWithFormat:@"HELP For %@", [o objectForKey:@"command"]];
                     else
-                        tv.navigationItem.title = @"HELP";
+                        tv.navigationItem.title = type.uppercaseString;
                     tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
                     tv.type = type;
                     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];

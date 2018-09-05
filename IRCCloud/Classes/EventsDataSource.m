@@ -494,7 +494,6 @@
                           @"server_luserconns": status, @"server_luserme": status, @"server_n_local": status,
                           @"server_luserchannels": status, @"server_n_global": status, @"server_yourhost": status,
                           @"server_created": status, @"server_luserunknown": status,
-                          @"help_topics_start": status, @"help_topics": status, @"help_topics_end": status, @"helphdr": status, @"helpop": status, @"helptlr": status, @"helphlp": status, @"helpfwd": status, @"helpign": status, @"help": status,
                           @"btn_metadata_set": status, @"logged_in_as": status, @"sasl_success": status, @"you_are_operator": status,
                           @"server_snomask": status, @"starircd_welcome": status, @"zurna_motd": status, @"codepage": status, @"logged_out": status,
                           @"nick_locked": status, @"text": status, @"admin_info": status,
