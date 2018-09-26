@@ -378,8 +378,12 @@ extern UIImage *__socketClosedBackgroundImage;
         ((YouTubeViewController *)viewControllerToCommit).toolbar.hidden = NO;
         [self.slidingViewController presentViewController:viewControllerToCommit animated:NO completion:nil];
     } else if([viewControllerToCommit isKindOfClass:[UINavigationController class]]) {
-        ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
-        [((UINavigationController *)viewControllerToCommit).topViewController didMoveToParentViewController:nil];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:((UINavigationController *)viewControllerToCommit).topViewController];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        viewControllerToCommit = nc;
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
     } else if([viewControllerToCommit isKindOfClass:[PastebinViewController class]]) {
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:viewControllerToCommit];

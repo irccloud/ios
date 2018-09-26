@@ -704,8 +704,14 @@ NSArray *_sortedChannels;
 }
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
-    if([viewControllerToCommit isKindOfClass:[UINavigationController class]])
-        ((UINavigationController *)viewControllerToCommit).navigationBarHidden = NO;
+    if([viewControllerToCommit isKindOfClass:[UINavigationController class]]) {
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:((UINavigationController *)viewControllerToCommit).topViewController];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        viewControllerToCommit = nc;
+    }
     [self presentViewController:viewControllerToCommit animated:YES completion:nil];
 }
 
