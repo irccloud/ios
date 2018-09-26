@@ -406,8 +406,10 @@
     
     [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
     
+#if TARGET_IPHONE_SIMULATOR
 #ifdef FLEX
     [FLEXManager sharedManager].simulatorShortcutsEnabled = YES;
+#endif
 #endif
     return YES;
 }

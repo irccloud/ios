@@ -60,33 +60,6 @@
 #import "ImageCache.h"
 #import "AvatarsTableViewController.h"
 
-#if TARGET_IPHONE_SIMULATOR
-//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
-@interface UIPreviewForceInteractionProgress : NSObject
-
-- (void)endInteraction:(BOOL)arg1;
-
-@end
-
-@interface UIPreviewInteractionController : NSObject
-
-@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
-
-- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
-- (void)cancelInteractivePreview;
-- (void)commitInteractivePreview;
-
-@end
-
-@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
-
-@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
-
-@end
-
-void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation);
-#endif
-
 #define TAG_BAN 1
 #define TAG_IGNORE 2
 #define TAG_KICK 3
@@ -561,30 +534,10 @@ NSArray *_sortedChannels;
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.navigationController.view];
     }
     
-#if TARGET_IPHONE_SIMULATOR
-    /*UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
-    t.delegate = self;
-    [self.navigationController.view addGestureRecognizer:t];*/
-#endif
-    
     if (@available(iOS 11, *)) {
         [self.view addInteraction:[[UIDropInteraction alloc] initWithDelegate:self]];
     }
 }
-
-#if TARGET_IPHONE_SIMULATOR
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
-        return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.navigationController.view]] != nil);
-    } else {
-        return YES;
-    }
-}
-
-- (void)_test3DTouch:(UITapGestureRecognizer *)r {
-    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.navigationController.view]);
-}
-#endif
 
 -(BOOL)dropInteraction:(UIDropInteraction *)interaction canHandleSession:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
     return session.items.count == 1 && [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", @"public.image", @"public.movie"]];

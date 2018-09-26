@@ -32,45 +32,6 @@
 #import "AvatarsDataSource.h"
 #import "ImageCache.h"
 
-#if TARGET_IPHONE_SIMULATOR
-//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
-@interface UIPreviewForceInteractionProgress : NSObject
-
-- (void)endInteraction:(BOOL)arg1;
-
-@end
-
-@interface UIPreviewInteractionController : NSObject
-
-@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
-
-- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
-- (void)cancelInteractivePreview;
-- (void)commitInteractivePreview;
-
-@end
-
-@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
-
-@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
-
-@end
-
-void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation) {
-    /*_UIViewControllerPreviewSourceViewRecord *record = (_UIViewControllerPreviewSourceViewRecord *)previewer;
-     UIPreviewInteractionController *interactionController = record.previewInteractionController;
-     [interactionController startInteractivePreviewAtLocation:sourceLocation inView:record.sourceView];
-     
-     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-     [interactionController.interactionProgressForPresentation endInteraction:YES];
-     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-     [interactionController commitInteractivePreview];
-     //[interactionController cancelInteractivePreview];
-     });
-     });*/
-}
-#endif
-
 int __timestampWidth;
 BOOL __24hrPref = NO;
 BOOL __secondsPref = NO;
@@ -266,26 +227,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:_tableView];
         [__previewer.previewingGestureRecognizerForFailureRelationship addTarget:self action:@selector(_3DTouchChanged:)];
     }
-    
-#if TARGET_IPHONE_SIMULATOR
-    //UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
-    //t.delegate = self;
-    //[_tableView addGestureRecognizer:t];
-#endif
 }
-
-#if TARGET_IPHONE_SIMULATOR
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if([gestureRecognizer isKindOfClass:[UILongPressGestureRecognizer class]])
-        return YES;
-    else
-        return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:_tableView]] != nil);
-}
-
-- (void)_test3DTouch:(UITapGestureRecognizer *)r {
-    WFSimulate3DTouchPreview(__previewer, [r locationInView:_tableView]);
-}
-#endif
 
 -(void)_3DTouchChanged:(UIGestureRecognizer *)gesture {
     if(gesture.state == UIGestureRecognizerStateEnded || gesture.state == UIGestureRecognizerStateCancelled) {

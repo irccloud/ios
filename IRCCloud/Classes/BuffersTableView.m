@@ -29,33 +29,6 @@
 #import "EventsTableView.h"
 #import "MainViewController.h"
 
-#if TARGET_IPHONE_SIMULATOR
-//Private API for testing force touch from https://gist.github.com/jamesfinley/7e2009dd87b223c69190
-@interface UIPreviewForceInteractionProgress : NSObject
-
-- (void)endInteraction:(BOOL)arg1;
-
-@end
-
-@interface UIPreviewInteractionController : NSObject
-
-@property (nonatomic, readonly) UIPreviewForceInteractionProgress *interactionProgressForPresentation;
-
-- (BOOL)startInteractivePreviewAtLocation:(CGPoint)point inView:(UIView *)view;
-- (void)cancelInteractivePreview;
-- (void)commitInteractivePreview;
-
-@end
-
-@interface _UIViewControllerPreviewSourceViewRecord : NSObject <UIViewControllerPreviewing>
-
-@property (nonatomic, readonly) UIPreviewInteractionController *previewInteractionController;
-
-@end
-
-void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint sourceLocation);
-#endif
-
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
 #define TYPE_CONVERSATION 2
@@ -624,26 +597,8 @@ void WFSimulate3DTouchPreview(id<UIViewControllerPreviewing> previewer, CGPoint 
     if([self respondsToSelector:@selector(registerForPreviewingWithDelegate:sourceView:)]) {
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
     }
-
-#if TARGET_IPHONE_SIMULATOR
-    //UITapGestureRecognizer *t = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_test3DTouch:)];
-    //t.delegate = self;
-    //[self.view addGestureRecognizer:t];
-#endif
 #endif
 }
-
-#ifndef EXTENSION
-#if TARGET_IPHONE_SIMULATOR
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    return ([self previewingContext:__previewer viewControllerForLocation:[touch locationInView:self.tableView]] != nil);
-}
-
-- (void)_test3DTouch:(UITapGestureRecognizer *)r {
-    WFSimulate3DTouchPreview(__previewer, [r locationInView:self.tableView]);
-}
-#endif
-#endif
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
 #ifndef EXTENSION
