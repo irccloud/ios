@@ -30,6 +30,9 @@
 #import "ImageCache.h"
 #import "LogExportsTableViewController.h"
 #import "ImageViewController.h"
+#if DEBUG
+#import "FLEXManager.h"
+#endif
 
 #ifdef DEBUG
 @implementation NSURLRequest(CertificateHack)
@@ -403,6 +406,9 @@
     
     [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
     
+#ifdef FLEX
+    [FLEXManager sharedManager].simulatorShortcutsEnabled = YES;
+#endif
     return YES;
 }
 -(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray* _Nullable))restorationHandler {
