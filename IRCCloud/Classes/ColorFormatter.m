@@ -2037,7 +2037,7 @@ extern BOOL __compact;
             NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
             for(NSArray *old_position in mention) {
                 NSMutableArray *position = old_position.mutableCopy;
-                if([[position objectAtIndex:0] intValue] + mentionOffset >= 0 && [[position objectAtIndex:0] intValue] + mentionOffset + [[position objectAtIndex:1] intValue] < input.length) {
+                if([[position objectAtIndex:0] intValue] + mentionOffset >= 0 && [[position objectAtIndex:0] intValue] + mentionOffset + [[position objectAtIndex:1] intValue] <= input.length) {
                     [position setObject:@([[position objectAtIndex:0] intValue] + mentionOffset) atIndexedSubscript:0];
                     [text replaceCharactersInRange:NSMakeRange([[position objectAtIndex:0] intValue], [[position objectAtIndex:1] intValue]) withString:[@"" stringByPaddingToLength:[[position objectAtIndex:1] intValue] withString:@"A" startingAtIndex:0]];
                     [new_mention addObject:position];
@@ -2497,7 +2497,7 @@ extern BOOL __compact;
                     if(!name)
                         name = nick;
                 }
-                if(!name || start < 0 || start + length >= output.length)
+                if(!name || start < 0 || start + length >= (output.length + 1))
                     continue;
                 [output replaceCharactersInRange:NSMakeRange(start, length) withString:name];
                 if(colorizeMentions && ![nick.lowercaseString isEqualToString:server.nick.lowercaseString]) {
