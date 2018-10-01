@@ -956,7 +956,9 @@ volatile BOOL __socketPaused = NO;
                        }
                    },
                    @"empty_msg": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_pendingEdits addObject:object];
+                       @synchronized (self) {
+                           [_pendingEdits addObject:object];
+                       }
                        [self _processPendingEdits:backlog];
                    },
                }.mutableCopy;
