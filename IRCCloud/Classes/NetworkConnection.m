@@ -953,7 +953,23 @@ volatile BOOL __socketPaused = NO;
                            if(!_resuming)
                                [self postObject:object forEvent:kIRCEventNickChange];
                        }
-                   }
+                   },
+                   @"empty_msg": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       NSDictionary *entities = [object objectForKey:@"entities"];
+                       //NSLog(@"empty_msg entities: %@", entities);
+                       if([entities objectForKey:@"delete"]) {
+                           NSString *msgId = [entities objectForKey:@"delete"];
+                           if(msgId.length) {
+                               NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
+                               for(Event *e in events) {
+                                   if([e.msgid isEqualToString:msgId])
+                                       [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                               }
+                           }
+                           if(!backlog && !_resuming)
+                               [self postObject:object forEvent:kIRCEventMessageChanged];
+                       }
+                   },
                }.mutableCopy;
         
         for(NSString *type in @[@"buffer_msg", @"buffer_me_msg", @"wait", @"banned", @"kill", @"connecting_cancelled",
@@ -1553,6 +1569,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(int)deleteFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"delete-file" args:@{@"file":fileID} handler:resultHandler];
+}
+
+-(int)deleteMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"delete-message" args:@{@"cid":@(cid), @"to":to, @"msgid":msgId} handler:resultHandler];
 }
 
 -(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)resultHandler {

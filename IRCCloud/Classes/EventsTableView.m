@@ -732,6 +732,12 @@ extern UIImage *__socketClosedBackgroundImage;
             [_rowCache removeAllObjects];
             [self refresh];
             break;
+        case kIRCEventMessageChanged:
+            o = notification.object;
+            if(o.bid == _buffer.bid) {
+                [self refresh];
+            }
+            break;
         default:
             break;
     }

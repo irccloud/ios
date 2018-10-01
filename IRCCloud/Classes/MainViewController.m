@@ -3659,6 +3659,7 @@ NSArray *_sortedChannels;
 -(void)_showUserPopupInRect:(CGRect)rect {
     [self dismissKeyboard];
     NSString *title = @"";;
+    Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
     if(_selectedUser) {
         if(!_buffer.serverIsSlack && ([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)))
             title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.display_name,[_selectedUser.hostmask stripIRCFormatting]];
@@ -3681,6 +3682,9 @@ NSArray *_sortedChannels;
         if(!_msgid && _selectedEvent.msgid && ([_selectedEvent.type isEqualToString:@"buffer_msg"] || [_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [_selectedEvent.type isEqualToString:@"notice"])) {
             [sheet addButtonWithTitle:@"Reply"];
         }
+        if(_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
+            [sheet addButtonWithTitle:@"Delete Message"];
+        }
     }
     if(_selectedUser) {
         if(_buffer.serverIsSlack)
@@ -3693,7 +3697,6 @@ NSArray *_sortedChannels;
             [sheet addButtonWithTitle:@"Invite to Channel"];
         [sheet addButtonWithTitle:@"Ignore"];
         if(!_buffer.serverIsSlack && [_buffer.type isEqualToString:@"channel"]) {
-            Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
             User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
             if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
                 if([_selectedUser.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound)
@@ -4693,6 +4696,24 @@ NSArray *_sortedChannels;
             activityController.popoverPresentationController.sourceView = self.slidingViewController.view;
             activityController.popoverPresentationController.sourceRect = [_eventsView.tableView convertRect:_selectedRect toView:self.slidingViewController.view];
             [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
+        } else if([action isEqualToString:@"Delete Message"]) {
+            [self dismissKeyboard];
+            [self.view.window endEditing:YES];
+            
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Message" message:@"Are you sure you want to delete this message?" preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                [[NetworkConnection sharedInstance] deleteMessage:_selectedEvent.msgid cid:_selectedEvent.cid to:_selectedEvent.chan handler:^(IRCCloudJSONObject *result) {
+                    if(![[result objectForKey:@"success"] boolValue]) {
+                        CLS_LOG(@"Error deleting message: %@", result);
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                        [alert show];
+                    }
+                }];
+            }]];
+            
+            [self presentViewController:alert animated:YES completion:nil];
         } else if([action isEqualToString:@"Delete File"]) {
             [[NetworkConnection sharedInstance] deleteFile:[_selectedEvent.entities objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
                 if([[result objectForKey:@"success"] boolValue]) {
