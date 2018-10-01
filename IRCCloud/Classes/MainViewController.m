@@ -3683,6 +3683,9 @@ NSArray *_sortedChannels;
             [sheet addButtonWithTitle:@"Reply"];
         }
         if(_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
+            [sheet addButtonWithTitle:@"Edit Message"];
+        }
+        if(_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
             [sheet addButtonWithTitle:@"Delete Message"];
         }
     }
@@ -4714,6 +4717,37 @@ NSArray *_sortedChannels;
             }]];
             
             [self presentViewController:alert animated:YES completion:nil];
+        } else if([action isEqualToString:@"Edit Message"]) {
+            [self dismissKeyboard];
+            [self.view.window endEditing:YES];
+            
+            Server *s = [[ServersDataSource sharedInstance] getServer:_selectedEvent.cid];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Edit message" preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Edit" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
+                    [[NetworkConnection sharedInstance] editMessage:_selectedEvent.msgid cid:_selectedEvent.cid to:_selectedEvent.chan msg:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
+                        if(![[result objectForKey:@"success"] boolValue]) {
+                            CLS_LOG(@"Error deleting message: %@", result);
+                            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                            [alert show];
+                        }
+                    }];
+            }]];
+            
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+                [self presentViewController:alert animated:YES completion:nil];
+            }
+            
+            [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.text = _selectedEvent.msg;
+                textField.delegate = self;
+                [textField becomeFirstResponder];
+            }];
+            
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+                [self presentViewController:alert animated:YES completion:nil];
         } else if([action isEqualToString:@"Delete File"]) {
             [[NetworkConnection sharedInstance] deleteFile:[_selectedEvent.entities objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
                 if([[result objectForKey:@"success"] boolValue]) {

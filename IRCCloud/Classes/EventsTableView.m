@@ -735,6 +735,15 @@ extern UIImage *__socketClosedBackgroundImage;
         case kIRCEventMessageChanged:
             o = notification.object;
             if(o.bid == _buffer.bid) {
+                [[EventsDataSource sharedInstance] clearFormattingCache];
+                for(Event *e in _data) {
+                    e.formatted = nil;
+                    e.timestamp = nil;
+                    e.formattedNick = nil;
+                    e.formattedRealname = nil;
+                    e.height = 0;
+                }
+                [_rowCache removeAllObjects];
                 [self refresh];
             }
             break;
@@ -960,6 +969,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 event.mentionOffset = event.formattedMsg.length;
                 
                 NSString *eventMsg = event.msg;
+                if(event.edited)
+                    eventMsg = [eventMsg stringByAppendingFormat:@" %c%@(edited)%c", COLOR_RGB, [UIColor collapsedRowTextColor].toHexString, COLOR_RGB];
 
                 if(!__disableCodeBlockPref && eventMsg) {
                     static NSRegularExpression *_pattern = nil;

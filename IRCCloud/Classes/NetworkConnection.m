@@ -962,8 +962,26 @@ volatile BOOL __socketPaused = NO;
                            if(msgId.length) {
                                NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
                                for(Event *e in events) {
-                                   if([e.msgid isEqualToString:msgId])
+                                   if([e.msgid isEqualToString:msgId]) {
                                        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                                       break;
+                                   }
+                               }
+                           }
+                           if(!backlog && !_resuming)
+                               [self postObject:object forEvent:kIRCEventMessageChanged];
+                       } else if([entities objectForKey:@"edit"]) {
+                           NSString *msgId = [entities objectForKey:@"edit"];
+                           if(msgId.length) {
+                               NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
+                               for(Event *e in events) {
+                                   if([e.msgid isEqualToString:msgId]) {
+                                       e.msg = [entities objectForKey:@"edit_text"];
+                                       e.edited = YES;
+                                       e.formatted = nil;
+                                       e.formattedMsg = nil;
+                                       break;
+                                   }
                                }
                            }
                            if(!backlog && !_resuming)
@@ -1573,6 +1591,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(int)deleteMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"delete-message" args:@{@"cid":@(cid), @"to":to, @"msgid":msgId} handler:resultHandler];
+}
+
+-(int)editMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to msg:(NSString *)msg handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"edit-message" args:@{@"cid":@(cid), @"to":to, @"msgid":msgId, @"edit":msg} handler:resultHandler];
 }
 
 -(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)resultHandler {
