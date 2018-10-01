@@ -4729,8 +4729,8 @@ NSArray *_sortedChannels;
                 if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
                     [[NetworkConnection sharedInstance] editMessage:_selectedEvent.msgid cid:_selectedEvent.cid to:_selectedEvent.chan msg:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
                         if(![[result objectForKey:@"success"] boolValue]) {
-                            CLS_LOG(@"Error deleting message: %@", result);
-                            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                            CLS_LOG(@"Error editing message: %@", result);
+                            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to edit message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                             [alert show];
                         }
                     }];
