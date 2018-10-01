@@ -163,6 +163,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
     int _keychainFailCount;
     NSTimeInterval _highestEID;
     NSMutableDictionary *_resultHandlers;
+    NSMutableArray *_pendingEdits;
 }
 @property (readonly) NSDictionary *parserMap;
 @property (readonly) kIRCCloudState state;

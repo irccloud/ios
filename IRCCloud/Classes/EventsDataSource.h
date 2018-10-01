@@ -103,9 +103,10 @@
     NSInteger _mentionOffset;
     NSMutableSet *_replyNicks;
     BOOL _edited;
+    NSTimeInterval _lastEditEID;
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount, replyCount;
-@property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime, parent;
+@property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime, parent, lastEditEID;
 @property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick, *msgid;
 @property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock, hasReply, isReply, edited;
 @property (nonatomic, copy) NSDictionary *ops,*entities;

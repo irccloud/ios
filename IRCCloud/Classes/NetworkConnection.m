@@ -268,6 +268,7 @@ volatile BOOL __socketPaused = NO;
     _reachabilityValid = NO;
     _reachability = nil;
     _resultHandlers = [[NSMutableDictionary alloc] init];
+    _pendingEdits = [[NSMutableArray alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogStarted:) name:kIRCCloudBacklogStartedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
@@ -955,38 +956,8 @@ volatile BOOL __socketPaused = NO;
                        }
                    },
                    @"empty_msg": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       NSDictionary *entities = [object objectForKey:@"entities"];
-                       //NSLog(@"empty_msg entities: %@", entities);
-                       if([entities objectForKey:@"delete"]) {
-                           NSString *msgId = [entities objectForKey:@"delete"];
-                           if(msgId.length) {
-                               NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
-                               for(Event *e in events) {
-                                   if([e.msgid isEqualToString:msgId]) {
-                                       [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                                       break;
-                                   }
-                               }
-                           }
-                           if(!backlog && !_resuming)
-                               [self postObject:object forEvent:kIRCEventMessageChanged];
-                       } else if([entities objectForKey:@"edit"]) {
-                           NSString *msgId = [entities objectForKey:@"edit"];
-                           if(msgId.length) {
-                               NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
-                               for(Event *e in events) {
-                                   if([e.msgid isEqualToString:msgId]) {
-                                       e.msg = [entities objectForKey:@"edit_text"];
-                                       e.edited = YES;
-                                       e.formatted = nil;
-                                       e.formattedMsg = nil;
-                                       break;
-                                   }
-                               }
-                           }
-                           if(!backlog && !_resuming)
-                               [self postObject:object forEvent:kIRCEventMessageChanged];
-                       }
+                       [_pendingEdits addObject:object];
+                       [self _processPendingEdits:backlog];
                    },
                }.mutableCopy;
         
@@ -1071,6 +1042,63 @@ volatile BOOL __socketPaused = NO;
         _parserMap = parserMap;
     }
     return self;
+}
+
+-(void)_processPendingEdits:(BOOL)backlog {
+    NSArray *pending;
+    @synchronized (self) {
+        pending = _pendingEdits;
+        _pendingEdits = [[NSMutableArray alloc] init];
+    }
+    for(IRCCloudJSONObject *object in pending) {
+        NSDictionary *entities = [object objectForKey:@"entities"];
+        //NSLog(@"empty_msg entities: %@", entities);
+        if([entities objectForKey:@"delete"]) {
+            BOOL found = NO;
+            NSString *msgId = [entities objectForKey:@"delete"];
+            if(msgId.length) {
+                NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
+                for(Event *e in events) {
+                    if([e.msgid isEqualToString:msgId]) {
+                        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                        found = YES;
+                        break;
+                    }
+                }
+            }
+            if(found) {
+                if(!backlog && !_resuming)
+                    [self postObject:object forEvent:kIRCEventMessageChanged];
+            } else {
+                [_pendingEdits addObject:object];
+                CLS_LOG(@"Queued delete for msgID %@", msgId);
+            }
+        } else if([entities objectForKey:@"edit"]) {
+            BOOL found = NO;
+            NSString *msgId = [entities objectForKey:@"edit"];
+            if(msgId.length) {
+                NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
+                for(Event *e in events) {
+                    if([e.msgid isEqualToString:msgId] && object.eid >= e.lastEditEID) {
+                        e.msg = [entities objectForKey:@"edit_text"];
+                        e.edited = YES;
+                        e.formatted = nil;
+                        e.formattedMsg = nil;
+                        e.lastEditEID = object.eid;
+                        found = YES;
+                        break;
+                    }
+                }
+            }
+            if(found) {
+                if(!backlog && !_resuming)
+                    [self postObject:object forEvent:kIRCEventMessageChanged];
+            } else {
+                [_pendingEdits addObject:object];
+                CLS_LOG(@"Queued edit for msgID %@", msgId);
+            }
+        }
+    }
 }
 
 //Adapted from http://stackoverflow.com/a/17057553/1406639
@@ -2201,6 +2229,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     CLS_LOG(@"I downloaded %i events", _totalCount);
     [_oobQueue removeObject:fetcher];
     [_notifications updateBadgeCount];
+    [self _processPendingEdits:NO];
     if([_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }

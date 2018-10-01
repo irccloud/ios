@@ -814,6 +814,7 @@
         case kIRCEventAuthFailure:
         case kIRCEventAlert:
         case kIRCEventAvatarChange:
+        case kIRCEventMessageChanged:
             break;
         case kIRCEventJoin:
         case kIRCEventPart:

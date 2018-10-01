@@ -129,6 +129,8 @@
         decodeObject(_avatarURL);
         decodeObject(_fromNick);
         decodeObject(_msgid);
+        decodeBool(_edited);
+        decodeDouble(_lastEditEID);
 
         if(_rowType == ROW_TIMESTAMP)
             _bgColor = [UIColor timestampBackgroundColor];
@@ -192,6 +194,8 @@
     encodeObject(_avatarURL);
     encodeObject(_fromNick);
     encodeObject(_msgid);
+    encodeBool(_edited);
+    encodeDouble(_lastEditEID);
 
     if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
         encodeObject(_bgColor);
