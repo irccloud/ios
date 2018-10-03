@@ -1082,10 +1082,12 @@ volatile BOOL __socketPaused = NO;
                 NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
                 for(Event *e in events) {
                     if([e.msgid isEqualToString:msgId] && object.eid >= e.lastEditEID) {
-                        e.msg = [entities objectForKey:@"edit_text"];
-                        e.edited = YES;
-                        e.formatted = nil;
-                        e.formattedMsg = nil;
+                        if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class] && [[entities objectForKey:@"edit_text"] length]) {
+                            e.msg = [entities objectForKey:@"edit_text"];
+                            e.edited = YES;
+                            e.formatted = nil;
+                            e.formattedMsg = nil;
+                        }
                         e.lastEditEID = object.eid;
                         found = YES;
                         break;
