@@ -2531,7 +2531,7 @@ extern BOOL __compact;
             int bgColormIRC = -1;
             if([key isEqualToString:NSFontAttributeName]) {
                 UIFont *font = [string attribute:key atIndex:index effectiveRange:nil];
-                if(font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold && ![font.fontDescriptor objectForKey:@"NSCTFontUIUsageAttribute"]) {
+                if(font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold && ![[font.fontDescriptor objectForKey:@"NSCTFontUIUsageAttribute"] isEqualToString:@"CTFontRegularUsage"] && ![[font.fontDescriptor objectForKey:@"NSCTFontUIUsageAttribute"] isEqualToString:@"UICTFontTextStyleBody"]) {
                     [formattedMsg appendFormat:@"%c", BOLD];
                     shouldClear = YES;
                 }
