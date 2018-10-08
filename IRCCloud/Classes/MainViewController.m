@@ -473,7 +473,7 @@ NSArray *_sortedChannels;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
     _message.translatesAutoresizingMaskIntoConstraints = NO;
-    _defaultTextareaFont = _message.internalTextView.font;
+    _message.internalTextView.font = _defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
     _messageWidthConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
     _messageHeightConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
     [_message addConstraints:@[_messageWidthConstraint, _messageHeightConstraint]];
@@ -2549,8 +2549,9 @@ NSArray *_sortedChannels;
     }
     [[self userActivity] setNeedsSave:YES];
     [self userActivityWillSave:[self userActivity]];
-    if(_buffer)
-        _buffer.draft = expandingTextView.text;
+    if(_buffer) {
+        _buffer.draft = expandingTextView.text.length ? expandingTextView.text : nil;
+    }
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
     [_sendBtn setTitleColor:c forState:UIControlStateNormal];
     [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
@@ -2814,7 +2815,7 @@ NSArray *_sortedChannels;
         }
         _buffer.lastBuffer = lastBuffer;
         _buffer.nextBuffer = nil;
-        lastBuffer.draft = _message.text;
+        lastBuffer.draft = _message.text.length ? _message.text : nil;
         [self showTwoSwipeTip];
     }
     if(_buffer) {
@@ -2872,7 +2873,7 @@ NSArray *_sortedChannels;
         _eventActivity.alpha = 1;
         [_eventActivity startAnimating];
         if(changed) {
-            NSString *draft = _buffer.draft;
+            NSString *draft = _buffer.draft.length ? _buffer.draft : nil;
             _message.delegate = nil;
             [_message clearText];
             _message.delegate = self;

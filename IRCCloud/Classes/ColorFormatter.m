@@ -2531,11 +2531,11 @@ extern BOOL __compact;
             int bgColormIRC = -1;
             if([key isEqualToString:NSFontAttributeName]) {
                 UIFont *font = [string attribute:key atIndex:index effectiveRange:nil];
-                if(font.fontDescriptor.symbolicTraits & kCTFontBoldTrait) {
+                if(font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold && ![font.fontDescriptor objectForKey:@"NSCTFontUIUsageAttribute"]) {
                     [formattedMsg appendFormat:@"%c", BOLD];
                     shouldClear = YES;
                 }
-                if(font.fontDescriptor.symbolicTraits & kCTFontItalicTrait) {
+                if(font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitItalic) {
                     [formattedMsg appendFormat:@"%c", ITALICS];
                     shouldClear = YES;
                 }
