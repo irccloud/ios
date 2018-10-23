@@ -2884,7 +2884,7 @@ extern UIImage *__socketClosedBackgroundImage;
             
             CGRect frame = [tableView convertRect:[tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:_data.count - 1 inSection:0]] toView:tableView.superview];
             
-            if(frame.origin.y + frame.size.height <= tableView.frame.origin.y + tableView.frame.size.height - tableView.contentInset.top - tableView.contentInset.bottom + 4 + (FONT_SIZE / 2)) {
+            if(frame.origin.y + frame.size.height <= tableView.frame.origin.y + tableView.frame.size.height - tableView.contentInset.bottom + 4 + (FONT_SIZE / 2)) {
                 [UIView beginAnimations:nil context:nil];
                 [UIView setAnimationDuration:0.1];
                 _bottomUnreadView.alpha = 0;
