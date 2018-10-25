@@ -473,6 +473,7 @@ NSArray *_sortedChannels;
     _message.returnKeyType = UIReturnKeySend;
     _message.autoresizesSubviews = NO;
     _message.translatesAutoresizingMaskIntoConstraints = NO;
+    //    _message.internalTextView.font = _defaultTextareaFont = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:FONT_SIZE];
     _message.internalTextView.font = _defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
     _messageWidthConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
     _messageHeightConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
