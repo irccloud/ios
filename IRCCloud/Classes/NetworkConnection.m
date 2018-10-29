@@ -961,6 +961,13 @@ volatile BOOL __socketPaused = NO;
                        }
                        [self _processPendingEdits:backlog];
                    },
+                   @"watch_status": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       NSMutableDictionary *d = object.dictionary.mutableCopy;
+                       [d setObject:@([[NSDate date] timeIntervalSince1970] * 1000000) forKey:@"eid"];
+                       Event *e = [_events addJSONObject:[[IRCCloudJSONObject alloc] initWithDictionary:d]];
+                       if(!backlog && !_resuming)
+                           [self postObject:e forEvent:kIRCEventBufferMsg];
+                   },
                }.mutableCopy;
         
         for(NSString *type in @[@"buffer_msg", @"buffer_me_msg", @"wait", @"banned", @"kill", @"connecting_cancelled",
@@ -980,7 +987,7 @@ volatile BOOL __socketPaused = NO;
                                 @"unknown_umode", @"bad_ping", @"cap_raw", @"rehashed_config", @"knock", @"bad_channel_mask", @"kill_deny",
                                 @"chan_own_priv_needed", @"not_for_halfops", @"chan_forbidden", @"starircd_welcome", @"zurna_motd",
                                 @"ambiguous_error_message", @"list_usage", @"list_syntax", @"who_syntax", @"text", @"admin_info",
-                                @"watch_status", @"sqline_nick", @"user_chghost", @"loaded_module", @"unloaded_module", @"invite_notify", @"help"]) {
+                                @"sqline_nick", @"user_chghost", @"loaded_module", @"unloaded_module", @"invite_notify", @"help"]) {
             [parserMap setObject:msg forKey:type];
         }
         
