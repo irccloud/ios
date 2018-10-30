@@ -150,8 +150,8 @@
         return nil;
     } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
         return nil;
-    } else if(([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) && [url.path hasPrefix:@"/p/"]) {
-        return nil;
+    /*} else if(([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) && [url.path hasPrefix:@"/p/"]) {
+        return nil;*/
     } else if([url.host.lowercaseString isEqualToString:@"cl.ly"]) {
         return nil;
     } else if([url.path hasPrefix:@"/wiki/"] && [url.absoluteString containsString:@"/File:"]) {
@@ -206,8 +206,8 @@
             [self _loadOembed:[NSString stringWithFormat:@"https://giphy.com/services/oembed/?url=%@", u] result:callback original_url:url];
         } else if([[url.host lowercaseString] hasSuffix:@"flickr.com"] && [url.host rangeOfString:@"static"].location == NSNotFound) {
             [self _loadOembed:[NSString stringWithFormat:@"https://www.flickr.com/services/oembed/?url=%@&format=json", url.absoluteString] result:callback original_url:url];
-        } else if(([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) && [url.path hasPrefix:@"/p/"]) {
-            [self _loadOembed:[NSString stringWithFormat:@"http://api.instagram.com/oembed?url=%@", url.absoluteString] result:callback original_url:url];
+        /*} else if(([[url.host lowercaseString] hasSuffix:@"instagram.com"] || [[url.host lowercaseString] hasSuffix:@"instagr.am"]) && [url.path hasPrefix:@"/p/"]) {
+            [self _loadOembed:[NSString stringWithFormat:@"http://api.instagram.com/oembed?url=%@", url.absoluteString] result:callback original_url:url];*/
         } else if([url.host.lowercaseString isEqualToString:@"cl.ly"]) {
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
@@ -447,7 +447,7 @@
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || IS_INSTAGRAM(url) || IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url) || IS_XKCD(url));
+    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || /*IS_INSTAGRAM(url) ||*/ IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url) || IS_XKCD(url));
 }
 
 + (BOOL)isYouTubeURL:(NSURL *)url
