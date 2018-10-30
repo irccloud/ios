@@ -1679,7 +1679,7 @@ extern UIImage *__socketClosedBackgroundImage;
         [_reloadTimer invalidate];
         
         if(@available(iOS 11, *)) {
-            if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
+            if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
                 _stickyAvatarXOffsetConstraint.constant = 20;
             } else {
                 _stickyAvatarXOffsetConstraint.constant = 20 + self.slidingViewController.view.safeAreaInsets.left;
