@@ -43,6 +43,7 @@
     IBOutlet UILabel *_bottomUnreadLabel;
     IBOutlet HighlightsCountView *_bottomHighlightsCountView;
     IBOutlet NSLayoutConstraint *_topUnreadLabelXOffsetConstraint;
+    IBOutlet NSLayoutConstraint *_topUnreadDismissXOffsetConstraint;
     IBOutlet NSLayoutConstraint *_bottomUnreadLabelXOffsetConstraint;
     IBOutlet NSLayoutConstraint *_stickyAvatarYOffsetConstraint;
     IBOutlet NSLayoutConstraint *_stickyAvatarXOffsetConstraint;

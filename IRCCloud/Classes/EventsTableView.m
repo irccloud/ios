@@ -1317,6 +1317,11 @@ extern UIImage *__socketClosedBackgroundImage;
         _topHighlightsCountView.hidden = YES;
         _topUnreadLabelXOffsetConstraint.constant = 0;
     }
+    if(@available(iOS 11, *)) {
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone]) {
+            _topUnreadDismissXOffsetConstraint.constant = -self.slidingViewController.view.safeAreaInsets.left;
+        }
+    }
     if(_lastSeenEidPos == 0 && firstRow < _data.count) {
         int seconds;
         if(firstRow < 0)

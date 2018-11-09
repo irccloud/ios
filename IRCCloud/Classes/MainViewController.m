@@ -3250,7 +3250,7 @@ NSArray *_sortedChannels;
     if(@available(iOS 11, *)) {
         if(self.slidingViewController.view.safeAreaInsets.bottom) {
             if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
-                _bottomBarOffsetConstraint.constant -= 20;
+                _bottomBarOffsetConstraint.constant -= self.slidingViewController.view.safeAreaInsets.bottom/2;
         }
     }
     CGFloat height = _bottomBarHeightConstraint.constant + _kbSize.height;
@@ -3262,7 +3262,8 @@ NSArray *_sortedChannels;
     if(!_serverStatusBar.hidden)
         height += _serverStatusBar.bounds.size.height;
     if(@available(iOS 11, *)) {
-        height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+            height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
     }
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
