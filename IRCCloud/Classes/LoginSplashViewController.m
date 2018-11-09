@@ -205,12 +205,8 @@
 
 -(void)_promptForSWC {
     if(username.text.length == 0 && !_gotCredentialsFromPasswordManager && !_accessLink) {
-        loginView.alpha = 0;
         SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
             if (error != NULL) {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    loginView.alpha = 1;
-                }];
                 NSLog(@"Unable to request shared web credentials: %@", error);
                 return;
             }
@@ -223,10 +219,6 @@
                     [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
                     [self loginHintPressed:nil];
                     [self loginButtonPressed:nil];
-                }];
-            } else {
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    loginView.alpha = 1;
                 }];
             }
         });

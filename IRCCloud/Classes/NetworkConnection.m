@@ -1094,8 +1094,8 @@ volatile BOOL __socketPaused = NO;
                             e.edited = YES;
                             e.formatted = nil;
                             e.formattedMsg = nil;
+                            e.lastEditEID = object.eid;
                         }
-                        e.lastEditEID = object.eid;
                         found = YES;
                         break;
                     }
