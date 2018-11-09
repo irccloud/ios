@@ -3268,7 +3268,7 @@ NSArray *_sortedChannels;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if(@available(iOS 11, *)) {
-            CGFloat bottom = _kbSize.height ? (_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : self.slidingViewController.view.safeAreaInsets.bottom;
+            CGFloat bottom = _kbSize.height ? (_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) ? self.slidingViewController.view.safeAreaInsets.bottom : self.slidingViewController.view.safeAreaInsets.bottom/2);
             _buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
             _usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
             _buffersView.tableView.contentInset = UIEdgeInsetsZero;

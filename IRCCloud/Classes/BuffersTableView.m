@@ -452,8 +452,8 @@
                 bottomUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
                 bottomUnreadIndicatorBorder.backgroundColor = [UIColor networkErrorBorderColor];
             } else {
-                bottomUnreadIndicator.hidden = YES;
-                bottomUnreadIndicator.alpha = 0;
+                bottomUnreadIndicator.hidden = NO;
+                bottomUnreadIndicator.alpha = 1;
             }
             if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
                 bottomUnreadIndicator.hidden = NO;
@@ -469,8 +469,8 @@
                 bottomUnreadIndicatorBorder.backgroundColor = [UIColor highlightBorderColor];
             }
         } else {
-            bottomUnreadIndicator.hidden = YES;
-            bottomUnreadIndicator.alpha = 0;
+            bottomUnreadIndicator.hidden = NO;
+            bottomUnreadIndicator.alpha = 1;
         }
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y + self.tableView.contentInset.top,self.view.frame.size.width, 40);
