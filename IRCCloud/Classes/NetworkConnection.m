@@ -1092,10 +1092,17 @@ volatile BOOL __socketPaused = NO;
                         if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class] && [[entities objectForKey:@"edit_text"] length]) {
                             e.msg = [entities objectForKey:@"edit_text"];
                             e.edited = YES;
-                            e.formatted = nil;
-                            e.formattedMsg = nil;
-                            e.lastEditEID = object.eid;
                         }
+                        if(e.entities) {
+                            NSMutableDictionary *d = e.entities.mutableCopy;
+                            [d setValuesForKeysWithDictionary:entities];
+                            e.entities = d;
+                        } else {
+                            e.entities = entities;
+                        }
+                        e.lastEditEID = object.eid;
+                        e.formatted = nil;
+                        e.formattedMsg = nil;
                         found = YES;
                         break;
                     }
