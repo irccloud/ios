@@ -492,6 +492,7 @@ volatile BOOL __socketPaused = NO;
                            [_events clear];
                            _highestEID = 0;
                            _streamId = nil;
+                           _pendingEdits = [[NSMutableArray alloc] init];
                            [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
                            _state = kIRCCloudStateDisconnected;
                            [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
@@ -1088,15 +1089,17 @@ volatile BOOL __socketPaused = NO;
             if(msgId.length) {
                 NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
                 for(Event *e in events) {
-                    if([e.msgid isEqualToString:msgId] && object.eid >= e.lastEditEID) {
-                        if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class] && [[entities objectForKey:@"edit_text"] length]) {
-                            e.msg = [entities objectForKey:@"edit_text"];
-                            e.edited = YES;
+                    if([e.msgid isEqualToString:msgId]) {
+                        if(object.eid >= e.lastEditEID) {
+                            if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class] && [[entities objectForKey:@"edit_text"] length]) {
+                                e.msg = [entities objectForKey:@"edit_text"];
+                                e.edited = YES;
+                            }
+                            e.entities = entities;
+                            e.lastEditEID = object.eid;
+                            e.formatted = nil;
+                            e.formattedMsg = nil;
                         }
-                        e.entities = entities;
-                        e.lastEditEID = object.eid;
-                        e.formatted = nil;
-                        e.formattedMsg = nil;
                         found = YES;
                         break;
                     }
@@ -2015,6 +2018,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                             [_events clear];
                             _highestEID = 0;
                             _streamId = nil;
+                            _pendingEdits = [[NSMutableArray alloc] init];
                             [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
                             _state = kIRCCloudStateDisconnected;
                             [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
@@ -2369,6 +2373,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [_users clear];
     [_channels clear];
     [_events clear];
+    _pendingEdits = [[NSMutableArray alloc] init];
     [self serialize];
     [NetworkConnection sync];
 #ifndef EXTENSION
