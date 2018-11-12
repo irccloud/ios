@@ -115,8 +115,11 @@
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     switch(event) {
         case kIRCEventAway:
-            if(o.cid != _buffer.cid)
-                break;
+            if(o.cid == _buffer.cid)
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self.tableView reloadData];
+            }];
+            break;
         case kIRCEventUserInfo:
         case kIRCEventChannelInit:
         case kIRCEventJoin:
@@ -170,7 +173,7 @@
             [data addObject:@{
              @"type":@TYPE_USER,
              @"text":user.display_name,
-             @"color":user.away?[UIColor memberListAwayTextColor]:[UIColor memberListTextColor],
+             @"user":user,
              @"bgColor":groupColor,
              @"last":@(user == users.lastObject && ![heading isEqualToString:@"Members"]),
              @"borderColor":borderColor
@@ -396,7 +399,10 @@
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.bgColor = [row objectForKey:@"bgColor"];
     cell.label.text = [row objectForKey:@"text"];
-    cell.fgColor = [row objectForKey:@"color"];
+    if(cell.type == TYPE_USER)
+        cell.fgColor = [(User *)[row objectForKey:@"user"] away]?[UIColor memberListAwayTextColor]:[UIColor memberListTextColor];
+    else
+        cell.fgColor = [row objectForKey:@"color"];
     if([[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue])
         cell.count.text = [NSString stringWithFormat:@"%@ %@", [row objectForKey:@"symbol"], [row objectForKey:@"count"]];
     else
