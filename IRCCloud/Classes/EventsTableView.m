@@ -1206,39 +1206,42 @@ extern UIImage *__socketClosedBackgroundImage;
         if(__inlineMediaPref && event.linkify && event.msg.length && event.rowType != ROW_THUMBNAIL) {
             NSTimeInterval entity_eid = event.eid;
 
-            NSArray *results = [ColorFormatter webURLs:event.msg];
-            for(NSTextCheckingResult *result in results) {
-                BOOL found = NO;
-                for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
-                    if([result.URL.absoluteString rangeOfString:[entity objectForKey:@"id"]].location != NSNotFound) {
-                        found = YES;
-                        break;
+            NSArray *results = event.links;
+            for(id r in results) {
+                if([r isKindOfClass:NSTextCheckingResult.class]) {
+                    NSTextCheckingResult *result = r;
+                    BOOL found = NO;
+                    for(NSDictionary *entity in [event.entities objectForKey:@"files"]) {
+                        if([result.URL.absoluteString rangeOfString:[entity objectForKey:@"id"]].location != NSNotFound) {
+                            found = YES;
+                            break;
+                        }
                     }
-                }
-                
-                if(!found) {
-                    entity_eid = event.eid + ++event.childEventCount;
-                    if([_closedPreviews containsObject:@(entity_eid)])
-                        continue;
-                    if([URLHandler isImageURL:result.URL] && [[ImageCache sharedInstance] isValidURL:result.URL]) {
-                        if([_urlHandler MediaURLs:result.URL]) {
-                            Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
-                            if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]])
-                                [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
-                        } else {
-                            [_urlHandler fetchMediaURLs:result.URL result:^(BOOL success, NSString *error) {
-                                if([_data containsObject:event]) {
-                                    if(success) {
-                                        Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
-                                        if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]]) {
-                                            [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
-                                            [self reloadForEvent:e1];
+                    
+                    if(!found) {
+                        entity_eid = event.eid + ++event.childEventCount;
+                        if([_closedPreviews containsObject:@(entity_eid)])
+                            continue;
+                        if([URLHandler isImageURL:result.URL] && [[ImageCache sharedInstance] isValidURL:result.URL]) {
+                            if([_urlHandler MediaURLs:result.URL]) {
+                                Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
+                                if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]])
+                                    [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
+                            } else {
+                                [_urlHandler fetchMediaURLs:result.URL result:^(BOOL success, NSString *error) {
+                                    if([_data containsObject:event]) {
+                                        if(success) {
+                                            Event *e1 = [self entity:event eid:entity_eid properties:[_urlHandler MediaURLs:result.URL]];
+                                            if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]]) {
+                                                [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
+                                                [self reloadForEvent:e1];
+                                            }
+                                        } else {
+                                            NSLog(@"METADATA FAILED: %@: %@", result.URL, error);
                                         }
-                                    } else {
-                                        NSLog(@"METADATA FAILED: %@: %@", result.URL, error);
                                     }
-                                }
-                            }];
+                                }];
+                            }
                         }
                     }
                 }
