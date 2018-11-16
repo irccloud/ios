@@ -1,6 +1,8 @@
-• Added a setting on iPad for hiding the members list
-• Improved the layout in landscape mode on iPhone 6+ and iPhone X
-• Fixed an issue that could cause the app to disconnect when receiving a large amount of data
-• Mentions now appear in the correct position on lines containing quote formatting
-• Timestamps are now properly aligned when shown on the left
+• Fixed login issues on iOS 12
+• Fixed missing navigation bar after previewing channel information via 3D touch
+• Added support for editing and deleting messages on IRCCloud Teams and Slack connections
+• Prevented bold text from unexpectedly being sent in messages when the "bold text" system accessibility option is enabled
+• The "unread messages" bar no longer prevents channels from scrolling when receiving new messages
+• Disabled Instagram previews, since they weren't showing videos or multi-part posts properly.
+• Improved iPhone X layout
 • Stability improvements and minor fixes
