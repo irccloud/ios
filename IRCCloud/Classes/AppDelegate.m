@@ -413,7 +413,7 @@
 #endif
     return YES;
 }
--(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray* _Nullable))restorationHandler {
+-(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
     CLS_LOG(@"Continuing activity type: %@", userActivity.activityType);
 #ifdef ENTERPRISE
     if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"])
