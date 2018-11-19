@@ -533,11 +533,6 @@ static NSString * const ServerHasSSLKey = @"ssl";
     tap.cancelsTouchesInView = NO;
     [self.view addGestureRecognizer:tap];
 
-    if(self.presentingViewController) {
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-    } else {
-        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStylePlain target:self action:@selector(logoutButtonPressed:)];
-    }
     NSDictionary *userInfo = [NetworkConnection sharedInstance].userInfo;
     NSString *name = [userInfo objectForKey:@"name"];
     
@@ -671,6 +666,12 @@ static NSString * const ServerHasSSLKey = @"ssl";
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    if(self.presentingViewController) {
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
+    } else {
+        self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStylePlain target:self action:@selector(logoutButtonPressed:)];
+    }
+
     UILabel *unverified = (UILabel *)self.tableView.tableHeaderView;
     
     if(unverified) {
