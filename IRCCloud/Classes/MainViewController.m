@@ -166,7 +166,7 @@ NSArray *_sortedChannels;
             }
         }
         
-        if(text.length > 1 && [text hasPrefix:@":"]) {
+        if(text.length > 2 && [text hasPrefix:@":"]) {
             NSString *q = [text substringFromIndex:1];
             
             for(NSString *emocode in emojiMap.keyEnumerator) {
