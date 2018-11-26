@@ -1731,10 +1731,10 @@ NSArray *_sortedChannels;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([notification.object bid] == 0) {
           [self _themeChanged];
-        }
-        if(!((AppDelegate *)([UIApplication sharedApplication].delegate)).movedToBackground && [ServersDataSource sharedInstance].count < 1) {
-            [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
-            return;
+            if(!((AppDelegate *)([UIApplication sharedApplication].delegate)).movedToBackground && [ServersDataSource sharedInstance].count < 1) {
+                [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
+                return;
+            }
         }
         [self _hideConnectingView];
         if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && _cidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
