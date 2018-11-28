@@ -1731,7 +1731,7 @@ NSArray *_sortedChannels;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([notification.object bid] == 0) {
           [self _themeChanged];
-            if(!((AppDelegate *)([UIApplication sharedApplication].delegate)).movedToBackground && [ServersDataSource sharedInstance].count < 1) {
+            if(!((AppDelegate *)([UIApplication sharedApplication].delegate)).movedToBackground && [NetworkConnection sharedInstance].ready && ![NetworkConnection sharedInstance].notifier && [ServersDataSource sharedInstance].count < 1) {
                 [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
                 return;
             }
