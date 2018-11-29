@@ -299,6 +299,12 @@ NSArray *_sortedChannels;
     [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
     _message.textColor = [UIColor textareaTextColor];
     _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    _defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
+    if(!_message.text.length)
+        _message.font = _defaultTextareaFont;
+    _message.minimumHeight = FONT_SIZE + 22;
+    if(_message.minimumHeight < 35)
+        _message.minimumHeight = 35;
     
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
