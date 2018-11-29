@@ -65,7 +65,7 @@
 
 - (CGRect)caretRectForPosition:(UITextPosition *)position {
     CGRect originalRect = [super caretRectForPosition:position];
-    originalRect.size.height = 19.4;
+    originalRect.size.height = self.font.pointSize + 6;
     return originalRect;
 }
 
