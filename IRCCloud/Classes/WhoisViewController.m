@@ -26,17 +26,17 @@
     if (self) {
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
         
-        _scrollView = [[UIScrollView alloc] init];
-        _scrollView.backgroundColor = [UIColor contentBackgroundColor];
-        _label = [[LinkTextView alloc] init];
-        _label.linkDelegate = self;
-        _label.editable = NO;
-        _label.scrollEnabled = NO;
-        _label.backgroundColor = [UIColor clearColor];
-        _label.textColor = [UIColor messageTextColor];
-        _label.textContainerInset = UIEdgeInsetsZero;
+        self->_scrollView = [[UIScrollView alloc] init];
+        self->_scrollView.backgroundColor = [UIColor contentBackgroundColor];
+        self->_label = [[LinkTextView alloc] init];
+        self->_label.linkDelegate = self;
+        self->_label.editable = NO;
+        self->_label.scrollEnabled = NO;
+        self->_label.backgroundColor = [UIColor clearColor];
+        self->_label.textColor = [UIColor messageTextColor];
+        self->_label.textContainerInset = UIEdgeInsetsZero;
         
-        [_scrollView addSubview:_label];
+        [self->_scrollView addSubview:self->_label];
     }
     return self;
 }
@@ -162,10 +162,10 @@
     }
     
     
-    _label.attributedText = data;
-    _label.linkAttributes = [UIColor linkAttributes];
+    self->_label.attributedText = data;
+    self->_label.linkAttributes = [UIColor linkAttributes];
     for(NSTextCheckingResult *result in links)
-        [_label addLinkWithTextCheckingResult:result];
+        [self->_label addLinkWithTextCheckingResult:result];
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
@@ -217,10 +217,10 @@
 -(void)loadView {
     [super loadView];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    _label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, [LinkTextView heightOfString:_label.attributedText constrainedToWidth:self.view.bounds.size.width-24]+12);
-    _scrollView.frame = self.view.frame;
-    _scrollView.contentSize = _label.frame.size;
-    self.view = _scrollView;
+    self->_label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, [LinkTextView heightOfString:self->_label.attributedText constrainedToWidth:self.view.bounds.size.width-24]+12);
+    self->_scrollView.frame = self.view.frame;
+    self->_scrollView.contentSize = self->_label.frame.size;
+    self.view = self->_scrollView;
 }
 
 -(void)doneButtonPressed:(id)sender {

@@ -43,13 +43,13 @@
         int diskCacheSize = 1024*1024*500; //500MB
         NSURLCache *httpCache = [[NSURLCache alloc] initWithMemoryCapacity:memoryCacheSize diskCapacity:diskCacheSize diskPath:@"httpCache"];
         [NSURLCache setSharedURLCache:httpCache];
-        _cachePath = [sharedcontainer URLByAppendingPathComponent:@"imagecache"];
-        _session = [NSURLSession sharedSession];
-        _session.configuration.URLCache = httpCache;
-        _session.configuration.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
-        _tasks = [[NSMutableDictionary alloc] init];
-        _images = [[NSMutableDictionary alloc] init];
-        _failures = [[NSMutableDictionary alloc] init];
+        self->_cachePath = [sharedcontainer URLByAppendingPathComponent:@"imagecache"];
+        self->_session = [NSURLSession sharedSession];
+        self->_session.configuration.URLCache = httpCache;
+        self->_session.configuration.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
+        self->_tasks = [[NSMutableDictionary alloc] init];
+        self->_images = [[NSMutableDictionary alloc] init];
+        self->_failures = [[NSMutableDictionary alloc] init];
         [self clear];
     }
     return self;
@@ -59,7 +59,7 @@
     @synchronized (self) {
         CLS_LOG(@"Pruning image cache directory: %@", _cachePath.path);
         
-        NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtURL:_cachePath includingPropertiesForKeys:@[NSURLContentModificationDateKey] options:0 errorHandler:nil];
+        NSDirectoryEnumerator *directoryEnumerator = [[NSFileManager defaultManager] enumeratorAtURL:self->_cachePath includingPropertiesForKeys:@[NSURLContentModificationDateKey] options:0 errorHandler:nil];
         
         NSDate *lastWeek = [NSDate dateWithTimeIntervalSinceNow:(-60*60*24*7)];
         
@@ -76,23 +76,23 @@
 }
 
 -(void)clear {
-    @synchronized(_tasks) {
-        [_tasks.allValues makeObjectsPerformSelector:@selector(cancel)];
-        [_tasks removeAllObjects];
+    @synchronized(self->_tasks) {
+        [self->_tasks.allValues makeObjectsPerformSelector:@selector(cancel)];
+        [self->_tasks removeAllObjects];
     }
-    @synchronized(_images) {
-        [_images removeAllObjects];
+    @synchronized(self->_images) {
+        [self->_images removeAllObjects];
     }
 }
 
 -(void)clearFailedURLs {
-    @synchronized(_failures) {
-        [_failures removeAllObjects];
+    @synchronized(self->_failures) {
+        [self->_failures removeAllObjects];
     }
 }
 
 -(void)purge {
-    [[NSFileManager defaultManager] removeItemAtURL:_cachePath error:nil];
+    [[NSFileManager defaultManager] removeItemAtURL:self->_cachePath error:nil];
     [self clear];
 }
 
@@ -111,8 +111,8 @@
 }
 
 -(BOOL)isValidURL:(NSURL *)url {
-    @synchronized(_failures) {
-        return url != nil && [_failures objectForKey:url.absoluteString] == nil;
+    @synchronized(self->_failures) {
+        return url != nil && [self->_failures objectForKey:url.absoluteString] == nil;
     }
 }
 
@@ -125,8 +125,8 @@
 }
 
 -(BOOL)isLoaded:(NSURL *)url {
-    @synchronized(_images) {
-        return [_images objectForKey:url.absoluteString] != nil || [_failures objectForKey:url.absoluteString] != nil;
+    @synchronized(self->_images) {
+        return [self->_images objectForKey:url.absoluteString] != nil || [self->_failures objectForKey:url.absoluteString] != nil;
     }
 }
 
@@ -135,13 +135,13 @@
 }
 
 -(UIImage *)imageForURL:(NSURL *)url {
-    @synchronized(_failures) {
-        if([_failures objectForKey:url.absoluteString])
+    @synchronized(self->_failures) {
+        if([self->_failures objectForKey:url.absoluteString])
             return nil;
     }
     YYImage *img;
-    @synchronized(_images) {
-        img = [_images objectForKey:url.absoluteString];
+    @synchronized(self->_images) {
+        img = [self->_images objectForKey:url.absoluteString];
     }
     if(!img) {
         NSURL *cache = [self pathForURL:url];
@@ -150,13 +150,13 @@
             if(data.length) {
                 img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
                 if(img.size.width) {
-                    @synchronized(_images) {
-                        [_images setObject:img forKey:url.absoluteString];
+                    @synchronized(self->_images) {
+                        [self->_images setObject:img forKey:url.absoluteString];
                     }
                 } else {
                     CLS_LOG(@"Unable to load %@ from cache", url);
-                    @synchronized(_failures) {
-                        [_failures setObject:@(YES) forKey:url.absoluteString];
+                    @synchronized(self->_failures) {
+                        [self->_failures setObject:@(YES) forKey:url.absoluteString];
                     }
                 }
             } else {
@@ -179,47 +179,47 @@
 }
 
 -(void)fetchURL:(NSURL *)url completionHandler:(imageCompletionHandler)handler {
-    @synchronized (_tasks) {
-        if(url == nil || [_tasks objectForKey:url] || [_failures objectForKey:url]) {
+    @synchronized (self->_tasks) {
+        if(url == nil || [self->_tasks objectForKey:url] || [self->_failures objectForKey:url]) {
             return;
         }
         
-        NSURLSessionDownloadTask *task = [_session downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
-            [_tasks removeObjectForKey:url];
+        NSURLSessionDownloadTask *task = [self->_session downloadTaskWithURL:url completionHandler:^(NSURL *location, NSURLResponse *response, NSError *error) {
+            [self->_tasks removeObjectForKey:url];
             if(error) {
                 CLS_LOG(@"Download failed: %@", error);
-                @synchronized(_failures) {
-                    [_failures setObject:@(YES) forKey:url.absoluteString];
+                @synchronized(self->_failures) {
+                    [self->_failures setObject:@(YES) forKey:url.absoluteString];
                 }
             } else if(location) {
                 NSURL *cache = [self pathForURL:url];
-                [[NSFileManager defaultManager] createDirectoryAtURL:_cachePath withIntermediateDirectories:YES attributes:nil error:nil];
+                [[NSFileManager defaultManager] createDirectoryAtURL:self->_cachePath withIntermediateDirectories:YES attributes:nil error:nil];
                 [[NSFileManager defaultManager] copyItemAtURL:location toURL:cache error:nil];
                 NSLog(@"Downloaded %@ to %@", url, cache);
                 NSData *data = [NSData dataWithContentsOfURL:cache];
                 if(data.length) {
                     YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
                     if(img.size.width) {
-                        @synchronized(_images) {
-                            [_images setObject:img forKey:url.absoluteString];
+                        @synchronized(self->_images) {
+                            [self->_images setObject:img forKey:url.absoluteString];
                         }
                     } else {
-                        @synchronized(_failures) {
-                            [_failures setObject:@(YES) forKey:url.absoluteString];
+                        @synchronized(self->_failures) {
+                            [self->_failures setObject:@(YES) forKey:url.absoluteString];
                         }
                     }
                 } else {
                     [[NSFileManager defaultManager] removeItemAtURL:cache error:nil];
-                    @synchronized(_failures) {
-                        [_failures setObject:@(YES) forKey:url.absoluteString];
+                    @synchronized(self->_failures) {
+                        [self->_failures setObject:@(YES) forKey:url.absoluteString];
                     }
                 }
             }
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                handler([_images objectForKey:url.absoluteString] != nil);
+                handler([self->_images objectForKey:url.absoluteString] != nil);
             }];
         }];
-        [_tasks setObject:task forKey:url];
+        [self->_tasks setObject:task forKey:url];
         [task resume];
     }
 }
@@ -234,7 +234,7 @@
 
 -(NSURL *)pathForURL:(NSURL *)url {
     if(url)
-        return [_cachePath URLByAppendingPathComponent:[ImageCache md5:url.absoluteString]];
+        return [self->_cachePath URLByAppendingPathComponent:[ImageCache md5:url.absoluteString]];
     else
         return nil;
 }

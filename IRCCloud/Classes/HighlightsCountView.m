@@ -22,7 +22,7 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _font = [UIFont boldSystemFontOfSize:14];
+        self->_font = [UIFont boldSystemFontOfSize:14];
         self.backgroundColor = [UIColor clearColor];
     }
     return self;
@@ -31,14 +31,14 @@
 -(id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _font = [UIFont boldSystemFontOfSize:14];
+        self->_font = [UIFont boldSystemFontOfSize:14];
         self.backgroundColor = [UIColor clearColor];
     }
     return self;
 }
 
 -(void)setCount:(NSString *)count {
-    _count = count;
+    self->_count = count;
     [self invalidateIntrinsicContentSize];
     [self setNeedsDisplay];
 }
@@ -58,9 +58,9 @@
     [[UIColor whiteColor] set];
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    CGSize size = [_count sizeWithFont:_font forWidth:rect.size.width lineBreakMode:NSLineBreakByClipping];
-    [_count drawInRect:CGRectMake(rect.origin.x + ((rect.size.width - size.width) / 2), rect.origin.y + ((rect.size.height - size.height) / 2), size.width, size.height)
-              withFont:_font];
+    CGSize size = [self->_count sizeWithFont:self->_font forWidth:rect.size.width lineBreakMode:NSLineBreakByClipping];
+    [self->_count drawInRect:CGRectMake(rect.origin.x + ((rect.size.width - size.width) / 2), rect.origin.y + ((rect.size.height - size.height) / 2), size.width, size.height)
+              withFont:self->_font];
 #pragma GCC diagnostic pop
     CGContextRestoreGState(ctx);
 }
@@ -68,7 +68,7 @@
 -(CGSize)intrinsicContentSize {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-    CGSize size = [_count sizeWithFont:_font forWidth:INT_MAX lineBreakMode:NSLineBreakByClipping];
+    CGSize size = [self->_count sizeWithFont:self->_font forWidth:INT_MAX lineBreakMode:NSLineBreakByClipping];
 #pragma GCC diagnostic pop
     size.width += 6;
     size.height += 6;

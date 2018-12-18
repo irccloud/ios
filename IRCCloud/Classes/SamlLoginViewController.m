@@ -23,7 +23,7 @@
 - (id)initWithURL:(NSString *)url {
     self = [super init];
     if (self) {
-        _url = [NSURL URLWithString:url];
+        self->_url = [NSURL URLWithString:url];
     }
     return self;
 }
@@ -37,15 +37,15 @@
         }
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    _activity.hidesWhenStopped = YES;
-    [_activity startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_activity];
-    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height)];
-    _webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    _webView.delegate = self;
-    [_webView loadRequest:[NSURLRequest requestWithURL:_url]];
-    [self.view addSubview:_webView];
+    self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self->_activity.hidesWhenStopped = YES;
+    [self->_activity startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
+    self->_webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height)];
+    self->_webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    self->_webView.delegate = self;
+    [self->_webView loadRequest:[NSURLRequest requestWithURL:self->_url]];
+    [self.view addSubview:self->_webView];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -59,19 +59,19 @@
         return;
     NSLog(@"Error: %@", error);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [_activity stopAnimating];
+    [self->_activity stopAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 }
 
 -(void)webViewDidStartLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_activity];
-    [_activity startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
+    [self->_activity startAnimating];
 }
 
 -(void)webViewDidFinishLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [_activity stopAnimating];
+    [self->_activity stopAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 }
 
@@ -109,7 +109,7 @@
 }
 
 - (void)cancelButtonPressed:(id)sender {
-    [_webView stopLoading];
+    [self->_webView stopLoading];
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }

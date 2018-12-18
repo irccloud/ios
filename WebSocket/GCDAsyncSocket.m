@@ -1051,7 +1051,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block id result;
         
         dispatch_sync(socketQueue, ^{
-            result = delegate;
+            result = self->delegate;
         });
         
         return result;
@@ -1061,7 +1061,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 - (void)setDelegate:(id)newDelegate synchronously:(BOOL)synchronously
 {
     dispatch_block_t block = ^{
-        delegate = newDelegate;
+        self->delegate = newDelegate;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
@@ -1096,7 +1096,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block dispatch_queue_t result;
         
         dispatch_sync(socketQueue, ^{
-            result = delegateQueue;
+            result = self->delegateQueue;
         });
         
         return result;
@@ -1112,7 +1112,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         if (newDelegateQueue) dispatch_retain(newDelegateQueue);
 #endif
         
-        delegateQueue = newDelegateQueue;
+        self->delegateQueue = newDelegateQueue;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
@@ -1149,8 +1149,8 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block dispatch_queue_t dqPtr = NULL;
         
         dispatch_sync(socketQueue, ^{
-            dPtr = delegate;
-            dqPtr = delegateQueue;
+            dPtr = self->delegate;
+            dqPtr = self->delegateQueue;
         });
         
         if (delegatePtr) *delegatePtr = dPtr;
@@ -1162,14 +1162,14 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 {
     dispatch_block_t block = ^{
         
-        delegate = newDelegate;
+        self->delegate = newDelegate;
         
 #if !OS_OBJECT_USE_OBJC
         if (delegateQueue) dispatch_release(delegateQueue);
         if (newDelegateQueue) dispatch_retain(newDelegateQueue);
 #endif
         
-        delegateQueue = newDelegateQueue;
+        self->delegateQueue = newDelegateQueue;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey)) {
@@ -1206,7 +1206,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block BOOL result;
         
         dispatch_sync(socketQueue, ^{
-            result = ((config & kIPv4Disabled) == 0);
+            result = ((self->config & kIPv4Disabled) == 0);
         });
         
         return result;
@@ -1220,9 +1220,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     dispatch_block_t block = ^{
         
         if (flag)
-            config &= ~kIPv4Disabled;
+            self->config &= ~kIPv4Disabled;
         else
-            config |= kIPv4Disabled;
+            self->config |= kIPv4Disabled;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -1244,7 +1244,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block BOOL result;
         
         dispatch_sync(socketQueue, ^{
-            result = ((config & kIPv6Disabled) == 0);
+            result = ((self->config & kIPv6Disabled) == 0);
         });
         
         return result;
@@ -1258,9 +1258,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     dispatch_block_t block = ^{
         
         if (flag)
-            config &= ~kIPv6Disabled;
+            self->config &= ~kIPv6Disabled;
         else
-            config |= kIPv6Disabled;
+            self->config |= kIPv6Disabled;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -1282,7 +1282,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block BOOL result;
         
         dispatch_sync(socketQueue, ^{
-            result = ((config & kPreferIPv6) == 0);
+            result = ((self->config & kPreferIPv6) == 0);
         });
         
         return result;
@@ -1296,9 +1296,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     dispatch_block_t block = ^{
         
         if (flag)
-            config &= ~kPreferIPv6;
+            self->config &= ~kPreferIPv6;
         else
-            config |= kPreferIPv6;
+            self->config |= kPreferIPv6;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -1310,7 +1310,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 - (NSTimeInterval) alternateAddressDelay {
     __block NSTimeInterval delay;
     dispatch_block_t block = ^{
-        delay = alternateAddressDelay;
+        delay = self->alternateAddressDelay;
     };
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
         block();
@@ -1321,7 +1321,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 
 - (void) setAlternateAddressDelay:(NSTimeInterval)delay {
     dispatch_block_t block = ^{
-        alternateAddressDelay = delay;
+        self->alternateAddressDelay = delay;
     };
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
         block();
@@ -1335,7 +1335,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     
     dispatch_block_t block = ^{
         
-        result = userData;
+        result = self->userData;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -1350,9 +1350,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 {
     dispatch_block_t block = ^{
         
-        if (userData != arbitraryUserData)
+        if (self->userData != arbitraryUserData)
         {
-            userData = arbitraryUserData;
+            self->userData = arbitraryUserData;
         }
     };
     
@@ -1456,7 +1456,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     
     dispatch_block_t block = ^{ @autoreleasepool {
         
-        if (delegate == nil) // Must have delegate set
+        if (self->delegate == nil) // Must have delegate set
         {
             NSString *msg = @"Attempting to accept without a delegate. Set a delegate first.";
             err = [self badConfigError:msg];
@@ -1464,7 +1464,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             return_from_block;
         }
         
-        if (delegateQueue == NULL) // Must have delegate queue set
+        if (self->delegateQueue == NULL) // Must have delegate queue set
         {
             NSString *msg = @"Attempting to accept without a delegate queue. Set a delegate queue first.";
             err = [self badConfigError:msg];
@@ -1472,8 +1472,8 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             return_from_block;
         }
         
-        BOOL isIPv4Disabled = (config & kIPv4Disabled) ? YES : NO;
-        BOOL isIPv6Disabled = (config & kIPv6Disabled) ? YES : NO;
+        BOOL isIPv4Disabled = (self->config & kIPv4Disabled) ? YES : NO;
+        BOOL isIPv6Disabled = (self->config & kIPv6Disabled) ? YES : NO;
         
         if (isIPv4Disabled && isIPv6Disabled) // Must have IPv4 or IPv6 enabled
         {
@@ -1492,8 +1492,8 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         }
         
         // Clear queues (spurious read/write requests post disconnect)
-        [readQueue removeAllObjects];
-        [writeQueue removeAllObjects];
+        [self->readQueue removeAllObjects];
+        [self->writeQueue removeAllObjects];
         
         // Resolve interface from description
         
@@ -1534,9 +1534,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         if (enableIPv4)
         {
             LogVerbose(@"Creating IPv4 socket");
-            socket4FD = createSocket(AF_INET, interface4);
+            self->socket4FD = createSocket(AF_INET, interface4);
             
-            if (socket4FD == SOCKET_NULL)
+            if (self->socket4FD == SOCKET_NULL)
             {
                 return_from_block;
             }
@@ -1555,14 +1555,14 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
                 addr6->sin6_port = htons([self localPort4]);
             }
             
-            socket6FD = createSocket(AF_INET6, interface6);
+            self->socket6FD = createSocket(AF_INET6, interface6);
             
-            if (socket6FD == SOCKET_NULL)
+            if (self->socket6FD == SOCKET_NULL)
             {
-                if (socket4FD != SOCKET_NULL)
+                if (self->socket4FD != SOCKET_NULL)
                 {
                     LogVerbose(@"close(socket4FD)");
-                    close(socket4FD);
+                    close(self->socket4FD);
                 }
                 
                 return_from_block;
@@ -1573,14 +1573,14 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         if (enableIPv4)
         {
-            accept4Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socket4FD, 0, socketQueue);
+            self->accept4Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, self->socket4FD, 0, self->socketQueue);
             
-            int socketFD = socket4FD;
-            dispatch_source_t acceptSource = accept4Source;
+            int socketFD = self->socket4FD;
+            dispatch_source_t acceptSource = self->accept4Source;
             
             __weak GCDAsyncSocket *weakSelf = self;
             
-            dispatch_source_set_event_handler(accept4Source, ^{ @autoreleasepool {
+            dispatch_source_set_event_handler(self->accept4Source, ^{ @autoreleasepool {
 #pragma clang diagnostic push
 #pragma clang diagnostic warning "-Wimplicit-retain-self"
                 
@@ -1600,7 +1600,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             }});
             
             
-            dispatch_source_set_cancel_handler(accept4Source, ^{
+            dispatch_source_set_cancel_handler(self->accept4Source, ^{
 #pragma clang diagnostic push
 #pragma clang diagnostic warning "-Wimplicit-retain-self"
                 
@@ -1616,19 +1616,19 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             });
             
             LogVerbose(@"dispatch_resume(accept4Source)");
-            dispatch_resume(accept4Source);
+            dispatch_resume(self->accept4Source);
         }
         
         if (enableIPv6)
         {
-            accept6Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socket6FD, 0, socketQueue);
+            self->accept6Source = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, self->socket6FD, 0, self->socketQueue);
             
-            int socketFD = socket6FD;
-            dispatch_source_t acceptSource = accept6Source;
+            int socketFD = self->socket6FD;
+            dispatch_source_t acceptSource = self->accept6Source;
             
             __weak GCDAsyncSocket *weakSelf = self;
             
-            dispatch_source_set_event_handler(accept6Source, ^{ @autoreleasepool {
+            dispatch_source_set_event_handler(self->accept6Source, ^{ @autoreleasepool {
 #pragma clang diagnostic push
 #pragma clang diagnostic warning "-Wimplicit-retain-self"
                 
@@ -1647,7 +1647,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 #pragma clang diagnostic pop
             }});
             
-            dispatch_source_set_cancel_handler(accept6Source, ^{
+            dispatch_source_set_cancel_handler(self->accept6Source, ^{
 #pragma clang diagnostic push
 #pragma clang diagnostic warning "-Wimplicit-retain-self"
                 
@@ -1663,10 +1663,10 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             });
             
             LogVerbose(@"dispatch_resume(accept6Source)");
-            dispatch_resume(accept6Source);
+            dispatch_resume(self->accept6Source);
         }
         
-        flags |= kSocketStarted;
+        self->flags |= kSocketStarted;
         
         result = YES;
     }};
@@ -1769,7 +1769,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     
     dispatch_block_t block = ^{ @autoreleasepool {
         
-        if (delegate == nil) // Must have delegate set
+        if (self->delegate == nil) // Must have delegate set
         {
             NSString *msg = @"Attempting to accept without a delegate. Set a delegate first.";
             err = [self badConfigError:msg];
@@ -1777,7 +1777,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             return_from_block;
         }
         
-        if (delegateQueue == NULL) // Must have delegate queue set
+        if (self->delegateQueue == NULL) // Must have delegate queue set
         {
             NSString *msg = @"Attempting to accept without a delegate queue. Set a delegate queue first.";
             err = [self badConfigError:msg];
@@ -1794,8 +1794,8 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         }
         
         // Clear queues (spurious read/write requests post disconnect)
-        [readQueue removeAllObjects];
-        [writeQueue removeAllObjects];
+        [self->readQueue removeAllObjects];
+        [self->writeQueue removeAllObjects];
         
         // Remove a previous socket
         
@@ -1825,23 +1825,23 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         // Create sockets, configure, bind, and listen
         
         LogVerbose(@"Creating unix domain socket");
-        socketUN = createSocket(AF_UNIX, interface);
+        self->socketUN = createSocket(AF_UNIX, interface);
         
-        if (socketUN == SOCKET_NULL)
+        if (self->socketUN == SOCKET_NULL)
         {
             return_from_block;
         }
         
-        socketUrl = url;
+        self->socketUrl = url;
         
         // Create accept sources
         
-        acceptUNSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, socketUN, 0, socketQueue);
+        self->acceptUNSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_READ, self->socketUN, 0, self->socketQueue);
         
-        int socketFD = socketUN;
-        dispatch_source_t acceptSource = acceptUNSource;
+        int socketFD = self->socketUN;
+        dispatch_source_t acceptSource = self->acceptUNSource;
         
-        dispatch_source_set_event_handler(acceptUNSource, ^{ @autoreleasepool {
+        dispatch_source_set_event_handler(self->acceptUNSource, ^{ @autoreleasepool {
             
             LogVerbose(@"eventUNBlock");
             
@@ -1853,7 +1853,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             while ([self doAccept:socketFD] && (++i < numPendingConnections));
         }});
         
-        dispatch_source_set_cancel_handler(acceptUNSource, ^{
+        dispatch_source_set_cancel_handler(self->acceptUNSource, ^{
             
 #if NEEDS_DISPATCH_RETAIN_RELEASE
             LogVerbose(@"dispatch_release(accept4Source)");
@@ -1865,9 +1865,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         });
         
         LogVerbose(@"dispatch_resume(accept4Source)");
-        dispatch_resume(acceptUNSource);
+        dispatch_resume(self->acceptUNSource);
         
-        flags |= kSocketStarted;
+        self->flags |= kSocketStarted;
         
         result = YES;
     }};
@@ -1983,7 +1983,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             // Create GCDAsyncSocket instance for accepted socket
             
             GCDAsyncSocket *acceptedSocket = [[[self class] alloc] initWithDelegate:theDelegate
-                                                                      delegateQueue:delegateQueue
+                                                                      delegateQueue:self->delegateQueue
                                                                         socketQueue:childSocketQueue];
             
             if (socketType == 0)
@@ -2231,7 +2231,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         // We've made it past all the checks.
         // It's time to start the connection process.
         
-        flags |= kSocketStarted;
+        self->flags |= kSocketStarted;
         
         LogVerbose(@"Dispatching DNS lookup...");
         
@@ -2241,7 +2241,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         NSString *hostCpy = [host copy];
         
-        int aStateIndex = stateIndex;
+        int aStateIndex = self->stateIndex;
         __weak GCDAsyncSocket *weakSelf = self;
         
         dispatch_queue_t globalConcurrentQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
@@ -2362,8 +2362,8 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             return_from_block;
         }
         
-        BOOL isIPv4Disabled = (config & kIPv4Disabled) ? YES : NO;
-        BOOL isIPv6Disabled = (config & kIPv6Disabled) ? YES : NO;
+        BOOL isIPv4Disabled = (self->config & kIPv4Disabled) ? YES : NO;
+        BOOL isIPv6Disabled = (self->config & kIPv6Disabled) ? YES : NO;
         
         if (isIPv4Disabled && (address4 != nil))
         {
@@ -2396,7 +2396,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             return_from_block;
         }
         
-        flags |= kSocketStarted;
+        self->flags |= kSocketStarted;
         
         [self startConnectTimeout:timeout];
         
@@ -2446,12 +2446,12 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         // We've made it past all the checks.
         // It's time to start the connection process.
         
-        flags |= kSocketStarted;
+        self->flags |= kSocketStarted;
         
         // Start the normal connection process
         
         NSError *connectError = nil;
-        if (![self connectWithAddressUN:connectInterfaceUN error:&connectError])
+        if (![self connectWithAddressUN:self->connectInterfaceUN error:&connectError])
         {
             [self closeWithError:connectError];
             
@@ -2822,7 +2822,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         int result = connect(socketFD, addr, addr->sa_len);
         if (result == 0)
         {
-            dispatch_async(socketQueue, ^{ @autoreleasepool {
+            dispatch_async(self->socketQueue, ^{ @autoreleasepool {
                 
                 [self didConnect:aStateIndex];
             }});
@@ -2833,7 +2833,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             perror("connect");
             NSError *error = [self errnoErrorWithReason:@"Error in connect() function"];
             
-            dispatch_async(socketQueue, ^{ @autoreleasepool {
+            dispatch_async(self->socketQueue, ^{ @autoreleasepool {
                 
                 [self didNotConnect:aStateIndex error:error];
             }});
@@ -2899,7 +2899,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     dispatch_block_t SetupStreamsPart2 = ^{
 #if TARGET_OS_IPHONE
         
-        if (aStateIndex != stateIndex)
+        if (aStateIndex != self->stateIndex)
         {
             // The socket has been disconnected.
             return;
@@ -2936,7 +2936,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             
             [theDelegate socket:self didConnectToHost:host port:port];
             
-            dispatch_async(socketQueue, ^{ @autoreleasepool {
+            dispatch_async(self->socketQueue, ^{ @autoreleasepool {
                 
                 SetupStreamsPart2();
             }});
@@ -2950,7 +2950,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             
             [theDelegate socket:self didConnectToUrl:url];
             
-            dispatch_async(socketQueue, ^{ @autoreleasepool {
+            dispatch_async(self->socketQueue, ^{ @autoreleasepool {
                 
                 SetupStreamsPart2();
             }});
@@ -3264,7 +3264,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 {
     dispatch_block_t block = ^{ @autoreleasepool {
         
-        if (flags & kSocketStarted)
+        if (self->flags & kSocketStarted)
         {
             [self closeWithError:nil];
         }
@@ -3282,9 +3282,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 {
     dispatch_async(socketQueue, ^{ @autoreleasepool {
         
-        if (flags & kSocketStarted)
+        if (self->flags & kSocketStarted)
         {
-            flags |= (kForbidReadsWrites | kDisconnectAfterReads);
+            self->flags |= (kForbidReadsWrites | kDisconnectAfterReads);
             [self maybeClose];
         }
     }});
@@ -3294,9 +3294,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 {
     dispatch_async(socketQueue, ^{ @autoreleasepool {
         
-        if (flags & kSocketStarted)
+        if (self->flags & kSocketStarted)
         {
-            flags |= (kForbidReadsWrites | kDisconnectAfterWrites);
+            self->flags |= (kForbidReadsWrites | kDisconnectAfterWrites);
             [self maybeClose];
         }
     }});
@@ -3306,9 +3306,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
 {
     dispatch_async(socketQueue, ^{ @autoreleasepool {
         
-        if (flags & kSocketStarted)
+        if (self->flags & kSocketStarted)
         {
-            flags |= (kForbidReadsWrites | kDisconnectAfterReads | kDisconnectAfterWrites);
+            self->flags |= (kForbidReadsWrites | kDisconnectAfterReads | kDisconnectAfterWrites);
             [self maybeClose];
         }
     }});
@@ -3487,7 +3487,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     __block BOOL result = NO;
     
     dispatch_block_t block = ^{
-        result = (flags & kSocketStarted) ? NO : YES;
+        result = (self->flags & kSocketStarted) ? NO : YES;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -3503,7 +3503,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     __block BOOL result = NO;
     
     dispatch_block_t block = ^{
-        result = (flags & kConnected) ? YES : NO;
+        result = (self->flags & kConnected) ? YES : NO;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))
@@ -3531,10 +3531,10 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         dispatch_sync(socketQueue, ^{ @autoreleasepool {
             
-            if (socket4FD != SOCKET_NULL)
-                result = [self connectedHostFromSocket4:socket4FD];
-            else if (socket6FD != SOCKET_NULL)
-                result = [self connectedHostFromSocket6:socket6FD];
+            if (self->socket4FD != SOCKET_NULL)
+                result = [self connectedHostFromSocket4:self->socket4FD];
+            else if (self->socket6FD != SOCKET_NULL)
+                result = [self connectedHostFromSocket6:self->socket6FD];
         }});
         
         return result;
@@ -3559,10 +3559,10 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         dispatch_sync(socketQueue, ^{
             // No need for autorelease pool
             
-            if (socket4FD != SOCKET_NULL)
-                result = [self connectedPortFromSocket4:socket4FD];
-            else if (socket6FD != SOCKET_NULL)
-                result = [self connectedPortFromSocket6:socket6FD];
+            if (self->socket4FD != SOCKET_NULL)
+                result = [self connectedPortFromSocket4:self->socket4FD];
+            else if (self->socket6FD != SOCKET_NULL)
+                result = [self connectedPortFromSocket6:self->socket6FD];
         });
         
         return result;
@@ -3584,8 +3584,8 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         dispatch_sync(socketQueue, ^{ @autoreleasepool {
             
-            if (socketUN != SOCKET_NULL)
-                result = [self connectedUrlFromSocketUN:socketUN];
+            if (self->socketUN != SOCKET_NULL)
+                result = [self connectedUrlFromSocketUN:self->socketUN];
         }});
         
         return result;
@@ -3609,10 +3609,10 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         dispatch_sync(socketQueue, ^{ @autoreleasepool {
             
-            if (socket4FD != SOCKET_NULL)
-                result = [self localHostFromSocket4:socket4FD];
-            else if (socket6FD != SOCKET_NULL)
-                result = [self localHostFromSocket6:socket6FD];
+            if (self->socket4FD != SOCKET_NULL)
+                result = [self localHostFromSocket4:self->socket4FD];
+            else if (self->socket6FD != SOCKET_NULL)
+                result = [self localHostFromSocket6:self->socket6FD];
         }});
         
         return result;
@@ -3637,10 +3637,10 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         dispatch_sync(socketQueue, ^{
             // No need for autorelease pool
             
-            if (socket4FD != SOCKET_NULL)
-                result = [self localPortFromSocket4:socket4FD];
-            else if (socket6FD != SOCKET_NULL)
-                result = [self localPortFromSocket6:socket6FD];
+            if (self->socket4FD != SOCKET_NULL)
+                result = [self localPortFromSocket4:self->socket4FD];
+            else if (self->socket6FD != SOCKET_NULL)
+                result = [self localPortFromSocket6:self->socket6FD];
         });
         
         return result;
@@ -3824,23 +3824,23 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     __block NSData *result = nil;
     
     dispatch_block_t block = ^{
-        if (socket4FD != SOCKET_NULL)
+        if (self->socket4FD != SOCKET_NULL)
         {
             struct sockaddr_in sockaddr4;
             socklen_t sockaddr4len = sizeof(sockaddr4);
             
-            if (getpeername(socket4FD, (struct sockaddr *)&sockaddr4, &sockaddr4len) == 0)
+            if (getpeername(self->socket4FD, (struct sockaddr *)&sockaddr4, &sockaddr4len) == 0)
             {
                 result = [[NSData alloc] initWithBytes:&sockaddr4 length:sockaddr4len];
             }
         }
         
-        if (socket6FD != SOCKET_NULL)
+        if (self->socket6FD != SOCKET_NULL)
         {
             struct sockaddr_in6 sockaddr6;
             socklen_t sockaddr6len = sizeof(sockaddr6);
             
-            if (getpeername(socket6FD, (struct sockaddr *)&sockaddr6, &sockaddr6len) == 0)
+            if (getpeername(self->socket6FD, (struct sockaddr *)&sockaddr6, &sockaddr6len) == 0)
             {
                 result = [[NSData alloc] initWithBytes:&sockaddr6 length:sockaddr6len];
             }
@@ -3860,23 +3860,23 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     __block NSData *result = nil;
     
     dispatch_block_t block = ^{
-        if (socket4FD != SOCKET_NULL)
+        if (self->socket4FD != SOCKET_NULL)
         {
             struct sockaddr_in sockaddr4;
             socklen_t sockaddr4len = sizeof(sockaddr4);
             
-            if (getsockname(socket4FD, (struct sockaddr *)&sockaddr4, &sockaddr4len) == 0)
+            if (getsockname(self->socket4FD, (struct sockaddr *)&sockaddr4, &sockaddr4len) == 0)
             {
                 result = [[NSData alloc] initWithBytes:&sockaddr4 length:sockaddr4len];
             }
         }
         
-        if (socket6FD != SOCKET_NULL)
+        if (self->socket6FD != SOCKET_NULL)
         {
             struct sockaddr_in6 sockaddr6;
             socklen_t sockaddr6len = sizeof(sockaddr6);
             
-            if (getsockname(socket6FD, (struct sockaddr *)&sockaddr6, &sockaddr6len) == 0)
+            if (getsockname(self->socket6FD, (struct sockaddr *)&sockaddr6, &sockaddr6len) == 0)
             {
                 result = [[NSData alloc] initWithBytes:&sockaddr6 length:sockaddr6len];
             }
@@ -3902,7 +3902,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block BOOL result = NO;
         
         dispatch_sync(socketQueue, ^{
-            result = (socket4FD != SOCKET_NULL);
+            result = (self->socket4FD != SOCKET_NULL);
         });
         
         return result;
@@ -3920,7 +3920,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block BOOL result = NO;
         
         dispatch_sync(socketQueue, ^{
-            result = (socket6FD != SOCKET_NULL);
+            result = (self->socket6FD != SOCKET_NULL);
         });
         
         return result;
@@ -3938,7 +3938,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         __block BOOL result;
         
         dispatch_sync(socketQueue, ^{
-            result = (flags & kSocketSecure) ? YES : NO;
+            result = (self->flags & kSocketSecure) ? YES : NO;
         });
         
         return result;
@@ -4359,9 +4359,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         LogTrace();
         
-        if ((flags & kSocketStarted) && !(flags & kForbidReadsWrites))
+        if ((self->flags & kSocketStarted) && !(self->flags & kForbidReadsWrites))
         {
-            [readQueue addObject:packet];
+            [self->readQueue addObject:packet];
             [self maybeDequeueRead];
         }
     }});
@@ -4402,9 +4402,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         LogTrace();
         
-        if ((flags & kSocketStarted) && !(flags & kForbidReadsWrites))
+        if ((self->flags & kSocketStarted) && !(self->flags & kForbidReadsWrites))
         {
-            [readQueue addObject:packet];
+            [self->readQueue addObject:packet];
             [self maybeDequeueRead];
         }
     }});
@@ -4464,9 +4464,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         LogTrace();
         
-        if ((flags & kSocketStarted) && !(flags & kForbidReadsWrites))
+        if ((self->flags & kSocketStarted) && !(self->flags & kForbidReadsWrites))
         {
-            [readQueue addObject:packet];
+            [self->readQueue addObject:packet];
             [self maybeDequeueRead];
         }
     }});
@@ -4481,7 +4481,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     
     dispatch_block_t block = ^{
         
-        if (!currentRead || ![currentRead isKindOfClass:[GCDAsyncReadPacket class]])
+        if (!self->currentRead || ![self->currentRead isKindOfClass:[GCDAsyncReadPacket class]])
         {
             // We're not reading anything right now.
             
@@ -4497,10 +4497,10 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
             // If we're reading to data, we of course have no idea when the data will arrive.
             // If we're reading to timeout, then we have no idea when the next chunk of data will arrive.
             
-            NSUInteger done = currentRead->bytesDone;
-            NSUInteger total = currentRead->readLength;
+            NSUInteger done = self->currentRead->bytesDone;
+            NSUInteger total = self->currentRead->readLength;
             
-            if (tagPtr != NULL)   *tagPtr = currentRead->tag;
+            if (tagPtr != NULL)   *tagPtr = self->currentRead->tag;
             if (donePtr != NULL)  *donePtr = done;
             if (totalPtr != NULL) *totalPtr = total;
             
@@ -4664,10 +4664,10 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         // from the encrypted bytes in the sslPreBuffer.
         // However, we do know this is an upper bound on the estimation.
         
-        estimatedBytesAvailable = socketFDBytesAvailable + [sslPreBuffer availableBytes];
+        estimatedBytesAvailable = self->socketFDBytesAvailable + [self->sslPreBuffer availableBytes];
         
         size_t sslInternalBufSize = 0;
-        SSLGetBufferedReadSize(sslContext, &sslInternalBufSize);
+        SSLGetBufferedReadSize(self->sslContext, &sslInternalBufSize);
         
         estimatedBytesAvailable += sslInternalBufSize;
     };
@@ -5723,7 +5723,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
                                            elapsed:theRead->timeout
                                          bytesDone:theRead->bytesDone];
             
-            dispatch_async(socketQueue, ^{ @autoreleasepool {
+            dispatch_async(self->socketQueue, ^{ @autoreleasepool {
                 
                 [self doReadTimeoutWithExtension:timeoutExtension];
             }});
@@ -5774,9 +5774,9 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         
         LogTrace();
         
-        if ((flags & kSocketStarted) && !(flags & kForbidReadsWrites))
+        if ((self->flags & kSocketStarted) && !(self->flags & kForbidReadsWrites))
         {
-            [writeQueue addObject:packet];
+            [self->writeQueue addObject:packet];
             [self maybeDequeueWrite];
         }
     }});
@@ -5791,7 +5791,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     
     dispatch_block_t block = ^{
         
-        if (!currentWrite || ![currentWrite isKindOfClass:[GCDAsyncWritePacket class]])
+        if (!self->currentWrite || ![self->currentWrite isKindOfClass:[GCDAsyncWritePacket class]])
         {
             // We're not writing anything right now.
             
@@ -5803,10 +5803,10 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
         }
         else
         {
-            NSUInteger done = currentWrite->bytesDone;
-            NSUInteger total = [currentWrite->buffer length];
+            NSUInteger done = self->currentWrite->bytesDone;
+            NSUInteger total = [self->currentWrite->buffer length];
             
-            if (tagPtr != NULL)   *tagPtr = currentWrite->tag;
+            if (tagPtr != NULL)   *tagPtr = self->currentWrite->tag;
             if (donePtr != NULL)  *donePtr = done;
             if (totalPtr != NULL) *totalPtr = total;
             
@@ -6366,7 +6366,7 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
                                            elapsed:theWrite->timeout
                                          bytesDone:theWrite->bytesDone];
             
-            dispatch_async(socketQueue, ^{ @autoreleasepool {
+            dispatch_async(self->socketQueue, ^{ @autoreleasepool {
                 
                 [self doWriteTimeoutWithExtension:timeoutExtension];
             }});
@@ -6428,12 +6428,12 @@ static dispatch_queue_t cfstreamThreadSetupQueue; // setup & teardown
     
     dispatch_async(socketQueue, ^{ @autoreleasepool {
         
-        if ((flags & kSocketStarted) && !(flags & kQueuedTLS) && !(flags & kForbidReadsWrites))
+        if ((self->flags & kSocketStarted) && !(self->flags & kQueuedTLS) && !(self->flags & kForbidReadsWrites))
         {
-            [readQueue addObject:packet];
-            [writeQueue addObject:packet];
+            [self->readQueue addObject:packet];
+            [self->writeQueue addObject:packet];
             
-            flags |= kQueuedTLS;
+            self->flags |= kQueuedTLS;
             
             [self maybeDequeueRead];
             [self maybeDequeueWrite];
@@ -7887,7 +7887,7 @@ static void CFWriteStreamCallback (CFWriteStreamRef stream, CFStreamEventType ty
         __block BOOL result;
         
         dispatch_sync(socketQueue, ^{
-            result = ((config & kAllowHalfDuplexConnection) == 0);
+            result = ((self->config & kAllowHalfDuplexConnection) == 0);
         });
         
         return result;
@@ -7904,9 +7904,9 @@ static void CFWriteStreamCallback (CFWriteStreamRef stream, CFStreamEventType ty
     dispatch_block_t block = ^{
         
         if (flag)
-            config &= ~kAllowHalfDuplexConnection;
+            self->config &= ~kAllowHalfDuplexConnection;
         else
-            config |= kAllowHalfDuplexConnection;
+            self->config |= kAllowHalfDuplexConnection;
     };
     
     if (dispatch_get_specific(IsOnSocketQueueOrTargetQueueKey))

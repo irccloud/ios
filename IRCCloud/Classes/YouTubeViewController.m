@@ -30,7 +30,7 @@
 - (id)initWithURL:(NSURL *)url {
     self = [super init];
     if(self) {
-        _url = url;
+        self->_url = url;
     }
     return self;
 }
@@ -39,19 +39,19 @@
     return @[
              [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                 [pb setValue:_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                 [pb setValue:self->_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
              }],
              [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIApplication *app = [UIApplication sharedApplication];
                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                  MainViewController *mainViewController = [appDelegate mainViewController];
                  
-                 UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[_url] type:@"Youtube"];
+                 UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[self->_url] type:@"Youtube"];
                  activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
              }],
              [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-                 if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:_url
+                 if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:self->_url
                                                                                                                                                          withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
                                                                                                                                                                           @"irccloud-enterprise://"
@@ -61,10 +61,10 @@
                                                                                                                                                                           ]
                                                                                                                                                             createNewTab:NO])
                      return;
-                 else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_url])
+                 else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_url])
                      return;
                  else
-                     [[UIApplication sharedApplication] openURL:_url];
+                     [[UIApplication sharedApplication] openURL:self->_url];
              }]
              ];
 }
@@ -75,7 +75,7 @@
         int margin = (size.width > size.height)?YTMARGIN:0;
         CGFloat width = self.view.bounds.size.width - margin;
         CGFloat height = (width / 16.0f) * 9.0f;
-        _player.frame = CGRectMake(margin/2, (self.view.bounds.size.height - height) / 2.0f, width, height);
+        self->_player.frame = CGRectMake(margin/2, (self.view.bounds.size.height - height) / 2.0f, width, height);
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         
     }
@@ -89,30 +89,30 @@
     UIPanGestureRecognizer *panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(_YTpanned:)];
     [self.view addGestureRecognizer:panGesture];
     
-    _toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height - 44,self.view.bounds.size.width, 44)];
-    [_toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
-    [_toolbar setShadowImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny];
-    [_toolbar setBarStyle:UIBarStyleBlack];
-    _toolbar.translucent = YES;
-    _toolbar.items = @[
+    self->_toolbar = [[UIToolbar alloc] initWithFrame:CGRectMake(0,self.view.bounds.size.height - 44,self.view.bounds.size.width, 44)];
+    [self->_toolbar setBackgroundImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny barMetrics:UIBarMetricsDefault];
+    [self->_toolbar setShadowImage:[[UIImage alloc] init] forToolbarPosition:UIToolbarPositionAny];
+    [self->_toolbar setBarStyle:UIBarStyleBlack];
+    self->_toolbar.translucent = YES;
+    self->_toolbar.items = @[
                       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(_YTShare:)],
                       [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                       [[UIBarButtonItem alloc] initWithTitle:@"Done" style:UIBarButtonItemStylePlain target:self action:@selector(_YTWrapperTapped)]
                       ];
-    _toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-    [self.view addSubview:_toolbar];
+    self->_toolbar.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    [self.view addSubview:self->_toolbar];
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(_YTWrapperTapped)];
     [self.view addGestureRecognizer:tap];
     
     NSString *videoID;
     NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-    [params setObject:_url.absoluteString forKey:@"origin"];
+    [params setObject:self->_url.absoluteString forKey:@"origin"];
     
-    if([_url.host isEqualToString:@"youtu.be"]) {
-        videoID = [_url.path substringFromIndex:1];
+    if([self->_url.host isEqualToString:@"youtu.be"]) {
+        videoID = [self->_url.path substringFromIndex:1];
     }
     
-    for(NSString *param in [_url.query componentsSeparatedByString:@"&"]) {
+    for(NSString *param in [self->_url.query componentsSeparatedByString:@"&"]) {
         NSArray *kv = [param componentsSeparatedByString:@"="];
         if(kv.count == 2) {
             if([[kv objectAtIndex:0] isEqualToString:@"v"]) {
@@ -166,25 +166,25 @@
     CGFloat width = self.view.bounds.size.width - margin;
     CGFloat height = (width / 16.0f) * 9.0f;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
-    _player = [[YTPlayerView alloc] initWithFrame:CGRectMake(margin/2, (self.view.bounds.size.height - height) / 2.0f, width, height)];
-    _player.backgroundColor = [UIColor blackColor];
-    _player.webView.backgroundColor = [UIColor blackColor];
-    _player.hidden = YES;
-    _player.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-    _player.autoresizesSubviews = YES;
-    _player.delegate = self;
+    self->_player = [[YTPlayerView alloc] initWithFrame:CGRectMake(margin/2, (self.view.bounds.size.height - height) / 2.0f, width, height)];
+    self->_player.backgroundColor = [UIColor blackColor];
+    self->_player.webView.backgroundColor = [UIColor blackColor];
+    self->_player.hidden = YES;
+    self->_player.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self->_player.autoresizesSubviews = YES;
+    self->_player.delegate = self;
     if(videoID)
-        [_player loadWithVideoId:videoID playerVars:params];
+        [self->_player loadWithVideoId:videoID playerVars:params];
     else
         CLS_LOG(@"Unable to extract video ID from URL: %@", _url);
-    [self.view addSubview:_player];
+    [self.view addSubview:self->_player];
     
-    _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
-    _activity.center = self.view.center;
-    _activity.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-    _activity.hidesWhenStopped = YES;
-    [_activity startAnimating];
-    [self.view addSubview:_activity];
+    self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self->_activity.center = self.view.center;
+    self->_activity.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+    self->_activity.hidesWhenStopped = YES;
+    [self->_activity startAnimating];
+    [self.view addSubview:self->_activity];
     
     [Answers logContentViewWithName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
 }
@@ -195,27 +195,27 @@
     } completion:^(BOOL finished) {
         [self.presentingViewController dismissViewControllerAnimated:NO completion:nil];
     }];
-    [_activity stopAnimating];
-    _player.delegate = nil;
-    _player.webView.navigationDelegate = nil;
-    [_player stopVideo];
-    [_player.webView stopLoading];
+    [self->_activity stopAnimating];
+    self->_player.delegate = nil;
+    self->_player.webView.navigationDelegate = nil;
+    [self->_player stopVideo];
+    [self->_player.webView stopLoading];
 }
 
 -(void)_YTShare:(id)sender {
-    UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[_url] type:@"Youtube"];
+    UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[self->_url] type:@"Youtube"];
     activityController.popoverPresentationController.delegate = self;
     activityController.popoverPresentationController.barButtonItem = sender;
     [self presentViewController:activityController animated:YES completion:nil];
 }
 
 -(void)playerViewDidBecomeReady:(YTPlayerView *)playerView {
-    [_activity stopAnimating];
+    [self->_activity stopAnimating];
     playerView.hidden = NO;
 }
 
 -(void)playerView:(YTPlayerView *)playerView receivedError:(YTPlayerError)error {
-    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:_url
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:self->_url
                                                                                                                                             withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
                                                                                                                                                              @"irccloud-enterprise://"
@@ -225,14 +225,14 @@
                                                                                                                                                              ]
                                                                                                                                                createNewTab:NO])
         return;
-    else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_url])
+    else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_url])
         return;
     else
-        [[UIApplication sharedApplication] openURL:_url];
+        [[UIApplication sharedApplication] openURL:self->_url];
 }
 
 - (void)_YTpanned:(UIPanGestureRecognizer *)recognizer {
-    CGRect frame = _player.frame;
+    CGRect frame = self->_player.frame;
     
     switch(recognizer.state) {
         case UIGestureRecognizerStateBegan:
@@ -242,14 +242,14 @@
         case UIGestureRecognizerStateCancelled: {
             frame.origin.y = 0;
             [UIView animateWithDuration:0.25 animations:^{
-                _player.frame = frame;
+                self->_player.frame = frame;
             }];
             self.view.alpha = 1;
             break;
         }
         case UIGestureRecognizerStateChanged:
             frame.origin.y = (self.view.bounds.size.height - frame.size.height) / 2 + [recognizer translationInView:self.view].y;
-            _player.frame = frame;
+            self->_player.frame = frame;
             self.view.alpha = 1 - (fabs([recognizer translationInView:self.view].y) / self.view.frame.size.height / 2);
             break;
         case UIGestureRecognizerStateEnded:
@@ -257,7 +257,7 @@
             if(fabs([recognizer translationInView:self.view].y) > 100 || fabs([recognizer velocityInView:self.view].y) > 1000) {
                 frame.origin.y = ([recognizer translationInView:self.view].y > 0)?self.view.bounds.size.height:-self.view.bounds.size.height;
                 [UIView animateWithDuration:0.25 animations:^{
-                    _player.frame = frame;
+                    self->_player.frame = frame;
                     self.view.alpha = 0;
                 } completion:^(BOOL finished) {
                     [self _YTWrapperTapped];
@@ -265,7 +265,7 @@
             } else {
                 frame.origin.y = (self.view.bounds.size.height - frame.size.height) / 2;
                 [UIView animateWithDuration:0.25 animations:^{
-                    _player.frame = frame;
+                    self->_player.frame = frame;
                     self.view.alpha = 1;
                 }];
             }

@@ -40,14 +40,14 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.navigationItem.title = @"Browser";
-        _browsers = [[NSMutableArray alloc] init];
+        self->_browsers = [[NSMutableArray alloc] init];
         if([SFSafariViewController class])
-            [_browsers addObject:@"IRCCloud"];
-        [_browsers addObject:@"Safari"];
+            [self->_browsers addObject:@"IRCCloud"];
+        [self->_browsers addObject:@"Safari"];
         if([[OpenInChromeController sharedInstance] isChromeInstalled])
-            [_browsers addObject:@"Chrome"];
+            [self->_browsers addObject:@"Chrome"];
         if([[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled])
-            [_browsers addObject:@"Firefox"];
+            [self->_browsers addObject:@"Firefox"];
     }
     return self;
 }
@@ -72,8 +72,8 @@
     if(!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"imageservicecell"];
     
-    cell.textLabel.text = [_browsers objectAtIndex:indexPath.row];
-    cell.accessoryType = [[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:[_browsers objectAtIndex:indexPath.row]]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
+    cell.textLabel.text = [self->_browsers objectAtIndex:indexPath.row];
+    cell.accessoryType = [[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:[self->_browsers objectAtIndex:indexPath.row]]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
     
     return cell;
 }
@@ -82,7 +82,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
-    [[NSUserDefaults standardUserDefaults] setObject:[_browsers objectAtIndex:indexPath.row] forKey:@"browser"];
+    [[NSUserDefaults standardUserDefaults] setObject:[self->_browsers objectAtIndex:indexPath.row] forKey:@"browser"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [tableView reloadData];
     [self.navigationController popViewControllerAnimated:YES];
@@ -97,37 +97,37 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _small = [[UILabel alloc] init];
-        _small.font = [UIFont boldSystemFontOfSize:FONT_MIN];
-        _small.lineBreakMode = NSLineBreakByCharWrapping;
-        _small.textAlignment = NSTextAlignmentCenter;
-        _small.numberOfLines = 0;
-        _small.text = @"Aa";
-        _small.textColor = [[UITableViewCell appearance] textLabelColor];
-        [self.contentView addSubview:_small];
+        self->_small = [[UILabel alloc] init];
+        self->_small.font = [UIFont boldSystemFontOfSize:FONT_MIN];
+        self->_small.lineBreakMode = NSLineBreakByCharWrapping;
+        self->_small.textAlignment = NSTextAlignmentCenter;
+        self->_small.numberOfLines = 0;
+        self->_small.text = @"Aa";
+        self->_small.textColor = [[UITableViewCell appearance] textLabelColor];
+        [self.contentView addSubview:self->_small];
         
-        _large = [[UILabel alloc] init];
-        _large.font = [UIFont systemFontOfSize:FONT_MAX];
-        _large.lineBreakMode = NSLineBreakByCharWrapping;
-        _large.textAlignment = NSTextAlignmentCenter;
-        _large.numberOfLines = 0;
-        _large.text = @"Aa";
-        _large.textColor = [[UITableViewCell appearance] textLabelColor];
-        [self.contentView addSubview:_large];
+        self->_large = [[UILabel alloc] init];
+        self->_large.font = [UIFont systemFontOfSize:FONT_MAX];
+        self->_large.lineBreakMode = NSLineBreakByCharWrapping;
+        self->_large.textAlignment = NSTextAlignmentCenter;
+        self->_large.numberOfLines = 0;
+        self->_large.text = @"Aa";
+        self->_large.textColor = [[UITableViewCell appearance] textLabelColor];
+        [self.contentView addSubview:self->_large];
         
-        _fontSample = [[UILabel alloc] initWithFrame:CGRectZero];
-        _fontSample.textAlignment = NSTextAlignmentCenter;
-        _fontSample.text = @"Example";
-        [self.contentView addSubview:_fontSample];
+        self->_fontSample = [[UILabel alloc] initWithFrame:CGRectZero];
+        self->_fontSample.textAlignment = NSTextAlignmentCenter;
+        self->_fontSample.text = @"Example";
+        [self.contentView addSubview:self->_fontSample];
     }
     return self;
 }
 
 -(void)setFontSize:(UISlider *)fontSize {
-    [_fontSize removeFromSuperview];
-    _fontSize = fontSize;
+    [self->_fontSize removeFromSuperview];
+    self->_fontSize = fontSize;
     
-    [self.contentView addSubview:_fontSize];
+    [self.contentView addSubview:self->_fontSize];
 }
 
 -(void)layoutSubviews {
@@ -135,14 +135,14 @@
     
     CGRect frame = CGRectInset([self.contentView bounds], 6, 6);
     
-    _small.frame = CGRectMake(frame.origin.x, frame.origin.y, 32, frame.size.height/2);
-    _large.frame = CGRectMake(frame.origin.x + frame.size.width - 32, frame.origin.y, 32, frame.size.height/2);
-    [_fontSize sizeToFit];
-    _fontSize.frame = CGRectMake(frame.origin.x + 32, 0, frame.size.width - 64 - frame.origin.x, _fontSize.frame.size.height/2);
-    CGPoint p = _fontSize.center;
+    self->_small.frame = CGRectMake(frame.origin.x, frame.origin.y, 32, frame.size.height/2);
+    self->_large.frame = CGRectMake(frame.origin.x + frame.size.width - 32, frame.origin.y, 32, frame.size.height/2);
+    [self->_fontSize sizeToFit];
+    self->_fontSize.frame = CGRectMake(frame.origin.x + 32, 0, frame.size.width - 64 - frame.origin.x, _fontSize.frame.size.height/2);
+    CGPoint p = self->_fontSize.center;
     p.y = self.contentView.center.y/2;
-    _fontSize.center = p;
-    _fontSample.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height / 2, frame.size.width, frame.size.height / 2);
+    self->_fontSize.center = p;
+    self->_fontSample.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height / 2, frame.size.width, frame.size.height / 2);
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -317,7 +317,7 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.navigationItem.title = @"Theme";
-        _themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
+        self->_themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
         
         NSMutableArray *previews = [[NSMutableArray alloc] init];
         
@@ -375,7 +375,7 @@
         v.layer.borderWidth = 1.0f;
         [previews addObject:v];
         
-        _themePreviews = previews;
+        self->_themePreviews = previews;
         
         self.tableView.separatorInset = UIEdgeInsetsMake(0, 40, 0, 0);
     }
@@ -403,13 +403,13 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"themecell"];
 
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    cell.textLabel.text = [_themes objectAtIndex:indexPath.row];
-    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[_themes objectAtIndex:indexPath.row] lowercaseString]] || (![[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] && indexPath.row == 0))
+    cell.textLabel.text = [self->_themes objectAtIndex:indexPath.row];
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] isEqualToString:[[self->_themes objectAtIndex:indexPath.row] lowercaseString]] || (![[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] && indexPath.row == 0))
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     else
         cell.accessoryType = UITableViewCellAccessoryNone;
     
-    UIView *v = [_themePreviews objectAtIndex:indexPath.row];
+    UIView *v = [self->_themePreviews objectAtIndex:indexPath.row];
     [v removeFromSuperview];
     if(@available(iOS 11, *)) {
         v.frame = CGRectMake(self.view.safeAreaInsets.left?-12:8,cell.contentView.frame.size.height / 2 - 12,24,24);
@@ -425,9 +425,9 @@
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    [[NSUserDefaults standardUserDefaults] setObject:[[_themes objectAtIndex:indexPath.row] lowercaseString] forKey:@"theme"];
+    [[NSUserDefaults standardUserDefaults] setObject:[[self->_themes objectAtIndex:indexPath.row] lowercaseString] forKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [UIColor setTheme:[[_themes objectAtIndex:indexPath.row] lowercaseString]];
+    [UIColor setTheme:[[self->_themes objectAtIndex:indexPath.row] lowercaseString]];
     [[EventsDataSource sharedInstance] reformat];
     [tableView reloadData];
     UIView *v = self.navigationController.view.superview;
@@ -447,7 +447,7 @@
         self.navigationItem.title = @"Settings";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-        _oldTheme = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
+        self->_oldTheme = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
     }
     return self;
 }
@@ -460,7 +460,7 @@
         [spinny startAnimating];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
         
-        [[NetworkConnection sharedInstance] changeEmail:_email.text password:[alertView textFieldAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
+        [[NetworkConnection sharedInstance] changeEmail:self->_email.text password:[alertView textFieldAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] boolValue]) {
                 [self saveButtonPressed:nil];
             } else {
@@ -475,7 +475,7 @@
         }];
     }
     
-    _alertView = nil;
+    self->_alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
@@ -488,42 +488,42 @@
 -(void)saveButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
     
-    if(sender && [NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"email"] && ![_email.text isEqualToString:[[NetworkConnection sharedInstance].userInfo objectForKey:@"email"]]) {
+    if(sender && [NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"email"] && ![self->_email.text isEqualToString:[[NetworkConnection sharedInstance].userInfo objectForKey:@"email"]]) {
         [self.view endEditing:YES];
-        _alertView = [[UIAlertView alloc] initWithTitle:@"Change Your Email Address" message:@"Please enter your current password to confirm this change" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
-        _alertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
-        [_alertView textFieldAtIndex:0].delegate = self;
-        [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-        [_alertView show];
+        self->_alertView = [[UIAlertView alloc] initWithTitle:@"Change Your Email Address" message:@"Please enter your current password to confirm this change" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
+        self->_alertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
+        [self->_alertView textFieldAtIndex:0].delegate = self;
+        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+        [self->_alertView show];
     } else {
         UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
         [spinny startAnimating];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
         NSMutableDictionary *prefs = [[NSMutableDictionary alloc] initWithDictionary:[[NetworkConnection sharedInstance] prefs]];
         
-        [prefs setObject:[NSNumber numberWithBool:_24hour.isOn] forKey:@"time-24hr"];
-        [prefs setObject:[NSNumber numberWithBool:_seconds.isOn] forKey:@"time-seconds"];
-        [prefs setObject:[NSNumber numberWithBool:_symbols.isOn] forKey:@"mode-showsymbol"];
-        [prefs setObject:[NSNumber numberWithBool:_colors.isOn] forKey:@"nick-colors"];
-        [prefs setObject:[NSNumber numberWithBool:_colorizeMentions.isOn] forKey:@"mention-colors"];
+        [prefs setObject:[NSNumber numberWithBool:self->_24hour.isOn] forKey:@"time-24hr"];
+        [prefs setObject:[NSNumber numberWithBool:self->_seconds.isOn] forKey:@"time-seconds"];
+        [prefs setObject:[NSNumber numberWithBool:self->_symbols.isOn] forKey:@"mode-showsymbol"];
+        [prefs setObject:[NSNumber numberWithBool:self->_colors.isOn] forKey:@"nick-colors"];
+        [prefs setObject:[NSNumber numberWithBool:self->_colorizeMentions.isOn] forKey:@"mention-colors"];
         [prefs setObject:[NSNumber numberWithBool:!_emocodes.isOn] forKey:@"emoji-disableconvert"];
         [prefs setObject:[NSNumber numberWithBool:!_pastebin.isOn] forKey:@"pastebin-disableprompt"];
         if([prefs objectForKey:@"font"]) {
-            if(_mono.isOn)
+            if(self->_mono.isOn)
                 [prefs setObject:@"mono" forKey:@"font"];
             else if([[prefs objectForKey:@"font"] isEqualToString:@"mono"])
                 [prefs setObject:@"sans" forKey:@"font"];
         } else {
-            [prefs setObject:_mono.isOn?@"mono":@"sans" forKey:@"font"];
+            [prefs setObject:self->_mono.isOn?@"mono":@"sans" forKey:@"font"];
         }
         [prefs setObject:[NSNumber numberWithBool:!_hideJoinPart.isOn] forKey:@"hideJoinPart"];
         [prefs setObject:[NSNumber numberWithBool:!_expandJoinPart.isOn] forKey:@"expandJoinPart"];
-        [prefs setObject:[NSNumber numberWithBool:_notifyAll.isOn] forKey:@"notifications-all"];
+        [prefs setObject:[NSNumber numberWithBool:self->_notifyAll.isOn] forKey:@"notifications-all"];
         [prefs setObject:[NSNumber numberWithBool:!_showUnread.isOn] forKey:@"disableTrackUnread"];
-        [prefs setObject:[NSNumber numberWithBool:_markAsRead.isOn] forKey:@"enableReadOnSelect"];
-        [prefs setObject:[NSNumber numberWithBool:_compact.isOn] forKey:@"ascii-compact"];
+        [prefs setObject:[NSNumber numberWithBool:self->_markAsRead.isOn] forKey:@"enableReadOnSelect"];
+        [prefs setObject:[NSNumber numberWithBool:self->_compact.isOn] forKey:@"ascii-compact"];
         [prefs setObject:[NSNumber numberWithBool:!_disableInlineFiles.isOn] forKey:@"files-disableinline"];
-        [prefs setObject:[NSNumber numberWithBool:_inlineImages.isOn] forKey:@"inlineimages"];
+        [prefs setObject:[NSNumber numberWithBool:self->_inlineImages.isOn] forKey:@"inlineimages"];
         [prefs setObject:[NSNumber numberWithBool:!_disableBigEmoji.isOn] forKey:@"emoji-nobig"];
         [prefs setObject:[NSNumber numberWithBool:!_disableCodeSpan.isOn] forKey:@"chat-nocodespan"];
         [prefs setObject:[NSNumber numberWithBool:!_disableCodeBlock.isOn] forKey:@"chat-nocodeblock"];
@@ -532,7 +532,7 @@
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];
         
-        [[NetworkConnection sharedInstance] setRealname:_name.text highlights:_highlights.text autoaway:_autoaway.isOn handler:^(IRCCloudJSONObject *result) {
+        [[NetworkConnection sharedInstance] setRealname:self->_name.text highlights:self->_highlights.text autoaway:self->_autoaway.isOn handler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] boolValue]) {
                 [[NetworkConnection sharedInstance] setPrefs:json handler:^(IRCCloudJSONObject *result) {
                     if([[result objectForKey:@"success"] boolValue]) {
@@ -551,12 +551,12 @@
             }
         }];
         
-        [[NSUserDefaults standardUserDefaults] setBool:_screen.on forKey:@"keepScreenOn"];
-        [[NSUserDefaults standardUserDefaults] setBool:_autoCaps.on forKey:@"autoCaps"];
-        [[NSUserDefaults standardUserDefaults] setBool:_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
-        [[NSUserDefaults standardUserDefaults] setBool:_notificationSound.on forKey:@"notificationSound"];
-        [[NSUserDefaults standardUserDefaults] setBool:_tabletMode.on forKey:@"tabletMode"];
-        [[NSUserDefaults standardUserDefaults] setFloat:ceilf(_fontSize.value) forKey:@"fontSize"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_screen.on forKey:@"keepScreenOn"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_autoCaps.on forKey:@"autoCaps"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_saveToCameraRoll.on forKey:@"saveToCameraRoll"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_notificationSound.on forKey:@"notificationSound"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_tabletMode.on forKey:@"tabletMode"];
+        [[NSUserDefaults standardUserDefaults] setFloat:ceilf(self->_fontSize.value) forKey:@"fontSize"];
         [[NSUserDefaults standardUserDefaults] setBool:!_oneLine.isOn forKey:@"chat-oneline"];
         [[NSUserDefaults standardUserDefaults] setBool:!_noRealName.isOn forKey:@"chat-norealname"];
         [[NSUserDefaults standardUserDefaults] setBool:!_timeLeft.isOn forKey:@"time-left"];
@@ -565,14 +565,14 @@
         [[NSUserDefaults standardUserDefaults] setBool:!_imageViewer.isOn forKey:@"imageViewer"];
         [[NSUserDefaults standardUserDefaults] setBool:!_videoViewer.isOn forKey:@"videoViewer"];
         [[NSUserDefaults standardUserDefaults] setBool:!_inlineWifiOnly.isOn forKey:@"inlineWifiOnly"];
-        [[NSUserDefaults standardUserDefaults] setBool:_defaultSound.isOn forKey:@"defaultSound"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_defaultSound.isOn forKey:@"defaultSound"];
         [[NSUserDefaults standardUserDefaults] setBool:!_notificationPreviews.isOn forKey:@"disableNotificationPreviews"];
-        [[NSUserDefaults standardUserDefaults] setBool:_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
-        [[NSUserDefaults standardUserDefaults] setBool:_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
-        [[NSUserDefaults standardUserDefaults] setBool:_avatarImages.isOn forKey:@"avatarImages"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_thirdPartyNotificationPreviews.isOn forKey:@"thirdPartyNotificationPreviews"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_avatarImages.isOn forKey:@"avatarImages"];
         [[NSUserDefaults standardUserDefaults] setBool:!_hiddenMembers.isOn forKey:@"hiddenMembers"];
 #ifndef APPSTORE
-        [[NSUserDefaults standardUserDefaults] setBool:_backgroundUploads.isOn forKey:@"backgroundUploads"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_backgroundUploads.isOn forKey:@"backgroundUploads"];
 #endif
         [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -612,9 +612,9 @@
     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
     [d synchronize];
-    [[NSUserDefaults standardUserDefaults] setObject:_oldTheme forKey:@"theme"];
+    [[NSUserDefaults standardUserDefaults] setObject:self->_oldTheme forKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [UIColor setTheme:_oldTheme];
+    [UIColor setTheme:self->_oldTheme];
     [[EventsDataSource sharedInstance] reformat];
     UIView *v = self.navigationController.view.superview;
     [self.navigationController.view removeFromSuperview];
@@ -628,9 +628,9 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    _email.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _name.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _highlights.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_email.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_name.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_highlights.textColor = [UITableViewCell appearance].detailTextLabelColor;
     [self refresh];
 }
 
@@ -677,9 +677,9 @@
     if([[[NetworkConnection sharedInstance].config objectForKey:@"auth_mechanism"] isEqualToString:@"internal"]) {
 #endif
         account = @[
-                    @{@"title":@"Email Address", @"accessory":_email},
-                    @{@"title":@"Full Name", @"accessory":_name},
-                    @{@"title":@"Auto Away", @"accessory":_autoaway},
+                    @{@"title":@"Email Address", @"accessory":self->_email},
+                    @{@"title":@"Full Name", @"accessory":self->_name},
+                    @{@"title":@"Auto Away", @"accessory":self->_autoaway},
 #ifndef ENTERPRISE
                     @{@"title":@"Public Avatar", @"value":@"", @"selected":^{
                         AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:-1];
@@ -758,8 +758,8 @@
 #ifdef ENTERPRISE
     } else {
         account = @[
-                    @{@"title":@"Full Name", @"accessory":_name},
-                    @{@"title":@"Auto Away", @"accessory":_autoaway},
+                    @{@"title":@"Full Name", @"accessory":self->_name},
+                    @{@"title":@"Auto Away", @"accessory":self->_autoaway},
                     ];
     }
 #endif
@@ -782,18 +782,18 @@
     
     NSMutableArray *device = [[NSMutableArray alloc] init];
     [device addObject:@{@"title":@"Theme", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]?[[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"] capitalizedString]:@"Dawn", @"selected":^{ [self.navigationController pushViewController:[[ThemesViewController alloc] init] animated:YES]; }}];
-    [device addObject:@{@"title":@"Monospace Font", @"accessory":_mono}];
-    [device addObject:@{@"title":@"Prevent Auto-Lock", @"accessory":_screen}];
-    [device addObject:@{@"title":@"Auto-capitalization", @"accessory":_autoCaps}];
+    [device addObject:@{@"title":@"Monospace Font", @"accessory":self->_mono}];
+    [device addObject:@{@"title":@"Prevent Auto-Lock", @"accessory":self->_screen}];
+    [device addObject:@{@"title":@"Auto-capitalization", @"accessory":self->_autoCaps}];
     [device addObject:@{@"title":@"Preferred Browser", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"], @"selected":^{ [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES]; }}];
     if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-        [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":_tabletMode}];
-        [device addObject:@{@"title":@"Always show channel members", @"accessory":_hiddenMembers}];
+        [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":self->_tabletMode}];
+        [device addObject:@{@"title":@"Always show channel members", @"accessory":self->_hiddenMembers}];
     }
-    [device addObject:@{@"title":@"Ask To Post A Snippet", @"accessory":_pastebin}];
-    [device addObject:@{@"title":@"Open Images in Browser", @"accessory":_imageViewer}];
-    [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":_videoViewer}];
-    [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":_browserWarning}];
+    [device addObject:@{@"title":@"Ask To Post A Snippet", @"accessory":self->_pastebin}];
+    [device addObject:@{@"title":@"Open Images in Browser", @"accessory":self->_imageViewer}];
+    [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":self->_videoViewer}];
+    [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":self->_browserWarning}];
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
@@ -810,69 +810,69 @@
             [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
         }}];
     }
-    [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":_saveToCameraRoll}];
+    [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":self->_saveToCameraRoll}];
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
 #ifndef APPSTORE
-    [photos addObject:@{@"title":@"Upload In The Background", @"accessory":_backgroundUploads}];
+    [photos addObject:@{@"title":@"Upload In The Background", @"accessory":self->_backgroundUploads}];
 #endif
 
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
     if(@available(iOS 10, *)) {
-        [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":_defaultSound}];
-        [notifications addObject:@{@"title":@"Preview Uploaded Files", @"accessory":_notificationPreviews}];
-        [notifications addObject:@{@"title":@"Preview External URLs", @"accessory":_thirdPartyNotificationPreviews}];
+        [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":self->_defaultSound}];
+        [notifications addObject:@{@"title":@"Preview Uploaded Files", @"accessory":self->_notificationPreviews}];
+        [notifications addObject:@{@"title":@"Preview External URLs", @"accessory":self->_thirdPartyNotificationPreviews}];
     } else {
-        [notifications addObject:@{@"title":@"Background Alert Sounds", @"accessory":_notificationSound}];
+        [notifications addObject:@{@"title":@"Background Alert Sounds", @"accessory":self->_notificationSound}];
     }
-    [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":_notifyAll}];
-    [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":_showUnread}];
-    [notifications addObject:@{@"title":@"Mark As Read Automatically", @"accessory":_markAsRead}];
+    [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":self->_notifyAll}];
+    [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":self->_showUnread}];
+    [notifications addObject:@{@"title":@"Mark As Read Automatically", @"accessory":self->_markAsRead}];
     
-    _data = @[
+    self->_data = @[
               @{@"title":@"Account", @"items":account},
               @{@"title":@"Highlight Words", @"items":@[
                         @{@"configure":^(UITableViewCell *cell) {
                             cell.textLabel.text = nil;
-                            [_highlights removeFromSuperview];
-                            _highlights.frame = CGRectInset(cell.contentView.bounds, 4, 4);
-                            [cell.contentView addSubview:_highlights];
+                            [self->_highlights removeFromSuperview];
+                            self->_highlights.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+                            [cell.contentView addSubview:self->_highlights];
                         }, @"style":@(UITableViewCellStyleDefault)}
                         ]},
               @{@"title":@"Message Layout", @"items":@[
-                         @{@"title":@"Nicknames on Separate Line", @"accessory":_oneLine},
-                         @{@"title":@"Show Real Names", @"accessory":_noRealName},
-                         @{@"title":@"Right Hand Side Timestamps", @"accessory":_timeLeft},
-                         @{@"title":@"User Icons", @"accessory":_avatarsOff},
+                         @{@"title":@"Nicknames on Separate Line", @"accessory":self->_oneLine},
+                         @{@"title":@"Show Real Names", @"accessory":self->_noRealName},
+                         @{@"title":@"Right Hand Side Timestamps", @"accessory":self->_timeLeft},
+                         @{@"title":@"User Icons", @"accessory":self->_avatarsOff},
 #ifndef ENTERPRISE
-                         @{@"title":@"Avatars", @"accessory":_avatarImages},
+                         @{@"title":@"Avatars", @"accessory":self->_avatarImages},
 #endif
-                         @{@"title":@"Compact Spacing", @"accessory":_compact},
-                         @{@"title":@"24-Hour Clock", @"accessory":_24hour},
-                         @{@"title":@"Show Seconds", @"accessory":_seconds},
-                         @{@"title":@"Usermode Symbols", @"accessory":_symbols, @"subtitle":@"@, +, etc."},
-                         @{@"title":@"Colourise Nicknames", @"accessory":_colors},
-                         @{@"title":@"Colourise Mentions", @"accessory":_colorizeMentions},
-                         @{@"title":@"Convert :emocodes: to Emoji", @"accessory":_emocodes, @"subtitle":@":thumbsup: → 👍"},
-                         @{@"title":@"Enlarge Emoji Messages", @"accessory":_disableBigEmoji},
+                         @{@"title":@"Compact Spacing", @"accessory":self->_compact},
+                         @{@"title":@"24-Hour Clock", @"accessory":self->_24hour},
+                         @{@"title":@"Show Seconds", @"accessory":self->_seconds},
+                         @{@"title":@"Usermode Symbols", @"accessory":self->_symbols, @"subtitle":@"@, +, etc."},
+                         @{@"title":@"Colourise Nicknames", @"accessory":self->_colors},
+                         @{@"title":@"Colourise Mentions", @"accessory":self->_colorizeMentions},
+                         @{@"title":@"Convert :emocodes: to Emoji", @"accessory":self->_emocodes, @"subtitle":@":thumbsup: → 👍"},
+                         @{@"title":@"Enlarge Emoji Messages", @"accessory":self->_disableBigEmoji},
                          ]},
               @{@"title":@"Chat & Embeds", @"items":@[
-                        @{@"title":@"Show Joins, Parts, Quits", @"accessory":_hideJoinPart},
-                        @{@"title":@"Collapse Joins, Parts, Quits", @"accessory":_expandJoinPart},
-                        @{@"title":@"Embed Uploaded Files", @"accessory":_disableInlineFiles},
-                        @{@"title":@"Embed External Media", @"accessory":_inlineImages},
-                        @{@"title":@"Embed Using Mobile Data", @"accessory":_inlineWifiOnly},
-                        @{@"title":@"Format inline code", @"accessory":_disableCodeSpan},
-                        @{@"title":@"Format code blocks", @"accessory":_disableCodeBlock},
-                        @{@"title":@"Format quoted text", @"accessory":_disableQuote},
-                        @{@"title":@"Clear colors after sending", @"accessory":_clearFormattingAfterSending},
+                        @{@"title":@"Show Joins, Parts, Quits", @"accessory":self->_hideJoinPart},
+                        @{@"title":@"Collapse Joins, Parts, Quits", @"accessory":self->_expandJoinPart},
+                        @{@"title":@"Embed Uploaded Files", @"accessory":self->_disableInlineFiles},
+                        @{@"title":@"Embed External Media", @"accessory":self->_inlineImages},
+                        @{@"title":@"Embed Using Mobile Data", @"accessory":self->_inlineWifiOnly},
+                        @{@"title":@"Format inline code", @"accessory":self->_disableCodeSpan},
+                        @{@"title":@"Format code blocks", @"accessory":self->_disableCodeBlock},
+                        @{@"title":@"Format quoted text", @"accessory":self->_disableQuote},
+                        @{@"title":@"Clear colors after sending", @"accessory":self->_clearFormattingAfterSending},
                         ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":notifications},
               @{@"title":@"Font Size", @"items":@[
                         @{@"special":^UITableViewCell *(UITableViewCell *cell, NSString *identifier) {
-                            _fontSizeCell.fontSample.textColor = [UIColor messageTextColor];
+                            self->_fontSizeCell.fontSample.textColor = [UIColor messageTextColor];
                             [self monoToggled:nil];
-                            return _fontSizeCell;
+                            return self->_fontSizeCell;
                         }}
                         ]},
               @{@"title":@"Photo Sharing", @"items":photos},
@@ -883,7 +883,7 @@
                         @{@"title":@"FAQ", @"selected":^{[(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];}},
                         @{@"title":@"Version History", @"selected":^{[(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://github.com/irccloud/ios/releases"]];}},
                         @{@"title":@"Open-Source Licenses", @"selected":^{[self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];}},
-                        @{@"title":@"Version", @"subtitle":_version}
+                        @{@"title":@"Version", @"subtitle":self->_version}
                         ]}
               ];
     
@@ -895,100 +895,100 @@
     
     self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
-    _email.text = @"";
-    _email.textAlignment = NSTextAlignmentRight;
-    _email.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _email.autocorrectionType = UITextAutocorrectionTypeNo;
-    _email.keyboardType = UIKeyboardTypeEmailAddress;
-    _email.adjustsFontSizeToFitWidth = YES;
-    _email.returnKeyType = UIReturnKeyDone;
-    _email.delegate = self;
+    self->_email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
+    self->_email.text = @"";
+    self->_email.textAlignment = NSTextAlignmentRight;
+    self->_email.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_email.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_email.keyboardType = UIKeyboardTypeEmailAddress;
+    self->_email.adjustsFontSizeToFitWidth = YES;
+    self->_email.returnKeyType = UIReturnKeyDone;
+    self->_email.delegate = self;
     
-    _name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
-    _name.text = @"";
-    _name.textAlignment = NSTextAlignmentRight;
-    _name.autocapitalizationType = UITextAutocapitalizationTypeWords;
-    _name.autocorrectionType = UITextAutocorrectionTypeNo;
-    _name.keyboardType = UIKeyboardTypeDefault;
-    _name.adjustsFontSizeToFitWidth = YES;
-    _name.returnKeyType = UIReturnKeyDone;
-    _name.delegate = self;
+    self->_name = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
+    self->_name.text = @"";
+    self->_name.textAlignment = NSTextAlignmentRight;
+    self->_name.autocapitalizationType = UITextAutocapitalizationTypeWords;
+    self->_name.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_name.keyboardType = UIKeyboardTypeDefault;
+    self->_name.adjustsFontSizeToFitWidth = YES;
+    self->_name.returnKeyType = UIReturnKeyDone;
+    self->_name.delegate = self;
     
-    _autoaway = [[UISwitch alloc] init];
+    self->_autoaway = [[UISwitch alloc] init];
     _24hour = [[UISwitch alloc] init];
-    _seconds = [[UISwitch alloc] init];
-    _symbols = [[UISwitch alloc] init];
-    _colors = [[UISwitch alloc] init];
-    _screen = [[UISwitch alloc] init];
-    _autoCaps = [[UISwitch alloc] init];
-    _emocodes = [[UISwitch alloc] init];
-    _saveToCameraRoll = [[UISwitch alloc] init];
-    _notificationSound = [[UISwitch alloc] init];
-    _tabletMode = [[UISwitch alloc] init];
-    _pastebin = [[UISwitch alloc] init];
-    _mono = [[UISwitch alloc] init];
-    [_mono addTarget:self action:@selector(monoToggled:) forControlEvents:UIControlEventValueChanged];
-    _hideJoinPart = [[UISwitch alloc] init];
-    [_hideJoinPart addTarget:self action:@selector(hideJoinPartToggled:) forControlEvents:UIControlEventValueChanged];
-    _expandJoinPart = [[UISwitch alloc] init];
-    _notifyAll = [[UISwitch alloc] init];
-    _showUnread = [[UISwitch alloc] init];
-    _markAsRead = [[UISwitch alloc] init];
-    _oneLine = [[UISwitch alloc] init];
-    [_oneLine addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
-    _noRealName = [[UISwitch alloc] init];
-    _timeLeft = [[UISwitch alloc] init];
-    _avatarsOff = [[UISwitch alloc] init];
-    [_avatarsOff addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
-    _browserWarning = [[UISwitch alloc] init];
-    _compact = [[UISwitch alloc] init];
-    _imageViewer = [[UISwitch alloc] init];
-    _videoViewer = [[UISwitch alloc] init];
-    _disableInlineFiles = [[UISwitch alloc] init];
-    _disableBigEmoji = [[UISwitch alloc] init];
-    _inlineWifiOnly = [[UISwitch alloc] init];
-    _defaultSound = [[UISwitch alloc] init];
-    _notificationPreviews = [[UISwitch alloc] init];
-    [_notificationPreviews addTarget:self action:@selector(notificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
-    _thirdPartyNotificationPreviews = [[UISwitch alloc] init];
-    [_thirdPartyNotificationPreviews addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
-    _disableCodeSpan = [[UISwitch alloc] init];
-    _disableCodeBlock = [[UISwitch alloc] init];
-    _disableQuote = [[UISwitch alloc] init];
-    _inlineImages = [[UISwitch alloc] init];
-    [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
-    _clearFormattingAfterSending = [[UISwitch alloc] init];
-    _avatarImages = [[UISwitch alloc] init];
-    _backgroundUploads = [[UISwitch alloc] init];
-    _colorizeMentions = [[UISwitch alloc] init];
-    _hiddenMembers = [[UISwitch alloc] init];
+    self->_seconds = [[UISwitch alloc] init];
+    self->_symbols = [[UISwitch alloc] init];
+    self->_colors = [[UISwitch alloc] init];
+    self->_screen = [[UISwitch alloc] init];
+    self->_autoCaps = [[UISwitch alloc] init];
+    self->_emocodes = [[UISwitch alloc] init];
+    self->_saveToCameraRoll = [[UISwitch alloc] init];
+    self->_notificationSound = [[UISwitch alloc] init];
+    self->_tabletMode = [[UISwitch alloc] init];
+    self->_pastebin = [[UISwitch alloc] init];
+    self->_mono = [[UISwitch alloc] init];
+    [self->_mono addTarget:self action:@selector(monoToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_hideJoinPart = [[UISwitch alloc] init];
+    [self->_hideJoinPart addTarget:self action:@selector(hideJoinPartToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_expandJoinPart = [[UISwitch alloc] init];
+    self->_notifyAll = [[UISwitch alloc] init];
+    self->_showUnread = [[UISwitch alloc] init];
+    self->_markAsRead = [[UISwitch alloc] init];
+    self->_oneLine = [[UISwitch alloc] init];
+    [self->_oneLine addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_noRealName = [[UISwitch alloc] init];
+    self->_timeLeft = [[UISwitch alloc] init];
+    self->_avatarsOff = [[UISwitch alloc] init];
+    [self->_avatarsOff addTarget:self action:@selector(oneLineToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_browserWarning = [[UISwitch alloc] init];
+    self->_compact = [[UISwitch alloc] init];
+    self->_imageViewer = [[UISwitch alloc] init];
+    self->_videoViewer = [[UISwitch alloc] init];
+    self->_disableInlineFiles = [[UISwitch alloc] init];
+    self->_disableBigEmoji = [[UISwitch alloc] init];
+    self->_inlineWifiOnly = [[UISwitch alloc] init];
+    self->_defaultSound = [[UISwitch alloc] init];
+    self->_notificationPreviews = [[UISwitch alloc] init];
+    [self->_notificationPreviews addTarget:self action:@selector(notificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_thirdPartyNotificationPreviews = [[UISwitch alloc] init];
+    [self->_thirdPartyNotificationPreviews addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_disableCodeSpan = [[UISwitch alloc] init];
+    self->_disableCodeBlock = [[UISwitch alloc] init];
+    self->_disableQuote = [[UISwitch alloc] init];
+    self->_inlineImages = [[UISwitch alloc] init];
+    [self->_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_clearFormattingAfterSending = [[UISwitch alloc] init];
+    self->_avatarImages = [[UISwitch alloc] init];
+    self->_backgroundUploads = [[UISwitch alloc] init];
+    self->_colorizeMentions = [[UISwitch alloc] init];
+    self->_hiddenMembers = [[UISwitch alloc] init];
 
-    _highlights = [[UITextView alloc] initWithFrame:CGRectZero];
-    _highlights.text = @"";
-    _highlights.backgroundColor = [UIColor clearColor];
-    _highlights.returnKeyType = UIReturnKeyDone;
-    _highlights.delegate = self;
-    _highlights.font = _email.font;
-    _highlights.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _highlights.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_highlights = [[UITextView alloc] initWithFrame:CGRectZero];
+    self->_highlights.text = @"";
+    self->_highlights.backgroundColor = [UIColor clearColor];
+    self->_highlights.returnKeyType = UIReturnKeyDone;
+    self->_highlights.delegate = self;
+    self->_highlights.font = self->_email.font;
+    self->_highlights.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_highlights.keyboardAppearance = [UITextField appearance].keyboardAppearance;
 
-    _version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+    self->_version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 #ifdef BRAND_NAME
-    _version = [_version stringByAppendingFormat:@"-%@", BRAND_NAME];
+    self->_version = [self->_version stringByAppendingFormat:@"-%@", BRAND_NAME];
 #endif
 #ifndef APPSTORE
-    _version = [_version stringByAppendingFormat:@" (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
+    self->_version = [self->_version stringByAppendingFormat:@" (%@)", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
 #endif
     
-    _fontSize = [[UISlider alloc] init];
-    _fontSize.minimumValue = FONT_MIN;
-    _fontSize.maximumValue = FONT_MAX;
-    _fontSize.continuous = YES;
-    [_fontSize addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
+    self->_fontSize = [[UISlider alloc] init];
+    self->_fontSize.minimumValue = FONT_MIN;
+    self->_fontSize.maximumValue = FONT_MAX;
+    self->_fontSize.continuous = YES;
+    [self->_fontSize addTarget:self action:@selector(sliderChanged:) forControlEvents:UIControlEventValueChanged];
     
-    _fontSizeCell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
-    _fontSizeCell.fontSize = _fontSize;
+    self->_fontSizeCell = [[FontSizeCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:nil];
+    self->_fontSizeCell.fontSize = self->_fontSize;
     
     [self setFromPrefs];
     [self refresh];
@@ -999,25 +999,25 @@
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
     if([[userInfo objectForKey:@"name"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"name"] length])
-        _name.text = [userInfo objectForKey:@"name"];
+        self->_name.text = [userInfo objectForKey:@"name"];
     else
-        _name.text = @"";
+        self->_name.text = @"";
     
     if([[userInfo objectForKey:@"email"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"email"] length])
-        _email.text = [userInfo objectForKey:@"email"];
+        self->_email.text = [userInfo objectForKey:@"email"];
     else
-        _email.text = @"";
+        self->_email.text = @"";
     
     if([[userInfo objectForKey:@"autoaway"] isKindOfClass:[NSNumber class]]) {
-        _autoaway.on = [[userInfo objectForKey:@"autoaway"] boolValue];
+        self->_autoaway.on = [[userInfo objectForKey:@"autoaway"] boolValue];
     }
     
     if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSArray class]] && [(NSArray *)[userInfo objectForKey:@"highlights"] count])
-        _highlights.text = [[userInfo objectForKey:@"highlights"] componentsJoinedByString:@", "];
+        self->_highlights.text = [[userInfo objectForKey:@"highlights"] componentsJoinedByString:@", "];
     else if([[userInfo objectForKey:@"highlights"] isKindOfClass:[NSString class]] && [[userInfo objectForKey:@"highlights"] length])
-        _highlights.text = [userInfo objectForKey:@"highlights"];
+        self->_highlights.text = [userInfo objectForKey:@"highlights"];
     else
-        _highlights.text = @"";
+        self->_highlights.text = @"";
     
     if([[prefs objectForKey:@"time-24hr"] isKindOfClass:[NSNumber class]]) {
         _24hour.on = [[prefs objectForKey:@"time-24hr"] boolValue];
@@ -1026,226 +1026,226 @@
     }
     
     if([[prefs objectForKey:@"time-seconds"] isKindOfClass:[NSNumber class]]) {
-        _seconds.on = [[prefs objectForKey:@"time-seconds"] boolValue];
+        self->_seconds.on = [[prefs objectForKey:@"time-seconds"] boolValue];
     } else {
-        _seconds.on = NO;
+        self->_seconds.on = NO;
     }
     
     if([[prefs objectForKey:@"mode-showsymbol"] isKindOfClass:[NSNumber class]]) {
-        _symbols.on = [[prefs objectForKey:@"mode-showsymbol"] boolValue];
+        self->_symbols.on = [[prefs objectForKey:@"mode-showsymbol"] boolValue];
     } else {
-        _symbols.on = NO;
+        self->_symbols.on = NO;
     }
     
     if([[prefs objectForKey:@"nick-colors"] isKindOfClass:[NSNumber class]]) {
-        _colors.on = [[prefs objectForKey:@"nick-colors"] boolValue];
+        self->_colors.on = [[prefs objectForKey:@"nick-colors"] boolValue];
     } else {
-        _colors.on = NO;
+        self->_colors.on = NO;
     }
     
     if([[prefs objectForKey:@"mention-colors"] isKindOfClass:[NSNumber class]]) {
-        _colorizeMentions.on = [[prefs objectForKey:@"mention-colors"] boolValue];
+        self->_colorizeMentions.on = [[prefs objectForKey:@"mention-colors"] boolValue];
     } else {
-        _colorizeMentions.on = NO;
+        self->_colorizeMentions.on = NO;
     }
     
     if([[prefs objectForKey:@"emoji-disableconvert"] isKindOfClass:[NSNumber class]]) {
-        _emocodes.on = ![[prefs objectForKey:@"emoji-disableconvert"] boolValue];
+        self->_emocodes.on = ![[prefs objectForKey:@"emoji-disableconvert"] boolValue];
     } else {
-        _emocodes.on = YES;
+        self->_emocodes.on = YES;
     }
     
     if([[prefs objectForKey:@"pastebin-disableprompt"] isKindOfClass:[NSNumber class]]) {
-        _pastebin.on = ![[prefs objectForKey:@"pastebin-disableprompt"] boolValue];
+        self->_pastebin.on = ![[prefs objectForKey:@"pastebin-disableprompt"] boolValue];
     } else {
-        _pastebin.on = YES;
+        self->_pastebin.on = YES;
     }
     
     if([[prefs objectForKey:@"hideJoinPart"] isKindOfClass:[NSNumber class]]) {
-        _hideJoinPart.on = ![[prefs objectForKey:@"hideJoinPart"] boolValue];
+        self->_hideJoinPart.on = ![[prefs objectForKey:@"hideJoinPart"] boolValue];
     } else {
-        _hideJoinPart.on = YES;
+        self->_hideJoinPart.on = YES;
     }
     
     if([[prefs objectForKey:@"expandJoinPart"] isKindOfClass:[NSNumber class]]) {
-        _expandJoinPart.on = ![[prefs objectForKey:@"expandJoinPart"] boolValue];
+        self->_expandJoinPart.on = ![[prefs objectForKey:@"expandJoinPart"] boolValue];
     } else {
-        _expandJoinPart.on = YES;
+        self->_expandJoinPart.on = YES;
     }
     
-    _expandJoinPart.enabled = _hideJoinPart.on;
+    self->_expandJoinPart.enabled = self->_hideJoinPart.on;
     
     if([[prefs objectForKey:@"font"] isKindOfClass:[NSString class]]) {
-        _mono.on = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
+        self->_mono.on = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
     } else {
-        _mono.on = NO;
+        self->_mono.on = NO;
     }
     
     if([[prefs objectForKey:@"notifications-all"] isKindOfClass:[NSNumber class]]) {
-        _notifyAll.on = [[prefs objectForKey:@"notifications-all"] boolValue];
+        self->_notifyAll.on = [[prefs objectForKey:@"notifications-all"] boolValue];
     } else {
-        _notifyAll.on = NO;
+        self->_notifyAll.on = NO;
     }
     
     if([[prefs objectForKey:@"disableTrackUnread"] isKindOfClass:[NSNumber class]]) {
-        _showUnread.on = ![[prefs objectForKey:@"disableTrackUnread"] boolValue];
+        self->_showUnread.on = ![[prefs objectForKey:@"disableTrackUnread"] boolValue];
     } else {
-        _showUnread.on = YES;
+        self->_showUnread.on = YES;
     }
     
     if([[prefs objectForKey:@"enableReadOnSelect"] isKindOfClass:[NSNumber class]]) {
-        _markAsRead.on = [[prefs objectForKey:@"enableReadOnSelect"] boolValue];
+        self->_markAsRead.on = [[prefs objectForKey:@"enableReadOnSelect"] boolValue];
     } else {
-        _markAsRead.on = NO;
+        self->_markAsRead.on = NO;
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"chat-oneline"]) {
-        _oneLine.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-oneline"];
+        self->_oneLine.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-oneline"];
     } else {
-        _oneLine.on = YES;
+        self->_oneLine.on = YES;
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"chat-norealname"]) {
-        _noRealName.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
+        self->_noRealName.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"chat-norealname"];
     } else {
-        _noRealName.on = YES;
+        self->_noRealName.on = YES;
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"time-left"]) {
-        _timeLeft.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"time-left"];
+        self->_timeLeft.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"time-left"];
     } else {
-        _timeLeft.on = YES;
+        self->_timeLeft.on = YES;
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"avatars-off"]) {
-        _avatarsOff.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"avatars-off"];
+        self->_avatarsOff.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"avatars-off"];
     } else {
-        _avatarsOff.on = YES;
+        self->_avatarsOff.on = YES;
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"warnBeforeLaunchingBrowser"]) {
-        _browserWarning.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"warnBeforeLaunchingBrowser"];
+        self->_browserWarning.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"warnBeforeLaunchingBrowser"];
     } else {
-        _browserWarning.on = YES;
+        self->_browserWarning.on = YES;
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"inlineWifiOnly"]) {
-        _inlineWifiOnly.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"];
+        self->_inlineWifiOnly.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"inlineWifiOnly"];
     } else {
-        _inlineWifiOnly.on = YES;
+        self->_inlineWifiOnly.on = YES;
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"hiddenMembers"]) {
-        _hiddenMembers.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"];
+        self->_hiddenMembers.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"];
     } else {
-        _hiddenMembers.on = YES;
+        self->_hiddenMembers.on = YES;
     }
     
-    if(_oneLine.on) {
-        _noRealName.enabled = YES;
-        if(_avatarsOff.on) {
-            _timeLeft.enabled = NO;
-            _timeLeft.on = YES;
+    if(self->_oneLine.on) {
+        self->_noRealName.enabled = YES;
+        if(self->_avatarsOff.on) {
+            self->_timeLeft.enabled = NO;
+            self->_timeLeft.on = YES;
         } else {
-            _timeLeft.enabled = YES;
+            self->_timeLeft.enabled = YES;
         }
     } else {
-        _noRealName.enabled = NO;
-        _timeLeft.enabled = YES;
+        self->_noRealName.enabled = NO;
+        self->_timeLeft.enabled = YES;
     }
     
     if([[prefs objectForKey:@"ascii-compact"] isKindOfClass:[NSNumber class]]) {
-        _compact.on = [[prefs objectForKey:@"ascii-compact"] boolValue];
+        self->_compact.on = [[prefs objectForKey:@"ascii-compact"] boolValue];
     } else {
-        _compact.on = NO;
+        self->_compact.on = NO;
     }
     
     if([[prefs objectForKey:@"files-disableinline"] isKindOfClass:[NSNumber class]]) {
-        _disableInlineFiles.on = ![[prefs objectForKey:@"files-disableinline"] boolValue];
+        self->_disableInlineFiles.on = ![[prefs objectForKey:@"files-disableinline"] boolValue];
     } else {
-        _disableInlineFiles.on = YES;
+        self->_disableInlineFiles.on = YES;
     }
     
     if([[prefs objectForKey:@"inlineimages"] isKindOfClass:[NSNumber class]]) {
-        _inlineImages.on = [[prefs objectForKey:@"inlineimages"] boolValue];
+        self->_inlineImages.on = [[prefs objectForKey:@"inlineimages"] boolValue];
     } else {
-        _inlineImages.on = NO;
+        self->_inlineImages.on = NO;
     }
     
     if([[prefs objectForKey:@"emoji-nobig"] isKindOfClass:[NSNumber class]]) {
-        _disableBigEmoji.on = ![[prefs objectForKey:@"emoji-nobig"] boolValue];
+        self->_disableBigEmoji.on = ![[prefs objectForKey:@"emoji-nobig"] boolValue];
     } else {
-        _disableBigEmoji.on = YES;
+        self->_disableBigEmoji.on = YES;
     }
     
     if([[prefs objectForKey:@"chat-nocodespan"] isKindOfClass:[NSNumber class]]) {
-        _disableCodeSpan.on = ![[prefs objectForKey:@"chat-nocodespan"] boolValue];
+        self->_disableCodeSpan.on = ![[prefs objectForKey:@"chat-nocodespan"] boolValue];
     } else {
-        _disableCodeSpan.on = YES;
+        self->_disableCodeSpan.on = YES;
     }
     
     if([[prefs objectForKey:@"chat-nocodeblock"] isKindOfClass:[NSNumber class]]) {
-        _disableCodeBlock.on = ![[prefs objectForKey:@"chat-nocodeblock"] boolValue];
+        self->_disableCodeBlock.on = ![[prefs objectForKey:@"chat-nocodeblock"] boolValue];
     } else {
-        _disableCodeBlock.on = YES;
+        self->_disableCodeBlock.on = YES;
     }
     
     if([[prefs objectForKey:@"chat-noquote"] isKindOfClass:[NSNumber class]]) {
-        _disableQuote.on = ![[prefs objectForKey:@"chat-noquote"] boolValue];
+        self->_disableQuote.on = ![[prefs objectForKey:@"chat-noquote"] boolValue];
     } else {
-        _disableQuote.on = YES;
+        self->_disableQuote.on = YES;
     }
     
-    _screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
-    _autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
-    _saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
-    _notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
-    _tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
-    _fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
-    _imageViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"];
-    _videoViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"];
-    _defaultSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"defaultSound"];
-    _notificationPreviews.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"disableNotificationPreviews"];
-    _thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
-    _clearFormattingAfterSending.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"];
-    _avatarImages.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
+    self->_screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
+    self->_autoCaps.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"];
+    self->_saveToCameraRoll.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"];
+    self->_notificationSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"];
+    self->_tabletMode.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"];
+    self->_fontSize.value = [[NSUserDefaults standardUserDefaults] floatForKey:@"fontSize"];
+    self->_imageViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"];
+    self->_videoViewer.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"];
+    self->_defaultSound.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"defaultSound"];
+    self->_notificationPreviews.on = ![[NSUserDefaults standardUserDefaults] boolForKey:@"disableNotificationPreviews"];
+    self->_thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
+    self->_clearFormattingAfterSending.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"];
+    self->_avatarImages.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
 #ifndef APPSTORE
-    _backgroundUploads.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"];
+    self->_backgroundUploads.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"];
 #endif
 }
 
 -(void)hideJoinPartToggled:(id)sender {
-    _expandJoinPart.enabled = _hideJoinPart.on;
+    self->_expandJoinPart.enabled = self->_hideJoinPart.on;
 }
 
 -(void)oneLineToggled:(id)sender {
-    if(_oneLine.on) {
-        _noRealName.enabled = YES;
-        if(_avatarsOff.on) {
-            _timeLeft.enabled = NO;
-            _timeLeft.on = YES;
+    if(self->_oneLine.on) {
+        self->_noRealName.enabled = YES;
+        if(self->_avatarsOff.on) {
+            self->_timeLeft.enabled = NO;
+            self->_timeLeft.on = YES;
         } else {
-            _timeLeft.enabled = YES;
+            self->_timeLeft.enabled = YES;
         }
     } else {
-        _noRealName.enabled = NO;
-        _timeLeft.enabled = YES;
+        self->_noRealName.enabled = NO;
+        self->_timeLeft.enabled = YES;
     }
 }
 
 -(void)monoToggled:(id)sender {
-    if(_mono.on)
-        _fontSizeCell.fontSample.font = [UIFont fontWithName:@"Hack" size:_fontSize.value - 1];
+    if(self->_mono.on)
+        self->_fontSizeCell.fontSample.font = [UIFont fontWithName:@"Hack" size:self->_fontSize.value - 1];
     else
-        _fontSizeCell.fontSample.font = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:_fontSize.value];
+        self->_fontSizeCell.fontSample.font = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:self->_fontSize.value];
 }
 
 -(void)notificationPreviewsToggled:(id)sender {
-    _thirdPartyNotificationPreviews.enabled = _notificationPreviews.on;
+    self->_thirdPartyNotificationPreviews.enabled = self->_notificationPreviews.on;
 }
 
 -(void)thirdPartyNotificationPreviewsToggled:(UISwitch *)sender {
-    [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    [self->_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     if(sender.on) {
         UIAlertController *ac = [UIAlertController alertControllerWithTitle:@"Warning" message:@"External URLs may load insecurely and could result in your IP address being revealed to external site operators" preferredStyle:UIAlertControllerStyleAlert];
         
@@ -1277,9 +1277,9 @@
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if(_alertView) {
-        [_alertView dismissWithClickedButtonIndex:1 animated:YES];
-        [self alertView:_alertView clickedButtonAtIndex:1];
+    if(self->_alertView) {
+        [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
+        [self alertView:self->_alertView clickedButtonAtIndex:1];
     }
     [self.tableView endEditing:YES];
     return NO;
@@ -1293,7 +1293,7 @@
 #pragma mark - Table view data source
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    if(indexPath.section == 1 || [[[_data objectAtIndex:indexPath.section] objectForKey:@"title"] isEqualToString:@"Font Size"])
+    if(indexPath.section == 1 || [[[self->_data objectAtIndex:indexPath.section] objectForKey:@"title"] isEqualToString:@"Font Size"])
         return 80;
     else
         return 48;
@@ -1304,11 +1304,11 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [(NSArray *)[[_data objectAtIndex:section] objectForKey:@"items"] count];
+    return [(NSArray *)[[self->_data objectAtIndex:section] objectForKey:@"items"] count];
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    return [[_data objectAtIndex:section] objectForKey:@"title"];
+    return [[self->_data objectAtIndex:section] objectForKey:@"title"];
 }
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
@@ -1334,7 +1334,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString *identifier = [NSString stringWithFormat:@"settingscell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
-    NSDictionary *item = [[[_data objectAtIndex:indexPath.section] objectForKey:@"items"] objectAtIndex:indexPath.row];
+    NSDictionary *item = [[[self->_data objectAtIndex:indexPath.section] objectForKey:@"items"] objectAtIndex:indexPath.row];
     
     if([item objectForKey:@"special"]) {
         UITableViewCell *(^special)(UITableViewCell *cell, NSString *identifier) = [item objectForKey:@"special"];
@@ -1363,7 +1363,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    NSDictionary *item = [[[_data objectAtIndex:indexPath.section] objectForKey:@"items"] objectAtIndex:indexPath.row];
+    NSDictionary *item = [[[self->_data objectAtIndex:indexPath.section] objectForKey:@"items"] objectAtIndex:indexPath.row];
 
     if([item objectForKey:@"selected"]) {
         void (^selected)(void) = [item objectForKey:@"selected"];

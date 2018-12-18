@@ -71,105 +71,105 @@ volatile BOOL __socketPaused = NO;
     self = [super init];
     if(self) {
         NetworkConnection *conn = [NetworkConnection sharedInstance];
-        _url = URL;
-        _bid = -1;
-        _parser = [SBJson5Parser unwrapRootArrayParserWithBlock:^(id item, BOOL *stop) {
-            if(_cancelled)
+        self->_url = URL;
+        self->_bid = -1;
+        self->_parser = [SBJson5Parser unwrapRootArrayParserWithBlock:^(id item, BOOL *stop) {
+            if(self->_cancelled)
                 *stop = YES;
             else
                 [conn parse:item backlog:YES];
         } errorHandler:^(NSError *error) {
             CLS_LOG(@"OOB JSON ERROR: %@", error);
         }];
-        _cancelled = NO;
-        _running = NO;
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+        self->_cancelled = NO;
+        self->_running = NO;
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self->_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
         
-        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-        [_connection setDelegateQueue:[NetworkConnection sharedInstance].queue];
+        self->_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+        [self->_connection setDelegateQueue:[NetworkConnection sharedInstance].queue];
     }
     return self;
 }
 -(void)cancel {
     CLS_LOG(@"Cancelled OOB fetcher for URL: %@", _url);
-    _cancelled = YES;
-    _running = NO;
-    [_connection cancel];
+    self->_cancelled = YES;
+    self->_running = NO;
+    [self->_connection cancel];
 }
 -(void)start {
-    if(_cancelled || _running) {
+    if(self->_cancelled || _running) {
         CLS_LOG(@"Not starting cancelled OOB fetcher");
         return;
     }
     
-    if(_connection) {
-        _running = YES;
-        [_connection start];
+    if(self->_connection) {
+        self->_running = YES;
+        [self->_connection start];
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
     } else {
         CLS_LOG(@"Failed to create NSURLConnection");
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
-        if(_completionHandler)
-            _completionHandler(NO);
+        if(self->_completionHandler)
+            self->_completionHandler(NO);
     }
 }
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
     return nil;
 }
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    if(_cancelled) {
+    if(self->_cancelled) {
         CLS_LOG(@"Request failed for cancelled OOB fetcher, ignoring");
         return;
     }
 	CLS_LOG(@"Request failed: %@", error);
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
-        if(_completionHandler)
-            _completionHandler(NO);
+        if(self->_completionHandler)
+            self->_completionHandler(NO);
     }];
-    _running = NO;
-    _cancelled = YES;
+    self->_running = NO;
+    self->_cancelled = YES;
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if(_cancelled) {
+    if(self->_cancelled) {
         CLS_LOG(@"Connection finished loading for cancelled OOB fetcher, ignoring");
         return;
     }
 	CLS_LOG(@"Backlog download completed");
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if(!_cancelled) {
+        if(!self->_cancelled) {
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
-            if(_completionHandler)
-                _completionHandler(YES);
+            if(self->_completionHandler)
+                self->_completionHandler(YES);
         }
     }];
-    _running = NO;
+    self->_running = NO;
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
-    if(_cancelled)
+    if(self->_cancelled)
         return nil;
 	CLS_LOG(@"Fetching: %@", [request URL]);
 	return request;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
-	if(!_cancelled && [response statusCode] != 200) {
+	if(!self->_cancelled && [response statusCode] != 200) {
         CLS_LOG(@"HTTP status code: %li", (long)[response statusCode]);
 		CLS_LOG(@"HTTP headers: %@", [response allHeaderFields]);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
-            if(_completionHandler)
-                _completionHandler(NO);
+            if(self->_completionHandler)
+                self->_completionHandler(NO);
         }];
-        _cancelled = YES;
+        self->_cancelled = YES;
 	}
 }
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     //NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
-    if(!_cancelled) {
-        [_parser parse:data];
+    if(!self->_cancelled) {
+        [self->_parser parse:data];
     } else {
         CLS_LOG(@"Ignoring data for cancelled OOB fetcher");
     }
@@ -248,27 +248,27 @@ volatile BOOL __socketPaused = NO;
                                                         }}];
     __serializeLock = [[NSLock alloc] init];
     __userInfoLock = [[NSLock alloc] init];
-    _queue = [[NSOperationQueue alloc] init];
-    _servers = [ServersDataSource sharedInstance];
-    _buffers = [BuffersDataSource sharedInstance];
-    _channels = [ChannelsDataSource sharedInstance];
-    _users = [UsersDataSource sharedInstance];
-    _events = [EventsDataSource sharedInstance];
-    _notifications = [NotificationsDataSource sharedInstance];
-    _state = kIRCCloudStateDisconnected;
-    _oobQueue = [[NSMutableArray alloc] init];
-    _awayOverride = nil;
-    _lastReqId = 1;
-    _idleInterval = 20;
-    _reconnectTimestamp = -1;
-    _failCount = 0;
-    _notifier = NO;
+    self->_queue = [[NSOperationQueue alloc] init];
+    self->_servers = [ServersDataSource sharedInstance];
+    self->_buffers = [BuffersDataSource sharedInstance];
+    self->_channels = [ChannelsDataSource sharedInstance];
+    self->_users = [UsersDataSource sharedInstance];
+    self->_events = [EventsDataSource sharedInstance];
+    self->_notifications = [NotificationsDataSource sharedInstance];
+    self->_state = kIRCCloudStateDisconnected;
+    self->_oobQueue = [[NSMutableArray alloc] init];
+    self->_awayOverride = nil;
+    self->_lastReqId = 1;
+    self->_idleInterval = 20;
+    self->_reconnectTimestamp = -1;
+    self->_failCount = 0;
+    self->_notifier = NO;
     [self _createJSONParser];
-    _writer = [[SBJson5Writer alloc] init];
-    _reachabilityValid = NO;
-    _reachability = nil;
-    _resultHandlers = [[NSMutableDictionary alloc] init];
-    _pendingEdits = [[NSMutableArray alloc] init];
+    self->_writer = [[SBJson5Writer alloc] init];
+    self->_reachabilityValid = NO;
+    self->_reachability = nil;
+    self->_resultHandlers = [[NSMutableDictionary alloc] init];
+    self->_pendingEdits = [[NSMutableArray alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogStarted:) name:kIRCCloudBacklogStartedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_backlogFailed:) name:kIRCCloudBacklogFailedNotification object:nil];
@@ -290,10 +290,10 @@ volatile BOOL __socketPaused = NO;
     
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
     [__userInfoLock lock];
-    _userInfo = [NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile];
+    self->_userInfo = [NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile];
     [__userInfoLock unlock];
     if(self.userInfo) {
-        _config = [self.userInfo objectForKey:@"config"];
+        self->_config = [self.userInfo objectForKey:@"config"];
     }
     
     CLS_LOG(@"%@", _userAgent);
@@ -305,15 +305,15 @@ volatile BOOL __socketPaused = NO;
     };
     
     void (^alert)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-        if(!backlog && !_resuming)
+        if(!backlog && !self->_resuming)
             [self postObject:object forEvent:kIRCEventAlert];
     };
     
     void (^makeserver)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-        Server *server = [_servers getServer:object.cid];
+        Server *server = [self->_servers getServer:object.cid];
         if(!server) {
             server = [[Server alloc] init];
-            [_servers addServer:server];
+            [self->_servers addServer:server];
         }
         server.cid = object.cid;
         server.name = [object objectForKey:@"name"];
@@ -330,7 +330,7 @@ volatile BOOL __socketPaused = NO;
         server.join_commands = [object objectForKey:@"join_commands"];
         server.fail_info = [object objectForKey:@"fail_info"];
         server.caps = [object objectForKey:@"caps"];
-        server.away = (backlog && [_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
+        server.away = (backlog && [self->_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
         if([[self.userInfo objectForKey:@"autoaway"] intValue] && [server.away isEqualToString:@"Auto-away"])
             server.away = @"";
         server.ignores = [object objectForKey:@"ignores"];
@@ -366,40 +366,40 @@ volatile BOOL __socketPaused = NO;
             server.slack = [[object objectForKey:@"slack"] intValue];
         else
             server.slack = 0;
-        if(!backlog && !_resuming)
+        if(!backlog && !self->_resuming)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };
     
     void (^msg)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-        Buffer *b = [_buffers getBuffer:object.bid];
+        Buffer *b = [self->_buffers getBuffer:object.bid];
         if(b) {
-            Event *event = [_events addJSONObject:object];
+            Event *event = [self->_events addJSONObject:object];
             if(event.eid == -1) {
                 alert(object,backlog);
             } else {
-                if((!backlog || _resuming || [[_oobQueue firstObject] bid] == -1) && event.eid > _highestEID) {
-                    _highestEID = event.eid;
+                if((!backlog || self->_resuming || [[self->_oobQueue firstObject] bid] == -1) && event.eid > self->_highestEID) {
+                    self->_highestEID = event.eid;
                 }
                 if(event.eid > b.last_seen_eid && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"])) {
                     BOOL show = YES;
-                    if([[_servers getServer:event.cid].ignore match:event.ignoreMask] || [[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
+                    if([[self->_servers getServer:event.cid].ignore match:event.ignoreMask] || [[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
                         show = NO;
                     }
                     
-                    if(show && ![_notifications getNotification:event.eid bid:event.bid]) {
-                        [_notifications notify:[NSString stringWithFormat:@"<%@> %@",event.from,event.msg] category:event.type cid:event.cid bid:event.bid eid:event.eid];
+                    if(show && ![self->_notifications getNotification:event.eid bid:event.bid]) {
+                        [self->_notifications notify:[NSString stringWithFormat:@"<%@> %@",event.from,event.msg] category:event.type cid:event.cid bid:event.bid eid:event.eid];
                         if(!backlog)
-                            [_notifications updateBadgeCount];
+                            [self->_notifications updateBadgeCount];
                     }
                 }
-                if((!backlog && !_resuming) || event.reqId > 0) {
+                if((!backlog && !self->_resuming) || event.reqId > 0) {
                     [self postObject:event forEvent:kIRCEventBufferMsg];
                     event.entities = [object objectForKey:@"entities"];
                     
                     NSTimeInterval entity_eid = event.eid;
                     for(int i = 0; i < [[event.entities objectForKey:@"files"] count]; i++) {
                         entity_eid += 1;
-                        [self postObject:[_events event:entity_eid buffer:event.bid] forEvent:kIRCEventBufferMsg];
+                        [self postObject:[self->_events event:entity_eid buffer:event.bid] forEvent:kIRCEventBufferMsg];
                     }
                 }
             }
@@ -407,15 +407,15 @@ volatile BOOL __socketPaused = NO;
     };
     
     void (^joined_channel)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-        [_events addJSONObject:object];
+        [self->_events addJSONObject:object];
         if(!backlog) {
-            User *user = [_users getUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+            User *user = [self->_users getUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             if(!user) {
                 user = [[User alloc] init];
                 user.cid = object.cid;
                 user.bid = object.bid;
                 user.nick = [object objectForKey:@"nick"];
-                [_users addUser:user];
+                [self->_users addUser:user];
             }
             if(user.nick)
                 user.old_nick = user.nick;
@@ -428,44 +428,44 @@ volatile BOOL __socketPaused = NO;
                 user.display_name = [object objectForKey:@"display_name"];
             else
                 user.display_name = nil;
-            if(!_resuming)
+            if(!self->_resuming)
                 [self postObject:object forEvent:kIRCEventJoin];
         }
     };
     
     void (^parted_channel)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-        [_events addJSONObject:object];
+        [self->_events addJSONObject:object];
         if(!backlog) {
-            [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+            [self->_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             if([object.type isEqualToString:@"you_parted_channel"]) {
-                [_channels removeChannelForBuffer:object.bid];
-                [_users removeUsersForBuffer:object.bid];
+                [self->_channels removeChannelForBuffer:object.bid];
+                [self->_users removeUsersForBuffer:object.bid];
             }
-            if(!_resuming)
+            if(!self->_resuming)
                 [self postObject:object forEvent:kIRCEventPart];
         }
     };
     
     void (^kicked_channel)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-        [_events addJSONObject:object];
+        [self->_events addJSONObject:object];
         if(!backlog) {
-            [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+            [self->_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
             if([object.type isEqualToString:@"you_kicked_channel"]) {
-                [_channels removeChannelForBuffer:object.bid];
-                [_users removeUsersForBuffer:object.bid];
+                [self->_channels removeChannelForBuffer:object.bid];
+                [self->_users removeUsersForBuffer:object.bid];
             }
-            if(!_resuming)
+            if(!self->_resuming)
                 [self postObject:object forEvent:kIRCEventKick];
         }
     };
     
     void (^nickchange)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-        [_events addJSONObject:object];
+        [self->_events addJSONObject:object];
         if(!backlog) {
-            [_users updateNick:[object objectForKey:@"newnick"] oldNick:[object objectForKey:@"oldnick"] cid:object.cid bid:object.bid];
+            [self->_users updateNick:[object objectForKey:@"newnick"] oldNick:[object objectForKey:@"oldnick"] cid:object.cid bid:object.bid];
             if([object.type isEqualToString:@"you_nickchange"])
-                [_servers updateNick:[object objectForKey:@"newnick"] server:object.cid];
-            if(!_resuming)
+                [self->_servers updateNick:[object objectForKey:@"newnick"] server:object.cid];
+            if(!self->_resuming)
                 [self postObject:object forEvent:kIRCEventNickChange];
         }
     };
@@ -473,65 +473,65 @@ volatile BOOL __socketPaused = NO;
     NSMutableDictionary *parserMap = @{
                    @"idle":ignored, @"end_of_backlog":ignored, @"oob_skipped":ignored, @"num_invites":ignored, @"user_account":ignored, @"twitch_hosttarget_start":ignored, @"twitch_hosttarget_stop":ignored, @"twitch_usernotice":ignored,
                    @"header": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       _state = kIRCCloudStateConnected;
+                       self->_state = kIRCCloudStateConnected;
                        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-                       _idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
-                       _clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
-                       _streamId = [object objectForKey:@"streamid"];
-                       _accrued = [[object objectForKey:@"accrued"] intValue];
-                       _currentCount = 0;
-                       _resuming = [[object objectForKey:@"resumed"] boolValue];
-                       CLS_LOG(@"idle interval: %f clock offset: %f stream id: %@ resumed: %i", _idleInterval, _clockOffset, _streamId, _resuming);
-                       if(_accrued > 0) {
+                       self->_idleInterval = ([[object objectForKey:@"idle_interval"] doubleValue] / 1000.0) + 10;
+                       self->_clockOffset = [[NSDate date] timeIntervalSince1970] - [[object objectForKey:@"time"] doubleValue];
+                       self->_streamId = [object objectForKey:@"streamid"];
+                       self->_accrued = [[object objectForKey:@"accrued"] intValue];
+                       self->_currentCount = 0;
+                       self->_resuming = [[object objectForKey:@"resumed"] boolValue];
+                       CLS_LOG(@"idle interval: %f clock offset: %f stream id: %@ resumed: %i", self->_idleInterval, self->_clockOffset, self->_streamId, self->_resuming);
+                       if(self->_accrued > 0) {
                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:nil];
                            }];
                        }
-                       if(_highestEID > 0 && !_resuming) {
+                       if(self->_highestEID > 0 && !self->_resuming) {
                            CLS_LOG(@"Unable to resume socket, requesting a full OOB load");
-                           [_events clear];
-                           _highestEID = 0;
-                           _streamId = nil;
-                           _pendingEdits = [[NSMutableArray alloc] init];
+                           [self->_events clear];
+                           self->_highestEID = 0;
+                           self->_streamId = nil;
+                           self->_pendingEdits = [[NSMutableArray alloc] init];
                            [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
-                           _state = kIRCCloudStateDisconnected;
+                           self->_state = kIRCCloudStateDisconnected;
                            [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
                        }
                    },
                    @"backlog_cache_init": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        CLS_LOG(@"backlog_cache_init for bid%i", object.bid);
-                       [_events removeEventsForBuffer:object.bid];
+                       [self->_events removeEventsForBuffer:object.bid];
                        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:object.bid];
                        if(b && b.created < object.eid)
                            b.deferred = 1;
                    },
                    @"global_system_message": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!_resuming && !backlog && [object objectForKey:@"system_message_type"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"eval"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"refresh"]) {
-                           _globalMsg = [object objectForKey:@"msg"];
+                       if(!self->_resuming && !backlog && [object objectForKey:@"system_message_type"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"eval"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"refresh"]) {
+                           self->_globalMsg = [object objectForKey:@"msg"];
                            [self postObject:object forEvent:kIRCEventGlobalMsg];
                        }
                    },
                    @"oob_include": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        __socketPaused = YES;
-                       _awayOverride = [[NSMutableDictionary alloc] init];
-                       _reconnectTimestamp = -1;
+                       self->_awayOverride = [[NSMutableDictionary alloc] init];
+                       self->_reconnectTimestamp = -1;
                        CLS_LOG(@"oob_include, invalidating BIDs");
-                       [_buffers invalidate];
-                       [_channels invalidate];
+                       [self->_buffers invalidate];
+                       [self->_channels invalidate];
                        [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
                    },
                    @"oob_timeout": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        CLS_LOG(@"OOB timed out");
                        [self clearOOB];
-                       _highestEID = 0;
-                       _streamId = nil;
+                       self->_highestEID = 0;
+                       self->_streamId = nil;
                        [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
-                       _state = kIRCCloudStateDisconnected;
+                       self->_state = kIRCCloudStateDisconnected;
                        [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
                    },
                    @"stat_user": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        [__userInfoLock lock];
-                       _userInfo = object.dictionary;
+                       self->_userInfo = object.dictionary;
                        [__userInfoLock unlock];
                        if([[self.userInfo objectForKey:@"uploads_disabled"] intValue] == 1 && [[self.userInfo objectForKey:@"id"] intValue] != 11694)
                            [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"uploadsAvailable"];
@@ -545,7 +545,7 @@ volatile BOOL __socketPaused = NO;
                        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
                        [d synchronize];
 
-                       _prefs = nil;
+                       self->_prefs = nil;
 #ifndef EXTENSION
                        NSDictionary *p = [self prefs];
                        if([p objectForKey:@"theme"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]) {
@@ -586,7 +586,7 @@ volatile BOOL __socketPaused = NO;
                            [[NSUserDefaults standardUserDefaults] setObject:[object objectForKey:@"id"] forKey:@"last_uid"];
                        }
                        [[NSUserDefaults standardUserDefaults] synchronize];
-                       [_events reformat];
+                       [self->_events reformat];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
                        CLS_LOG(@"Prefs: %@", [self prefs]);
@@ -594,22 +594,22 @@ volatile BOOL __socketPaused = NO;
                    },
                    @"backlog_starts": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if([object objectForKey:@"numbuffers"]) {
-                           CLS_LOG(@"I currently have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
-                           _numBuffers = [[object objectForKey:@"numbuffers"] intValue];
-                           _totalBuffers = 0;
-                           CLS_LOG(@"OOB includes has %i buffers", _numBuffers);
+                           CLS_LOG(@"I currently have %lu servers with %lu buffers", (unsigned long)[self->_servers count], (unsigned long)[self->_buffers count]);
+                           self->_numBuffers = [[object objectForKey:@"numbuffers"] intValue];
+                           self->_totalBuffers = 0;
+                           CLS_LOG(@"OOB includes has %i buffers", self->_numBuffers);
                        }
                    },
                    @"makeserver": makeserver,
                    @"server_details_changed": makeserver,
                    @"makebuffer": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       Buffer *buffer = [_buffers getBuffer:object.bid];
+                       Buffer *buffer = [self->_buffers getBuffer:object.bid];
                        if(!buffer) {
                            buffer = [[Buffer alloc] init];
                            buffer.bid = object.bid;
                            buffer.scrolledUpFrom = -1;
                            buffer.savedScrollOffset = -1;
-                           [_buffers addBuffer:buffer];
+                           [self->_buffers addBuffer:buffer];
                        }
                        buffer.bid = object.bid;
                        buffer.cid = object.cid;
@@ -630,16 +630,16 @@ volatile BOOL __socketPaused = NO;
                            if(server.deferred_archives)
                                server.deferred_archives--;
                        }
-                       [_notifications removeNotificationsForBID:buffer.bid olderThan:buffer.last_seen_eid];
-                       if(!backlog && !_resuming)
+                       [self->_notifications removeNotificationsForBID:buffer.bid olderThan:buffer.last_seen_eid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:buffer forEvent:kIRCEventMakeBuffer];
-                       if(_numBuffers > 0) {
-                           _totalBuffers++;
-                           [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@((float)_totalBuffers / (float)_numBuffers) waitUntilDone:YES];
+                       if(self->_numBuffers > 0) {
+                           self->_totalBuffers++;
+                           [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@((float)self->_totalBuffers / (float)self->_numBuffers) waitUntilDone:YES];
                        }
                    },
                    @"backlog_complete": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && _oobQueue.count == 0) {
+                       if(!backlog && self->_oobQueue.count == 0) {
                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                CLS_LOG(@"backlog_complete from websocket");
                                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:nil];
@@ -647,80 +647,80 @@ volatile BOOL __socketPaused = NO;
                        }
                    },
                    @"who_response": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog && !_resuming) {
-                           Buffer *b = [_buffers getBufferWithName:[object objectForKey:@"subject"] server:[[object objectForKey:@"cid"] intValue]];
+                       if(!backlog && !self->_resuming) {
+                           Buffer *b = [self->_buffers getBufferWithName:[object objectForKey:@"subject"] server:[[object objectForKey:@"cid"] intValue]];
                            if(b) {
                                for(NSDictionary *user in [object objectForKey:@"users"]) {
-                                   [_users updateHostmask:[user objectForKey:@"usermask"] nick:[user objectForKey:@"nick"] cid:b.cid bid:b.bid];
-                                   [_users updateAway:[[user objectForKey:@"away"] intValue] nick:[user objectForKey:@"nick"] cid:b.cid];
+                                   [self->_users updateHostmask:[user objectForKey:@"usermask"] nick:[user objectForKey:@"nick"] cid:b.cid bid:b.bid];
+                                   [self->_users updateAway:[[user objectForKey:@"away"] intValue] nick:[user objectForKey:@"nick"] cid:b.cid];
                                }
                            }
                            [self postObject:object forEvent:kIRCEventWhoList];
                        }
                    },
                    @"connection_deleted": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_servers removeAllDataForServer:object.cid];
-                       if(!backlog && !_resuming)
+                       [self->_servers removeAllDataForServer:object.cid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventConnectionDeleted];
                    },
                    @"delete_buffer": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_buffers removeAllDataForBuffer:object.bid];
-                       if(!backlog && !_resuming)
+                       [self->_buffers removeAllDataForBuffer:object.bid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventDeleteBuffer];
                    },
                    @"buffer_archived": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_buffers updateArchived:1 buffer:object.bid];
-                       if(!backlog && !_resuming)
+                       [self->_buffers updateArchived:1 buffer:object.bid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventBufferArchived];
                    },
                    @"buffer_unarchived": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_buffers updateArchived:0 buffer:object.bid];
-                       if(!backlog && !_resuming)
+                       [self->_buffers updateArchived:0 buffer:object.bid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventBufferUnarchived];
                    },
                    @"rename_conversation": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_buffers updateName:[object objectForKey:@"new_name"] buffer:object.bid];
-                       if(!backlog && !_resuming)
+                       [self->_buffers updateName:[object objectForKey:@"new_name"] buffer:object.bid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventRenameConversation];
                    },
                    @"rename_channel": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_buffers updateName:[object objectForKey:@"new_name"] buffer:object.bid];
-                       Channel *c = [_channels channelForBuffer:object.bid];
+                       [self->_buffers updateName:[object objectForKey:@"new_name"] buffer:object.bid];
+                       Channel *c = [self->_channels channelForBuffer:object.bid];
                        if(c)
                            c.name = [object objectForKey:@"new_name"];
-                       if(!backlog && !_resuming)
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventRenameConversation];
                    },
                    @"status_changed": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       CLS_LOG(@"cid%i changed to status %@ (backlog: %i resuming: %i)", object.cid, [object objectForKey:@"new_status"], backlog, _resuming);
-                       [_servers updateStatus:[object objectForKey:@"new_status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
+                       CLS_LOG(@"cid%i changed to status %@ (backlog: %i resuming: %i)", object.cid, [object objectForKey:@"new_status"], backlog, self->_resuming);
+                       [self->_servers updateStatus:[object objectForKey:@"new_status"] failInfo:[object objectForKey:@"fail_info"] server:object.cid];
                        if(!backlog) {
                            if([[object objectForKey:@"new_status"] isEqualToString:@"disconnected"]) {
-                               NSArray *channels = [_channels channelsForServer:object.cid];
+                               NSArray *channels = [self->_channels channelsForServer:object.cid];
                                for(Channel *c in channels) {
-                                   [_channels removeChannelForBuffer:c.bid];
+                                   [self->_channels removeChannelForBuffer:c.bid];
                                }
                            }
                            [self postObject:object forEvent:kIRCEventStatusChanged];
                        }
                    },
                    @"time": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       Event *event = [_events addJSONObject:object];
-                       if(!backlog && !_resuming) {
+                       Event *event = [self->_events addJSONObject:object];
+                       if(!backlog && !self->_resuming) {
                            [self postObject:object forEvent:kIRCEventAlert];
                            [self postObject:event forEvent:kIRCEventBufferMsg];
                        }
                    },
                    @"link_channel": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
-                       if(!backlog && !_resuming)
+                       [self->_events addJSONObject:object];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventLinkChannel];
                    },
                    @"channel_init": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       Channel *channel = [_channels channelForBuffer:object.bid];
+                       Channel *channel = [self->_channels channelForBuffer:object.bid];
                        if(!channel) {
                            channel = [[Channel alloc] init];
-                           [_channels addChannel:channel];
+                           [self->_channels addChannel:channel];
                        }
                        channel.cid = object.cid;
                        channel.bid = object.bid;
@@ -735,8 +735,8 @@ volatile BOOL __socketPaused = NO;
                        channel.url = [object objectForKey:@"url"];
                        channel.valid = YES;
                        channel.key = NO;
-                       [_channels updateMode:[object objectForKey:@"mode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
-                       [_users removeUsersForBuffer:object.bid];
+                       [self->_channels updateMode:[object objectForKey:@"mode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
+                       [self->_users removeUsersForBuffer:object.bid];
                        for(NSDictionary *member in [object objectForKey:@"members"]) {
                            User *user = [[User alloc] init];
                            user.cid = object.cid;
@@ -750,53 +750,53 @@ volatile BOOL __socketPaused = NO;
                                user.display_name = [member objectForKey:@"display_name"];
                            else
                                user.display_name = nil;
-                           [_users addUser:user];
+                           [self->_users addUser:user];
                        }
-                       if(!backlog && !_resuming)
+                       if(!backlog && !self->_resuming)
                            [self postObject:channel forEvent:kIRCEventChannelInit];
                    },
                    @"channel_topic": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
+                       [self->_events addJSONObject:object];
                        if(!backlog) {
-                           [_channels updateTopic:[object objectForKey:@"topic"] time:object.eid/1000000 author:[[object objectForKey:@"author"] length]?[object objectForKey:@"author"]:[object objectForKey:@"server"] buffer:object.bid];
-                           if(!_resuming)
+                           [self->_channels updateTopic:[object objectForKey:@"topic"] time:object.eid/1000000 author:[[object objectForKey:@"author"] length]?[object objectForKey:@"author"]:[object objectForKey:@"server"] buffer:object.bid];
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventChannelTopic];
                        }
                    },
                    @"channel_topic_is": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!backlog) {
-                           Buffer *b = [_buffers getBufferWithName:[object objectForKey:@"chan"] server:object.cid];
+                           Buffer *b = [self->_buffers getBufferWithName:[object objectForKey:@"chan"] server:object.cid];
                            if(b) {
-                               [_channels updateTopic:[object objectForKey:@"text"] time:[[object objectForKey:@"time"] longValue] author:[object objectForKey:@"author"] buffer:b.bid];
+                               [self->_channels updateTopic:[object objectForKey:@"text"] time:[[object objectForKey:@"time"] longValue] author:[object objectForKey:@"author"] buffer:b.bid];
                            }
-                           if(!_resuming)
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventChannelTopicIs];
                        }
                    },
                    @"channel_url": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!backlog)
-                           [_channels updateURL:[object objectForKey:@"url"] buffer:object.bid];
+                           [self->_channels updateURL:[object objectForKey:@"url"] buffer:object.bid];
                    },
                    @"channel_mode": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
+                       [self->_events addJSONObject:object];
                        if(!backlog) {
-                           [_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
-                           if(!_resuming)
+                           [self->_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventChannelMode];
                        }
                    },
                    @"channel_mode_is": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
+                       [self->_events addJSONObject:object];
                        if(!backlog) {
-                           [_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
-                           if(!_resuming)
+                           [self->_channels updateMode:[object objectForKey:@"newmode"] buffer:object.bid ops:[object objectForKey:@"ops"]];
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventChannelMode];
                        }
                    },
                    @"channel_timestamp": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!backlog) {
-                           [_channels updateTimestamp:[[object objectForKey:@"timestamp"] doubleValue] buffer:object.bid];
-                           if(!_resuming)
+                           [self->_channels updateTimestamp:[[object objectForKey:@"timestamp"] doubleValue] buffer:object.bid];
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventChannelTimestamp];
                        }
                    },
@@ -805,23 +805,23 @@ volatile BOOL __socketPaused = NO;
                    @"kicked_channel":kicked_channel, @"you_kicked_channel":kicked_channel,
                    @"nickchange":nickchange, @"you_nickchange":nickchange,
                    @"quit": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
+                       [self->_events addJSONObject:object];
                        if(!backlog) {
-                           [_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                           if(!_resuming)
+                           [self->_users removeUser:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventQuit];
                        }
                    },
                    @"quit_server": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
-                       if(!backlog && !_resuming)
+                       [self->_events addJSONObject:object];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventQuit];
                    },
                    @"user_channel_mode": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
+                       [self->_events addJSONObject:object];
                        if(!backlog) {
-                           [_users updateMode:[object objectForKey:@"newmode"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
-                           if(!_resuming)
+                           [self->_users updateMode:[object objectForKey:@"newmode"] nick:[object objectForKey:@"nick"] cid:object.cid bid:object.bid];
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventUserChannelMode];
                        }
                    },
@@ -831,87 +831,87 @@ volatile BOOL __socketPaused = NO;
                        NSString *nick;
                        while((nick = (NSString *)(keys.nextObject))) {
                            NSDictionary *update = [updates objectForKey:nick];
-                           [_users updateAway:[[update objectForKey:@"away"] intValue] nick:nick cid:object.cid];
-                           [_users updateHostmask:[update objectForKey:@"usermask"] nick:nick cid:object.cid bid:object.bid];
+                           [self->_users updateAway:[[update objectForKey:@"away"] intValue] nick:nick cid:object.cid];
+                           [self->_users updateHostmask:[update objectForKey:@"usermask"] nick:nick cid:object.cid bid:object.bid];
                        }
-                       if(!backlog && !_resuming)
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventMemberUpdates];
                    },
                    @"user_away": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       Buffer *b = [_buffers getBuffer:object.bid];
+                       Buffer *b = [self->_buffers getBuffer:object.bid];
                        if([b.type isEqualToString:@"console"]) {
-                           [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
-                           [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
-                           if(!backlog && !_resuming)
+                           [self->_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
+                           [self->_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
+                           if(!backlog && !self->_resuming)
                                [self postObject:object forEvent:kIRCEventAway];
                        }
                    },
                    @"away": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       Buffer *b = [_buffers getBuffer:object.bid];
+                       Buffer *b = [self->_buffers getBuffer:object.bid];
                        if([b.type isEqualToString:@"console"]) {
-                           [_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
-                           [_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
-                           if(!backlog && !_resuming)
+                           [self->_users updateAway:1 msg:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
+                           [self->_buffers updateAway:[object objectForKey:@"msg"] nick:[object objectForKey:@"nick"] server:object.cid];
+                           if(!backlog && !self->_resuming)
                                [self postObject:object forEvent:kIRCEventAway];
                        }
                    },
                    @"user_back": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       Buffer *b = [_buffers getBuffer:object.bid];
+                       Buffer *b = [self->_buffers getBuffer:object.bid];
                        if([b.type isEqualToString:@"console"]) {
-                           [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid];
-                           [_buffers updateAway:@"" nick:[object objectForKey:@"nick"] server:object.cid];
-                           if(!backlog && !_resuming)
+                           [self->_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid];
+                           [self->_buffers updateAway:@"" nick:[object objectForKey:@"nick"] server:object.cid];
+                           if(!backlog && !self->_resuming)
                                [self postObject:object forEvent:kIRCEventAway];
                        }
                    },
                    @"self_away": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!_resuming) {
-                           [_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
-                           [_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
+                       if(!self->_resuming) {
+                           [self->_users updateAway:1 msg:[object objectForKey:@"away_msg"] nick:[object objectForKey:@"nick"] cid:object.cid];
+                           [self->_servers updateAway:[object objectForKey:@"away_msg"] server:object.cid];
                            if(!backlog)
                                [self postObject:object forEvent:kIRCEventAway];
                        }
                    },
                    @"self_back": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_awayOverride setObject:@YES forKey:@(object.cid)];
-                       [_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid];
-                       [_servers updateAway:@"" server:object.cid];
-                       if(!backlog && !_resuming)
+                       [self->_awayOverride setObject:@YES forKey:@(object.cid)];
+                       [self->_users updateAway:0 msg:@"" nick:[object objectForKey:@"nick"] cid:object.cid];
+                       [self->_servers updateAway:@"" server:object.cid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventSelfBack];
                    },
                    @"self_details": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       Event *e = [_events addJSONObject:object];
-                       Server *s = [_servers getServer:e.cid];
+                       Event *e = [self->_events addJSONObject:object];
+                       Server *s = [self->_servers getServer:e.cid];
                        if([[object objectForKey:@"server_realname"] isKindOfClass:[NSString class]])
                            s.server_realname = [object objectForKey:@"server_realname"];
                        s.usermask = [object objectForKey:@"usermask"];
-                       if(!backlog && !_resuming) {
+                       if(!backlog && !self->_resuming) {
                            [self postObject:e forEvent:kIRCEventSelfDetails];
-                           e = [_events event:e.eid + 1 buffer:e.bid];
+                           e = [self->_events event:e.eid + 1 buffer:e.bid];
                            if(e)
                                [self postObject:e forEvent:kIRCEventSelfDetails];
                        }
                    },
                    @"user_mode": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_events addJSONObject:object];
+                       [self->_events addJSONObject:object];
                        if(!backlog) {
-                           [_servers updateMode:[object objectForKey:@"newmode"] server:object.cid];
-                           if(!_resuming)
+                           [self->_servers updateMode:[object objectForKey:@"newmode"] server:object.cid];
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventUserMode];
                        }
                    },
                    @"isupport_params": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_servers updateIsupport:[object objectForKey:@"params"] server:object.cid];
-                       [_servers updateUserModes:[object objectForKey:@"usermodes"] server:object.cid];
+                       [self->_servers updateIsupport:[object objectForKey:@"params"] server:object.cid];
+                       [self->_servers updateUserModes:[object objectForKey:@"usermodes"] server:object.cid];
                    },
                    @"set_ignores": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];
-                       if(!backlog && !_resuming)
+                       [self->_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventSetIgnores];
                    },
                    @"ignore_list": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       [_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];
-                       if(!backlog && !_resuming)
+                       [self->_servers updateIgnores:[object objectForKey:@"masks"] server:object.cid];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventSetIgnores];
                    },
                    @"heartbeat_echo": ^(IRCCloudJSONObject *object, BOOL backlog) {
@@ -921,28 +921,28 @@ volatile BOOL __socketPaused = NO;
                            for(id bid in eids.allKeys) {
                                if([[eids objectForKey:bid] isKindOfClass:NSNumber.class]) {
                                    NSTimeInterval eid = [[eids objectForKey:bid] doubleValue];
-                                   Buffer *buffer = [_buffers getBuffer:[bid intValue]];
+                                   Buffer *buffer = [self->_buffers getBuffer:[bid intValue]];
                                    if(buffer) {
                                        buffer.last_seen_eid = eid;
                                        buffer.extraHighlights = 0;
                                    }
-                                   [_notifications removeNotificationsForBID:[bid intValue] olderThan:eid];
+                                   [self->_notifications removeNotificationsForBID:[bid intValue] olderThan:eid];
                                }
                            }
                        }
-                       [_notifications updateBadgeCount];
-                       if(!backlog && !_resuming)
+                       [self->_notifications updateBadgeCount];
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventHeartbeatEcho];
                    },
                    @"reorder_connections": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        NSArray *order = [object objectForKey:@"order"];
                        
                        for(int i = 0; i < order.count; i++) {
-                           Server *s = [_servers getServer:[[order objectAtIndex:i] intValue]];
+                           Server *s = [self->_servers getServer:[[order objectAtIndex:i] intValue]];
                            s.order = i + 1;
                        }
 
-                       if(!backlog && !_resuming)
+                       if(!backlog && !self->_resuming)
                            [self postObject:object forEvent:kIRCEventReorderConnections];
                    },
                    @"session_deleted": ^(IRCCloudJSONObject *object, BOOL backlog) {
@@ -951,27 +951,27 @@ volatile BOOL __socketPaused = NO;
                    },
                    @"display_name_change": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!backlog) {
-                           [_users updateDisplayName:[object objectForKey:@"display_name"] nick:[object objectForKey:@"nick"] cid:object.cid];
-                           if(!_resuming)
+                           [self->_users updateDisplayName:[object objectForKey:@"display_name"] nick:[object objectForKey:@"nick"] cid:object.cid];
+                           if(!self->_resuming)
                                [self postObject:object forEvent:kIRCEventNickChange];
                        }
                    },
                    @"empty_msg": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        @synchronized (self) {
-                           [_pendingEdits addObject:object];
+                           [self->_pendingEdits addObject:object];
                        }
                        [self _processPendingEdits:backlog];
                    },
                    @"watch_status": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        NSMutableDictionary *d = object.dictionary.mutableCopy;
                        [d setObject:@([[NSDate date] timeIntervalSince1970] * 1000000) forKey:@"eid"];
-                       Event *e = [_events addJSONObject:[[IRCCloudJSONObject alloc] initWithDictionary:d]];
-                       if(!backlog && !_resuming)
+                       Event *e = [self->_events addJSONObject:[[IRCCloudJSONObject alloc] initWithDictionary:d]];
+                       if(!backlog && !self->_resuming)
                            [self postObject:e forEvent:kIRCEventBufferMsg];
                    },
                }.mutableCopy;
         
-        for(NSString *type in @[@"buffer_msg", @"buffer_me_msg", @"wait", @"banned", @"kill", @"connecting_cancelled",
+        for(NSString *type in @[@"buffer_msg", @"buffer_me_msg", @"wait", @"banned", @"kill", @"connectingself->_cancelled",
                                 @"target_callerid", @"notice", @"server_motdstart", @"server_welcome", @"server_motd", @"server_endofmotd",
                                 @"server_nomotd", @"server_luserclient", @"server_luserop", @"server_luserconns", @"server_luserme", @"server_n_local",
                                 @"server_luserchannels", @"server_n_global", @"server_yourhost",@"server_created", @"server_luserunknown",
@@ -1041,7 +1041,7 @@ volatile BOOL __socketPaused = NO;
                                            @"chanfilter_list":@(kIRCEventChanFilterList)
                                            };
         void (^broadcast)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
-            if(!backlog && !_resuming)
+            if(!backlog && !self->_resuming)
                 [self postObject:object forEvent:[[broadcastMap objectForKey:object.type] intValue]];
         };
 
@@ -1049,7 +1049,7 @@ volatile BOOL __socketPaused = NO;
             [parserMap setObject:broadcast forKey:type];
         }
         
-        _parserMap = parserMap;
+        self->_parserMap = parserMap;
     }
     return self;
 }
@@ -1057,8 +1057,8 @@ volatile BOOL __socketPaused = NO;
 -(void)_processPendingEdits:(BOOL)backlog {
     NSArray *pending;
     @synchronized (self) {
-        pending = _pendingEdits;
-        _pendingEdits = [[NSMutableArray alloc] init];
+        pending = self->_pendingEdits;
+        self->_pendingEdits = [[NSMutableArray alloc] init];
     }
     for(IRCCloudJSONObject *object in pending) {
         NSDictionary *entities = [object objectForKey:@"entities"];
@@ -1077,10 +1077,10 @@ volatile BOOL __socketPaused = NO;
                 }
             }
             if(found) {
-                if(!backlog && !_resuming)
+                if(!backlog && !self->_resuming)
                     [self postObject:object forEvent:kIRCEventMessageChanged];
             } else {
-                [_pendingEdits addObject:object];
+                [self->_pendingEdits addObject:object];
                 CLS_LOG(@"Queued delete for msgID %@", msgId);
             }
         } else if([entities objectForKey:@"edit"]) {
@@ -1106,10 +1106,10 @@ volatile BOOL __socketPaused = NO;
                 }
             }
             if(found) {
-                if(!backlog && !_resuming)
+                if(!backlog && !self->_resuming)
                     [self postObject:object forEvent:kIRCEventMessageChanged];
             } else {
-                [_pendingEdits addObject:object];
+                [self->_pendingEdits addObject:object];
                 CLS_LOG(@"Queued edit for msgID %@", msgId);
             }
         }
@@ -1119,7 +1119,7 @@ volatile BOOL __socketPaused = NO;
 //Adapted from http://stackoverflow.com/a/17057553/1406639
 -(kIRCCloudReachability)reachable {
     SCNetworkReachabilityFlags flags;
-    if(_reachabilityValid && SCNetworkReachabilityGetFlags(_reachability, &flags)) {
+    if(self->_reachabilityValid && SCNetworkReachabilityGetFlags(self->_reachability, &flags)) {
         if((flags & kSCNetworkReachabilityFlagsReachable) == 0) {
             // if target host is not reachable
             return kIRCCloudUnreachable;
@@ -1153,7 +1153,7 @@ volatile BOOL __socketPaused = NO;
 
 -(BOOL)isWifi {
     SCNetworkReachabilityFlags flags;
-    if(_reachabilityValid && SCNetworkReachabilityGetFlags(_reachability, &flags)) {
+    if(self->_reachabilityValid && SCNetworkReachabilityGetFlags(self->_reachability, &flags)) {
         return (flags & kSCNetworkReachabilityFlagsIsWWAN) != kSCNetworkReachabilityFlagsIsWWAN;
     }
     return NO;
@@ -1202,7 +1202,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_connect {
-    [self connect:_notifier];
+    [self connect:self->_notifier];
 }
 
 -(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token {
@@ -1298,10 +1298,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]]];
     NSError *error = nil;
     if(data)
-        _config = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+        self->_config = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
 #ifdef ENTERPRISE
-    if(![[_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
-        _globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [_config objectForKey:@"ios_app"]];
+    if(![[self->_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
+        self->_globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [self->_config objectForKey:@"ios_app"]];
 #endif
     self.fileURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
     self.pasteURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
@@ -1351,15 +1351,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args handler:(IRCCloudAPIResultHandler)resultHandler {
-    @synchronized(_writer) {
-        if(_state == kIRCCloudStateConnected || [method isEqualToString:@"auth"]) {
+    @synchronized(self->_writer) {
+        if(self->_state == kIRCCloudStateConnected || [method isEqualToString:@"auth"]) {
             NSMutableDictionary *dict = args?[[NSMutableDictionary alloc] initWithDictionary:args]:[[NSMutableDictionary alloc] init];
             [dict setObject:method forKey:@"_method"];
             if(![method isEqualToString:@"auth"])
                 [dict setObject:@(++_lastReqId) forKey:@"_reqid"];
-            [_socket sendText:[_writer stringWithObject:dict]];
+            [self->_socket sendText:[self->_writer stringWithObject:dict]];
             if(resultHandler)
-                [_resultHandlers setObject:resultHandler forKey:@(_lastReqId)];
+                [self->_resultHandlers setObject:resultHandler forKey:@(self->_lastReqId)];
             return _lastReqId;
         } else {
             CLS_LOG(@"Discarding request '%@' on disconnected socket", method);
@@ -1433,7 +1433,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids handler:(IRCCloudAPIResultHandler)resultHandler {
-    @synchronized(_writer) {
+    @synchronized(self->_writer) {
         NSMutableDictionary *heartbeat = [[NSMutableDictionary alloc] init];
         for(int i = 0; i < cids.count; i++) {
             NSMutableDictionary *d = [heartbeat objectForKey:[NSString stringWithFormat:@"%@",[cids objectAtIndex:i]]];
@@ -1443,11 +1443,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             }
             [d setObject:[lastSeenEids objectAtIndex:i] forKey:[NSString stringWithFormat:@"%@",[bids objectAtIndex:i]]];
         }
-        NSString *seenEids = [_writer stringWithObject:heartbeat];
+        NSString *seenEids = [self->_writer stringWithObject:heartbeat];
         [__userInfoLock lock];
-        NSMutableDictionary *d = _userInfo.mutableCopy;
+        NSMutableDictionary *d = self->_userInfo.mutableCopy;
         [d setObject:@(selectedBuffer) forKey:@"last_selected_bid"];
-        _userInfo = d;
+        self->_userInfo = d;
         [__userInfoLock unlock];
         return [self _sendRequest:@"heartbeat" args:@{@"selectedBuffer":@(selectedBuffer), @"seenEids":seenEids} handler:resultHandler];
     }
@@ -1546,7 +1546,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(int)setPrefs:(NSString *)prefs handler:(IRCCloudAPIResultHandler)resultHandler {
-    _prefs = nil;
+    self->_prefs = nil;
     return [self _sendRequest:@"set-prefs" args:@{@"prefs":prefs} handler:resultHandler];
 }
 
@@ -1603,7 +1603,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     CLS_LOG(@"Reconnecting cid%i", cid);
     int reqid = [self _sendRequest:@"reconnect" args:@{@"cid":@(cid)} handler:resultHandler];
     if(reqid > 0) {
-        Server *s = [_servers getServer:cid];
+        Server *s = [self->_servers getServer:cid];
         if(s) {
             s.status = @"queued";
             [self postObject:@{@"cid":@(cid)} forEvent:kIRCEventConnectionLag];
@@ -1699,21 +1699,21 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_createJSONParser {
-    _parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {
+    self->_parser = [SBJson5Parser multiRootParserWithBlock:^(id item, BOOL *stop) {
         [self parse:item backlog:NO];
     } errorHandler:^(NSError *error) {
         CLS_LOG(@"JSON ERROR: %@", error);
-        _streamId = nil;
-        _highestEID = 0;
+        self->_streamId = nil;
+        self->_highestEID = 0;
     }];
 }
 
 -(void)connect:(BOOL)notifier {
     @synchronized(self) {
-        if(_mock) {
-            _reconnectTimestamp = -1;
-            _state = kIRCCloudStateConnected;
-            _ready = YES;
+        if(self->_mock) {
+            self->_reconnectTimestamp = -1;
+            self->_state = kIRCCloudStateConnected;
+            self->_ready = YES;
             return;
         }
         
@@ -1727,45 +1727,45 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             return;
         }
         
-        [_idleTimer invalidate];
-        _idleTimer = nil;
+        [self->_idleTimer invalidate];
+        self->_idleTimer = nil;
 
-        if(_socket) {
+        if(self->_socket) {
             CLS_LOG(@"Discarding previous socket");
-            WebSocket *s = _socket;
-            _socket = nil;
+            WebSocket *s = self->_socket;
+            self->_socket = nil;
             s.delegate = nil;
             [s close];
         }
         
         if(!_reachability) {
-            _reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
-            SCNetworkReachabilityScheduleWithRunLoop(_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
-            SCNetworkReachabilitySetCallback(_reachability, ReachabilityCallback, NULL);
+            self->_reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
+            SCNetworkReachabilityScheduleWithRunLoop(self->_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
+            SCNetworkReachabilitySetCallback(self->_reachability, ReachabilityCallback, NULL);
         } else {
             kIRCCloudReachability reachability = [self reachable];
-            if(_reachabilityValid && reachability != kIRCCloudReachable) {
+            if(self->_reachabilityValid && reachability != kIRCCloudReachable) {
                 CLS_LOG(@"IRCCloud is unreachable");
-                _reconnectTimestamp = -1;
-                _state = kIRCCloudStateDisconnected;
+                self->_reconnectTimestamp = -1;
+                self->_state = kIRCCloudStateDisconnected;
                 if(reachability == kIRCCloudUnreachable)
                     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-                _ready = YES;
+                self->_ready = YES;
                 return;
             }
         }
         
-        if(_oobQueue.count) {
+        if(self->_oobQueue.count) {
             CLS_LOG(@"Cancelling pending OOB requests");
             for(OOBFetcher *fetcher in _oobQueue) {
                 [fetcher cancel];
             }
-            [_oobQueue removeAllObjects];
-            _streamId = nil;
-            _highestEID = 0;
+            [self->_oobQueue removeAllObjects];
+            self->_streamId = nil;
+            self->_highestEID = 0;
         }
         NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
-        if(_highestEID > 0 && _streamId.length) {
+        if(self->_highestEID > 0 && _streamId.length) {
             url = [url stringByAppendingFormat:@"?since_id=%.0lf&stream_id=%@", _highestEID, _streamId];
         }
         if(notifier) {
@@ -1780,7 +1780,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             url = [url stringByAppendingFormat:@"&exclude_archives=1"];
 
         SCNetworkReachabilityFlags flags;
-        BOOL success = SCNetworkReachabilityGetFlags(_reachability, &flags);
+        BOOL success = SCNetworkReachabilityGetFlags(self->_reachability, &flags);
         if(success && flags & kSCNetworkReachabilityFlagsIsWWAN) {
             CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
             int limit = 50;
@@ -1796,19 +1796,19 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         }
         
         CLS_LOG(@"Connecting: %@", url);
-        _notifier = notifier;
-        _state = kIRCCloudStateConnecting;
-        _idleInterval = 20;
-        _accrued = 0;
-        _currentCount = 0;
-        _totalCount = 0;
-        _reconnectTimestamp = -1;
-        _resuming = NO;
-        _ready = NO;
-        _firstEID = 0;
+        self->_notifier = notifier;
+        self->_state = kIRCCloudStateConnecting;
+        self->_idleInterval = 20;
+        self->_accrued = 0;
+        self->_currentCount = 0;
+        self->_totalCount = 0;
+        self->_reconnectTimestamp = -1;
+        self->_resuming = NO;
+        self->_ready = NO;
+        self->_firstEID = 0;
         __socketPaused = NO;
-        _lastReqId = 1;
-        [_resultHandlers removeAllObjects];
+        self->_lastReqId = 1;
+        [self->_resultHandlers removeAllObjects];
         
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
@@ -1818,9 +1818,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                                                                                         } mutableCopy]
                                                                              headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
                                                                    verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
-        _socket = [WebSocket webSocketWithConfig:config delegate:self];
+        self->_socket = [WebSocket webSocketWithConfig:config delegate:self];
         
-        [_socket open];
+        [self->_socket open];
     }
 }
 
@@ -1828,52 +1828,52 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     for(OOBFetcher *fetcher in _oobQueue.copy) {
         if(fetcher.bid > 0) {
             [fetcher cancel];
-            [_oobQueue removeObject:fetcher];
+            [self->_oobQueue removeObject:fetcher];
         }
     }
 }
 
 -(void)disconnect {
     CLS_LOG(@"Closing websocket");
-    if(_reachability)
-        CFRelease(_reachability);
-    _reachability = nil;
-    _reachabilityValid = NO;
-    if(_oobQueue.count) {
+    if(self->_reachability)
+        CFRelease(self->_reachability);
+    self->_reachability = nil;
+    self->_reachabilityValid = NO;
+    if(self->_oobQueue.count) {
         for(OOBFetcher *fetcher in _oobQueue) {
             [fetcher cancel];
         }
-        [_oobQueue removeAllObjects];
-        _streamId = nil;
-        _highestEID = 0;
+        [self->_oobQueue removeAllObjects];
+        self->_streamId = nil;
+        self->_highestEID = 0;
     }
-    _reconnectTimestamp = 0;
+    self->_reconnectTimestamp = 0;
     [self cancelIdleTimer];
-    _state = kIRCCloudStateDisconnected;
+    self->_state = kIRCCloudStateDisconnected;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-    [_socket close];
-    _socket = nil;
-    for(Buffer *b in [_buffers getBuffers]) {
-        if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
+    [self->_socket close];
+    self->_socket = nil;
+    for(Buffer *b in [self->_buffers getBuffers]) {
+        if(!b.scrolledUp && [self->_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                [_events pruneEventsForBuffer:b.bid maxSize:50];
+                [self->_events pruneEventsForBuffer:b.bid maxSize:50];
             });
         }
     }
 }
 
 -(void)clearPrefs {
-    _prefs = nil;
+    self->_prefs = nil;
     [__userInfoLock lock];
-    _userInfo = nil;
+    self->_userInfo = nil;
     [__userInfoLock unlock];
 }
 
 -(void)webSocketDidOpen:(WebSocket *)socket {
-    if(socket == _socket) {
+    if(socket == self->_socket) {
         CLS_LOG(@"Socket connected");
-        _idleInterval = 20;
-        _reconnectTimestamp = -1;
+        self->_idleInterval = 20;
+        self->_reconnectTimestamp = -1;
         [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         [self performSelectorInBackground:@selector(requestConfiguration) withObject:nil];
@@ -1884,28 +1884,28 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)fail {
     [self clearOOB];
-    _failCount++;
-    if(_failCount < 4)
-        _idleInterval = _failCount;
-    else if(_failCount < 10)
-        _idleInterval = 10;
+    self->_failCount++;
+    if(self->_failCount < 4)
+        self->_idleInterval = self->_failCount;
+    else if(self->_failCount < 10)
+        self->_idleInterval = 10;
     else
-        _idleInterval = 30;
-    _reconnectTimestamp = -1;
+        self->_idleInterval = 30;
+    self->_reconnectTimestamp = -1;
     CLS_LOG(@"Fail count: %i will reconnect in %f seconds", _failCount, _idleInterval);
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
 }
 
 -(void)webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
-    if(socket == _socket) {
+    if(socket == self->_socket) {
         CLS_LOG(@"Status Code: %lu", (unsigned long)aStatusCode);
         CLS_LOG(@"Close Message: %@", aMessage);
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
-        _state = kIRCCloudStateDisconnected;
+        self->_state = kIRCCloudStateDisconnected;
         __socketPaused = NO;
         if(aStatusCode == WebSocketCloseStatusProtocolError) {
-            _streamId = nil;
-            _highestEID = 0;
+            self->_streamId = nil;
+            self->_highestEID = 0;
         }
         if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0) {
             [self fail];
@@ -1921,9 +1921,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)webSocket:(WebSocket *)socket didReceiveError: (NSError*) aError {
-    if(socket == _socket) {
+    if(socket == self->_socket) {
         CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
-        _state = kIRCCloudStateDisconnected;
+        self->_state = kIRCCloudStateDisconnected;
         __socketPaused = NO;
         if([self reachable] && _reconnectTimestamp != 0) {
             [self fail];
@@ -1935,12 +1935,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)webSocket:(WebSocket *)socket didReceiveTextMessage:(NSString*)aMessage {
-    if(socket == _socket) {
+    if(socket == self->_socket) {
         if(aMessage) {
             while(__socketPaused) { //GCD uses a thread pool and can't guarantee NSLock will be locked and unlocked on the same thread, so here's an ugly hack instead
                 [NSThread sleepForTimeInterval:0.05];
             }
-            [_parser parse:[aMessage dataUsingEncoding:NSUTF8StringEncoding]];
+            [self->_parser parse:[aMessage dataUsingEncoding:NSUTF8StringEncoding]];
         }
     } else {
         CLS_LOG(@"Got event for inactive socket");
@@ -1948,12 +1948,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 - (void)webSocket:(WebSocket *)socket didReceiveBinaryMessage: (NSData*) aMessage {
-    if(socket == _socket) {
+    if(socket == self->_socket) {
         if(aMessage) {
             while(__socketPaused) {
                 [NSThread sleepForTimeInterval:0.05];
             }
-            [_parser parse:aMessage];
+            [self->_parser parse:aMessage];
         }
     } else {
         CLS_LOG(@"Got event for inactive socket");
@@ -1961,7 +1961,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)postObject:(id)object forEvent:(kIRCEvent)event {
-    if(_accrued == 0) {
+    if(self->_accrued == 0) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:object userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:event]}];
         }];
@@ -1983,7 +1983,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     @synchronized(self) {
         if(!_prefs && self.userInfo && [[self.userInfo objectForKey:@"prefs"] isKindOfClass:[NSString class]] && [[self.userInfo objectForKey:@"prefs"] length]) {
             NSError *error;
-            _prefs = [NSJSONSerialization JSONObjectWithData:[[self.userInfo objectForKey:@"prefs"] dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
+            self->_prefs = [NSJSONSerialization JSONObjectWithData:[[self.userInfo objectForKey:@"prefs"] dataUsingEncoding:NSUTF8StringEncoding] options:kNilOptions error:&error];
             if(error) {
                 CLS_LOG(@"Prefs parse error: %@", error);
                 CLS_LOG(@"JSON string: %@", [self.userInfo objectForKey:@"prefs"]);
@@ -1996,31 +1996,31 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)parse:(NSDictionary *)dict backlog:(BOOL)backlog {
     if(![dict isKindOfClass:[NSDictionary class]])
         return;
-    @synchronized(_parserMap) {
+    @synchronized(self->_parserMap) {
         NSTimeInterval start = [NSDate timeIntervalSinceReferenceDate];
         if(backlog)
-            _totalCount++;
+            self->_totalCount++;
         if([NSThread currentThread].isMainThread)
             NSLog(@"WARNING: Parsing on main thread");
         [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
-        if(_accrued > 0) {
+        if(self->_accrued > 0) {
             [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalCount++ / (float)_accrued)) waitUntilDone:NO];
         }
         IRCCloudJSONObject *object = [[IRCCloudJSONObject alloc] initWithDictionary:dict];
         if(object.type) {
             //NSLog(@"New event (backlog: %i resuming: %i highestEID: %f) (%@) %@", backlog, _resuming, _highestEID, object.type, object);
-            if((backlog || _accrued > 0) && object.bid > -1 && object.bid != _currentBid && object.eid > 0) {
+            if((backlog || _accrued > 0) && object.bid > -1 && object.bid != self->_currentBid && object.eid > 0) {
                 if(!backlog) {
-                    if(_firstEID == 0) {
-                        _firstEID = object.eid;
+                    if(self->_firstEID == 0) {
+                        self->_firstEID = object.eid;
                         if(object.eid > _highestEID) {
                             CLS_LOG(@"Backlog gap detected, purging cache");
-                            [_events clear];
-                            _highestEID = 0;
-                            _streamId = nil;
-                            _pendingEdits = [[NSMutableArray alloc] init];
+                            [self->_events clear];
+                            self->_highestEID = 0;
+                            self->_streamId = nil;
+                            self->_pendingEdits = [[NSMutableArray alloc] init];
                             [self performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
-                            _state = kIRCCloudStateDisconnected;
+                            self->_state = kIRCCloudStateDisconnected;
                             [self performSelectorOnMainThread:@selector(fail) withObject:nil waitUntilDone:NO];
                             return;
                         } else {
@@ -2028,27 +2028,27 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                         }
                     }
                 }
-                _currentBid = object.bid;
-                _currentCount = 0;
+                self->_currentBid = object.bid;
+                self->_currentCount = 0;
             }
-            void (^block)(IRCCloudJSONObject *o, BOOL backlog) = [_parserMap objectForKey:object.type];
+            void (^block)(IRCCloudJSONObject *o, BOOL backlog) = [self->_parserMap objectForKey:object.type];
             if(block != nil) {
                 block(object,backlog);
             } else {
                 CLS_LOG(@"Unhandled type: %@", object.type);
             }
             if(backlog || _accrued > 0) {
-                if(_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
-                    if(object.bid != _currentBid) {
-                        _currentBid = object.bid;
-                        _currentCount = 0;
+                if(self->_numBuffers > 1 && (object.bid > -1 || [object.type isEqualToString:@"backlog_complete"]) && ![object.type isEqualToString:@"makebuffer"] && ![object.type isEqualToString:@"channel_init"]) {
+                    if(object.bid != self->_currentBid) {
+                        self->_currentBid = object.bid;
+                        self->_currentCount = 0;
                     }
                     [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalBuffers + (float)_currentCount/100.0f)/ (float)_numBuffers) waitUntilDone:NO];
-                    _currentCount++;
+                    self->_currentCount++;
                 }
             }
             if(!backlog && [object objectForKey:@"reqid"]) {
-                IRCCloudAPIResultHandler handler = [_resultHandlers objectForKey:@([[object objectForKey:@"reqid"] intValue])];
+                IRCCloudAPIResultHandler handler = [self->_resultHandlers objectForKey:@([[object objectForKey:@"reqid"] intValue])];
                 if(handler) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         handler(object);
@@ -2056,8 +2056,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 }
             }
             if([NSDate timeIntervalSinceReferenceDate] - start > _longestEventTime) {
-                _longestEventTime = [NSDate timeIntervalSinceReferenceDate] - start;
-                _longestEventType = object.type;
+                self->_longestEventTime = [NSDate timeIntervalSinceReferenceDate] - start;
+                self->_longestEventType = object.type;
             }
         } else {
             if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
@@ -2085,15 +2085,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
                     [d synchronize];
                     [self connect:NO];
-                } else if([_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])]) {
+                } else if([self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])]) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        ((IRCCloudAPIResultHandler)[_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])(object);
+                        ((IRCCloudAPIResultHandler)[self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])(object);
                     }];
                 }
             } else if([object objectForKey:@"success"]) {
-                if([_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])
+                if([self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        ((IRCCloudAPIResultHandler)[_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])(object);
+                        ((IRCCloudAPIResultHandler)[self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])(object);
                     }];
             }
         }
@@ -2106,31 +2106,31 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(![NSThread currentThread].isMainThread)
         CLS_LOG(@"WARNING: cancel idle timer called outside of main thread");
     
-    [_idleTimer invalidate];
-    _idleTimer = nil;
+    [self->_idleTimer invalidate];
+    self->_idleTimer = nil;
 }
 
 -(void)scheduleIdleTimer {
     if(![NSThread currentThread].isMainThread)
         CLS_LOG(@"WARNING: schedule idle timer called outside of main thread");
-    [_idleTimer invalidate];
-    _idleTimer = nil;
-    if(_reconnectTimestamp == 0)
+    [self->_idleTimer invalidate];
+    self->_idleTimer = nil;
+    if(self->_reconnectTimestamp == 0)
         return;
     
-    _idleTimer = [NSTimer scheduledTimerWithTimeInterval:_idleInterval target:self selector:@selector(_idle) userInfo:nil repeats:NO];
-    _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
+    self->_idleTimer = [NSTimer scheduledTimerWithTimeInterval:self->_idleInterval target:self selector:@selector(_idle) userInfo:nil repeats:NO];
+    self->_reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
 }
 
 -(void)_idle {
-    _reconnectTimestamp = 0;
-    _idleTimer = nil;
-    [_socket close];
-    _state = kIRCCloudStateDisconnected;
+    self->_reconnectTimestamp = 0;
+    self->_idleTimer = nil;
+    [self->_socket close];
+    self->_state = kIRCCloudStateDisconnected;
 #ifndef EXTENSION
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
         CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
-        [self connect:_notifier];
+        [self connect:self->_notifier];
     }
 #endif
 }
@@ -2156,19 +2156,19 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(OOBFetcher *)fetchOOB:(NSString *)url {
-    @synchronized(_oobQueue) {
-        NSArray *fetchers = _oobQueue.copy;
+    @synchronized(self->_oobQueue) {
+        NSArray *fetchers = self->_oobQueue.copy;
         for(OOBFetcher *fetcher in fetchers) {
             if([fetcher.url isEqualToString:url]) {
                 CLS_LOG(@"Cancelling previous OOB request");
                 [fetcher cancel];
-                [_oobQueue removeObject:fetcher];
+                [self->_oobQueue removeObject:fetcher];
             }
         }
         OOBFetcher *fetcher = [[OOBFetcher alloc] initWithURL:url];
-        [_oobQueue addObject:fetcher];
-        if(_oobQueue.count == 1) {
-            [_queue addOperationWithBlock:^{
+        [self->_oobQueue addObject:fetcher];
+        if(self->_oobQueue.count == 1) {
+            [self->_queue addOperationWithBlock:^{
                 @autoreleasepool {
                     CLS_LOG(@"Starting fetcher for URL: %@", url);
                     [fetcher start];
@@ -2182,9 +2182,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)clearOOB {
-    @synchronized(_oobQueue) {
-        NSMutableArray *oldQueue = _oobQueue;
-        _oobQueue = [[NSMutableArray alloc] init];
+    @synchronized(self->_oobQueue) {
+        NSMutableArray *oldQueue = self->_oobQueue;
+        self->_oobQueue = [[NSMutableArray alloc] init];
         for(OOBFetcher *fetcher in oldQueue) {
             [fetcher cancel];
         }
@@ -2192,61 +2192,61 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogStarted:(NSNotification *)notification {
-    _OOBStartTime = [NSDate timeIntervalSinceReferenceDate];
-    _longestEventTime = 0;
-    _longestEventType = nil;
-    if(_awayOverride.count)
+    self->_OOBStartTime = [NSDate timeIntervalSinceReferenceDate];
+    self->_longestEventTime = 0;
+    self->_longestEventType = nil;
+    if(self->_awayOverride.count)
         NSLog(@"Caught %lu self_back events", (unsigned long)_awayOverride.count);
-    _currentBid = -1;
-    _currentCount = 0;
-    _totalCount = 0;
+    self->_currentBid = -1;
+    self->_currentCount = 0;
+    self->_totalCount = 0;
 }
 
 -(void)_backlogCompleted:(NSNotification *)notification {
-    if(_OOBStartTime) {
+    if(self->_OOBStartTime) {
         NSTimeInterval total = [NSDate timeIntervalSinceReferenceDate] - _OOBStartTime;
         CLS_LOG(@"OOB processed %i events in %f seconds (%f seconds / event)", _totalCount, total, total / (double)_totalCount);
         CLS_LOG(@"Longest event: %@ (%f seconds)", _longestEventType, _longestEventTime);
-        _OOBStartTime = 0;
-        _longestEventTime = 0;
-        _longestEventType = nil;
+        self->_OOBStartTime = 0;
+        self->_longestEventTime = 0;
+        self->_longestEventType = nil;
     }
-    _failCount = 0;
-    _accrued = 0;
-    _resuming = NO;
-    _awayOverride = nil;
-    _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
+    self->_failCount = 0;
+    self->_accrued = 0;
+    self->_resuming = NO;
+    self->_awayOverride = nil;
+    self->_reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
     OOBFetcher *fetcher = notification.object;
     CLS_LOG(@"Backlog finished for bid: %i", fetcher.bid);
     if(fetcher.bid > 0) {
-        [_buffers getBuffer:fetcher.bid].deferred = 0;
-        [_buffers updateTimeout:0 buffer:fetcher.bid];
+        [self->_buffers getBuffer:fetcher.bid].deferred = 0;
+        [self->_buffers updateTimeout:0 buffer:fetcher.bid];
     } else {
-        _ready = YES;
-        CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
+        self->_ready = YES;
+        CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[self->_servers count], (unsigned long)[self->_buffers count]);
         if(fetcher.bid == -1) {
-            [_buffers purgeInvalidBIDs];
-            [_channels purgeInvalidChannels];
-            CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
+            [self->_buffers purgeInvalidBIDs];
+            [self->_channels purgeInvalidChannels];
+            CLS_LOG(@"I now have %lu servers with %lu buffers", (unsigned long)[self->_servers count], (unsigned long)[self->_buffers count]);
         }
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            for(Buffer *b in [_buffers getBuffers]) {
-                if(!b.scrolledUp && [_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
-                        [_events pruneEventsForBuffer:b.bid maxSize:101];
+            for(Buffer *b in [self->_buffers getBuffers]) {
+                if(!b.scrolledUp && [self->_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
+                        [self->_events pruneEventsForBuffer:b.bid maxSize:101];
                 }
-                [_notifications removeNotificationsForBID:b.bid olderThan:b.last_seen_eid];
+                [self->_notifications removeNotificationsForBID:b.bid olderThan:b.last_seen_eid];
             }
             [NetworkConnection sync];
         });
-        _numBuffers = 0;
+        self->_numBuffers = 0;
         __socketPaused = NO;
     }
     CLS_LOG(@"I downloaded %i events", _totalCount);
-    [_oobQueue removeObject:fetcher];
-    [_notifications updateBadgeCount];
+    [self->_oobQueue removeObject:fetcher];
+    [self->_notifications updateBadgeCount];
     [self _processPendingEdits:NO];
-    if([_servers count]) {
+    if([self->_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
     [self performSelectorInBackground:@selector(serialize) withObject:nil];
@@ -2256,25 +2256,25 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [__serializeLock lock];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [_servers serialize];
-    [_buffers serialize];
-    [_channels serialize];
-    [_users serialize];
-    [_events serialize];
-    [_notifications serialize];
+    [self->_servers serialize];
+    [self->_buffers serialize];
+    [self->_channels serialize];
+    [self->_users serialize];
+    [self->_events serialize];
+    [self->_notifications serialize];
 #ifndef EXTENSION
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
     [__userInfoLock lock];
-    NSMutableDictionary *stream = [_userInfo mutableCopy];
-    if(_streamId)
-        [stream setObject:_streamId forKey:@"streamId"];
+    NSMutableDictionary *stream = [self->_userInfo mutableCopy];
+    if(self->_streamId)
+        [stream setObject:self->_streamId forKey:@"streamId"];
     else
         [stream removeObjectForKey:@"streamId"];
-    if(_config)
-        [stream setObject:_config forKey:@"config"];
+    if(self->_config)
+        [stream setObject:self->_config forKey:@"config"];
     else
         [stream removeObjectForKey:@"config"];
-    [stream setObject:@(_highestEID) forKey:@"highestEID"];
+    [stream setObject:@(self->_highestEID) forKey:@"highestEID"];
     [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
     [__userInfoLock unlock];
     [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
@@ -2293,11 +2293,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {
-    _accrued = 0;
-    _awayOverride = nil;
-    _reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
+    self->_accrued = 0;
+    self->_awayOverride = nil;
+    self->_reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
-    [_oobQueue removeObject:notification.object];
+    [self->_oobQueue removeObject:notification.object];
     if([(OOBFetcher *)notification.object bid] > 0) {
         CLS_LOG(@"Backlog download failed, rescheduling timed out buffers");
         [self _scheduleTimedoutBuffers];
@@ -2305,30 +2305,30 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         CLS_LOG(@"Initial backlog download failed");
         [self disconnect];
         __socketPaused = NO;
-        _state = kIRCCloudStateDisconnected;
-        _streamId = nil;
-        _highestEID = 0;
+        self->_state = kIRCCloudStateDisconnected;
+        self->_streamId = nil;
+        self->_highestEID = 0;
         [self fail];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     }
 }
 
 -(void)_scheduleTimedoutBuffers {
-    for(Buffer *buffer in [_buffers getBuffers]) {
+    for(Buffer *buffer in [self->_buffers getBuffers]) {
         if(buffer.timeout > 0) {
             if([buffer.type isEqualToString:@"channel"] && buffer.timeout == 0) {
-                if(![_channels channelForBuffer:buffer.bid])
+                if(![self->_channels channelForBuffer:buffer.bid])
                     continue;
             }
             CLS_LOG(@"Requesting backlog for buffer: %@", buffer.name);
             [self requestBacklogForBuffer:buffer.bid server:buffer.cid completion:nil];
         }
     }
-    if(_oobQueue.count > 0) {
-        [_queue addOperationWithBlock:^{
-            if(_oobQueue.count > 0 && ((OOBFetcher *)[_oobQueue objectAtIndex:0]).bid > 0) {
-                CLS_LOG(@"Starting fetcher for timed-out bid%i", ((OOBFetcher *)[_oobQueue objectAtIndex:0]).bid);
-                [(OOBFetcher *)[_oobQueue objectAtIndex:0] start];
+    if(self->_oobQueue.count > 0) {
+        [self->_queue addOperationWithBlock:^{
+            if(self->_oobQueue.count > 0 && ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid > 0) {
+                CLS_LOG(@"Starting fetcher for timed-out bid%i", ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid);
+                [(OOBFetcher *)[self->_oobQueue objectAtIndex:0] start];
             }
         }];
     }
@@ -2342,15 +2342,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)logout {
     CLS_LOG(@"Logging out");
-    _reconnectTimestamp = 0;
-    _streamId = nil;
+    self->_reconnectTimestamp = 0;
+    self->_streamId = nil;
     [__userInfoLock lock];
-    _userInfo = @{};
+    self->_userInfo = @{};
     [__userInfoLock unlock];
-    _highestEID = 0;
+    self->_highestEID = 0;
     NSString *s = self.session;
     SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, [NSBundle mainBundle].bundleIdentifier, kSecAttrService, nil]);
-    _session = nil;
+    self->_session = nil;
     [self disconnect];
     if(s)
         [self performSelectorInBackground:@selector(_logout:) withObject:s];
@@ -2368,12 +2368,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [[NSUserDefaults standardUserDefaults] synchronize];
     [UIColor setTheme:@"dawn"];
     [self clearPrefs];
-    [_servers clear];
-    [_buffers clear];
-    [_users clear];
-    [_channels clear];
-    [_events clear];
-    _pendingEdits = [[NSMutableArray alloc] init];
+    [self->_servers clear];
+    [self->_buffers clear];
+    [self->_users clear];
+    [self->_channels clear];
+    [self->_events clear];
+    self->_pendingEdits = [[NSMutableArray alloc] init];
     [self serialize];
     [NetworkConnection sync];
 #ifndef EXTENSION
@@ -2401,11 +2401,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSString *)session {
-    if(_mock)
+    if(self->_mock)
         return @"__mock_session__";
     
-    if(_session) {
-        _keychainFailCount = 0;
+    if(self->_session) {
+        self->_keychainFailCount = 0;
         return _session;
     }
     
@@ -2422,12 +2422,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
 #endif
     if(!err) {
-        _keychainFailCount = 0;
-        _session = [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
+        self->_keychainFailCount = 0;
+        self->_session = [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
         return _session;
     } else {
-        _keychainFailCount++;
-        if(_keychainFailCount < 10 && err != errSecItemNotFound) {
+        self->_keychainFailCount++;
+        if(self->_keychainFailCount < 10 && err != errSecItemNotFound) {
             CLS_LOG(@"Error fetching session: %i, trying again", (int)err);
             return self.session;
         } else {
@@ -2435,7 +2435,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 CLS_LOG(@"Session key not found");
             else
                 CLS_LOG(@"Error fetching session: %i", (int)err);
-            _keychainFailCount = 0;
+            self->_keychainFailCount = 0;
             return nil;
         }
     }
@@ -2451,7 +2451,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(session)
         SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, (__bridge id)(kSecAttrAccessibleAlways), kSecAttrAccessible, nil], NULL);
 #endif
-    _session = session;
+    self->_session = session;
 }
 
 -(BOOL)notifier {
@@ -2459,8 +2459,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)setNotifier:(BOOL)notifier {
-    _notifier = notifier;
-    if(_state == kIRCCloudStateConnected && !notifier) {
+    self->_notifier = notifier;
+    if(self->_state == kIRCCloudStateConnected && !notifier) {
         CLS_LOG(@"Upgrading websocket");
         [self _sendRequest:@"upgrade_notifier" args:nil handler:nil];
     }
@@ -2468,22 +2468,22 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(NSDictionary *)userInfo {
     [__userInfoLock lock];
-    NSDictionary *d = _userInfo;
+    NSDictionary *d = self->_userInfo;
     [__userInfoLock unlock];
     return d;
 }
 
 -(void)setUserInfo:(NSDictionary *)userInfo {
   [__userInfoLock lock];
-  _userInfo = userInfo;
+  self->_userInfo = userInfo;
   [__userInfoLock unlock];
 }
 
 -(void)setLastSelectedBID:(int)bid {
   [__userInfoLock lock];
-  NSMutableDictionary *d = _userInfo.mutableCopy;
+  NSMutableDictionary *d = self->_userInfo.mutableCopy;
   [d setObject:@(bid) forKey:@"last_selected_bid"];
-  _userInfo = d;
+  self->_userInfo = d;
   [__userInfoLock unlock];
   
 }

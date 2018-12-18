@@ -27,18 +27,18 @@ NSString *__DEFAULT_CHANTYPES__;
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
     @synchronized (self) {
         int joinedLeft = 1, joinedRight = 1;
-        if(_cid < aBuffer.cid)
+        if(self->_cid < aBuffer.cid)
             return NSOrderedAscending;
-        if(_cid > aBuffer.cid)
+        if(self->_cid > aBuffer.cid)
             return NSOrderedDescending;
-        if([_type isEqualToString:@"console"])
+        if([self->_type isEqualToString:@"console"])
             return NSOrderedAscending;
         if([aBuffer.type isEqualToString:@"console"])
             return NSOrderedDescending;
-        if(_bid == aBuffer.bid)
+        if(self->_bid == aBuffer.bid)
             return NSOrderedSame;
-        if([_type isEqualToString:@"channel"] || self.isMPDM)
-            joinedLeft = [[ChannelsDataSource sharedInstance] channelForBuffer:_bid] != nil;
+        if([self->_type isEqualToString:@"channel"] || self.isMPDM)
+            joinedLeft = [[ChannelsDataSource sharedInstance] channelForBuffer:self->_bid] != nil;
         if([[aBuffer type] isEqualToString:@"channel"] || aBuffer.isMPDM)
             joinedRight = [[ChannelsDataSource sharedInstance] channelForBuffer:aBuffer.bid] != nil;
         
@@ -57,26 +57,26 @@ NSString *__DEFAULT_CHANTYPES__;
             NSString *nameRight = aBuffer.normalizedName;
             
             if([nameLeft compare:nameRight] == NSOrderedSame)
-                return (_bid < aBuffer.bid)?NSOrderedAscending:NSOrderedDescending;
+                return (self->_bid < aBuffer.bid)?NSOrderedAscending:NSOrderedDescending;
             else
                 return [nameLeft localizedStandardCompare:nameRight];
         }
     }
 }
 -(NSString *)normalizedName {
-    if(_serverIsSlack)
+    if(self->_serverIsSlack)
         return self.displayName.lowercaseString;
     
-    if(_chantypes == nil || _chantypes == __DEFAULT_CHANTYPES__) {
-        Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
+    if(self->_chantypes == nil || _chantypes == __DEFAULT_CHANTYPES__) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_cid];
         if(s) {
-            _chantypes = s.CHANTYPES;
-            if(_chantypes == nil || _chantypes.length == 0)
-                _chantypes = __DEFAULT_CHANTYPES__;
+            self->_chantypes = s.CHANTYPES;
+            if(self->_chantypes == nil || _chantypes.length == 0)
+                self->_chantypes = __DEFAULT_CHANTYPES__;
         }
     }
     NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
-    return [r stringByReplacingMatchesInString:[_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
+    return [r stringByReplacingMatchesInString:[self->_name lowercaseString] options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
 }
 -(BOOL)isMPDM {
     if(!_serverIsSlack)
@@ -86,20 +86,20 @@ NSString *__DEFAULT_CHANTYPES__;
     if(!p)
         p = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"#mpdm-(.*)-\\d"];
 
-    return [p evaluateWithObject:_name];
+    return [p evaluateWithObject:self->_name];
 }
 -(NSString *)name {
     return _name;
 }
 -(void)setName:(NSString *)name {
-    _name = name;
-    _displayName = nil;
+    self->_name = name;
+    self->_displayName = nil;
 }
 -(NSString *)displayName {
     if(self.isMPDM) {
         if(!_displayName) {
-            NSString *selfNick = [[ServersDataSource sharedInstance] getServer:_cid].nick.lowercaseString;
-            NSMutableArray *names = [_name componentsSeparatedByString:@"-"].mutableCopy;
+            NSString *selfNick = [[ServersDataSource sharedInstance] getServer:self->_cid].nick.lowercaseString;
+            NSMutableArray *names = [self->_name componentsSeparatedByString:@"-"].mutableCopy;
             [names removeObjectAtIndex:0];
             [names removeObjectAtIndex:names.count - 1];
             for(int i = 0; i < names.count; i++) {
@@ -112,7 +112,7 @@ NSString *__DEFAULT_CHANTYPES__;
             [names sortUsingComparator:^NSComparisonResult(NSString *left, NSString *right) {
                 return [left.lowercaseString localizedStandardCompare:right.lowercaseString];
             }];
-            _displayName = [names componentsJoinedByString:@", "];
+            self->_displayName = [names componentsJoinedByString:@", "];
         }
         return _displayName;
     } else {
@@ -126,58 +126,58 @@ NSString *__DEFAULT_CHANTYPES__;
     if(self.isMPDM)
         return self.displayName;
     
-    if(_chantypes == nil || _chantypes == __DEFAULT_CHANTYPES__) {
-        Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
+    if(self->_chantypes == nil || _chantypes == __DEFAULT_CHANTYPES__) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_cid];
         if(s) {
-            _chantypes = [s.isupport objectForKey:@"CHANTYPES"];
-            if(_chantypes == nil || _chantypes.length == 0)
-                _chantypes = __DEFAULT_CHANTYPES__;
+            self->_chantypes = [s.isupport objectForKey:@"CHANTYPES"];
+            if(self->_chantypes == nil || _chantypes.length == 0)
+                self->_chantypes = __DEFAULT_CHANTYPES__;
         }
     }
     NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^[%@]+", _chantypes] options:NSRegularExpressionCaseInsensitive error:nil];
-    return [r stringByReplacingMatchesInString:_name options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
+    return [r stringByReplacingMatchesInString:self->_name options:0 range:NSMakeRange(0, _name.length) withTemplate:@""];
 }
 -(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
     if(self) {
-        decodeInt(_bid);
-        decodeInt(_cid);
-        decodeDouble(_min_eid);
-        decodeDouble(_last_seen_eid);
-        decodeObject(_name);
-        decodeObject(_type);
-        decodeInt(_archived);
-        decodeInt(_deferred);
-        decodeObject(_away_msg);
-        decodeBool(_valid);
-        decodeObject(_draft);
-        decodeObject(_chantypes);
-        decodeBool(_scrolledUp);
-        decodeDouble(_scrolledUpFrom);
-        decodeFloat(_savedScrollOffset);
-        decodeObject(_lastBuffer);
-        decodeObject(_nextBuffer);
+        decodeInt(self->_bid);
+        decodeInt(self->_cid);
+        decodeDouble(self->_min_eid);
+        decodeDouble(self->_last_seen_eid);
+        decodeObject(self->_name);
+        decodeObject(self->_type);
+        decodeInt(self->_archived);
+        decodeInt(self->_deferred);
+        decodeObject(self->_away_msg);
+        decodeBool(self->_valid);
+        decodeObject(self->_draft);
+        decodeObject(self->_chantypes);
+        decodeBool(self->_scrolledUp);
+        decodeDouble(self->_scrolledUpFrom);
+        decodeFloat(self->_savedScrollOffset);
+        decodeObject(self->_lastBuffer);
+        decodeObject(self->_nextBuffer);
     }
     return self;
 }
 -(void)encodeWithCoder:(NSCoder *)aCoder {
-    encodeInt(_bid);
-    encodeInt(_cid);
-    encodeDouble(_min_eid);
-    encodeDouble(_last_seen_eid);
-    encodeObject(_name);
-    encodeObject(_type);
-    encodeInt(_archived);
-    encodeInt(_deferred);
-    encodeObject(_away_msg);
-    encodeBool(_valid);
-    encodeObject(_draft);
-    encodeObject(_chantypes);
-    encodeBool(_scrolledUp);
-    encodeDouble(_scrolledUpFrom);
-    encodeFloat(_savedScrollOffset);
-    encodeObject(_lastBuffer);
-    encodeObject(_nextBuffer);
+    encodeInt(self->_bid);
+    encodeInt(self->_cid);
+    encodeDouble(self->_min_eid);
+    encodeDouble(self->_last_seen_eid);
+    encodeObject(self->_name);
+    encodeObject(self->_type);
+    encodeInt(self->_archived);
+    encodeInt(self->_deferred);
+    encodeObject(self->_away_msg);
+    encodeBool(self->_valid);
+    encodeObject(self->_draft);
+    encodeObject(self->_chantypes);
+    encodeBool(self->_scrolledUp);
+    encodeDouble(self->_scrolledUpFrom);
+    encodeFloat(self->_savedScrollOffset);
+    encodeObject(self->_lastBuffer);
+    encodeObject(self->_nextBuffer);
 }
 @end
 
@@ -205,7 +205,7 @@ NSString *__DEFAULT_CHANTYPES__;
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"buffers"];
             
             @try {
-                _buffers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                self->_buffers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
@@ -217,7 +217,7 @@ NSString *__DEFAULT_CHANTYPES__;
         }
         
         if(!_buffers)
-            _buffers = [[NSMutableDictionary alloc] init];
+            self->_buffers = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -226,8 +226,8 @@ NSString *__DEFAULT_CHANTYPES__;
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"buffers"];
 
     NSArray *buffers;
-    @synchronized(_buffers) {
-        buffers = [_buffers copy];
+    @synchronized(self->_buffers) {
+        buffers = [self->_buffers copy];
     }
     
     @synchronized(self) {
@@ -242,40 +242,40 @@ NSString *__DEFAULT_CHANTYPES__;
 }
 
 -(void)clear {
-    @synchronized(_buffers) {
-        [_buffers removeAllObjects];
+    @synchronized(self->_buffers) {
+        [self->_buffers removeAllObjects];
     }
 }
 
 -(NSUInteger)count {
-    @synchronized(_buffers) {
+    @synchronized(self->_buffers) {
         return _buffers.count;
     }
 }
 
 -(int)firstBid {
-    @synchronized(_buffers) {
-        if(_buffers.count)
-            return ((Buffer *)[_buffers.allValues objectAtIndex:0]).bid;
+    @synchronized(self->_buffers) {
+        if(self->_buffers.count)
+            return ((Buffer *)[self->_buffers.allValues objectAtIndex:0]).bid;
         else
             return -1;
     }
 }
 
 -(void)addBuffer:(Buffer *)buffer {
-    @synchronized(_buffers) {
-        [_buffers setObject:buffer forKey:@(buffer.bid)];
+    @synchronized(self->_buffers) {
+        [self->_buffers setObject:buffer forKey:@(buffer.bid)];
     }
 }
 
 -(Buffer *)getBuffer:(int)bid {
-    return [_buffers objectForKey:@(bid)];
+    return [self->_buffers objectForKey:@(bid)];
 }
 
 -(Buffer *)getBufferWithName:(NSString *)name server:(int)cid {
     NSArray *copy;
-    @synchronized(_buffers) {
-        copy = _buffers.allValues;
+    @synchronized(self->_buffers) {
+        copy = self->_buffers.allValues;
     }
     for(Buffer *buffer in copy) {
         if(buffer.cid == cid && [[buffer.name lowercaseString] isEqualToString:[name lowercaseString]])
@@ -288,8 +288,8 @@ NSString *__DEFAULT_CHANTYPES__;
     @synchronized (self) {
         NSMutableArray *buffers = [[NSMutableArray alloc] init];
         NSArray *copy;
-        @synchronized(_buffers) {
-            copy = _buffers.allValues;
+        @synchronized(self->_buffers) {
+            copy = self->_buffers.allValues;
         }
         for(Buffer *buffer in copy) {
             if(buffer.cid == cid)
@@ -300,7 +300,7 @@ NSString *__DEFAULT_CHANTYPES__;
 }
 
 -(NSArray *)getBuffers {
-    @synchronized(_buffers) {
+    @synchronized(self->_buffers) {
         return _buffers.allValues;
     }
 }
@@ -342,10 +342,10 @@ NSString *__DEFAULT_CHANTYPES__;
 }
 
 -(void)removeBuffer:(int)bid {
-    @synchronized(_buffers) {
+    @synchronized(self->_buffers) {
         NSArray *copy;
-        @synchronized(_buffers) {
-            copy = _buffers.allValues;
+        @synchronized(self->_buffers) {
+            copy = self->_buffers.allValues;
         }
         for(Buffer *buffer in copy) {
             if(buffer.lastBuffer.bid == bid)
@@ -353,7 +353,7 @@ NSString *__DEFAULT_CHANTYPES__;
             if(buffer.nextBuffer.bid == bid)
                 buffer.nextBuffer = buffer.nextBuffer.nextBuffer;
         }
-        [_buffers removeObjectForKey:@(bid)];
+        [self->_buffers removeObjectForKey:@(bid)];
     }
 }
 
@@ -369,8 +369,8 @@ NSString *__DEFAULT_CHANTYPES__;
 
 -(void)invalidate {
     NSArray *copy;
-    @synchronized(_buffers) {
-        copy = _buffers.allValues;
+    @synchronized(self->_buffers) {
+        copy = self->_buffers.allValues;
     }
     for(Buffer *buffer in copy) {
         buffer.valid = NO;
@@ -380,8 +380,8 @@ NSString *__DEFAULT_CHANTYPES__;
 -(void)purgeInvalidBIDs {
     CLS_LOG(@"Cleaning up invalid BIDs");
     NSArray *copy;
-    @synchronized(_buffers) {
-        copy = _buffers.allValues;
+    @synchronized(self->_buffers) {
+        copy = self->_buffers.allValues;
     }
     for(Buffer *buffer in copy) {
         if(!buffer.valid) {

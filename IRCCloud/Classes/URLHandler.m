@@ -68,13 +68,13 @@
 - (void)prepareWithActivityItems:(NSArray *)activityItems {
     for (id activityItem in activityItems) {
         if ([activityItem isKindOfClass:[NSURL class]]) {
-            _URL = activityItem;
+            self->_URL = activityItem;
         }
     }
 }
 
 - (void)performActivity {
-    BOOL completed = [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_URL];
+    BOOL completed = [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_URL];
     
     [self activityDidFinish:completed];
 }
@@ -123,8 +123,8 @@
     self = [super init];
     
     if(self) {
-        _tasks = [[NSMutableDictionary alloc] init];
-        _mediaURLs = [[NSMutableDictionary alloc] init];
+        self->_tasks = [[NSMutableDictionary alloc] init];
+        self->_mediaURLs = [[NSMutableDictionary alloc] init];
     }
     
     return self;
@@ -132,8 +132,8 @@
 
 -(NSDictionary *)MediaURLs:(NSURL *)original_url {
     NSURL *url = original_url;
-    if([_mediaURLs objectForKey:url])
-        return [_mediaURLs objectForKey:url];
+    if([self->_mediaURLs objectForKey:url])
+        return [self->_mediaURLs objectForKey:url];
     
     if([[url.host lowercaseString] isEqualToString:@"www.dropbox.com"]) {
         if([url.path hasPrefix:@"/s/"])
@@ -172,16 +172,16 @@
         url = [NSURL URLWithString:u];
     }
     
-    [_mediaURLs setObject:@{@"thumb":url, @"image":url, @"url":url} forKey:original_url];
+    [self->_mediaURLs setObject:@{@"thumb":url, @"image":url, @"url":url} forKey:original_url];
     
-    return [_mediaURLs objectForKey:url];
+    return [self->_mediaURLs objectForKey:url];
 }
 
 -(void)fetchMediaURLs:(NSURL *)url result:(mediaURLResult)callback {
-    if([_mediaURLs objectForKey:url]) {
-        callback(YES, [_mediaURLs objectForKey:url]);
-    } else if(![_tasks objectForKey:url]) {
-        [_tasks setObject:@(YES) forKey:url];
+    if([self->_mediaURLs objectForKey:url]) {
+        callback(YES, [self->_mediaURLs objectForKey:url]);
+    } else if(![self->_tasks objectForKey:url]) {
+        [self->_tasks setObject:@(YES) forKey:url];
         
         if(([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) && url.path.length > 1) {
             NSString *imageID = [url.path substringFromIndex:1];
@@ -218,7 +218,7 @@
                 } else {
                     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                     if([[dict objectForKey:@"item_type"] isEqualToString:@"image"]) {
-                        [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"content_url"]],
+                        [self->_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"content_url"]],
                                                 @"image":[NSURL URLWithString:[dict objectForKey:@"content_url"]],
                                                 @"url":url
                                                 } forKey:url];
@@ -242,7 +242,7 @@
                     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                     NSDictionary *page = [[[[dict objectForKey:@"query"] objectForKey:@"pages"] allValues] objectAtIndex:0];
                     if(page && [page objectForKey:@"imageinfo"]) {
-                        [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]],
+                        [self->_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]],
                                                 @"image":[NSURL URLWithString:[[[page objectForKey:@"imageinfo"] objectAtIndex:0] objectForKey:@"url"]],
                                                 @"url":url
                                                 } forKey:url];
@@ -269,13 +269,13 @@
         } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if([[dict objectForKey:@"type"] isEqualToString:@"photo"]) {
-                [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
+                [self->_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
                                         @"image":[NSURL URLWithString:[dict objectForKey:@"url"]],
                                         @"url":original_url
                                         } forKey:original_url];
                 callback(YES, nil);
             } else if([[dict objectForKey:@"provider_name"] isEqualToString:@"Instagram"]) {
-                [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"thumbnail_url"]],
+                [self->_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"thumbnail_url"]],
                                         @"image":[NSURL URLWithString:[dict objectForKey:@"thumbnail_url"]],
                                         @"description":[[dict objectForKey:@"title"] isKindOfClass:NSString.class]?[dict objectForKey:@"title"]:@"",
                                         @"url":original_url
@@ -283,7 +283,7 @@
                 callback(YES, nil);
             } else if([[dict objectForKey:@"provider_name"] isEqualToString:@"Giphy"] && [[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location != NSNotFound) {
                 if([dict objectForKey:@"image"] && [[dict objectForKey:@"image"] hasSuffix:@".gif"]) {
-                    [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"image"]],
+                    [self->_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"image"]],
                                             @"image":[NSURL URLWithString:[dict objectForKey:@"image"]],
                                             @"url":original_url
                                             } forKey:original_url];
@@ -312,13 +312,13 @@
             if([[[dict objectForKey:@"meta"] objectForKey:@"status"] intValue] == 200 && [[dict objectForKey:@"data"] objectForKey:@"images"]) {
                 dict = [[[dict objectForKey:@"data"] objectForKey:@"images"] objectForKey:@"original"];
                 if([[dict objectForKey:@"mp4"] length]) {
-                    [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
+                    [self->_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
                                             @"mp4":[NSURL URLWithString:[dict objectForKey:@"mp4"]],
                                             @"url":original_url
                                             } forKey:original_url];
                     callback(YES, nil);
                 } else if([[dict objectForKey:@"url"] hasSuffix:@".gif"]) {
-                    [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
+                    [self->_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"url"]],
                                             @"image":[NSURL URLWithString:[dict objectForKey:@"url"]],
                                             @"url":original_url
                                             } forKey:original_url];
@@ -373,7 +373,7 @@
                         if([[dict objectForKey:@"width"] intValue] && [[dict objectForKey:@"height"] intValue]) {
                             [d setObject:@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]} forKey:@"properties"];
                         }
-                        [_mediaURLs setObject:d forKey:original_url];
+                        [self->_mediaURLs setObject:d forKey:original_url];
                         callback(YES, nil);
                     } else if([[dict objectForKey:@"animated"] intValue] == 1 && [[dict objectForKey:@"mp4"] length] > 0) {
                         if([[dict objectForKey:@"looping"] intValue] == 1) {
@@ -386,7 +386,7 @@
                             if([[dict objectForKey:@"width"] intValue] && [[dict objectForKey:@"height"] intValue]) {
                                 [d setObject:@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]} forKey:@"properties"];
                             }
-                            [_mediaURLs setObject:d forKey:original_url];
+                            [self->_mediaURLs setObject:d forKey:original_url];
                             callback(YES, nil);
                         } else {
                             NSMutableDictionary *d = @{@"thumb":[NSURL URLWithString:[[dict objectForKey:@"mp4"] stringByReplacingOccurrencesOfString:@".mp4" withString:@".gif"]],
@@ -398,7 +398,7 @@
                             if([[dict objectForKey:@"width"] intValue] && [[dict objectForKey:@"height"] intValue]) {
                                 [d setObject:@{@"width":[dict objectForKey:@"width"],@"height":[dict objectForKey:@"height"]} forKey:@"properties"];
                             }
-                            [_mediaURLs setObject:d forKey:original_url];
+                            [self->_mediaURLs setObject:d forKey:original_url];
                             callback(YES, nil);
                         }
                     } else {
@@ -428,7 +428,7 @@
         } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             if([dict objectForKey:@"img"]) {
-                [_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"img"]],
+                [self->_mediaURLs setObject:@{@"thumb":[NSURL URLWithString:[dict objectForKey:@"img"]],
                                         @"image":[NSURL URLWithString:[dict objectForKey:@"img"]],
                                         @"name":[dict objectForKey:@"safe_title"],
                                         @"description":[dict objectForKey:@"alt"],

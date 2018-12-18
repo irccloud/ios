@@ -48,7 +48,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 -(id)initWithDelegate:(id)delegate {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-        _delegate = delegate;
+        self->_delegate = delegate;
         self.navigationItem.title = @"Networks";
         [self fetchServerList];
     }
@@ -57,11 +57,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
          
 - (void)fetchServerList
 {
-    _activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-    _activityIndicator.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin);
-    _activityIndicator.center = (CGPoint){(self.view.bounds.size.width * 0.5), (self.view.bounds.size.height * 0.5)};
-    [_activityIndicator startAnimating];
-    [self.view addSubview:_activityIndicator];
+    self->_activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+    self->_activityIndicator.autoresizingMask = (UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin);
+    self->_activityIndicator.center = (CGPoint){(self.view.bounds.size.width * 0.5), (self.view.bounds.size.height * 0.5)};
+    [self->_activityIndicator startAnimating];
+    [self.view addSubview:self->_activityIndicator];
 
 #ifdef DEBUG
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
@@ -72,7 +72,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         if (error) {
             NSLog(@"Error fetching remote networks list. Error %li : %@", (long)error.code, error.userInfo);
             
-            _networks = @[];
+            self->_networks = @[];
         }
         else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
@@ -88,11 +88,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
                                           }];
                 }
             }
-            _networks = networks;
+            self->_networks = networks;
         }
         
-        [_activityIndicator stopAnimating];
-        [_activityIndicator removeFromSuperview];
+        [self->_activityIndicator stopAnimating];
+        [self->_activityIndicator removeFromSuperview];
         
         [self.tableView reloadData];
     }];
@@ -114,7 +114,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_networks count];
+    return [self->_networks count];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -126,7 +126,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     if(!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"networkcell"];
     
-    NSDictionary *row = [_networks objectAtIndex:indexPath.row];
+    NSDictionary *row = [self->_networks objectAtIndex:indexPath.row];
     [[cell.textLabel subviews] makeObjectsPerformSelector:@selector(removeFromSuperview)];
     cell.textLabel.clipsToBounds = NO;
     UILabel *icon = [[UILabel alloc] initWithFrame:CGRectMake(2,2.4,16,16)];
@@ -148,7 +148,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     cell.textLabel.text = [NSString stringWithFormat:@"     %@",[row objectForKey:@"network"]];
     cell.detailTextLabel.text = [row objectForKey:@"host"];
     
-    if([_selection isEqualToString:cell.textLabel.text])
+    if([self->_selection isEqualToString:cell.textLabel.text])
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     else
         cell.accessoryType = UITableViewCellAccessoryNone;
@@ -198,10 +198,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    _selection = [self tableView:tableView cellForRowAtIndexPath:indexPath].textLabel.text;
+    self->_selection = [self tableView:tableView cellForRowAtIndexPath:indexPath].textLabel.text;
     [tableView reloadData];
-    NSDictionary *row = [_networks objectAtIndex:indexPath.row];
-    [_delegate setNetwork:[row objectForKey:@"network"] host:[row objectForKey:@"host"] port:[[row objectForKey:@"port"] intValue] SSL:[[row objectForKey:@"SSL"] boolValue]];
+    NSDictionary *row = [self->_networks objectAtIndex:indexPath.row];
+    [self->_delegate setNetwork:[row objectForKey:@"network"] host:[row objectForKey:@"host"] port:[[row objectForKey:@"port"] intValue] SSL:[[row objectForKey:@"SSL"] boolValue]];
     [self.navigationController popViewControllerAnimated:YES];
 }
 
@@ -212,7 +212,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        _cid = -1;
+        self->_cid = -1;
         self.navigationItem.title = @"New Connection";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
     }
@@ -327,9 +327,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
 //From: http://stackoverflow.com/a/13867108/1406639
 - (void)tableAnimationEnded:(NSString*)animationID finished:(NSNumber *)finished contextInfo:(void *)context {
     // Scroll to the active cell
-    if(_activeCellIndexPath) {
-        [self.tableView scrollToRowAtIndexPath:_activeCellIndexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
-//        [self.tableView selectRowAtIndexPath:_activeCellIndexPath animated:NO scrollPosition:UITableViewScrollPositionBottom];
+    if(self->_activeCellIndexPath) {
+        [self.tableView scrollToRowAtIndexPath:self->_activeCellIndexPath atScrollPosition:UITableViewScrollPositionNone animated:YES];
+//        [self.tableView selectRowAtIndexPath:self->_activeCellIndexPath animated:NO scrollPosition:UITableViewScrollPositionBottom];
     }
 }
 
@@ -340,14 +340,14 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
         if([[result objectForKey:@"success"] boolValue]) {
-            if(_cid == -1)
+            if(self->_cid == -1)
                 ((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController.cidToOpen = [[result objectForKey:@"cid"] intValue];
             if(self.presentingViewController) {
                 [self.tableView endEditing:YES];
                 [self dismissViewControllerAnimated:YES completion:nil];
                 [[NSNotificationCenter defaultCenter] removeObserver:self];
             } else if([[result objectForKey:@"cid"] intValue]) {
-                _cid = [[result objectForKey:@"cid"] intValue];
+                self->_cid = [[result objectForKey:@"cid"] intValue];
             }
         } else {
             NSString *msg = [result objectForKey:@"message"];
@@ -372,15 +372,15 @@ static NSString * const ServerHasSSLKey = @"ssl";
         }
     };
     
-    if(_cid == -1) {
-        [[NetworkConnection sharedInstance] addServer:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text channels:_channels.text handler:handler];
-    } else if(_slack) {
-        [[NetworkConnection sharedInstance] setNetworkName:_network.text cid:_cid handler:handler];
+    if(self->_cid == -1) {
+        [[NetworkConnection sharedInstance] addServer:self->_server.text port:[self->_port.text intValue] ssl:(self->_ssl.on)?1:0 netname:self->_netname nick:self->_nickname.text realname:self->_realname.text serverPass:self->_serverpass.text nickservPass:self->_nspass.text joinCommands:self->_commands.text channels:self->_channels.text handler:handler];
+    } else if(self->_slack) {
+        [[NetworkConnection sharedInstance] setNetworkName:self->_network.text cid:self->_cid handler:handler];
     } else {
-        _netname = _network.text;
-        if([_netname.lowercaseString isEqualToString:_server.text.lowercaseString])
-            _netname = nil;
-        [[NetworkConnection sharedInstance] editServer:_cid hostname:_server.text port:[_port.text intValue] ssl:(_ssl.on)?1:0 netname:_netname nick:_nickname.text realname:_realname.text serverPass:_serverpass.text nickservPass:_nspass.text joinCommands:_commands.text handler:handler];
+        self->_netname = self->_network.text;
+        if([self->_netname.lowercaseString isEqualToString:self->_server.text.lowercaseString])
+            self->_netname = nil;
+        [[NetworkConnection sharedInstance] editServer:self->_cid hostname:self->_server.text port:[self->_port.text intValue] ssl:(self->_ssl.on)?1:0 netname:self->_netname nick:self->_nickname.text realname:self->_realname.text serverPass:self->_serverpass.text nickservPass:self->_nspass.text joinCommands:self->_commands.text handler:handler];
     }
 }
 
@@ -397,109 +397,109 @@ static NSString * const ServerHasSSLKey = @"ssl";
 
 -(void)setServer:(int)cid {
     self.navigationItem.title = @"Edit Connection";
-    _cid = cid;
+    self->_cid = cid;
     [self refresh];
 }
 
 -(void)setNetwork:(NSString *)network host:(NSString *)host port:(int)port SSL:(BOOL)SSL {
-    _network.text = _netname = network;
-    _server.text = host;
-    _port.text = [NSString stringWithFormat:@"%i", port];
-    _ssl.on = SSL;
+    self->_network.text = self->_netname = network;
+    self->_server.text = host;
+    self->_port.text = [NSString stringWithFormat:@"%i", port];
+    self->_ssl.on = SSL;
     [self.tableView reloadData];
 }
 
 -(void)setURL:(NSURL *)url {
-    _url = url;
-    _network.text = _netname = url.host;
+    self->_url = url;
+    self->_network.text = self->_netname = url.host;
     [self refresh];
 }
 
 -(void)refresh {
     CGRect frame = CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22);
-    _server.frame = frame;
-    _port.frame = frame;
-    _nickname.frame = frame;
-    _realname.frame = frame;
-    _nspass.frame = frame;
-    _serverpass.frame = frame;
-    _network.frame = frame;
-    _commands.frame = frame;
-    _channels.frame = frame;
+    self->_server.frame = frame;
+    self->_port.frame = frame;
+    self->_nickname.frame = frame;
+    self->_realname.frame = frame;
+    self->_nspass.frame = frame;
+    self->_serverpass.frame = frame;
+    self->_network.frame = frame;
+    self->_commands.frame = frame;
+    self->_channels.frame = frame;
 
-    if(_url) {
-        int port = [_url.port intValue];
-        int ssl = [_url.scheme hasSuffix:@"s"]?1:0;
+    if(self->_url) {
+        int port = [self->_url.port intValue];
+        int ssl = [self->_url.scheme hasSuffix:@"s"]?1:0;
         if(port == 0)
             port = (ssl == 1)?6697:6667;
         
-        _server.text = _url.host;
-        _port.text = [NSString stringWithFormat:@"%i", port];
+        self->_server.text = self->_url.host;
+        self->_port.text = [NSString stringWithFormat:@"%i", port];
         if(ssl == 1)
-            _ssl.on = YES;
+            self->_ssl.on = YES;
         else
-            _ssl.on = NO;
+            self->_ssl.on = NO;
         
-        if(_url.path && _url.path.length > 1)
-            _channels.text = [_url.path substringFromIndex:1];
+        if(self->_url.path && _url.path.length > 1)
+            self->_channels.text = [self->_url.path substringFromIndex:1];
     } else {
-        Server *server = [[ServersDataSource sharedInstance] getServer:_cid];
+        Server *server = [[ServersDataSource sharedInstance] getServer:self->_cid];
         if(server) {
-            _slack = server.slack;
-            _network.text = _netname = server.name;
-            if(_netname.length == 0)
-                _network.text = _netname = server.hostname;
+            self->_slack = server.slack;
+            self->_network.text = self->_netname = server.name;
+            if(self->_netname.length == 0)
+                self->_network.text = self->_netname = server.hostname;
             
             if([server.hostname isKindOfClass:[NSString class]] && server.hostname.length)
-                _server.text = server.hostname;
+                self->_server.text = server.hostname;
             else
-                _server.text = @"";
+                self->_server.text = @"";
             
-            _port.text = [NSString stringWithFormat:@"%i", server.port];
+            self->_port.text = [NSString stringWithFormat:@"%i", server.port];
             
-            _ssl.on = (server.ssl > 0);
+            self->_ssl.on = (server.ssl > 0);
 
             if([server.nick isKindOfClass:[NSString class]] && server.nick.length)
-                _nickname.text = server.nick;
+                self->_nickname.text = server.nick;
             else
-                _nickname.text = @"";
+                self->_nickname.text = @"";
             
             if([server.realname isKindOfClass:[NSString class]] && server.realname.length)
-                _realname.text = server.realname;
+                self->_realname.text = server.realname;
             else
-                _realname.text = @"";
+                self->_realname.text = @"";
             
             if([server.nickserv_pass isKindOfClass:[NSString class]] && server.nickserv_pass.length)
-                _nspass.text = server.nickserv_pass;
+                self->_nspass.text = server.nickserv_pass;
             else
-                _nspass.text = @"";
+                self->_nspass.text = @"";
             
             if([server.server_pass isKindOfClass:[NSString class]] && server.server_pass.length)
-                _serverpass.text = server.server_pass;
+                self->_serverpass.text = server.server_pass;
             else
-                _serverpass.text = @"";
+                self->_serverpass.text = @"";
             
             if([server.join_commands isKindOfClass:[NSString class]] && server.join_commands.length)
-                _commands.text = server.join_commands;
+                self->_commands.text = server.join_commands;
             else
-                _commands.text = @"";
+                self->_commands.text = @"";
         }
     }
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField {
-    if(textField == _server)
-        _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:0];
-    else if(textField == _port)
-        _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:0];
-    if(textField == _nickname)
-        _activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:1];
-    if(textField == _realname)
-        _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:1];
-    if(textField == _nspass)
-        _activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:2];
-    if(textField == _serverpass)
-        _activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:2];
+    if(textField == self->_server)
+        self->_activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:0];
+    else if(textField == self->_port)
+        self->_activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:0];
+    if(textField == self->_nickname)
+        self->_activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:1];
+    if(textField == self->_realname)
+        self->_activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:1];
+    if(textField == self->_nspass)
+        self->_activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:2];
+    if(textField == self->_serverpass)
+        self->_activeCellIndexPath = [NSIndexPath indexPathForRow:1 inSection:2];
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
@@ -538,111 +538,111 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _network = [[UITextField alloc] initWithFrame:CGRectZero];
-    _network.placeholder = @"Network";
-    _network.text = @"";
-    _network.textAlignment = NSTextAlignmentRight;
-    _network.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _network.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _network.autocorrectionType = UITextAutocorrectionTypeNo;
-    _network.keyboardType = UIKeyboardTypeDefault;
-    _network.adjustsFontSizeToFitWidth = YES;
-    _network.returnKeyType = UIReturnKeyDone;
-    _network.delegate = self;
+    self->_network = [[UITextField alloc] initWithFrame:CGRectZero];
+    self->_network.placeholder = @"Network";
+    self->_network.text = @"";
+    self->_network.textAlignment = NSTextAlignmentRight;
+    self->_network.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_network.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_network.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_network.keyboardType = UIKeyboardTypeDefault;
+    self->_network.adjustsFontSizeToFitWidth = YES;
+    self->_network.returnKeyType = UIReturnKeyDone;
+    self->_network.delegate = self;
     
-    _server = [[UITextField alloc] initWithFrame:CGRectZero];
-    _server.placeholder = @"irc.example.net";
-    _server.text = @"";
-    _server.textAlignment = NSTextAlignmentRight;
-    _server.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _server.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _server.autocorrectionType = UITextAutocorrectionTypeNo;
-    _server.keyboardType = UIKeyboardTypeURL;
-    _server.adjustsFontSizeToFitWidth = YES;
-    _server.returnKeyType = UIReturnKeyDone;
-    _server.delegate = self;
+    self->_server = [[UITextField alloc] initWithFrame:CGRectZero];
+    self->_server.placeholder = @"irc.example.net";
+    self->_server.text = @"";
+    self->_server.textAlignment = NSTextAlignmentRight;
+    self->_server.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_server.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_server.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_server.keyboardType = UIKeyboardTypeURL;
+    self->_server.adjustsFontSizeToFitWidth = YES;
+    self->_server.returnKeyType = UIReturnKeyDone;
+    self->_server.delegate = self;
     
-    _port = [[UITextField alloc] initWithFrame:CGRectZero];
-    _port.text = @"6667";
-    _port.textAlignment = NSTextAlignmentRight;
-    _port.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _port.keyboardType = UIKeyboardTypeNumberPad;
-    _port.returnKeyType = UIReturnKeyDone;
-    _port.delegate = self;
+    self->_port = [[UITextField alloc] initWithFrame:CGRectZero];
+    self->_port.text = @"6667";
+    self->_port.textAlignment = NSTextAlignmentRight;
+    self->_port.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_port.keyboardType = UIKeyboardTypeNumberPad;
+    self->_port.returnKeyType = UIReturnKeyDone;
+    self->_port.delegate = self;
     
-    _ssl = [[UISwitch alloc] init];
+    self->_ssl = [[UISwitch alloc] init];
     
-    _nickname = [[UITextField alloc] initWithFrame:CGRectZero];
-    _nickname.text = @"";
-    _nickname.textAlignment = NSTextAlignmentRight;
-    _nickname.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _nickname.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _nickname.autocorrectionType = UITextAutocorrectionTypeNo;
-    _nickname.keyboardType = UIKeyboardTypeDefault;
-    _nickname.adjustsFontSizeToFitWidth = YES;
-    _nickname.returnKeyType = UIReturnKeyDone;
-    _nickname.delegate = self;
+    self->_nickname = [[UITextField alloc] initWithFrame:CGRectZero];
+    self->_nickname.text = @"";
+    self->_nickname.textAlignment = NSTextAlignmentRight;
+    self->_nickname.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_nickname.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_nickname.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_nickname.keyboardType = UIKeyboardTypeDefault;
+    self->_nickname.adjustsFontSizeToFitWidth = YES;
+    self->_nickname.returnKeyType = UIReturnKeyDone;
+    self->_nickname.delegate = self;
     if(name && [name isKindOfClass:[NSString class]] && name.length) {
         NSRange range = [name rangeOfString:@" "];
         if(range.location != NSNotFound && range.location > 0)
-            _nickname.text = [[name substringToIndex:range.location] lowercaseString];
+            self->_nickname.text = [[name substringToIndex:range.location] lowercaseString];
     }
     
-    _realname = [[UITextField alloc] initWithFrame:CGRectZero];
-    _realname.text = @"";
-    _realname.textAlignment = NSTextAlignmentRight;
-    _realname.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _realname.autocapitalizationType = UITextAutocapitalizationTypeWords;
-    _realname.autocorrectionType = UITextAutocorrectionTypeDefault;
-    _realname.keyboardType = UIKeyboardTypeDefault;
-    _realname.adjustsFontSizeToFitWidth = YES;
-    _realname.returnKeyType = UIReturnKeyDone;
-    _realname.delegate = self;
+    self->_realname = [[UITextField alloc] initWithFrame:CGRectZero];
+    self->_realname.text = @"";
+    self->_realname.textAlignment = NSTextAlignmentRight;
+    self->_realname.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_realname.autocapitalizationType = UITextAutocapitalizationTypeWords;
+    self->_realname.autocorrectionType = UITextAutocorrectionTypeDefault;
+    self->_realname.keyboardType = UIKeyboardTypeDefault;
+    self->_realname.adjustsFontSizeToFitWidth = YES;
+    self->_realname.returnKeyType = UIReturnKeyDone;
+    self->_realname.delegate = self;
     if(name && [name isKindOfClass:[NSString class]] && name.length) {
-        _realname.text = name;
+        self->_realname.text = name;
     }
     
-    _nspass = [[UITextField alloc] initWithFrame:CGRectZero];
-    _nspass.text = @"";
-    _nspass.textAlignment = NSTextAlignmentRight;
-    _nspass.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _nspass.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _nspass.autocorrectionType = UITextAutocorrectionTypeNo;
-    _nspass.keyboardType = UIKeyboardTypeDefault;
-    _nspass.adjustsFontSizeToFitWidth = YES;
-    _nspass.returnKeyType = UIReturnKeyDone;
-    _nspass.delegate = self;
-    _nspass.secureTextEntry = YES;
+    self->_nspass = [[UITextField alloc] initWithFrame:CGRectZero];
+    self->_nspass.text = @"";
+    self->_nspass.textAlignment = NSTextAlignmentRight;
+    self->_nspass.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_nspass.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_nspass.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_nspass.keyboardType = UIKeyboardTypeDefault;
+    self->_nspass.adjustsFontSizeToFitWidth = YES;
+    self->_nspass.returnKeyType = UIReturnKeyDone;
+    self->_nspass.delegate = self;
+    self->_nspass.secureTextEntry = YES;
 
-    _serverpass = [[UITextField alloc] initWithFrame:CGRectZero];
-    _serverpass.text = @"";
-    _serverpass.textAlignment = NSTextAlignmentRight;
-    _serverpass.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _serverpass.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _serverpass.autocorrectionType = UITextAutocorrectionTypeNo;
-    _serverpass.keyboardType = UIKeyboardTypeDefault;
-    _serverpass.adjustsFontSizeToFitWidth = YES;
-    _serverpass.returnKeyType = UIReturnKeyDone;
-    _serverpass.delegate = self;
-    _serverpass.secureTextEntry = YES;
+    self->_serverpass = [[UITextField alloc] initWithFrame:CGRectZero];
+    self->_serverpass.text = @"";
+    self->_serverpass.textAlignment = NSTextAlignmentRight;
+    self->_serverpass.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_serverpass.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_serverpass.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_serverpass.keyboardType = UIKeyboardTypeDefault;
+    self->_serverpass.adjustsFontSizeToFitWidth = YES;
+    self->_serverpass.returnKeyType = UIReturnKeyDone;
+    self->_serverpass.delegate = self;
+    self->_serverpass.secureTextEntry = YES;
 
-    _commands = [[UITextView alloc] initWithFrame:CGRectZero];
-    _commands.text = @"";
-    _commands.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _commands.backgroundColor = [UIColor clearColor];
-    _commands.delegate = self;
-    _commands.font = _server.font;
-    _commands.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _commands.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_commands = [[UITextView alloc] initWithFrame:CGRectZero];
+    self->_commands.text = @"";
+    self->_commands.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_commands.backgroundColor = [UIColor clearColor];
+    self->_commands.delegate = self;
+    self->_commands.font = self->_server.font;
+    self->_commands.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_commands.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     
-    _channels = [[UITextView alloc] initWithFrame:CGRectZero];
-    _channels.text = @"";
-    _channels.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _channels.backgroundColor = [UIColor clearColor];
-    _channels.delegate = self;
-    _channels.font = _server.font;
-    _channels.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _channels.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_channels = [[UITextView alloc] initWithFrame:CGRectZero];
+    self->_channels.text = @"";
+    self->_channels.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_channels.backgroundColor = [UIColor clearColor];
+    self->_channels.delegate = self;
+    self->_channels.font = self->_server.font;
+    self->_channels.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_channels.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     
     if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"verified"] intValue] == 0) {
         UITextView *unverified = [[UITextView alloc] init];
@@ -684,10 +684,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 - (BOOL)textViewShouldBeginEditing:(UITextView *)textView {
-    if(textView == _channels || (textView == _commands && _cid != -1))
-        _activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:3];
-    else if(textView == _commands)
-        _activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:4];
+    if(textView == self->_channels || (textView == self->_commands && _cid != -1))
+        self->_activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:3];
+    else if(textView == self->_commands)
+        self->_activeCellIndexPath = [NSIndexPath indexPathForRow:0 inSection:4];
     return YES;
 }
 
@@ -717,7 +717,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
             break;
         case kIRCEventMakeServer:
             s = notification.object;
-            if(s.cid == _cid) {
+            if(s.cid == self->_cid) {
                 [(AppDelegate *)([UIApplication sharedApplication].delegate) showMainView:YES];
                 [[NSNotificationCenter defaultCenter] removeObserver:self];
             }
@@ -737,9 +737,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if(_slack)
+    if(self->_slack)
         return 1;
-    else if(_cid == -1)
+    else if(self->_cid == -1)
         return 5;
     else
         return 4;
@@ -748,7 +748,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch(section) {
         case 0:
-            if(_slack)
+            if(self->_slack)
                 return 1;
             else
                 return 4;
@@ -773,7 +773,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         case 2:
             return @"Passwords";
         case 3:
-            return (_cid==-1)?@"Channels To Join":@"Commands To Run On Connect";
+            return (self->_cid==-1)?@"Channels To Join":@"Commands To Run On Connect";
         case 4:
             return @"Commands To Run On Connect";
     }
@@ -816,13 +816,13 @@ static NSString * const ServerHasSSLKey = @"ssl";
         case 0:
             switch(row) {
                 case 0:
-                    if(_cid!=-1 || _url) {
+                    if(self->_cid!=-1 || _url) {
                         cell.textLabel.text = @"Name";
-                        cell.accessoryView = _network;
+                        cell.accessoryView = self->_network;
                     } else {
                         cell.textLabel.text = @"Network";
-                        if(_netname.length)
-                            cell.detailTextLabel.text = _netname;
+                        if(self->_netname.length)
+                            cell.detailTextLabel.text = self->_netname;
                         else
                             cell.detailTextLabel.text = @"Choose a Network";
                         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -830,15 +830,15 @@ static NSString * const ServerHasSSLKey = @"ssl";
                     break;
                 case 1:
                     cell.textLabel.text = @"Hostname";
-                    cell.accessoryView = _server;
+                    cell.accessoryView = self->_server;
                     break;
                 case 2:
                     cell.textLabel.text = @"Port";
-                    cell.accessoryView = _port;
+                    cell.accessoryView = self->_port;
                     break;
                 case 3:
                     cell.textLabel.text = @"Use SSL";
-                    cell.accessoryView = _ssl;
+                    cell.accessoryView = self->_ssl;
                     break;
             }
             break;
@@ -846,11 +846,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"Nickname";
-                    cell.accessoryView = _nickname;
+                    cell.accessoryView = self->_nickname;
                     break;
                 case 1:
                     cell.textLabel.text = @"Real name";
-                    cell.accessoryView = _realname;
+                    cell.accessoryView = self->_realname;
                     break;
             }
             break;
@@ -858,25 +858,25 @@ static NSString * const ServerHasSSLKey = @"ssl";
             switch(row) {
                 case 0:
                     cell.textLabel.text = @"NickServ";
-                    cell.accessoryView = _nspass;
+                    cell.accessoryView = self->_nspass;
                     break;
                 case 1:
                     cell.textLabel.text = @"Server";
-                    cell.accessoryView = _serverpass;
+                    cell.accessoryView = self->_serverpass;
                     break;
             }
             break;
         case 3:
             cell.textLabel.text = nil;
-            [((_cid==-1)?_channels:_commands) removeFromSuperview];
-            ((_cid==-1)?_channels:_commands).frame = CGRectInset(cell.contentView.bounds, 4, 4);
-            [cell.contentView addSubview:(_cid==-1)?_channels:_commands];
+            [((self->_cid==-1)?_channels:self->_commands) removeFromSuperview];
+            ((self->_cid==-1)?_channels:self->_commands).frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:(self->_cid==-1)?_channels:self->_commands];
             break;
         case 4:
             cell.textLabel.text = nil;
-            [_commands removeFromSuperview];
-            _commands.frame = CGRectInset(cell.contentView.bounds, 4, 4);
-            [cell.contentView addSubview:_commands];
+            [self->_commands removeFromSuperview];
+            self->_commands.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:self->_commands];
             break;
     }
     
@@ -925,12 +925,12 @@ static NSString * const ServerHasSSLKey = @"ssl";
 #pragma mark - Table view delegate
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    _activeCellIndexPath = indexPath;
+    self->_activeCellIndexPath = indexPath;
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
-    if(_cid == -1 && indexPath.section == 0 && indexPath.row == 0) {
+    if(self->_cid == -1 && indexPath.section == 0 && indexPath.row == 0) {
         NetworkListViewController *nvc = [[NetworkListViewController alloc] initWithDelegate:self];
-        nvc.selection = _netname;
+        nvc.selection = self->_netname;
         [self.navigationController pushViewController:nvc animated:YES];
     } else {
         UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];

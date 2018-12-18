@@ -34,26 +34,26 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _channel = [[LinkTextView alloc] init];
-        _channel.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
-        _channel.editable = NO;
-        _channel.scrollEnabled = NO;
-        _channel.selectable = NO;
-        _channel.textContainerInset = UIEdgeInsetsZero;
-        _channel.textContainer.lineFragmentPadding = 0;
-        _channel.backgroundColor = [UIColor clearColor];
-        _channel.textColor = [UIColor messageTextColor];
-        [self.contentView addSubview:_channel];
+        self->_channel = [[LinkTextView alloc] init];
+        self->_channel.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        self->_channel.editable = NO;
+        self->_channel.scrollEnabled = NO;
+        self->_channel.selectable = NO;
+        self->_channel.textContainerInset = UIEdgeInsetsZero;
+        self->_channel.textContainer.lineFragmentPadding = 0;
+        self->_channel.backgroundColor = [UIColor clearColor];
+        self->_channel.textColor = [UIColor messageTextColor];
+        [self.contentView addSubview:self->_channel];
         
-        _topic = [[LinkTextView alloc] init];
-        _topic.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _topic.editable = NO;
-        _topic.scrollEnabled = NO;
-        _topic.textContainerInset = UIEdgeInsetsZero;
-        _topic.textContainer.lineFragmentPadding = 0;
-        _topic.backgroundColor = [UIColor clearColor];
-        _topic.textColor = [UIColor messageTextColor];
-        [self.contentView addSubview:_topic];
+        self->_topic = [[LinkTextView alloc] init];
+        self->_topic.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_topic.editable = NO;
+        self->_topic.scrollEnabled = NO;
+        self->_topic.textContainerInset = UIEdgeInsetsZero;
+        self->_topic.textContainer.lineFragmentPadding = 0;
+        self->_topic.backgroundColor = [UIColor clearColor];
+        self->_topic.textColor = [UIColor messageTextColor];
+        [self.contentView addSubview:self->_topic];
     }
     return self;
 }
@@ -67,8 +67,8 @@
     frame.size.width -= 12;
     frame.size.height -= 8;
     
-    _channel.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, FONT_SIZE + 2);
-    _topic.frame = CGRectMake(frame.origin.x, frame.origin.y + FONT_SIZE + 2, frame.size.width, frame.size.height - FONT_SIZE - 2);
+    self->_channel.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, FONT_SIZE + 2);
+    self->_topic.frame = CGRectMake(frame.origin.x, frame.origin.y + FONT_SIZE + 2, frame.size.width, frame.size.height - FONT_SIZE - 2);
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -82,14 +82,14 @@
 -(id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-        _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _placeholder.numberOfLines = 0;
-        _placeholder.textAlignment = NSTextAlignmentCenter;
-        _placeholder.textColor = [UIColor messageTextColor];
-        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-        _activity.hidesWhenStopped = YES;
-        [_placeholder addSubview:_activity];
+        self->_placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
+        self->_placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_placeholder.numberOfLines = 0;
+        self->_placeholder.textAlignment = NSTextAlignmentCenter;
+        self->_placeholder.textColor = [UIColor messageTextColor];
+        self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+        self->_activity.hidesWhenStopped = YES;
+        [self->_placeholder addSubview:self->_activity];
     }
     return self;
 }
@@ -108,16 +108,16 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    _placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);;
-    if(_channels.count) {
+    self->_placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);;
+    if(self->_channels.count) {
         [self refresh];
-        [_activity stopAnimating];
-        [_placeholder removeFromSuperview];
+        [self->_activity stopAnimating];
+        [self->_placeholder removeFromSuperview];
     } else {
-        _placeholder.text = [NSString stringWithFormat:@"\nLoading channel list for %@", [_event objectForKey:@"server"]];
-        _activity.frame = CGRectMake((_placeholder.frame.size.width - _activity.frame.size.width)/2,6,_activity.frame.size.width,_activity.frame.size.height);
-        [_activity startAnimating];
-        [self.tableView.superview addSubview:_placeholder];
+        self->_placeholder.text = [NSString stringWithFormat:@"\nLoading channel list for %@", [self->_event objectForKey:@"server"]];
+        self->_activity.frame = CGRectMake((self->_placeholder.frame.size.width - _activity.frame.size.width)/2,6,_activity.frame.size.width,_activity.frame.size.height);
+        [self->_activity startAnimating];
+        [self.tableView.superview addSubview:self->_placeholder];
     }
 }
 
@@ -137,7 +137,7 @@
         [data addObject:c];
     }
     
-    _data = data;
+    self->_data = data;
     [self.tableView reloadData];
 }
 
@@ -148,22 +148,22 @@
     switch(event) {
         case kIRCEventListResponse:
             o = notification.object;
-            if(o.cid == _event.cid) {
-                _event = o;
-                _channels = [o objectForKey:@"channels"];
+            if(o.cid == self->_event.cid) {
+                self->_event = o;
+                self->_channels = [o objectForKey:@"channels"];
                 [self refresh];
-                [_activity stopAnimating];
-                [_placeholder removeFromSuperview];
+                [self->_activity stopAnimating];
+                [self->_placeholder removeFromSuperview];
             }
             break;
         case kIRCEventListResponseTooManyChannels:
             o = notification.object;
-            if(o.cid == _event.cid) {
-                _event = o;
-                _placeholder.text = [NSString stringWithFormat:@"Too many channels to list for %@\n\nTry limiting the list to only respond with channels that have more than e.g. 50 members: `/LIST >50`\n", [o objectForKey:@"server"]];
-                _placeholder.attributedText = [ColorFormatter format:[_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
-                _placeholder.textAlignment = NSTextAlignmentCenter;
-                [_activity stopAnimating];
+            if(o.cid == self->_event.cid) {
+                self->_event = o;
+                self->_placeholder.text = [NSString stringWithFormat:@"Too many channels to list for %@\n\nTry limiting the list to only respond with channels that have more than e.g. 50 members: `/LIST >50`\n", [o objectForKey:@"server"]];
+                self->_placeholder.attributedText = [ColorFormatter format:[self->_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
+                self->_placeholder.textAlignment = NSTextAlignmentCenter;
+                [self->_activity stopAnimating];
             }
             break;
         default:
@@ -182,7 +182,7 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     return [[row objectForKey:@"height"] floatValue];
 }
 
@@ -191,18 +191,18 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if([_data count])
+    if([self->_data count])
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     else
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    return [_data count];
+    return [self->_data count];
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     ChannelTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"channelcell"];
     if(!cell)
         cell = [[ChannelTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"channelcell"];
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     cell.channel.attributedText = [ColorFormatter format:[NSString stringWithFormat:@"%c%@%c (%i member%@)",BOLD,[row objectForKey:@"name"],CLEAR, [[row objectForKey:@"num_members"] intValue],[[row objectForKey:@"num_members"] intValue]==1?@"":@"s"] defaultColor:[UITableViewCell appearance].textLabelColor mono:NO linkify:NO server:nil links:nil];
     cell.topic.attributedText = [row objectForKey:@"formatted_topic"];
     return cell;
@@ -212,8 +212,8 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    NSDictionary *row = [_data objectAtIndex:indexPath.row];
-    [[NetworkConnection sharedInstance] join:[row objectForKey:@"name"] key:nil cid:_event.cid handler:nil];
+    NSDictionary *row = [self->_data objectAtIndex:indexPath.row];
+    [[NetworkConnection sharedInstance] join:[row objectForKey:@"name"] key:nil cid:self->_event.cid handler:nil];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 

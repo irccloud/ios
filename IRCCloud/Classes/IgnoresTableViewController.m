@@ -25,13 +25,13 @@
 -(id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
-        _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-        _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _placeholder.numberOfLines = 0;
-        _placeholder.text = @"You're not ignoring anyone at the moment.\n\nYou can ignore someone by tapping their nickname in the user list, long-pressing a message, or by using `/ignore`.\n";
-        _placeholder.attributedText = [ColorFormatter format:[_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
-        _placeholder.textAlignment = NSTextAlignmentCenter;
+        self->_addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
+        self->_placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
+        self->_placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self->_placeholder.numberOfLines = 0;
+        self->_placeholder.text = @"You're not ignoring anyone at the moment.\n\nYou can ignore someone by tapping their nickname in the user list, long-pressing a message, or by using `/ignore`.\n";
+        self->_placeholder.attributedText = [ColorFormatter format:[self->_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
+        self->_placeholder.textAlignment = NSTextAlignmentCenter;
     }
     return self;
 }
@@ -43,7 +43,7 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    self.navigationItem.leftBarButtonItem = _addButton;
+    self.navigationItem.leftBarButtonItem = self->_addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
     self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
 }
@@ -51,11 +51,11 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    _placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);
-    if(_ignores.count)
-        [_placeholder removeFromSuperview];
+    self->_placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);
+    if(self->_ignores.count)
+        [self->_placeholder removeFromSuperview];
     else
-        [self.tableView.superview addSubview:_placeholder];
+        [self.tableView.superview addSubview:self->_placeholder];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -69,12 +69,12 @@
     
     switch(event) {
         case kIRCEventSetIgnores:
-            s = [[ServersDataSource sharedInstance] getServer:_cid];
-            _ignores = s.ignores;
-            if(_ignores.count)
-                [_placeholder removeFromSuperview];
+            s = [[ServersDataSource sharedInstance] getServer:self->_cid];
+            self->_ignores = s.ignores;
+            if(self->_ignores.count)
+                [self->_placeholder removeFromSuperview];
             else
-                [self.tableView.superview addSubview:_placeholder];
+                [self.tableView.superview addSubview:self->_placeholder];
             [self.tableView reloadData];
             break;
         default:
@@ -88,12 +88,12 @@
 
 -(void)addButtonPressed {
     [self.view endEditing:YES];
-    Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
-    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [_alertView textFieldAtIndex:0].delegate = self;
-    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [_alertView show];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_cid];
+    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
+    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [self->_alertView textFieldAtIndex:0].delegate = self;
+    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [self->_alertView show];
 }
 
 -(void)didReceiveMemoryWarning {
@@ -101,15 +101,15 @@
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
-    [self alertView:_alertView clickedButtonAtIndex:1];
+    [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:self->_alertView clickedButtonAtIndex:1];
     return NO;
 }
 
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [[_ignores objectAtIndex:indexPath.row] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:18]} context:nil].size.height + 16;
+    return [[self->_ignores objectAtIndex:indexPath.row] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont boldSystemFontOfSize:18]} context:nil].size.height + 16;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -117,21 +117,21 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if([_ignores count])
+    if([self->_ignores count])
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     else
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    @synchronized(_ignores) {
-        return [_ignores count];
+    @synchronized(self->_ignores) {
+        return [self->_ignores count];
     }
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_ignores) {
+    @synchronized(self->_ignores) {
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ignorescell"];
         if(!cell)
             cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"ignorescell"];
-        cell.textLabel.text = [_ignores objectAtIndex:[indexPath row]];
+        cell.textLabel.text = [self->_ignores objectAtIndex:[indexPath row]];
         cell.textLabel.font = [UIFont boldSystemFontOfSize:18];
         cell.textLabel.numberOfLines = 0;
         cell.textLabel.lineBreakMode = NSLineBreakByCharWrapping;
@@ -145,8 +145,8 @@
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _ignores.count) {
-        NSString *mask = [_ignores objectAtIndex:indexPath.row];
-        [[NetworkConnection sharedInstance] unignore:mask cid:_cid handler:nil];
+        NSString *mask = [self->_ignores objectAtIndex:indexPath.row];
+        [[NetworkConnection sharedInstance] unignore:mask cid:self->_cid handler:nil];
     }
 }
 
@@ -160,10 +160,10 @@
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
     if([title isEqualToString:@"Ignore"]) {
-        [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:_cid handler:nil];
+        [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:self->_cid handler:nil];
     }
     
-    _alertView = nil;
+    self->_alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {

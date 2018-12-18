@@ -34,19 +34,19 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _mask = [[UILabel alloc] init];
-        _mask.font = [UIFont boldSystemFontOfSize:16];
-        _mask.textColor = [UITableViewCell appearance].textLabelColor;
-        _mask.lineBreakMode = NSLineBreakByCharWrapping;
-        _mask.numberOfLines = 0;
-        [self.contentView addSubview:_mask];
+        self->_mask = [[UILabel alloc] init];
+        self->_mask.font = [UIFont boldSystemFontOfSize:16];
+        self->_mask.textColor = [UITableViewCell appearance].textLabelColor;
+        self->_mask.lineBreakMode = NSLineBreakByCharWrapping;
+        self->_mask.numberOfLines = 0;
+        [self.contentView addSubview:self->_mask];
         
-        _setBy = [[UILabel alloc] init];
-        _setBy.font = [UIFont systemFontOfSize:14];
-        _setBy.textColor = [UITableViewCell appearance].detailTextLabelColor;
-        _setBy.lineBreakMode = NSLineBreakByCharWrapping;
-        _setBy.numberOfLines = 0;
-        [self.contentView addSubview:_setBy];
+        self->_setBy = [[UILabel alloc] init];
+        self->_setBy.font = [UIFont systemFontOfSize:14];
+        self->_setBy.textColor = [UITableViewCell appearance].detailTextLabelColor;
+        self->_setBy.lineBreakMode = NSLineBreakByCharWrapping;
+        self->_setBy.numberOfLines = 0;
+        [self.contentView addSubview:self->_setBy];
     }
     return self;
 }
@@ -58,9 +58,9 @@
     frame.origin.x = frame.origin.y = 6;
     frame.size.width -= 12;
     
-    float maskHeight = ceil([_mask.text boundingRectWithSize:CGSizeMake(frame.size.width, INT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:_mask.font} context:nil].size.height) + 2;
-    _mask.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, maskHeight);
-    _setBy.frame = CGRectMake(frame.origin.x, frame.origin.y + maskHeight - 2, frame.size.width, frame.size.height - maskHeight - 8);
+    float maskHeight = ceil([self->_mask.text boundingRectWithSize:CGSizeMake(frame.size.width, INT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:self->_mask.font} context:nil].size.height) + 2;
+    self->_mask.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, maskHeight);
+    self->_setBy.frame = CGRectMake(frame.origin.x, frame.origin.y + maskHeight - 2, frame.size.width, frame.size.height - maskHeight - 8);
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -74,19 +74,19 @@
 -(id)initWithList:(int)list mode:(NSString *)mode param:(NSString *)param placeholder:(NSString *)placeholder bid:(int)bid {
     self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
-        _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
-        _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-        _placeholder.text = placeholder;
-        _placeholder.numberOfLines = 0;
-        _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _placeholder.attributedText = [ColorFormatter format:[_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
-        _placeholder.textAlignment = NSTextAlignmentCenter;
+        self->_addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
+        self->_placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
+        self->_placeholder.text = placeholder;
+        self->_placeholder.numberOfLines = 0;
+        self->_placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self->_placeholder.attributedText = [ColorFormatter format:[self->_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
+        self->_placeholder.textAlignment = NSTextAlignmentCenter;
 
-        _list = list;
-        _bid = bid;
-        _mode = mode;
-        _param = param;
-        _mask = @"mask";
+        self->_list = list;
+        self->_bid = bid;
+        self->_mode = mode;
+        self->_param = param;
+        self->_mask = @"mask";
     }
     return self;
 }
@@ -98,7 +98,7 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    self.navigationItem.leftBarButtonItem = _addButton;
+    self.navigationItem.leftBarButtonItem = self->_addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
     self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
 }
@@ -106,11 +106,11 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    _placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);
-    if(_data.count)
-        [_placeholder removeFromSuperview];
+    self->_placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);
+    if(self->_data.count)
+        [self->_placeholder removeFromSuperview];
     else
-        [self.tableView.superview addSubview:_placeholder];
+        [self.tableView.superview addSubview:self->_placeholder];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -123,21 +123,21 @@
     IRCCloudJSONObject *o = nil;
     Event *e = nil;
 
-    if(event == _list) {
+    if(event == self->_list) {
         o = notification.object;
-        if(o.cid == _event.cid && [[o objectForKey:@"channel"] isEqualToString:[_event objectForKey:@"channel"]]) {
-            _event = o;
-            _data = [o objectForKey:_param];
-            if(_data.count)
-                [_placeholder removeFromSuperview];
+        if(o.cid == self->_event.cid && [[o objectForKey:@"channel"] isEqualToString:[self->_event objectForKey:@"channel"]]) {
+            self->_event = o;
+            self->_data = [o objectForKey:self->_param];
+            if(self->_data.count)
+                [self->_placeholder removeFromSuperview];
             else
-                [self.tableView.superview addSubview:_placeholder];
+                [self.tableView.superview addSubview:self->_placeholder];
             [self.tableView reloadData];
         }
     } else if(event == kIRCEventBufferMsg) {
         e = notification.object;
-        if(e.cid == _event.cid && e.bid == _bid && [e.type isEqualToString:@"channel_mode_list_change"]) {
-            [[NetworkConnection sharedInstance] mode:_mode chan:[_event objectForKey:@"channel"] cid:_event.cid handler:nil];
+        if(e.cid == self->_event.cid && e.bid == self->_bid && [e.type isEqualToString:@"channel_mode_list_change"]) {
+            [[NetworkConnection sharedInstance] mode:self->_mode chan:[self->_event objectForKey:@"channel"] cid:self->_event.cid handler:nil];
         }
     }
 }
@@ -148,12 +148,12 @@
 
 -(void)addButtonPressed {
     [self.view endEditing:YES];
-    Server *s = [[ServersDataSource sharedInstance] getServer:_event.cid];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Add", nil];
-    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [_alertView textFieldAtIndex:0].delegate = self;
-    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [_alertView show];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_event.cid];
+    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Add", nil];
+    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [self->_alertView textFieldAtIndex:0].delegate = self;
+    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [self->_alertView show];
 }
 
 -(void)didReceiveMemoryWarning {
@@ -161,8 +161,8 @@
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
-    [self alertView:_alertView clickedButtonAtIndex:1];
+    [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:self->_alertView clickedButtonAtIndex:1];
     return NO;
 }
 
@@ -208,8 +208,8 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    return ceil([[row objectForKey:_mask] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:16]} context:nil].size.height + [[self setByTextForRow:row] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]} context:nil].size.height) + 12;
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
+    return ceil([[row objectForKey:self->_mask] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont boldSystemFontOfSize:16]} context:nil].size.height + [[self setByTextForRow:row] boundingRectWithSize:CGSizeMake(self.tableView.frame.size.width - 12, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]} context:nil].size.height) + 12;
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -217,22 +217,22 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if([_data count])
+    if([self->_data count])
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
     else
         self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-    @synchronized(_data) {
-        return [_data count];
+    @synchronized(self->_data) {
+        return [self->_data count];
     }
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         MaskTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"maskcell"];
         if(!cell)
             cell = [[MaskTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"maskcell"];
-        NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-        cell.mask.text = [row objectForKey:_mask];
+        NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
+        cell.mask.text = [row objectForKey:self->_mask];
         cell.setBy.text = [self setByTextForRow:row];
         return cell;
     }
@@ -244,8 +244,8 @@
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete && indexPath.row < _data.count) {
-        NSDictionary *row = [_data objectAtIndex:indexPath.row];
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@", _mode, [row objectForKey:_mask]] chan:[_event objectForKey:@"channel"] cid:_event.cid handler:nil];
+        NSDictionary *row = [self->_data objectAtIndex:indexPath.row];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@", _mode, [row objectForKey:self->_mask]] chan:[self->_event objectForKey:@"channel"] cid:self->_event.cid handler:nil];
     }
 }
 
@@ -259,10 +259,10 @@
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
     if([title isEqualToString:@"Add"]) {
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@", _mode, [alertView textFieldAtIndex:0].text] chan:[_event objectForKey:@"channel"] cid:_event.cid handler:nil];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@", _mode, [alertView textFieldAtIndex:0].text] chan:[self->_event objectForKey:@"channel"] cid:self->_event.cid handler:nil];
     }
     
-    _alertView = nil;
+    self->_alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {

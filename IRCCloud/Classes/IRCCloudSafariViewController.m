@@ -30,21 +30,21 @@
     NSMutableArray *items = @[
              [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                 [pb setValue:_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                 [pb setValue:self->_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
              }],
              [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIApplication *app = [UIApplication sharedApplication];
                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                  MainViewController *mainViewController = [appDelegate mainViewController];
                  
-                 UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[_url] type:@"URL"];
+                 UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[self->_url] type:@"URL"];
                  activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
              }]
      ].mutableCopy;
     
     [items addObject:[UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:_url
+        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:self->_url
                                               withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
                                                                @"irccloud-enterprise://"
@@ -54,10 +54,10 @@
                                                                ]
                                                  createNewTab:NO])
             return;
-        else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_url])
+        else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_url])
             return;
         else
-            [[UIApplication sharedApplication] openURL:_url];
+            [[UIApplication sharedApplication] openURL:self->_url];
     }]
 ];
     
@@ -67,7 +67,7 @@
 -(instancetype)initWithURL:(NSURL *)URL {
     self = [super initWithURL:URL];
     if(self) {
-        _url = URL;
+        self->_url = URL;
     }
     return self;
 }

@@ -28,21 +28,21 @@
 -(instancetype)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _label = [[UILabel alloc] init];
-        _label.textAlignment = NSTextAlignmentCenter;
-        _label.textColor = [UIColor bufferTextColor];
-        [self.contentView addSubview:_label];
+        self->_label = [[UILabel alloc] init];
+        self->_label.textAlignment = NSTextAlignmentCenter;
+        self->_label.textColor = [UIColor bufferTextColor];
+        [self.contentView addSubview:self->_label];
     }
     return self;
 }
 
 -(void)layoutSubviews {
-    _label.frame = self.bounds;
+    self->_label.frame = self.bounds;
 }
 
 -(void)setSelected:(BOOL)selected {
     self.contentView.backgroundColor = selected ? [UIColor selectedBufferBackgroundColor] : [UIColor clearColor];
-    _label.textColor = selected ? [UIColor selectedBufferTextColor] : [UIColor bufferTextColor];
+    self->_label.textColor = selected ? [UIColor selectedBufferTextColor] : [UIColor bufferTextColor];
 }
 @end
 
@@ -51,28 +51,28 @@
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
-        _selection = -1;
+        self->_selection = -1;
         UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
         layout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
         layout.sectionInset = UIEdgeInsetsMake(0, 6, 0, 6);
         layout.minimumInteritemSpacing = 0;
         layout.minimumLineSpacing = 0;
-        _collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
-        _collectionView.dataSource = self;
-        _collectionView.delegate = self;
-        [_collectionView registerClass:NickCompletionCell.class forCellWithReuseIdentifier:@"NickCompletionCell"];
-        _collectionView.translatesAutoresizingMaskIntoConstraints = NO;
-        _collectionView.layer.masksToBounds = YES;
-        _collectionView.layer.cornerRadius = 4;
-        _collectionView.allowsSelection = YES;
-        _collectionView.allowsMultipleSelection = NO;
-        _collectionView.scrollEnabled = NO;
-        [self addSubview:_collectionView];
+        self->_collectionView = [[UICollectionView alloc] initWithFrame:CGRectZero collectionViewLayout:layout];
+        self->_collectionView.dataSource = self;
+        self->_collectionView.delegate = self;
+        [self->_collectionView registerClass:NickCompletionCell.class forCellWithReuseIdentifier:@"NickCompletionCell"];
+        self->_collectionView.translatesAutoresizingMaskIntoConstraints = NO;
+        self->_collectionView.layer.masksToBounds = YES;
+        self->_collectionView.layer.cornerRadius = 4;
+        self->_collectionView.allowsSelection = YES;
+        self->_collectionView.allowsMultipleSelection = NO;
+        self->_collectionView.scrollEnabled = NO;
+        [self addSubview:self->_collectionView];
         [self addConstraints:@[
-                               [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0f constant:1.0f],
-                               [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-1.0f],
-                               [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0f constant:1.0f],
-                               [NSLayoutConstraint constraintWithItem:_collectionView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:-1.0f]
+                               [NSLayoutConstraint constraintWithItem:self->_collectionView attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTop multiplier:1.0f constant:1.0f],
+                               [NSLayoutConstraint constraintWithItem:self->_collectionView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-1.0f],
+                               [NSLayoutConstraint constraintWithItem:self->_collectionView attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeLeading multiplier:1.0f constant:1.0f],
+                               [NSLayoutConstraint constraintWithItem:self->_collectionView attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:self attribute:NSLayoutAttributeTrailing multiplier:1.0f constant:-1.0f]
                                ]];
         [self setSuggestions:@[]];
     }
@@ -84,32 +84,32 @@
 }
 
 -(void)setSuggestions:(NSArray *)suggestions {
-    _suggestions = suggestions;
-    _selection = -1;
-    _font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
+    self->_suggestions = suggestions;
+    self->_selection = -1;
+    self->_font = [UIFont preferredFontForTextStyle:UIFontTextStyleBody];
     
     CGFloat width = 0;
     for(NSString *s in _suggestions) {
-        width += [s sizeWithAttributes:@{NSFontAttributeName:_font}].width + 12;
+        width += [s sizeWithAttributes:@{NSFontAttributeName:self->_font}].width + 12;
         if(width > self.bounds.size.width)
             break;
     }
     
     if(width < self.bounds.size.width)
-        _collectionView.contentInset = UIEdgeInsetsMake(0, ((self.bounds.size.width - width) / 2) - 4, 0, 0);
+        self->_collectionView.contentInset = UIEdgeInsetsMake(0, ((self.bounds.size.width - width) / 2) - 4, 0, 0);
     else
-        _collectionView.contentInset = UIEdgeInsetsZero;
-    _collectionView.scrollEnabled = width > self.bounds.size.width;
+        self->_collectionView.contentInset = UIEdgeInsetsZero;
+    self->_collectionView.scrollEnabled = width > self.bounds.size.width;
 
     self.backgroundColor = [UIColor bufferBorderColor];
-    _collectionView.backgroundColor = [UIColor bufferBackgroundColor];
-    [_collectionView reloadData];
+    self->_collectionView.backgroundColor = [UIColor bufferBackgroundColor];
+    [self->_collectionView reloadData];
 }
 
 -(NSString *)suggestion {
-    if(_selection == -1 || _selection >= _suggestions.count)
+    if(self->_selection == -1 || _selection >= self->_suggestions.count)
         return nil;
-    NSString *suggestion = [_suggestions objectAtIndex:_selection];
+    NSString *suggestion = [self->_suggestions objectAtIndex:self->_selection];
     if([suggestion rangeOfString:@"\u00a0("].location != NSNotFound) {
         NSUInteger nickIndex = [suggestion rangeOfString:@"(" options:NSBackwardsSearch].location;
         suggestion = [suggestion substringWithRange:NSMakeRange(nickIndex + 1, suggestion.length - nickIndex - 2)];
@@ -127,8 +127,8 @@
 }
 
 -(void)setSelection:(NSInteger)selection {
-    _selection = selection;
-    [_collectionView selectItemAtIndexPath:[NSIndexPath indexPathForRow:selection inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionCenteredHorizontally];
+    self->_selection = selection;
+    [self->_collectionView selectItemAtIndexPath:[NSIndexPath indexPathForRow:selection inSection:0] animated:YES scrollPosition:UICollectionViewScrollPositionCenteredHorizontally];
 }
 
 -(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
@@ -140,20 +140,20 @@
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
-    NickCompletionCell *cell = [_collectionView dequeueReusableCellWithReuseIdentifier:@"NickCompletionCell" forIndexPath:indexPath];
-    cell.label.font = _font;
-    cell.label.text = [_suggestions objectAtIndex:indexPath.row];
+    NickCompletionCell *cell = [self->_collectionView dequeueReusableCellWithReuseIdentifier:@"NickCompletionCell" forIndexPath:indexPath];
+    cell.label.font = self->_font;
+    cell.label.text = [self->_suggestions objectAtIndex:indexPath.row];
     return cell;
 }
 
 -(CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake([[_suggestions objectAtIndex:indexPath.row] sizeWithAttributes:@{NSFontAttributeName:_font}].width + 12, _collectionView.frame.size.height - 1);
+    return CGSizeMake([[self->_suggestions objectAtIndex:indexPath.row] sizeWithAttributes:@{NSFontAttributeName:self->_font}].width + 12, _collectionView.frame.size.height - 1);
 }
 
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
     [[UIDevice currentDevice] playInputClick];
-    _selection = indexPath.row;
-    [_completionDelegate nickSelected:self.suggestion];
+    self->_selection = indexPath.row;
+    [self->_completionDelegate nickSelected:self.suggestion];
 }
 
 -(BOOL)enableInputClicksWhenVisible {

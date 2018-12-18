@@ -14,7 +14,7 @@
 @implementation ShareViewController
 
 - (void)presentationAnimationDidFinish {
-    if(_conn.session.length) {
+    if(self->_conn.session.length) {
 #ifdef ENTERPRISE
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
@@ -58,29 +58,29 @@
                 NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
                     if([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
                         NSLog(@"Uploading image to IRCCloud");
-                        _item = item;
-                        [_fileUploader uploadImage:item];
-                        if(!_filename)
-                            _filename = _fileUploader.originalFilename;
+                        self->_item = item;
+                        [self->_fileUploader uploadImage:item];
+                        if(!self->_filename)
+                            self->_filename = self->_fileUploader.originalFilename;
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                             [self reloadConfigurationItems];
                             [self validateContent];
                         }];
                     } else {
-                        _uploadStarted = YES;
+                        self->_uploadStarted = YES;
                     }
                 };
                 
                 NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
                     if([i hasItemConformingToTypeIdentifier:@"public.image"] && ![item.pathExtension.lowercaseString isEqualToString:@"gif"] && ![item.pathExtension.lowercaseString isEqualToString:@"png"]) {
-                            _fileUploader.originalFilename = [[item pathComponents] lastObject];
+                            self->_fileUploader.originalFilename = [[item pathComponents] lastObject];
                         [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                     } else {
                         if([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
                             NSLog(@"Uploading file to IRCCloud");
-                            [i hasItemConformingToTypeIdentifier:@"public.movie"]?[_fileUploader uploadVideo:item]:[_fileUploader uploadFile:item];
-                            if(!_filename)
-                                _filename = _fileUploader.originalFilename;
+                            [i hasItemConformingToTypeIdentifier:@"public.movie"]?[self->_fileUploader uploadVideo:item]:[self->_fileUploader uploadFile:item];
+                            if(!self->_filename)
+                                self->_filename = self->_fileUploader.originalFilename;
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                                 [self reloadConfigurationItems];
                                 [self validateContent];
@@ -92,7 +92,7 @@
                 if([i hasItemConformingToTypeIdentifier:@"public.file-url"]) {
                     [i loadItemForTypeIdentifier:@"public.file-url" options:nil completionHandler:urlHandler];
                 } else if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
-                    _fileUploader = nil;
+                    self->_fileUploader = nil;
                     [self reloadConfigurationItems];
                     [self validateContent];
                 } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
@@ -100,11 +100,11 @@
                 } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                 } else {
-                    _uploadStarted = YES;
+                    self->_uploadStarted = YES;
                 }
             }
         } else {
-            _uploadStarted = YES;
+            self->_uploadStarted = YES;
         }
     } else {
         UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Not Logged in" message:@"Please login to the IRCCloud app before sharing." preferredStyle:UIAlertControllerStyleAlert];
@@ -117,7 +117,7 @@
 
 - (void)viewDidLoad {
     __weak ShareViewController *weakSelf = self;
-    _resultHandler = ^(IRCCloudJSONObject *result) {
+    self->_resultHandler = ^(IRCCloudJSONObject *result) {
         NSLog(@"Say result: %@", result);
         [weakSelf.extensionContext completeRequestReturningItems:nil completionHandler:nil];
         AudioServicesPlaySystemSound(weakSelf.sound);
@@ -134,32 +134,32 @@
 #endif
     IRCCLOUD_HOST = [d objectForKey:@"host"];
     IRCCLOUD_PATH = [d objectForKey:@"path"];
-    _uploader = [[ImageUploader alloc] init];
-    _uploader.delegate = self;
-    _fileUploader = [[FileUploader alloc] init];
-    _fileUploader.delegate = self;
+    self->_uploader = [[ImageUploader alloc] init];
+    self->_uploader.delegate = self;
+    self->_fileUploader = [[FileUploader alloc] init];
+    self->_fileUploader.delegate = self;
     [[NSUserDefaults standardUserDefaults] setObject:[d objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
     if([d objectForKey:@"fontSize"])
         [[NSUserDefaults standardUserDefaults] setObject:[d objectForKey:@"fontSize"] forKey:@"fontSize"];
     [NetworkConnection sync];
-    _conn = [NetworkConnection sharedInstance];
-    if(_conn.session.length) {
+    self->_conn = [NetworkConnection sharedInstance];
+    if(self->_conn.session.length) {
         if([BuffersDataSource sharedInstance].count && _conn.userInfo) {
-            _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
+            self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[[self->_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
         }
-        [_conn connect:YES];
+        [self->_conn connect:YES];
     }
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";
-    _sound = 1001;
+    self->_sound = 1001;
 }
 
 - (void)backlogComplete:(NSNotification *)n {
-    if(!_buffer)
-        _buffer = [[BuffersDataSource sharedInstance] getBuffer:[[_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
-    if(!_buffer)
-        _buffer = [[BuffersDataSource sharedInstance] getBuffer:[BuffersDataSource sharedInstance].firstBid];
+    if(!self->_buffer)
+        self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[[self->_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
+    if(!self->_buffer)
+        self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[BuffersDataSource sharedInstance].firstBid];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self reloadConfigurationItems];
         [self validateContent];
@@ -167,9 +167,9 @@
 }
 
 - (BOOL)isContentValid {
-    if(_fileUploader && !_uploadStarted)
+    if(self->_fileUploader && !self->_uploadStarted)
         return NO;
-    return _conn.session.length && _buffer != nil && ![_buffer.type isEqualToString:@"console"];
+    return _conn.session.length && _buffer != nil && ![self->_buffer.type isEqualToString:@"console"];
 }
 
 - (void)didSelectPost {
@@ -178,11 +178,11 @@
     output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
 
     if(output.attachments.count) {
-        if(_fileUploader.originalFilename) {
+        if(self->_fileUploader.originalFilename) {
             NSLog(@"Setting filename, bid, and message for IRCCloud upload");
-            _fileUploader.bid = _buffer.bid;
-            [_fileUploader setFilename:_filename message:self.contentText];
-            if(!_fileUploader.finished) {
+            self->_fileUploader.bid = self->_buffer.bid;
+            [self->_fileUploader setFilename:self->_filename message:self.contentText];
+            if(!self->_fileUploader.finished) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.extensionContext completeRequestReturningItems:@[output] completionHandler:nil];
                 }];
@@ -208,9 +208,9 @@
 
             NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
                 NSLog(@"Uploading image to imgur");
-                _uploader.bid = _buffer.bid;
-                _uploader.msg = self.contentText;
-                [_uploader upload:item];
+                self->_uploader.bid = self->_buffer.bid;
+                self->_uploader.msg = self.contentText;
+                [self->_uploader upload:item];
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
                 }];
@@ -221,9 +221,9 @@
                     [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                 } else {
                     if(self.contentText.length)
-                        [_conn say:[NSString stringWithFormat:@"%@ %@",self.contentText,item.absoluteString] to:_buffer.name cid:_buffer.cid handler:_resultHandler];
+                        [self->_conn say:[NSString stringWithFormat:@"%@ %@",self.contentText,item.absoluteString] to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
                     else
-                        [_conn say:item.absoluteString to:_buffer.name cid:_buffer.cid handler:_resultHandler];
+                        [self->_conn say:item.absoluteString to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
                 }
             };
             
@@ -234,25 +234,25 @@
             } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
                 [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
             } else if([i hasItemConformingToTypeIdentifier:@"public.plain-text"]) {
-                [_conn say:self.contentText to:_buffer.name cid:_buffer.cid handler:_resultHandler];
+                [self->_conn say:self.contentText to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
             } else {
                 NSLog(@"Unknown attachment type: %@", output.attachments.firstObject);
                 [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
-                AudioServicesPlaySystemSound(_sound);
+                AudioServicesPlaySystemSound(self->_sound);
             }
         }
     } else {
-        [_conn say:self.contentText to:_buffer.name cid:_buffer.cid handler:_resultHandler];
+        [self->_conn say:self.contentText to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
     }
 }
 
 - (NSArray *)configurationItems {
-    if(_conn.session.length) {
+    if(self->_conn.session.length) {
         SLComposeSheetConfigurationItem *bufferConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
         bufferConfigItem.title = @"Conversation";
-        if(_buffer) {
-            if(![_buffer.type isEqualToString:@"console"])
-                bufferConfigItem.value = _buffer.displayName;
+        if(self->_buffer) {
+            if(![self->_buffer.type isEqualToString:@"console"])
+                bufferConfigItem.value = self->_buffer.displayName;
             else
                 bufferConfigItem.value = nil;
         } else {
@@ -272,7 +272,7 @@
 #else
         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-        if(_fileUploader && [d boolForKey:@"uploadsAvailable"]) {
+        if(self->_fileUploader && [d boolForKey:@"uploadsAvailable"]) {
             NSExtensionItem *input = self.extensionContext.inputItems.firstObject;
             NSExtensionItem *output = [input copy];
             output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
@@ -280,8 +280,8 @@
             if(output.attachments.count && (([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"]) || [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.movie"])) {
                 SLComposeSheetConfigurationItem *filenameConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
                 filenameConfigItem.title = @"Filename";
-                if(_filename)
-                    filenameConfigItem.value = _filename;
+                if(self->_filename)
+                    filenameConfigItem.value = self->_filename;
                 else
                     filenameConfigItem.valuePending = YES;
                 
@@ -289,19 +289,19 @@
                     [self.view.window endEditing:YES];
                     UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Enter a Filename" message:nil preferredStyle:UIAlertControllerStyleAlert];
                     [c addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                        textField.text = _filename;
+                        textField.text = self->_filename;
                         textField.delegate = self;
                         textField.placeholder = @"Filename";
                     }];
                     [c addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                        _filename = [[c.textFields objectAtIndex:0] text];
+                        self->_filename = [[c.textFields objectAtIndex:0] text];
                         [self reloadConfigurationItems];
                     }]];
                     
                     [self presentViewController:c animated:YES completion:nil];
                 };
                 
-                if(!_uploadStarted) {
+                if(!self->_uploadStarted) {
                     SLComposeSheetConfigurationItem *exporting = [[SLComposeSheetConfigurationItem alloc] init];
                     exporting.title = [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.movie"]?@"Exporting Video":@"Resizing Photo";
                     exporting.valuePending = YES;
@@ -331,7 +331,7 @@
 -(void)bufferSelected:(int)bid {
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(b && ![b.type isEqualToString:@"console"]) {
-        _buffer = b;
+        self->_buffer = b;
         [self reloadConfigurationItems];
         [self validateContent];
         [self popConfigurationViewController];
@@ -347,9 +347,9 @@
 }
 
 -(void)fileUploadProgress:(float)progress {
-    if(!_uploadStarted) {
+    if(!self->_uploadStarted) {
         NSLog(@"File upload started");
-        _uploadStarted = YES;
+        self->_uploadStarted = YES;
         [self reloadConfigurationItems];
         [self validateContent];
     }
@@ -389,8 +389,8 @@
 
 -(void)fileUploadDidFinish {
     NSLog(@"File upload successful");
-    [_conn disconnect];
-    AudioServicesPlaySystemSound(_sound);
+    [self->_conn disconnect];
+    AudioServicesPlaySystemSound(self->_sound);
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
     }];
@@ -427,14 +427,14 @@
         NSLog(@"Image upload successful");
         NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
         if(self.contentText.length)
-            [_conn say:[NSString stringWithFormat:@"%@ %@", self.contentText, link] to:_buffer.name cid:_buffer.cid handler:_resultHandler];
+            [self->_conn say:[NSString stringWithFormat:@"%@ %@", self.contentText, link] to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
         else
-            [_conn say:link to:_buffer.name cid:_buffer.cid handler:_resultHandler];
+            [self->_conn say:link to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
     } else {
         NSLog(@"Image upload failed");
     }
-    [_conn disconnect];
-    AudioServicesPlaySystemSound(_sound);
+    [self->_conn disconnect];
+    AudioServicesPlaySystemSound(self->_sound);
 }
 
 -(void)spamSelected:(int)cid {

@@ -25,7 +25,7 @@
 - (id)initWithData:(NSArray *)data {
     self = [super init];
     if(self) {
-        _data = data;
+        self->_data = data;
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
     }
     return self;
@@ -34,22 +34,22 @@
 - (id)initWithText:(NSString *)text {
     self = [super init];
     if(self) {
-        _text = text;
+        self->_text = text;
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
     }
     return self;
 }
 
 - (void)appendData:(NSArray *)data {
-    _data = [_data arrayByAddingObjectsFromArray:data];
+    self->_data = [self->_data arrayByAddingObjectsFromArray:data];
     [self refresh];
 }
 
 -(void)appendText:(NSString *)text {
-    if(_text)
-        _text = [_text stringByAppendingString:text];
+    if(self->_text)
+        self->_text = [self->_text stringByAppendingString:text];
     else
-        _text = text;
+        self->_text = text;
     
     [self refresh];
 }
@@ -60,11 +60,11 @@
 }
 
 - (void)refresh {
-    NSString *text = _text;
+    NSString *text = self->_text;
     if(!text) {
         NSMutableString *mutableText = [[NSMutableString alloc] init];
         
-        if(_data.count) {
+        if(self->_data.count) {
             for(id item in _data) {
                 NSString *s;
                 if([item isKindOfClass:[NSString class]]) {
@@ -77,14 +77,14 @@
                 [mutableText appendFormat:@"%@\n", s];
             }
         } else {
-            if(_placeholder)
-                [mutableText appendString:_placeholder];
+            if(self->_placeholder)
+                [mutableText appendString:self->_placeholder];
         }
         text = mutableText;
     }
     
     NSArray *links;
-    tv.attributedText = [ColorFormatter format:text defaultColor:[UIColor messageTextColor] mono:YES linkify:YES server:_server links:&links];
+    tv.attributedText = [ColorFormatter format:text defaultColor:[UIColor messageTextColor] mono:YES linkify:YES server:self->_server links:&links];
     tv.linkAttributes = [UIColor linkAttributes];
     
     for(NSTextCheckingResult *result in links) {

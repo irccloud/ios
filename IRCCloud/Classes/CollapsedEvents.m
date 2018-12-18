@@ -22,12 +22,12 @@
 
 @implementation CollapsedEvent
 -(NSComparisonResult)compare:(CollapsedEvent *)aEvent {
-    if(_type == aEvent.type) {
-        if(_eid < aEvent.eid)
+    if(self->_type == aEvent.type) {
+        if(self->_eid < aEvent.eid)
             return NSOrderedAscending;
         else
             return NSOrderedDescending;
-    } else if(_type < aEvent.type) {
+    } else if(self->_type < aEvent.type) {
         return NSOrderedAscending;
     } else {
         return NSOrderedDescending;
@@ -38,39 +38,39 @@
 }
 -(BOOL)addMode:(NSString *)mode server:(Server *)server {
     if([mode rangeOfString:server?server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound)
-        _operIsLower = YES;
+        self->_operIsLower = YES;
     mode = mode.lowercaseString;
     
     if([mode rangeOfString:server?server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound) {
-        if(_modes[kCollapsedModeDeOper])
-            _modes[kCollapsedModeDeOper] = false;
+        if(self->_modes[kCollapsedModeDeOper])
+            self->_modes[kCollapsedModeDeOper] = false;
         else
-            _modes[kCollapsedModeOper] = true;
+            self->_modes[kCollapsedModeOper] = true;
     } else if([mode rangeOfString:server?server.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound) {
-        if(_modes[kCollapsedModeDeOwner])
-            _modes[kCollapsedModeDeOwner] = false;
+        if(self->_modes[kCollapsedModeDeOwner])
+            self->_modes[kCollapsedModeDeOwner] = false;
         else
-            _modes[kCollapsedModeOwner] = true;
+            self->_modes[kCollapsedModeOwner] = true;
     } else if([mode rangeOfString:server?server.MODE_ADMIN.lowercaseString:@"a"].location != NSNotFound) {
-        if(_modes[kCollapsedModeDeAdmin])
-            _modes[kCollapsedModeDeAdmin] = false;
+        if(self->_modes[kCollapsedModeDeAdmin])
+            self->_modes[kCollapsedModeDeAdmin] = false;
         else
-            _modes[kCollapsedModeAdmin] = true;
+            self->_modes[kCollapsedModeAdmin] = true;
     } else if([mode rangeOfString:server?server.MODE_OP.lowercaseString:@"o"].location != NSNotFound) {
-        if(_modes[kCollapsedModeDeOp])
-            _modes[kCollapsedModeDeOp] = false;
+        if(self->_modes[kCollapsedModeDeOp])
+            self->_modes[kCollapsedModeDeOp] = false;
         else
-            _modes[kCollapsedModeOp] = true;
+            self->_modes[kCollapsedModeOp] = true;
     } else if([mode rangeOfString:server?server.MODE_HALFOP.lowercaseString:@"h"].location != NSNotFound) {
-        if(_modes[kCollapsedModeDeHalfOp])
-            _modes[kCollapsedModeDeHalfOp] = false;
+        if(self->_modes[kCollapsedModeDeHalfOp])
+            self->_modes[kCollapsedModeDeHalfOp] = false;
         else
-            _modes[kCollapsedModeHalfOp] = true;
+            self->_modes[kCollapsedModeHalfOp] = true;
     } else if([mode rangeOfString:server?server.MODE_VOICED.lowercaseString:@"v"].location != NSNotFound) {
-        if(_modes[kCollapsedModeDeVoice])
-            _modes[kCollapsedModeDeVoice] = false;
+        if(self->_modes[kCollapsedModeDeVoice])
+            self->_modes[kCollapsedModeDeVoice] = false;
         else
-            _modes[kCollapsedModeVoice] = true;
+            self->_modes[kCollapsedModeVoice] = true;
     } else {
         return NO;
     }
@@ -83,35 +83,35 @@
     mode = mode.lowercaseString;
     
     if([mode rangeOfString:server?server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound) {
-        if(_modes[kCollapsedModeOper])
-            _modes[kCollapsedModeOper] = false;
+        if(self->_modes[kCollapsedModeOper])
+            self->_modes[kCollapsedModeOper] = false;
         else
-            _modes[kCollapsedModeDeOper] = true;
+            self->_modes[kCollapsedModeDeOper] = true;
     } else if([mode rangeOfString:server?server.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound) {
-        if(_modes[kCollapsedModeOwner])
-            _modes[kCollapsedModeOwner] = false;
+        if(self->_modes[kCollapsedModeOwner])
+            self->_modes[kCollapsedModeOwner] = false;
         else
-            _modes[kCollapsedModeDeOwner] = true;
+            self->_modes[kCollapsedModeDeOwner] = true;
     } else if([mode rangeOfString:server?server.MODE_ADMIN.lowercaseString:@"a"].location != NSNotFound) {
-        if(_modes[kCollapsedModeAdmin])
-            _modes[kCollapsedModeAdmin] = false;
+        if(self->_modes[kCollapsedModeAdmin])
+            self->_modes[kCollapsedModeAdmin] = false;
         else
-            _modes[kCollapsedModeDeAdmin] = true;
+            self->_modes[kCollapsedModeDeAdmin] = true;
     } else if([mode rangeOfString:server?server.MODE_OP.lowercaseString:@"o"].location != NSNotFound) {
-        if(_modes[kCollapsedModeOp])
-            _modes[kCollapsedModeOp] = false;
+        if(self->_modes[kCollapsedModeOp])
+            self->_modes[kCollapsedModeOp] = false;
         else
-            _modes[kCollapsedModeDeOp] = true;
+            self->_modes[kCollapsedModeDeOp] = true;
     } else if([mode rangeOfString:server?server.MODE_HALFOP.lowercaseString:@"h"].location != NSNotFound) {
-        if(_modes[kCollapsedModeHalfOp])
-            _modes[kCollapsedModeHalfOp] = false;
+        if(self->_modes[kCollapsedModeHalfOp])
+            self->_modes[kCollapsedModeHalfOp] = false;
         else
-            _modes[kCollapsedModeDeHalfOp] = true;
+            self->_modes[kCollapsedModeDeHalfOp] = true;
     } else if([mode rangeOfString:server?server.MODE_VOICED.lowercaseString:@"v"].location != NSNotFound) {
-        if(_modes[kCollapsedModeVoice])
-            _modes[kCollapsedModeVoice] = false;
+        if(self->_modes[kCollapsedModeVoice])
+            self->_modes[kCollapsedModeVoice] = false;
         else
-            _modes[kCollapsedModeDeVoice] = true;
+            self->_modes[kCollapsedModeDeVoice] = true;
     } else {
         return NO;
     }
@@ -120,13 +120,13 @@
     return YES;
 }
 -(void)_copyModes:(BOOL *)to {
-    for(int i = 0; i < sizeof(_modes); i++) {
-        to[i] = _modes[i];
+    for(int i = 0; i < sizeof(self->_modes); i++) {
+        to[i] = self->_modes[i];
     }
 }
 -(void)copyModes:(CollapsedEvent *)from {
-    [from _copyModes:_modes];
-    _operIsLower = from.operIsLower;
+    [from _copyModes:self->_modes];
+    self->_operIsLower = from.operIsLower;
 }
 -(NSString *)modes:(BOOL)showSymbol mode_modes:(NSArray *)mode_modes {
     static NSString *mode_msgs[] = {
@@ -154,13 +154,13 @@
     NSString *output = nil;
     if(!mode_modes) {
         mode_modes = @[
-            _operIsLower?@"+y":@"+Y",
+            self->_operIsLower?@"+y":@"+Y",
             @"+q",
             @"+a",
             @"+o",
             @"+h",
             @"+v",
-            _operIsLower?@"-y":@"-Y",
+            self->_operIsLower?@"-y":@"-Y",
             @"-q",
             @"-a",
             @"-o",
@@ -171,8 +171,8 @@
     
     if([self modeCount]) {
         output = @"";
-        for(int i = 0; i < sizeof(_modes); i++) {
-            if(_modes[i]) {
+        for(int i = 0; i < sizeof(self->_modes); i++) {
+            if(self->_modes[i]) {
                 if(output.length)
                     output = [output stringByAppendingString:@", "];
                 output = [output stringByAppendingString:mode_msgs[i]];
@@ -187,8 +187,8 @@
 }
 -(int)modeCount {
     int count = 0;
-    for(int i = 0; i < sizeof(_modes); i++) {
-        if(_modes[i])
+    for(int i = 0; i < sizeof(self->_modes); i++) {
+        if(self->_modes[i])
             count++;
     }
     return count;
@@ -199,20 +199,20 @@
 -(id)init {
     self = [super init];
     if(self) {
-        _data = [[NSMutableArray alloc] init];
+        self->_data = [[NSMutableArray alloc] init];
         [self setServer:nil];
     }
     return self;
 }
 -(void)clear {
-    @synchronized(_data) {
-        [_data removeAllObjects];
+    @synchronized(self->_data) {
+        [self->_data removeAllObjects];
     }
 }
 -(void)setServer:(Server *)server {
-    _server = server;
+    self->_server = server;
     if(server) {
-        _mode_modes = @[
+        self->_mode_modes = @[
             [NSString stringWithFormat:@"+%@", server.MODE_OPER],
             [NSString stringWithFormat:@"+%@", server.MODE_OWNER],
             [NSString stringWithFormat:@"+%@", server.MODE_ADMIN],
@@ -227,11 +227,11 @@
             [NSString stringWithFormat:@"-%@", server.MODE_VOICED],
         ];
     } else {
-        _mode_modes = nil;
+        self->_mode_modes = nil;
     }
 }
 -(CollapsedEvent *)findEvent:(NSString *)nick chan:(NSString *)chan {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         for(CollapsedEvent *event in _data) {
             if([[event.nick lowercaseString] isEqualToString:[nick lowercaseString]] && (chan == nil || event.chan == nil || [[event.chan lowercaseString] isEqualToString:[chan lowercaseString]]))
                 return event;
@@ -240,11 +240,11 @@
     }
 }
 -(void)addCollapsedEvent:(CollapsedEvent *)event {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         CollapsedEvent *e = nil;
         
         if(event.type < kCollapsedEventNickChange) {
-            if(_showChan) {
+            if(self->_showChan) {
                 if(event.type == kCollapsedEventQuit) {
                     BOOL found = NO;
                     for(e in _data) {
@@ -258,7 +258,7 @@
                 } else if(event.type == kCollapsedEventJoin) {
                     for(e in _data) {
                         if(e.type == kCollapsedEventQuit) {
-                            [_data removeObject:e];
+                            [self->_data removeObject:e];
                             event.type = kCollapsedEventPopOut;
                             break;
                         } else if(e.type == kCollapsedEventPopOut) {
@@ -312,14 +312,14 @@
                     e.msg = event.msg;
                 [e copyModes:event];
             } else {
-                [_data addObject:event];
+                [self->_data addObject:event];
             }
         } else {
             if(event.type == kCollapsedEventNickChange) {
                 for(CollapsedEvent *e1 in _data) {
                     if(e1.type == kCollapsedEventNickChange && [[e1.nick lowercaseString] isEqualToString:[event.oldNick lowercaseString]]) {
                         if([[e1.oldNick lowercaseString] isEqualToString:[event.nick lowercaseString]]) {
-                            [_data removeObject:e1];
+                            [self->_data removeObject:e1];
                         } else {
                             e1.eid = event.eid;
                             e1.nick = event.nick;
@@ -333,7 +333,7 @@
                         for(CollapsedEvent *e2 in _data) {
                             if((e2.type == kCollapsedEventQuit || e2.type == kCollapsedEventPart) && [[e2.nick lowercaseString] isEqualToString:[event.nick lowercaseString]]) {
                                 e1.type = kCollapsedEventPopOut;
-                                [_data removeObject:e2];
+                                [self->_data removeObject:e2];
                                 break;
                             }
                         }
@@ -344,14 +344,14 @@
                         e1.type = kCollapsedEventPopOut;
                         for(CollapsedEvent *e2 in _data) {
                             if(e2.type == kCollapsedEventJoin && [[e2.nick lowercaseString] isEqualToString:[event.oldNick lowercaseString]]) {
-                                [_data removeObject:e2];
+                                [self->_data removeObject:e2];
                                 break;
                             }
                         }
                         return;
                     }
                 }
-                [_data addObject:event];
+                [self->_data addObject:event];
             } else if(event.type == kCollapsedEventConnectionStatus) {
                 for(CollapsedEvent *e1 in _data) {
                     if([e1.msg isEqualToString:event.msg]) {
@@ -359,15 +359,15 @@
                         return;
                     }
                 }
-                [_data addObject:event];
+                [self->_data addObject:event];
             } else {
-                [_data addObject:event];
+                [self->_data addObject:event];
             }
         }
     }
 }
 -(BOOL)addEvent:(Event *)event {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         CollapsedEvent *c;
         if([event.type hasSuffix:@"user_channel_mode"]) {
             c = [self findEvent:event.nick chan:event.chan];
@@ -378,7 +378,7 @@
             }
             if(event.ops) {
                 for(NSDictionary *op in [event.ops objectForKey:@"add"]) {
-                    if(![c addMode:[op objectForKey:@"mode"] server:_server])
+                    if(![c addMode:[op objectForKey:@"mode"] server:self->_server])
                         return NO;
                     if(c.type == kCollapsedEventMode) {
                         c.nick = [op objectForKey:@"param"];
@@ -398,7 +398,7 @@
                     }
                 }
                 for(NSDictionary *op in [event.ops objectForKey:@"remove"]) {
-                    if(![c removeMode:[op objectForKey:@"mode"] server:_server])
+                    if(![c removeMode:[op objectForKey:@"mode"] server:self->_server])
                         return NO;
                     if(c.type == kCollapsedEventMode) {
                         c.nick = [op objectForKey:@"param"];
@@ -449,7 +449,7 @@
                             CollapsedEvent *e = [[CollapsedEvent alloc] init];
                             e.type = kCollapsedEventNetSplit;
                             e.msg = event.msg;
-                            [_data addObject:e];
+                            [self->_data addObject:e];
                         }
                     }
                 }
@@ -469,7 +469,7 @@
 }
 -(NSString *)was:(CollapsedEvent *)e {
     NSString *output = @"";
-    NSString *modes = [e modes:NO mode_modes:_mode_modes];
+    NSString *modes = [e modes:NO mode_modes:self->_mode_modes];
     
     if(e.oldNick && e.type != kCollapsedEventMode && e.type != kCollapsedEventNickChange)
         output = [NSString stringWithFormat:@"was %@", e.oldNick];
@@ -485,20 +485,20 @@
     return output;
 }
 -(NSString *)collapse {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSString *output;
         
-        if(_data.count == 0)
+        if(self->_data.count == 0)
             return nil;
         
-        if(_data.count == 1 && [[_data objectAtIndex:0] modeCount] < ((((CollapsedEvent*)[_data objectAtIndex:0]).type == kCollapsedEventMode)?2:1)) {
-            CollapsedEvent *e = [_data objectAtIndex:0];
+        if(self->_data.count == 1 && [[self->_data objectAtIndex:0] modeCount] < ((((CollapsedEvent*)[self->_data objectAtIndex:0]).type == kCollapsedEventMode)?2:1)) {
+            CollapsedEvent *e = [self->_data objectAtIndex:0];
             switch(e.type) {
                 case kCollapsedEventNetSplit:
                     output = [e.msg stringByReplacingOccurrencesOfString:@" " withString:@" ↮ "];
                     break;
                 case kCollapsedEventMode:
-                    output = [NSString stringWithFormat:@"%c%@%@%c %c%@was %@", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.targetMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, COLOR_RGB, [UIColor messageTextColor].toHexString, [e modes:YES mode_modes:_mode_modes]];
+                    output = [NSString stringWithFormat:@"%c%@%@%c %c%@was %@", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.targetMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, COLOR_RGB, [UIColor messageTextColor].toHexString, [e modes:YES mode_modes:self->_mode_modes]];
                     if(e.fromNick) {
                         if([e.fromMode isEqualToString:@"__the_server__"])
                             output = [output stringByAppendingFormat:@" by the server %c%@%@%c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, e.fromNick, CLEAR];
@@ -507,7 +507,7 @@
                     }
                     break;
                 case kCollapsedEventJoin:
-                    if(_showChan)
+                    if(self->_showChan)
                         output = [NSString stringWithFormat:@"%c%@→\U0000FE0E\u00a0%@%c%@ joined %@", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e], e.chan];
                     else
                         output = [NSString stringWithFormat:@"%c%@→\U0000FE0E\u00a0%@%c%@ joined", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
@@ -515,7 +515,7 @@
                         output = [output stringByAppendingFormat:@" (%@)", e.hostname];
                     break;
                 case kCollapsedEventPart:
-                    if(_showChan)
+                    if(self->_showChan)
                         output = [NSString stringWithFormat:@"%c%@←\U0000FE0E\u00a0%@%c%@ left %@", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e], e.chan];
                     else
                         output = [NSString stringWithFormat:@"%c%@←\U0000FE0E\u00a0%@%c%@ left", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
@@ -536,12 +536,12 @@
                     break;
                 case kCollapsedEventPopIn:
                     output = [NSString stringWithFormat:@"%c%@↔\U0000FE0E\u00a0%@%c%@ popped in", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
-                    if(_showChan)
+                    if(self->_showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
                 case kCollapsedEventPopOut:
                     output = [NSString stringWithFormat:@"%c%@↔\U0000FE0E\u00a0%@%c%@ nipped out", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
-                    if(_showChan)
+                    if(self->_showChan)
                         output = [output stringByAppendingFormat:@" %@", e.chan];
                     break;
                 case kCollapsedEventConnectionStatus:
@@ -551,8 +551,8 @@
                     break;
             }
         } else {
-            [_data sortUsingSelector:@selector(compare:)];
-            NSEnumerator *i = [_data objectEnumerator];
+            [self->_data sortUsingSelector:@selector(compare:)];
+            NSEnumerator *i = [self->_data objectEnumerator];
             CollapsedEvent *last = nil;
             CollapsedEvent *next = [i nextObject];
             CollapsedEvent *e;
@@ -636,7 +636,7 @@
                         default:
                             break;
                     }
-                } else if(_showChan && e.type != kCollapsedEventNetSplit && e.type != kCollapsedEventConnectionStatus && e.type != kCollapsedEventNickChange) {
+                } else if(self->_showChan && e.type != kCollapsedEventNetSplit && e.type != kCollapsedEventConnectionStatus && e.type != kCollapsedEventNickChange) {
                     if(groupcount == 0) {
                         [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO displayName:nil]];
                         [message appendString:[self was:e]];
@@ -696,25 +696,25 @@
         displayName = nick;
     
     NSDictionary *PREFIX = nil;
-    if(_server)
-        PREFIX = _server.PREFIX;
+    if(self->_server)
+        PREFIX = self->_server.PREFIX;
     
     if(!PREFIX || PREFIX.count == 0) {
         PREFIX = @{_server?_server.MODE_OPER:@"y":@"!",
-                   _server?_server.MODE_OWNER:@"q":@"~",
-                   _server?_server.MODE_ADMIN:@"a":@"&",
-                   _server?_server.MODE_OP:@"o":@"@",
-                   _server?_server.MODE_HALFOP:@"h":@"%",
-                   _server?_server.MODE_VOICED:@"v":@"+"};
+                   self->_server?_server.MODE_OWNER:@"q":@"~",
+                   self->_server?_server.MODE_ADMIN:@"a":@"&",
+                   self->_server?_server.MODE_OP:@"o":@"@",
+                   self->_server?_server.MODE_HALFOP:@"h":@"%",
+                   self->_server?_server.MODE_VOICED:@"v":@"+"};
     }
     
     NSDictionary *mode_colors = @{
-        _server?_server.MODE_OPER.lowercaseString:@"y":@"E7AA00",
-        _server?_server.MODE_OWNER.lowercaseString:@"q":@"E7AA00",
-        _server?_server.MODE_ADMIN.lowercaseString:@"a":@"6500A5",
-        _server?_server.MODE_OP.lowercaseString:@"o":@"BA1719",
-        _server?_server.MODE_HALFOP.lowercaseString:@"h":@"B55900",
-        _server?_server.MODE_VOICED.lowercaseString:@"v":@"25B100"
+        self->_server?_server.MODE_OPER.lowercaseString:@"y":@"E7AA00",
+        self->_server?_server.MODE_OWNER.lowercaseString:@"q":@"E7AA00",
+        self->_server?_server.MODE_ADMIN.lowercaseString:@"a":@"6500A5",
+        self->_server?_server.MODE_OP.lowercaseString:@"o":@"BA1719",
+        self->_server?_server.MODE_HALFOP.lowercaseString:@"h":@"B55900",
+        self->_server?_server.MODE_VOICED.lowercaseString:@"v":@"25B100"
     };
     
     NSMutableString *output = [[NSMutableString alloc] initWithFormat:@"%c", BOLD];
@@ -725,20 +725,20 @@
     }
     
     if(mode.length) {
-        if([mode rangeOfString:_server?_server.MODE_OPER:@"Y"].location != NSNotFound)
-            mode = _server?_server.MODE_OPER:@"Y";
-        else if([mode rangeOfString:_server?_server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound)
-            mode = _server?_server.MODE_OPER.lowercaseString:@"y";
-        else if([mode rangeOfString:_server?_server.MODE_OWNER:@"q"].location != NSNotFound)
-            mode = _server?_server.MODE_OWNER:@"q";
-        else if([mode rangeOfString:_server?_server.MODE_ADMIN:@"a"].location != NSNotFound)
-            mode = _server?_server.MODE_ADMIN:@"a";
-        else if([mode rangeOfString:_server?_server.MODE_OP:@"o"].location != NSNotFound)
-            mode = _server?_server.MODE_OP:@"o";
-        else if([mode rangeOfString:_server?_server.MODE_HALFOP:@"h"].location != NSNotFound)
-            mode = _server?_server.MODE_HALFOP:@"h";
-        else if([mode rangeOfString:_server?_server.MODE_VOICED:@"v"].location != NSNotFound)
-            mode = _server?_server.MODE_VOICED:@"v";
+        if([mode rangeOfString:self->_server?_server.MODE_OPER:@"Y"].location != NSNotFound)
+            mode = self->_server?_server.MODE_OPER:@"Y";
+        else if([mode rangeOfString:self->_server?_server.MODE_OPER.lowercaseString:@"y"].location != NSNotFound)
+            mode = self->_server?_server.MODE_OPER.lowercaseString:@"y";
+        else if([mode rangeOfString:self->_server?_server.MODE_OWNER:@"q"].location != NSNotFound)
+            mode = self->_server?_server.MODE_OWNER:@"q";
+        else if([mode rangeOfString:self->_server?_server.MODE_ADMIN:@"a"].location != NSNotFound)
+            mode = self->_server?_server.MODE_ADMIN:@"a";
+        else if([mode rangeOfString:self->_server?_server.MODE_OP:@"o"].location != NSNotFound)
+            mode = self->_server?_server.MODE_OP:@"o";
+        else if([mode rangeOfString:self->_server?_server.MODE_HALFOP:@"h"].location != NSNotFound)
+            mode = self->_server?_server.MODE_HALFOP:@"h";
+        else if([mode rangeOfString:self->_server?_server.MODE_VOICED:@"v"].location != NSNotFound)
+            mode = self->_server?_server.MODE_VOICED:@"v";
         else
             mode = [mode substringToIndex:1];
         

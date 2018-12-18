@@ -33,11 +33,11 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _avatar = [[YYAnimatedImageView alloc] initWithFrame:CGRectZero];
-        _avatar.layer.cornerRadius = 5.0;
-        _avatar.layer.masksToBounds = YES;
+        self->_avatar = [[YYAnimatedImageView alloc] initWithFrame:CGRectZero];
+        self->_avatar.layer.cornerRadius = 5.0;
+        self->_avatar.layer.masksToBounds = YES;
         
-        [self.contentView addSubview:_avatar];
+        [self.contentView addSubview:self->_avatar];
     }
     return self;
 }
@@ -50,7 +50,7 @@
     frame.size.width -= 12;
     frame.size.height -= 12;
     
-    _avatar.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.height, frame.size.height);
+    self->_avatar.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.height, frame.size.height);
     self.textLabel.frame = CGRectMake(frame.origin.x + frame.size.height + 6, frame.origin.y, frame.size.width - frame.size.height, frame.size.height);
 }
 
@@ -66,7 +66,7 @@
 -(id)initWithServer:(int)cid {
     self = [super initWithStyle:UITableViewStylePlain];
     if(self) {
-        _server = [[ServersDataSource sharedInstance] getServer:cid];
+        self->_server = [[ServersDataSource sharedInstance] getServer:cid];
     }
     return self;
 }
@@ -82,7 +82,7 @@
 }
 
 -(void)cancelButtonPressed {
-    [_uploader cancel];
+    [self->_uploader cancel];
     if(self.navigationController.viewControllers.count == 1)
         [self.parentViewController dismissViewControllerAnimated:YES completion:nil];
     else
@@ -109,8 +109,8 @@
 }
 
 -(void)_choosePhoto:(UIImagePickerControllerSourceType)sourceType {
-    [_uploader cancel];
-    _uploader = nil;
+    [self->_uploader cancel];
+    self->_uploader = nil;
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.sourceType = sourceType;
     picker.allowsEditing = YES;
@@ -153,12 +153,12 @@
                 else if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(mediaURL.path))
                     UISaveVideoAtPathToSavedPhotosAlbum(mediaURL.path, nil, nil, nil);
             }
-            _failed = NO;
+            self->_failed = NO;
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
             u.avatar = YES;
-            if(_server)
-                u.orgId = _server.orgId;
+            if(self->_server)
+                u.orgId = self->_server.orgId;
             else
                 u.orgId = -1;
             
@@ -217,7 +217,7 @@
 }
 
 -(void)fileUploadDidFail:(NSString *)reason {
-    _failed = YES;
+    self->_failed = YES;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         CLS_LOG(@"File upload failed: %@", reason);
         NSString *msg;
@@ -345,7 +345,7 @@
                           }];
     }
 
-    _avatars = data;
+    self->_avatars = data;
     [self.tableView reloadData];
 }
 
@@ -369,11 +369,11 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_avatars) {
+    @synchronized(self->_avatars) {
         AvatarTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"avatarcell"];
         if(!cell)
             cell = [[AvatarTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"avatarcell"];
-        NSDictionary *row = [_avatars objectAtIndex:[indexPath row]];
+        NSDictionary *row = [self->_avatars objectAtIndex:[indexPath row]];
         cell.textLabel.text = [row objectForKey:@"label"];
         cell.avatar.image = [[ImageCache sharedInstance] imageForURL:[row objectForKey:@"url"]];
         return cell;
@@ -386,7 +386,7 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [[NetworkConnection sharedInstance] setAvatar:nil orgId:[[[_avatars objectAtIndex:indexPath.row] objectForKey:@"orgId"] intValue] handler:^(IRCCloudJSONObject *result) {
+        [[NetworkConnection sharedInstance] setAvatar:nil orgId:[[[self->_avatars objectAtIndex:indexPath.row] objectForKey:@"orgId"] intValue] handler:^(IRCCloudJSONObject *result) {
             if(![[result objectForKey:@"success"] intValue]) {
                 [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to clear avatar: %@", [result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
             }
@@ -395,11 +395,11 @@
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_avatars) {
-        NSDictionary *row = [_avatars objectAtIndex:[indexPath row]];
+    @synchronized(self->_avatars) {
+        NSDictionary *row = [self->_avatars objectAtIndex:[indexPath row]];
         int orgId = -1;
-        if(_server && _server.orgId)
-            orgId = _server.orgId;
+        if(self->_server && _server.orgId)
+            orgId = self->_server.orgId;
         [[NetworkConnection sharedInstance] setAvatar:[row objectForKey:@"id"] orgId:orgId handler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] intValue]) {
                 [self cancelButtonPressed];

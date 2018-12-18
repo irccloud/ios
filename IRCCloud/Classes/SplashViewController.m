@@ -24,7 +24,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _logo.center = CGPointMake(self.view.center.x, 39 + [UIApplication sharedApplication].statusBarFrame.size.height);
+    self->_logo.center = CGPointMake(self.view.center.x, 39 + [UIApplication sharedApplication].statusBarFrame.size.height);
 }
 
 - (void)didReceiveMemoryWarning {
@@ -35,22 +35,22 @@
 -(void)animate:(UIImageView *)loginLogo {
     if(loginLogo) {
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
-        [animation setFromValue:@(_logo.layer.position.x)];
+        [animation setFromValue:@(self->_logo.layer.position.x)];
         [animation setToValue:@((self.view.bounds.size.width / 2) - 112)];
         [animation setDuration:0.4];
         [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.17 :.89 :.32 :1.28]];
         animation.removedOnCompletion = NO;
         animation.fillMode = kCAFillModeForwards;
-        [_logo.layer addAnimation:animation forKey:nil];
+        [self->_logo.layer addAnimation:animation forKey:nil];
     } else {
         CABasicAnimation *animation = [CABasicAnimation animationWithKeyPath:@"position.x"];
-        [animation setFromValue:@(_logo.layer.position.x)];
+        [animation setFromValue:@(self->_logo.layer.position.x)];
         [animation setToValue:@(self.view.bounds.size.width + _logo.bounds.size.width)];
         [animation setDuration:0.4];
         [animation setTimingFunction:[CAMediaTimingFunction functionWithControlPoints:.8 :-.3 :.8 :-.3]];
         animation.removedOnCompletion = NO;
         animation.fillMode = kCAFillModeForwards;
-        [_logo.layer addAnimation:animation forKey:nil];
+        [self->_logo.layer addAnimation:animation forKey:nil];
     }
 }
 

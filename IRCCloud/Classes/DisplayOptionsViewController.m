@@ -55,7 +55,7 @@
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *replyCollapse = [[NSMutableDictionary alloc] init];
 
-    if([_buffer.type isEqualToString:@"channel"]) {
+    if([self->_buffer.type isEqualToString:@"channel"]) {
         NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
         if(!disableNickSuggestions)
             disableNickSuggestions = [[NSMutableDictionary alloc] init];
@@ -68,7 +68,7 @@
         if([[prefs objectForKey:@"channel-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"channel-disableReadOnSelect"]];
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
-            if(_readOnSelect.on)
+            if(self->_readOnSelect.on)
                 [disableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [disableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -101,7 +101,7 @@
             else
                 [prefs removeObjectForKey:@"channel-enableTrackUnread"];
         } else {
-            if(_trackUnread.on)
+            if(self->_trackUnread.on)
                 [disableTrackUnread removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [disableTrackUnread setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -125,7 +125,7 @@
             else
                 [prefs removeObjectForKey:@"channel-notifications-all-disable"];
         } else {
-            if(_notifyAll.on)
+            if(self->_notifyAll.on)
                 [notifyAll setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [notifyAll removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -137,7 +137,7 @@
         
         if([[prefs objectForKey:@"channel-hideJoinPart"] isKindOfClass:[NSDictionary class]])
             [hideJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-hideJoinPart"]];
-        if(_showJoinPart.on)
+        if(self->_showJoinPart.on)
             [hideJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
         else
             [hideJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -148,7 +148,7 @@
 
         if([[prefs objectForKey:@"channel-expandJoinPart"] isKindOfClass:[NSDictionary class]])
             [expandJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-expandJoinPart"]];
-        if(_collapseJoinPart.on)
+        if(self->_collapseJoinPart.on)
             [expandJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
         else
             [expandJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -170,7 +170,7 @@
         
         if([[prefs objectForKey:@"channel-hiddenMembers"] isKindOfClass:[NSDictionary class]])
             [hiddenMembers addEntriesFromDictionary:[prefs objectForKey:@"channel-hiddenMembers"]];
-        if(_showMembers.on)
+        if(self->_showMembers.on)
             [hiddenMembers removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
         else
             [hiddenMembers setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -181,7 +181,7 @@
         
         if([[prefs objectForKey:@"channel-files-disableinline"] isKindOfClass:[NSDictionary class]])
             [disableInlineFiles addEntriesFromDictionary:[prefs objectForKey:@"channel-files-disableinline"]];
-        if(_disableInlineFiles.on)
+        if(self->_disableInlineFiles.on)
             [disableInlineFiles removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
         else
             [disableInlineFiles setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -192,7 +192,7 @@
 
         if([[prefs objectForKey:@"channel-inlineimages"] isKindOfClass:[NSDictionary class]])
             [inlineImages addEntriesFromDictionary:[prefs objectForKey:@"channel-inlineimages"]];
-        if(_inlineImages.on)
+        if(self->_inlineImages.on)
             [inlineImages setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
         else
             [inlineImages removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -203,7 +203,7 @@
 
         if([[prefs objectForKey:@"channel-inlineimages-disable"] isKindOfClass:[NSDictionary class]])
             [disableInlineImages addEntriesFromDictionary:[prefs objectForKey:@"channel-inlineimages-disable"]];
-        if(_inlineImages.on)
+        if(self->_inlineImages.on)
             [disableInlineImages removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
         else
             [disableInlineImages setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -214,7 +214,7 @@
         
         if([[prefs objectForKey:@"channel-reply-collapse"] isKindOfClass:[NSDictionary class]])
             [replyCollapse addEntriesFromDictionary:[prefs objectForKey:@"channel-reply-collapse"]];
-        if(_replyCollapse.on)
+        if(self->_replyCollapse.on)
             [replyCollapse setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
         else
             [replyCollapse removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -226,7 +226,7 @@
         if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableReadOnSelect"]];
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
-            if(_readOnSelect.on)
+            if(self->_readOnSelect.on)
                 [disableReadOnSelect removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [disableReadOnSelect setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -259,7 +259,7 @@
             else
                 [prefs removeObjectForKey:@"buffer-enableTrackUnread"];
         } else {
-            if(_trackUnread.on)
+            if(self->_trackUnread.on)
                 [disableTrackUnread removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [disableTrackUnread setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -269,10 +269,10 @@
                 [prefs removeObjectForKey:@"buffer-disableTrackUnread"];
         }
         
-        if([_buffer.type isEqualToString:@"conversation"]) {
+        if([self->_buffer.type isEqualToString:@"conversation"]) {
             if([[prefs objectForKey:@"buffer-hideJoinPart"] isKindOfClass:[NSDictionary class]])
                 [hideJoinPart addEntriesFromDictionary:[prefs objectForKey:@"buffer-hideJoinPart"]];
-            if(_showJoinPart.on)
+            if(self->_showJoinPart.on)
                 [hideJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [hideJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -283,7 +283,7 @@
 
             if([[prefs objectForKey:@"buffer-expandJoinPart"] isKindOfClass:[NSDictionary class]])
                 [expandJoinPart addEntriesFromDictionary:[prefs objectForKey:@"buffer-expandJoinPart"]];
-            if(_collapseJoinPart.on)
+            if(self->_collapseJoinPart.on)
                 [expandJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [expandJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -305,7 +305,7 @@
 
             if([[prefs objectForKey:@"buffer-files-disableinline"] isKindOfClass:[NSDictionary class]])
                 [disableInlineFiles addEntriesFromDictionary:[prefs objectForKey:@"buffer-files-disableinline"]];
-            if(_disableInlineFiles.on)
+            if(self->_disableInlineFiles.on)
                 [disableInlineFiles removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [disableInlineFiles setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -316,7 +316,7 @@
             
             if([[prefs objectForKey:@"buffer-reply-collapse"] isKindOfClass:[NSDictionary class]])
                 [replyCollapse addEntriesFromDictionary:[prefs objectForKey:@"buffer-reply-collapse"]];
-            if(_replyCollapse.on)
+            if(self->_replyCollapse.on)
                 [replyCollapse setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [replyCollapse removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -326,10 +326,10 @@
                 [prefs removeObjectForKey:@"buffer-reply-collapse"];
         }
         
-        if([_buffer.type isEqualToString:@"console"]) {
+        if([self->_buffer.type isEqualToString:@"console"]) {
             if([[prefs objectForKey:@"buffer-expandDisco"] isKindOfClass:[NSDictionary class]])
                 [expandDisco addEntriesFromDictionary:[prefs objectForKey:@"buffer-expandDisco"]];
-            if(_expandDisco.on)
+            if(self->_expandDisco.on)
                 [expandDisco removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
             else
                 [expandDisco setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
@@ -383,177 +383,177 @@
 -(void)refresh {
     NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
     
-    if([_buffer.type isEqualToString:@"channel"]) {
+    if([self->_buffer.type isEqualToString:@"channel"]) {
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
             if([[[prefs objectForKey:@"channel-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _readOnSelect.on = NO;
+                self->_readOnSelect.on = NO;
             else
-                _readOnSelect.on = YES;
+                self->_readOnSelect.on = YES;
         } else {
             if([[[prefs objectForKey:@"channel-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _readOnSelect.on = YES;
+                self->_readOnSelect.on = YES;
             else
-                _readOnSelect.on = NO;
+                self->_readOnSelect.on = NO;
         }
         
         if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
             if([[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _trackUnread.on = YES;
+                self->_trackUnread.on = YES;
             else
-                _trackUnread.on = NO;
+                self->_trackUnread.on = NO;
         } else {
             if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _trackUnread.on = NO;
+                self->_trackUnread.on = NO;
             else
-                _trackUnread.on = YES;
+                self->_trackUnread.on = YES;
         }
         
         if([[prefs objectForKey:@"notifications-all"] intValue] == 1) {
             if([[[prefs objectForKey:@"channel-notifications-all-disable"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _notifyAll.on = NO;
+                self->_notifyAll.on = NO;
             else
-                _notifyAll.on = YES;
+                self->_notifyAll.on = YES;
         } else {
             if([[[prefs objectForKey:@"channel-notifications-all"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _notifyAll.on = YES;
+                self->_notifyAll.on = YES;
             else
-                _notifyAll.on = NO;
+                self->_notifyAll.on = NO;
         }
         
         if([[[prefs objectForKey:@"channel-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _showJoinPart.on = NO;
+            self->_showJoinPart.on = NO;
         else
-            _showJoinPart.on = YES;
+            self->_showJoinPart.on = YES;
 
         if([[prefs objectForKey:@"expandJoinPart"] intValue]) {
             if([[[prefs objectForKey:@"channel-collapseJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _collapseJoinPart.on = YES;
+                self->_collapseJoinPart.on = YES;
             else
-                _collapseJoinPart.on = NO;
+                self->_collapseJoinPart.on = NO;
         } else {
             if([[[prefs objectForKey:@"channel-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _collapseJoinPart.on = NO;
+                self->_collapseJoinPart.on = NO;
             else
-                _collapseJoinPart.on = YES;
+                self->_collapseJoinPart.on = YES;
         }
         if([[[prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _showMembers.on = NO;
+            self->_showMembers.on = NO;
         else
-            _showMembers.on = YES;
+            self->_showMembers.on = YES;
         
         if([[[prefs objectForKey:@"channel-files-disableinline"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _disableInlineFiles.on = NO;
+            self->_disableInlineFiles.on = NO;
         else
-            _disableInlineFiles.on = YES;
+            self->_disableInlineFiles.on = YES;
         
-        _inlineImages.on = [[prefs objectForKey:@"inlineimages"] boolValue];
-        if(_inlineImages.on) {
+        self->_inlineImages.on = [[prefs objectForKey:@"inlineimages"] boolValue];
+        if(self->_inlineImages.on) {
             NSDictionary *disableMap = [prefs objectForKey:@"channel-inlineimages-disable"];
             
             if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
-                _inlineImages.on = NO;
+                self->_inlineImages.on = NO;
         } else {
             NSDictionary *enableMap = [prefs objectForKey:@"channel-inlineimages"];
             
             if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
-                _inlineImages.on = YES;
+                self->_inlineImages.on = YES;
         }
         
         if([[[prefs objectForKey:@"channel-reply-collapse"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _replyCollapse.on = YES;
+            self->_replyCollapse.on = YES;
         else
-            _replyCollapse.on = NO;
+            self->_replyCollapse.on = NO;
     } else {
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
             if([[[prefs objectForKey:@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _readOnSelect.on = NO;
+                self->_readOnSelect.on = NO;
             else
-                _readOnSelect.on = YES;
+                self->_readOnSelect.on = YES;
         } else {
             if([[[prefs objectForKey:@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _readOnSelect.on = YES;
+                self->_readOnSelect.on = YES;
             else
-                _readOnSelect.on = NO;
+                self->_readOnSelect.on = NO;
         }
         
         if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
             if([[[prefs objectForKey:@"buffer-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _trackUnread.on = YES;
+                self->_trackUnread.on = YES;
             else
-                _trackUnread.on = NO;
+                self->_trackUnread.on = NO;
         } else {
             if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _trackUnread.on = NO;
+                self->_trackUnread.on = NO;
             else
-                _trackUnread.on = YES;
+                self->_trackUnread.on = YES;
         }
         
         if([[[prefs objectForKey:@"buffer-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _showJoinPart.on = NO;
+            self->_showJoinPart.on = NO;
         else
-            _showJoinPart.on = YES;
+            self->_showJoinPart.on = YES;
 
         if([[prefs objectForKey:@"expandJoinPart"] intValue]) {
             if([[[prefs objectForKey:@"buffer-collapseJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _collapseJoinPart.on = YES;
+                self->_collapseJoinPart.on = YES;
             else
-                _collapseJoinPart.on = NO;
+                self->_collapseJoinPart.on = NO;
         } else {
             if([[[prefs objectForKey:@"buffer-expandJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-                _collapseJoinPart.on = NO;
+                self->_collapseJoinPart.on = NO;
             else
-                _collapseJoinPart.on = YES;
+                self->_collapseJoinPart.on = YES;
         }
 
         if([[[prefs objectForKey:@"buffer-expandDisco"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _expandDisco.on = NO;
+            self->_expandDisco.on = NO;
         else
-            _expandDisco.on = YES;
+            self->_expandDisco.on = YES;
         
         if([[[prefs objectForKey:@"buffer-files-disableinline"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _disableInlineFiles.on = NO;
+            self->_disableInlineFiles.on = NO;
         else
-            _disableInlineFiles.on = YES;
+            self->_disableInlineFiles.on = YES;
         
-        _inlineImages.on = [[prefs objectForKey:@"inlineimages"] boolValue];
-        if(_inlineImages.on) {
+        self->_inlineImages.on = [[prefs objectForKey:@"inlineimages"] boolValue];
+        if(self->_inlineImages.on) {
             NSDictionary *disableMap = [prefs objectForKey:@"buffer-inlineimages-disable"];
             
             if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
-                _inlineImages.on = NO;
+                self->_inlineImages.on = NO;
         } else {
             NSDictionary *enableMap = [prefs objectForKey:@"buffer-inlineimages"];
             
             if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
-                _inlineImages.on = YES;
+                self->_inlineImages.on = YES;
         }
 
         if([[[prefs objectForKey:@"buffer-reply-collapse"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            _replyCollapse.on = YES;
+            self->_replyCollapse.on = YES;
         else
-            _replyCollapse.on = NO;
+            self->_replyCollapse.on = NO;
     }
-    _collapseJoinPart.enabled = _showJoinPart.on;
-    _disableNickSuggestions.on = !([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]);
+    self->_collapseJoinPart.enabled = self->_showJoinPart.on;
+    self->_disableNickSuggestions.on = !([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]);
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
         
-    _showMembers = [[UISwitch alloc] init];
-    _notifyAll = [[UISwitch alloc] init];
-    _trackUnread = [[UISwitch alloc] init];
-    _showJoinPart = [[UISwitch alloc] init];
-    [_showJoinPart addTarget:self action:@selector(showJoinPartToggled:) forControlEvents:UIControlEventValueChanged];
-    _collapseJoinPart = [[UISwitch alloc] init];
-    _expandDisco = [[UISwitch alloc] init];
-    _readOnSelect = [[UISwitch alloc] init];
-    _disableInlineFiles = [[UISwitch alloc] init];
-    _disableNickSuggestions = [[UISwitch alloc] init];
-    _replyCollapse = [[UISwitch alloc] init];
-    _inlineImages = [[UISwitch alloc] init];
-    [_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_showMembers = [[UISwitch alloc] init];
+    self->_notifyAll = [[UISwitch alloc] init];
+    self->_trackUnread = [[UISwitch alloc] init];
+    self->_showJoinPart = [[UISwitch alloc] init];
+    [self->_showJoinPart addTarget:self action:@selector(showJoinPartToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_collapseJoinPart = [[UISwitch alloc] init];
+    self->_expandDisco = [[UISwitch alloc] init];
+    self->_readOnSelect = [[UISwitch alloc] init];
+    self->_disableInlineFiles = [[UISwitch alloc] init];
+    self->_disableNickSuggestions = [[UISwitch alloc] init];
+    self->_replyCollapse = [[UISwitch alloc] init];
+    self->_inlineImages = [[UISwitch alloc] init];
+    [self->_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
 
     [self refresh];
 }
@@ -573,7 +573,7 @@
 }
 
 -(void)showJoinPartToggled:(id)sender {
-    _collapseJoinPart.enabled = _showJoinPart.on;
+    self->_collapseJoinPart.enabled = self->_showJoinPart.on;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -595,9 +595,9 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    if([_buffer.type isEqualToString:@"channel"])
+    if([self->_buffer.type isEqualToString:@"channel"])
         return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?9:10;
-    else if([_buffer.type isEqualToString:@"console"])
+    else if([self->_buffer.type isEqualToString:@"console"])
         return 3;
     else
         return 7;
@@ -612,7 +612,7 @@
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.accessoryView = nil;
     
-    if(![_buffer.type isEqualToString:@"channel"] && row > 1)
+    if(![self->_buffer.type isEqualToString:@"channel"] && row > 1)
         row+=3;
     else if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && row > 1)
         row++;
@@ -620,48 +620,48 @@
     switch(row) {
         case 0:
             cell.textLabel.text = @"Unread message indicator";
-            cell.accessoryView = _trackUnread;
+            cell.accessoryView = self->_trackUnread;
             break;
         case 1:
             cell.textLabel.text = @"Mark as read automatically";
-            cell.accessoryView = _readOnSelect;
+            cell.accessoryView = self->_readOnSelect;
             break;
         case 2:
             cell.textLabel.text = @"Member list";
-            cell.accessoryView = _showMembers;
+            cell.accessoryView = self->_showMembers;
             break;
         case 3:
             cell.textLabel.text = @"Notify on all messages";
-            cell.accessoryView = _notifyAll;
+            cell.accessoryView = self->_notifyAll;
             break;
         case 4:
             cell.textLabel.text = @"Suggest nicks as you type";
-            cell.accessoryView = _disableNickSuggestions;
+            cell.accessoryView = self->_disableNickSuggestions;
             break;
         case 5:
-            if([_buffer.type isEqualToString:@"console"]) {
+            if([self->_buffer.type isEqualToString:@"console"]) {
                 cell.textLabel.text = @"Group repeated disconnects";
-                cell.accessoryView = _expandDisco;
+                cell.accessoryView = self->_expandDisco;
             } else {
                 cell.textLabel.text = @"Show joins/parts";
-                cell.accessoryView = _showJoinPart;
+                cell.accessoryView = self->_showJoinPart;
             }
             break;
         case 6:
             cell.textLabel.text = @"Collapse joins/parts";
-            cell.accessoryView = _collapseJoinPart;
+            cell.accessoryView = self->_collapseJoinPart;
             break;
         case 7:
             cell.textLabel.text = @"Collapse reply threads";
-            cell.accessoryView = _replyCollapse;
+            cell.accessoryView = self->_replyCollapse;
             break;
         case 8:
             cell.textLabel.text = @"Embed uploaded files";
-            cell.accessoryView = _disableInlineFiles;
+            cell.accessoryView = self->_disableInlineFiles;
             break;
         case 9:
             cell.textLabel.text = @"Embed external media";
-            cell.accessoryView = _inlineImages;
+            cell.accessoryView = self->_inlineImages;
             break;
     }
     return cell;

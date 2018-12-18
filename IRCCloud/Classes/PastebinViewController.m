@@ -28,32 +28,32 @@
 @implementation PastebinViewController
 
 -(void)setUrl:(NSURL *)url {
-    _url = url.absoluteString;
+    self->_url = url.absoluteString;
     
-    if([_url rangeOfString:@"?"].location != NSNotFound) {
-        NSString *query = [_url substringFromIndex:[_url rangeOfString:@"?"].location + 1];
+    if([self->_url rangeOfString:@"?"].location != NSNotFound) {
+        NSString *query = [self->_url substringFromIndex:[self->_url rangeOfString:@"?"].location + 1];
         NSArray *args = [query componentsSeparatedByString:@"&"];
         for(NSString *arg in args) {
             NSArray *pair = [arg componentsSeparatedByString:@"="];
             
             if([[pair objectAtIndex:0] isEqualToString:@"id"])
-                _pasteID = [pair objectAtIndex:1];
+                self->_pasteID = [pair objectAtIndex:1];
             else if([[pair objectAtIndex:0] isEqualToString:@"own_paste"])
-                _ownPaste = [[pair objectAtIndex:1] isEqualToString:@"1"];
+                self->_ownPaste = [[pair objectAtIndex:1] isEqualToString:@"1"];
         }
         
-        _url = [_url substringToIndex:[_url rangeOfString:@"?"].location];
+        self->_url = [self->_url substringToIndex:[self->_url rangeOfString:@"?"].location];
     }
 }
 
 
 - (NSArray<id<UIPreviewActionItem>> *)previewActionItems {
-    NSURL *url = [NSURL URLWithString:_url];
+    NSURL *url = [NSURL URLWithString:self->_url];
     
     return @[
                               [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                                   UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                                  [pb setValue:_url forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                                  [pb setValue:self->_url forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
                               }],
                               [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                                   UIApplication *app = [UIApplication sharedApplication];
@@ -85,9 +85,9 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [_activity startAnimating];
-    _lineNumbers.enabled = NO;
-    _lineNumbers.on = YES;
+    [self->_activity startAnimating];
+    self->_lineNumbers.enabled = NO;
+    self->_lineNumbers.on = YES;
     [self _fetch];
     [Answers logContentViewWithName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
     [self didMoveToParentViewController:nil];
@@ -97,17 +97,17 @@
     [super viewDidLoad];
     
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
-    _chrome = [[OpenInChromeController alloc] init];
+    self->_chrome = [[OpenInChromeController alloc] init];
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.automaticallyAdjustsScrollViewInsets = NO;
 
-    _lineNumbers = [[UISwitch alloc] initWithFrame:CGRectZero];
-    _lineNumbers.on = YES;
-    [_lineNumbers addTarget:self action:@selector(_toggleLineNumbers) forControlEvents:UIControlEventValueChanged];
+    self->_lineNumbers = [[UISwitch alloc] initWithFrame:CGRectZero];
+    self->_lineNumbers.on = YES;
+    [self->_lineNumbers addTarget:self action:@selector(_toggleLineNumbers) forControlEvents:UIControlEventValueChanged];
     
-    if(_ownPaste) {
-        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
-                             [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
+    if(self->_ownPaste) {
+        [self->_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+                             [[UIBarButtonItem alloc] initWithCustomView:self->_lineNumbers],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(_editPaste)],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
@@ -116,53 +116,53 @@
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
                              ]];
     } else {
-        [_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
-                             [[UIBarButtonItem alloc] initWithCustomView:_lineNumbers],
+        [self->_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+                             [[UIBarButtonItem alloc] initWithCustomView:self->_lineNumbers],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
                              [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
                              ]];
         
     }
-    _lineNumbers.enabled = NO;
-    [_lineNumbers sizeToFit];
+    self->_lineNumbers.enabled = NO;
+    [self->_lineNumbers sizeToFit];
     
-    _webView.opaque = NO;
-    _webView.backgroundColor = [UIColor contentBackgroundColor];
-    _webView.scrollView.scrollsToTop = YES;
+    self->_webView.opaque = NO;
+    self->_webView.backgroundColor = [UIColor contentBackgroundColor];
+    self->_webView.scrollView.scrollsToTop = YES;
     
     self.view.backgroundColor = [UIColor contentBackgroundColor];
     
     if([UIColor isDarkTheme]) {
         self.navigationController.view.backgroundColor = [UIColor navBarColor];
-        _activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
-        [_toolbar setBackgroundImage:[UIColor navBarBackgroundImage] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
-        [_toolbar setTintColor:[UIColor navBarSubheadingColor]];
+        self->_activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+        [self->_toolbar setBackgroundImage:[UIColor navBarBackgroundImage] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+        [self->_toolbar setTintColor:[UIColor navBarSubheadingColor]];
     } else {
         self.navigationController.view.backgroundColor = [UIColor navBarColor];
-        _activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+        self->_activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
     }
 }
 
 -(void)didMoveToParentViewController:(UIViewController *)parent {
-    CGRect frame = _webView.frame;
+    CGRect frame = self->_webView.frame;
     if(self.navigationController.navigationBarHidden) {
-        _toolbar.hidden = YES;
+        self->_toolbar.hidden = YES;
         frame.size.height = self.view.frame.size.height - _webView.frame.origin.y;
     } else {
-        _toolbar.hidden = NO;
+        self->_toolbar.hidden = NO;
         frame.size.height = self.view.frame.size.height - _webView.frame.origin.y - _toolbar.frame.size.height;
     }
-    _webView.frame = frame;
+    self->_webView.frame = frame;
 }
 
 -(void)_fetch {
-    if([_url hasPrefix:[NSString stringWithFormat:@"https://%@/pastebin/", IRCCLOUD_HOST]] || [_url hasPrefix:@"https://www.irccloud.com/pastebin/"]) {
+    if([self->_url hasPrefix:[NSString stringWithFormat:@"https://%@/pastebin/", IRCCLOUD_HOST]] || [self->_url hasPrefix:@"https://www.irccloud.com/pastebin/"]) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         [[NSURLCache sharedURLCache] removeAllCachedResponses];
-        NSURL *url = [NSURL URLWithString:[_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]]];
+        NSURL *url = [NSURL URLWithString:[self->_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         [request setHTTPShouldHandleCookies:NO];
-        [_webView loadRequest:request];
+        [self->_webView loadRequest:request];
     }
 }
 
@@ -171,13 +171,13 @@
 }
 
 -(void)_toggleLineNumbers {
-    if(_lineNumbers.enabled)
-        [_webView stringByEvaluatingJavaScriptFromString:@"window.PASTEVIEW.doToggleLines()"];
+    if(self->_lineNumbers.enabled)
+        [self->_webView stringByEvaluatingJavaScriptFromString:@"window.PASTEVIEW.doToggleLines()"];
 }
 
 -(void)_toggleLineNumbersSwitch {
-    if(_lineNumbers.enabled) {
-        [_lineNumbers setOn:!_lineNumbers.on animated:YES];
+    if(self->_lineNumbers.enabled) {
+        [self->_lineNumbers setOn:!_lineNumbers.on animated:YES];
         [self _toggleLineNumbers];
     }
 }
@@ -189,7 +189,7 @@
 
 -(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
     if([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Delete"]) {
-        [[NetworkConnection sharedInstance] deletePaste:_pasteID handler:nil];
+        [[NetworkConnection sharedInstance] deletePaste:self->_pasteID handler:nil];
         if(self.navigationController.viewControllers.count == 1)
             [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         else
@@ -198,12 +198,12 @@
 }
 
 -(void)_editPaste {
-    [self.navigationController pushViewController:[[PastebinEditorViewController alloc] initWithPasteID:_pasteID] animated:YES];
-    [_webView loadHTMLString:@"" baseURL:nil];
+    [self.navigationController pushViewController:[[PastebinEditorViewController alloc] initWithPasteID:self->_pasteID] animated:YES];
+    [self->_webView loadHTMLString:@"" baseURL:nil];
 }
 
 -(IBAction)shareButtonPressed:(id)sender {
-    UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_url]] type:@"Pastebin"];
+    UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:self->_url]] type:@"Pastebin"];
     activityController.popoverPresentationController.delegate = self;
     activityController.popoverPresentationController.barButtonItem = sender;
     [self presentViewController:activityController animated:YES completion:nil];
@@ -214,7 +214,7 @@
         return;
     NSLog(@"Error: %@", error);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [_activity stopAnimating];
+    [self->_activity stopAnimating];
 }
 
 -(void)webViewDidStartLoad:(UIWebView *)webView {
@@ -227,8 +227,8 @@
 
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
     if([request.URL.scheme isEqualToString:@"hide-spinner"]) {
-        [_activity stopAnimating];
-        _lineNumbers.enabled = YES;
+        [self->_activity stopAnimating];
+        self->_lineNumbers.enabled = YES;
         return NO;
     }
     return YES;

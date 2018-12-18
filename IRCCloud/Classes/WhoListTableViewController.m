@@ -34,14 +34,14 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _info = [[LinkTextView alloc] init];
-        _info.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _info.editable = NO;
-        _info.scrollEnabled = NO;
-        _info.textContainerInset = UIEdgeInsetsZero;
-        _info.backgroundColor = [UIColor clearColor];
-        _info.textColor = [UIColor messageTextColor];
-        [self.contentView addSubview:_info];
+        self->_info = [[LinkTextView alloc] init];
+        self->_info.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_info.editable = NO;
+        self->_info.scrollEnabled = NO;
+        self->_info.textContainerInset = UIEdgeInsetsZero;
+        self->_info.backgroundColor = [UIColor clearColor];
+        self->_info.textColor = [UIColor messageTextColor];
+        [self.contentView addSubview:self->_info];
     }
     return self;
 }
@@ -53,7 +53,7 @@
     frame.origin.x = 6;
     frame.size.width -= 12;
     
-    _info.frame = frame;
+    self->_info.frame = frame;
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -79,7 +79,7 @@
 -(void)refresh {
     NSMutableArray *data = [[NSMutableArray alloc] init];
     
-    for(NSDictionary *user in [_event objectForKey:@"users"]) {
+    for(NSDictionary *user in [self->_event objectForKey:@"users"]) {
         NSMutableDictionary *u = [[NSMutableDictionary alloc] initWithDictionary:user];
         NSString *name;
         if([[user objectForKey:@"realname"] length])
@@ -92,7 +92,7 @@
         [data addObject:u];
     }
     
-    _data = data;
+    self->_data = data;
     [self.tableView reloadData];
 }
 
@@ -110,7 +110,7 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     return [[row objectForKey:@"height"] floatValue];
 }
 
@@ -119,14 +119,14 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_data count];
+    return [self->_data count];
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     WhoTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"whocell"];
     if(!cell)
         cell = [[WhoTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"whocell"];
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     cell.info.attributedText = [row objectForKey:@"formatted"];
     return cell;
 }
@@ -135,7 +135,7 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    _selectedRow = [_data objectAtIndex:[indexPath row]];
+    self->_selectedRow = [self->_data objectAtIndex:[indexPath row]];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alert addAction:[UIAlertAction actionWithTitle:@"Send a message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
@@ -157,16 +157,16 @@
     switch(buttonIndex) {
         case 0:
             [self dismissViewControllerAnimated:YES completion:nil];
-            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [_selectedRow objectForKey:@"nick"]] to:nil cid:_event.cid handler:nil];
+            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [self->_selectedRow objectForKey:@"nick"]] to:nil cid:self->_event.cid handler:nil];
             break;
         case 1:
             [self dismissViewControllerAnimated:YES completion:nil];
-            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/whois %@", [_selectedRow objectForKey:@"nick"]] to:nil cid:_event.cid handler:nil];
+            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/whois %@", [self->_selectedRow objectForKey:@"nick"]] to:nil cid:self->_event.cid handler:nil];
             break;
         case 2:
         {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            [pb setValue:[NSString stringWithFormat:@"%@!%@", [_selectedRow objectForKey:@"nick"], [_selectedRow objectForKey:@"usermask"]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+            [pb setValue:[NSString stringWithFormat:@"%@!%@", [self->_selectedRow objectForKey:@"nick"], [self->_selectedRow objectForKey:@"usermask"]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         }
             break;
         default:

@@ -37,19 +37,19 @@
         }
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    _activity.hidesWhenStopped = YES;
-    [_activity startAnimating];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_activity];
+    self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self->_activity.hidesWhenStopped = YES;
+    [self->_activity startAnimating];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
     self.view.backgroundColor = [UIColor blackColor];
-    _webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height)];
-    _webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    _webView.backgroundColor = [UIColor blackColor];
-    _webView.delegate = self;
+    self->_webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height)];
+    self->_webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+    self->_webView.backgroundColor = [UIColor blackColor];
+    self->_webView.delegate = self;
 #ifdef IMGUR_KEY
-    [_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.imgur.com/oauth2/authorize?client_id=%@&response_type=token", @IMGUR_KEY]]]];
+    [self->_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.imgur.com/oauth2/authorize?client_id=%@&response_type=token", @IMGUR_KEY]]]];
 #endif
-    [self.view addSubview:_webView];
+    [self.view addSubview:self->_webView];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -63,17 +63,17 @@
         return;
     NSLog(@"Error: %@", error);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [_activity stopAnimating];
+    [self->_activity stopAnimating];
 }
 
 -(void)webViewDidStartLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
-    [_activity startAnimating];
+    [self->_activity startAnimating];
 }
 
 -(void)webViewDidFinishLoad:(UIWebView *)webView {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-    [_activity stopAnimating];
+    [self->_activity stopAnimating];
 }
 
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {

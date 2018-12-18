@@ -23,16 +23,16 @@
     self = [super initWithFrame:frame];
     if (self) {
         for(int i = 0; i < 16; i++) {
-            _fg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
-            _fg[i].layer.borderColor = [UIColor blackColor].CGColor;
-            _fg[i].layer.borderWidth = 1;
-            [_fg[i] addTarget:self action:@selector(fgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:_fg[i]];
-            _bg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
-            _bg[i].layer.borderColor = [UIColor blackColor].CGColor;
-            _bg[i].layer.borderWidth = 1;
-            [_bg[i] addTarget:self action:@selector(bgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-            [self addSubview:_bg[i]];
+            self->_fg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
+            self->_fg[i].layer.borderColor = [UIColor blackColor].CGColor;
+            self->_fg[i].layer.borderWidth = 1;
+            [self->_fg[i] addTarget:self action:@selector(fgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+            [self addSubview:self->_fg[i]];
+            self->_bg[i] = [UIButton buttonWithType:UIButtonTypeCustom];
+            self->_bg[i].layer.borderColor = [UIColor blackColor].CGColor;
+            self->_bg[i].layer.borderWidth = 1;
+            [self->_bg[i] addTarget:self action:@selector(bgButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+            [self addSubview:self->_bg[i]];
         }
         self.layer.masksToBounds = YES;
         self.layer.cornerRadius = 4;
@@ -41,15 +41,15 @@
 }
 
 -(void)fgButtonPressed:(UIButton *)sender {
-    [_delegate foregroundColorPicked:sender.backgroundColor];
+    [self->_delegate foregroundColorPicked:sender.backgroundColor];
 }
 
 -(void)bgButtonPressed:(UIButton *)sender {
-    [_delegate backgroundColorPicked:sender.backgroundColor];
+    [self->_delegate backgroundColorPicked:sender.backgroundColor];
 }
 
 -(void)close:(id)sender {
-    [_delegate closeColorPicker];
+    [self->_delegate closeColorPicker];
 }
 
 -(CGSize)intrinsicContentSize {
@@ -60,17 +60,17 @@
     CGFloat bw = self.bounds.size.width / 8;
 
     for(int i = 0; i < 8; i++) {
-        _fg[i].frame = CGRectMake(i*bw + 3, 3, bw - 6, bw - 6);
-        _fg[i].layer.cornerRadius = (bw - 6) / 2;
-        _bg[i].frame = CGRectMake(i*bw + 3, 3, bw - 6, bw - 6);
-        _bg[i].layer.cornerRadius = (bw - 6) / 2;
+        self->_fg[i].frame = CGRectMake(i*bw + 3, 3, bw - 6, bw - 6);
+        self->_fg[i].layer.cornerRadius = (bw - 6) / 2;
+        self->_bg[i].frame = CGRectMake(i*bw + 3, 3, bw - 6, bw - 6);
+        self->_bg[i].layer.cornerRadius = (bw - 6) / 2;
     }
 
     for(int i = 0; i < 8; i++) {
-        _fg[i+8].frame = CGRectMake(i*bw + 3, 38, bw - 6, bw - 6);
-        _fg[i+8].layer.cornerRadius = (bw - 6) / 2;
-        _bg[i+8].frame = CGRectMake(i*bw + 3, 38, bw - 6, bw - 6);
-        _bg[i+8].layer.cornerRadius = (bw - 6) / 2;
+        self->_fg[i+8].frame = CGRectMake(i*bw + 3, 38, bw - 6, bw - 6);
+        self->_fg[i+8].layer.cornerRadius = (bw - 6) / 2;
+        self->_bg[i+8].frame = CGRectMake(i*bw + 3, 38, bw - 6, bw - 6);
+        self->_bg[i+8].layer.cornerRadius = (bw - 6) / 2;
     }
 }
 
@@ -80,21 +80,21 @@
     //self.layer.borderColor = [UIColor bufferBorderColor].CGColor;
 
     for(int i = 0; i < 16; i++)
-        _fg[i].backgroundColor = [UIColor mIRCColor:i background:NO];
+        self->_fg[i].backgroundColor = [UIColor mIRCColor:i background:NO];
 
     for(int i = 0; i < 16; i++)
-        _bg[i].backgroundColor = [UIColor mIRCColor:i background:YES];
+        self->_bg[i].backgroundColor = [UIColor mIRCColor:i background:YES];
     
     if(background) {
         for(int i = 0; i < 16; i++)
-            _fg[i].hidden = YES;
+            self->_fg[i].hidden = YES;
         for(int i = 0; i < 16; i++)
-            _bg[i].hidden = NO;
+            self->_bg[i].hidden = NO;
     } else {
         for(int i = 0; i < 16; i++)
-            _fg[i].hidden = NO;
+            self->_fg[i].hidden = NO;
         for(int i = 0; i < 16; i++)
-            _bg[i].hidden = YES;
+            self->_bg[i].hidden = YES;
     }
 }
 

@@ -31,11 +31,11 @@
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if(self) {
-        _icon = [[UILabel alloc] initWithFrame:CGRectMake(0,14,16,16)];
-        _icon.textColor = [UITableViewCell appearance].textLabelColor;
-        _icon.textAlignment = NSTextAlignmentCenter;
-        _icon.font = [UIFont fontWithName:@"FontAwesome" size:self.textLabel.font.pointSize];
-        [self.contentView addSubview:_icon];
+        self->_icon = [[UILabel alloc] initWithFrame:CGRectMake(0,14,16,16)];
+        self->_icon.textColor = [UITableViewCell appearance].textLabelColor;
+        self->_icon.textAlignment = NSTextAlignmentCenter;
+        self->_icon.font = [UIFont fontWithName:@"FontAwesome" size:self.textLabel.font.pointSize];
+        [self.contentView addSubview:self->_icon];
     }
     return self;
 }

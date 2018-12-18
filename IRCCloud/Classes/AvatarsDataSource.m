@@ -21,20 +21,20 @@
 -(id)init {
     self = [super init];
     if(self) {
-        _images = [[NSMutableDictionary alloc] init];
-        _selfImages = [[NSMutableDictionary alloc] init];
+        self->_images = [[NSMutableDictionary alloc] init];
+        self->_selfImages = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
 
 -(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf {
-    _lastAccessTime = [[NSDate date] timeIntervalSince1970];
-    NSMutableDictionary *images = isSelf?_selfImages:_images;
+    self->_lastAccessTime = [[NSDate date] timeIntervalSince1970];
+    NSMutableDictionary *images = isSelf?_selfImages:self->_images;
     if(![images objectForKey:@(size)]) {
         UIFont *font = [UIFont fontWithName:@"SourceSansPro-Semibold" size:(size * 0.65)];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
-        UIColor *color = isSelf?[UIColor selfNickColor]:[UIColor colorFromHexString:[UIColor colorForNick:_nick]];
+        UIColor *color = isSelf?[UIColor selfNickColor]:[UIColor colorFromHexString:[UIColor colorForNick:self->_nick]];
         if([UIColor isDarkTheme]) {
             CGContextSetFillColorWithColor(ctx, color.CGColor);
             CGContextFillEllipseInRect(ctx,CGRectMake(1,1,size-2,size-2));
@@ -49,9 +49,9 @@
         }
         
         NSRegularExpression *r = [NSRegularExpression regularExpressionWithPattern:@"[_\\W]+" options:NSRegularExpressionCaseInsensitive error:nil];
-        NSString *text = [r stringByReplacingMatchesInString:[_displayName uppercaseString] options:0 range:NSMakeRange(0, _displayName.length) withTemplate:@""];
+        NSString *text = [r stringByReplacingMatchesInString:[self->_displayName uppercaseString] options:0 range:NSMakeRange(0, _displayName.length) withTemplate:@""];
         if(!text.length)
-            text = [_displayName uppercaseString];
+            text = [self->_displayName uppercaseString];
         text = [text substringToIndex:1];
         CGSize textSize = [text sizeWithAttributes:@{NSFontAttributeName:font, NSForegroundColorAttributeName:[UIColor contentBackgroundColor]}];
         CGPoint p = CGPointMake((size / 2) - (textSize.width / 2),(size / 2) - (textSize.height / 2) - 0.5);
@@ -80,7 +80,7 @@
 -(id)init {
     self = [super init];
     if(self) {
-        _avatars = [[NSMutableDictionary alloc] init];
+        self->_avatars = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -92,22 +92,22 @@
     if(!nick.length)
         nick = displayName;
     
-    if(![_avatars objectForKey:@(bid)]) {
-        [_avatars setObject:[[NSMutableDictionary alloc] init] forKey:@(bid)];
+    if(![self->_avatars objectForKey:@(bid)]) {
+        [self->_avatars setObject:[[NSMutableDictionary alloc] init] forKey:@(bid)];
     }
     
-    if(![[_avatars objectForKey:@(bid)] objectForKey:nick]) {
+    if(![[self->_avatars objectForKey:@(bid)] objectForKey:nick]) {
         Avatar *a = [[Avatar alloc] init];
         a.bid = bid;
         a.nick = nick;
         a.displayName = displayName;
-        [[_avatars objectForKey:@(bid)] setObject:a forKey:displayName];
+        [[self->_avatars objectForKey:@(bid)] setObject:a forKey:displayName];
     }
     
-    return [[_avatars objectForKey:@(bid)] objectForKey:displayName];
+    return [[self->_avatars objectForKey:@(bid)] objectForKey:displayName];
 }
 
 -(void)clear {
-    [_avatars removeAllObjects];
+    [self->_avatars removeAllObjects];
 }
 @end

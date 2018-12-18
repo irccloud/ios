@@ -39,37 +39,37 @@
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        _date = [[UILabel alloc] init];
-        _date.textColor = [UITableViewCell appearance].detailTextLabelColor;
-        _date.font = [UIFont systemFontOfSize:FONT_SIZE];
-        [self.contentView addSubview:_date];
+        self->_date = [[UILabel alloc] init];
+        self->_date.textColor = [UITableViewCell appearance].detailTextLabelColor;
+        self->_date.font = [UIFont systemFontOfSize:FONT_SIZE];
+        [self.contentView addSubview:self->_date];
 
-        _name = [[UILabel alloc] init];
-        _name.textColor = [UITableViewCell appearance].textLabelColor;
-        _name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
-        [self.contentView addSubview:_name];
+        self->_name = [[UILabel alloc] init];
+        self->_name.textColor = [UITableViewCell appearance].textLabelColor;
+        self->_name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        [self.contentView addSubview:self->_name];
         
-        _metadata = [[UILabel alloc] init];
-        _metadata.textColor = [UITableViewCell appearance].detailTextLabelColor;
-        _metadata.font = [UIFont systemFontOfSize:FONT_SIZE];
-        [self.contentView addSubview:_metadata];
+        self->_metadata = [[UILabel alloc] init];
+        self->_metadata.textColor = [UITableViewCell appearance].detailTextLabelColor;
+        self->_metadata.font = [UIFont systemFontOfSize:FONT_SIZE];
+        [self.contentView addSubview:self->_metadata];
         
-        _extension = [[UILabel alloc] init];
-        _extension.textColor = [UIColor whiteColor];
-        _extension.backgroundColor = [UIColor unreadBlueColor];
-        _extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
-        _extension.textAlignment = NSTextAlignmentCenter;
-        _extension.hidden = YES;
-        [self.contentView addSubview:_extension];
+        self->_extension = [[UILabel alloc] init];
+        self->_extension.textColor = [UIColor whiteColor];
+        self->_extension.backgroundColor = [UIColor unreadBlueColor];
+        self->_extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        self->_extension.textAlignment = NSTextAlignmentCenter;
+        self->_extension.hidden = YES;
+        [self.contentView addSubview:self->_extension];
 
-        _thumbnail = [[YYAnimatedImageView alloc] init];
-        _thumbnail.contentMode = UIViewContentModeScaleAspectFit;
+        self->_thumbnail = [[YYAnimatedImageView alloc] init];
+        self->_thumbnail.contentMode = UIViewContentModeScaleAspectFit;
         if(@available(iOS 11, *))
-            _thumbnail.accessibilityIgnoresInvertColors = YES;
-        [self.contentView addSubview:_thumbnail];
+            self->_thumbnail.accessibilityIgnoresInvertColors = YES;
+        [self.contentView addSubview:self->_thumbnail];
         
-        _spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-        [self.contentView addSubview:_spinner];
+        self->_spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+        [self.contentView addSubview:self->_spinner];
     }
     return self;
 }
@@ -83,10 +83,10 @@
     frame.size.width -= 8;
     frame.size.height -= 8;
     
-    _extension.frame = _spinner.frame = _thumbnail.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.height, frame.size.height);
-    _date.frame = CGRectMake(frame.origin.x + 64, frame.origin.y, frame.size.width - 64, frame.size.height / 3);
-    _name.frame = CGRectMake(frame.origin.x + 64, _date.frame.origin.y + _date.frame.size.height, frame.size.width - 64, frame.size.height / 3);
-    _metadata.frame = CGRectMake(frame.origin.x + 64, _name.frame.origin.y + _name.frame.size.height, frame.size.width - 64, frame.size.height / 3);
+    self->_extension.frame = self->_spinner.frame = self->_thumbnail.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.height, frame.size.height);
+    self->_date.frame = CGRectMake(frame.origin.x + 64, frame.origin.y, frame.size.width - 64, frame.size.height / 3);
+    self->_name.frame = CGRectMake(frame.origin.x + 64, _date.frame.origin.y + _date.frame.size.height, frame.size.width - 64, frame.size.height / 3);
+    self->_metadata.frame = CGRectMake(frame.origin.x + 64, _name.frame.origin.y + _name.frame.size.height, frame.size.width - 64, frame.size.height / 3);
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -104,25 +104,25 @@
     self.navigationItem.title = @"File Uploads";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
-    _formatter = [[NSDateFormatter alloc] init];
-    _formatter.dateStyle = NSDateFormatterLongStyle;
-    _formatter.timeStyle = NSDateFormatterMediumStyle;
-    _imageViews = [[NSMutableDictionary alloc] init];
-    _spinners = [[NSMutableDictionary alloc] init];
-    _extensions = [[NSMutableDictionary alloc] init];
+    self->_formatter = [[NSDateFormatter alloc] init];
+    self->_formatter.dateStyle = NSDateFormatterLongStyle;
+    self->_formatter.timeStyle = NSDateFormatterMediumStyle;
+    self->_imageViews = [[NSMutableDictionary alloc] init];
+    self->_spinners = [[NSMutableDictionary alloc] init];
+    self->_extensions = [[NSMutableDictionary alloc] init];
     
-    _footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
-    _footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
+    self->_footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     UIActivityIndicatorView *a = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-    a.center = _footerView.center;
+    a.center = self->_footerView.center;
     a.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
     [a startAnimating];
-    [_footerView addSubview:a];
+    [self->_footerView addSubview:a];
     
-    self.tableView.tableFooterView = _footerView;
-    _pages = 0;
-    _files = nil;
-    _canLoadMore = YES;
+    self.tableView.tableFooterView = self->_footerView;
+    self->_pages = 0;
+    self->_files = nil;
+    self->_canLoadMore = YES;
     [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
 }
 
@@ -134,8 +134,8 @@
 -(void)doneButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
-    _files = nil;
-    _canLoadMore = NO;
+    self->_files = nil;
+    self->_canLoadMore = NO;
     [[ImageCache sharedInstance] clear];
 }
 
@@ -144,14 +144,14 @@
         NSDictionary *d = [[NetworkConnection sharedInstance] getFiles:++_pages];
         if([[d objectForKey:@"success"] boolValue]) {
             CLS_LOG(@"Loaded file list for page %i", _pages);
-            if(_files)
-                _files = [_files arrayByAddingObjectsFromArray:[d objectForKey:@"files"]];
+            if(self->_files)
+                self->_files = [self->_files arrayByAddingObjectsFromArray:[d objectForKey:@"files"]];
             else
-                _files = [d objectForKey:@"files"];
-            _canLoadMore = _files.count < [[d objectForKey:@"total"] intValue];
+                self->_files = [d objectForKey:@"files"];
+            self->_canLoadMore = self->_files.count < [[d objectForKey:@"total"] intValue];
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                self.tableView.tableFooterView = _canLoadMore?_footerView:nil;
-                if(!_files.count) {
+                self.tableView.tableFooterView = self->_canLoadMore?self->_footerView:nil;
+                if(!self->_files.count) {
                     CLS_LOG(@"File list is empty");
                     UILabel *fail = [[UILabel alloc] init];
                     fail.text = @"\nYou haven't uploaded any files yet.\n";
@@ -164,7 +164,7 @@
             }];
         } else {
             CLS_LOG(@"Failed to load file list for page %i: %@", _pages, d);
-            _canLoadMore = NO;
+            self->_canLoadMore = NO;
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 UILabel *fail = [[UILabel alloc] init];
                 fail.text = @"\nUnable to load files.\nPlease try again later.\n";
@@ -181,15 +181,15 @@
 }
 
 -(void)_refreshFileID:(NSString *)fileID {
-    [[_spinners objectForKey:fileID] stopAnimating];
-    [[_spinners objectForKey:fileID] setHidden:YES];
+    [[self->_spinners objectForKey:fileID] stopAnimating];
+    [[self->_spinners objectForKey:fileID] setHidden:YES];
     YYImage *image = [[ImageCache sharedInstance] imageForFileID:fileID width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
     if(image) {
-        [[_imageViews objectForKey:fileID] setImage:image];
-        [[_imageViews objectForKey:fileID] setHidden:NO];
-        [[_extensions objectForKey:fileID] setHidden:YES];
+        [[self->_imageViews objectForKey:fileID] setImage:image];
+        [[self->_imageViews objectForKey:fileID] setHidden:NO];
+        [[self->_extensions objectForKey:fileID] setHidden:YES];
     } else {
-        [[_extensions objectForKey:fileID] setHidden:NO];
+        [[self->_extensions objectForKey:fileID] setHidden:NO];
     }
 }
 
@@ -213,11 +213,11 @@
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(_files.count && _canLoadMore) {
+    if(self->_files.count && _canLoadMore) {
         NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
         
-        if([[rows lastObject] row] >= _files.count - 5) {
-            _canLoadMore = NO;
+        if([[rows lastObject] row] >= self->_files.count - 5) {
+            self->_canLoadMore = NO;
             [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
         }
     }
@@ -228,9 +228,9 @@
     if(!cell)
         cell = [[FilesTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:[NSString stringWithFormat:@"filecell-%li-%li", (long)indexPath.section, (long)indexPath.row]];
 
-    NSDictionary *file = [_files objectAtIndex:indexPath.row];
+    NSDictionary *file = [self->_files objectAtIndex:indexPath.row];
     
-    cell.date.text = [_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:[[file objectForKey:@"date"] intValue]]];
+    cell.date.text = [self->_formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:[[file objectForKey:@"date"] intValue]]];
     cell.name.text = [file objectForKey:@"name"];
     int bytes = [[file objectForKey:@"size"] intValue];
     if(bytes < 1024) {
@@ -248,9 +248,9 @@
     cell.extension.text = [e uppercaseString];
 
     if([[file objectForKey:@"mime_type"] hasPrefix:@"image/"]) {
-        [_spinners setObject:cell.spinner forKey:[file objectForKey:@"id"]];
-        [_imageViews setObject:cell.thumbnail forKey:[file objectForKey:@"id"]];
-        [_extensions setObject:cell.extension forKey:[file objectForKey:@"id"]];
+        [self->_spinners setObject:cell.spinner forKey:[file objectForKey:@"id"]];
+        [self->_imageViews setObject:cell.thumbnail forKey:[file objectForKey:@"id"]];
+        [self->_extensions setObject:cell.extension forKey:[file objectForKey:@"id"]];
         YYImage *image = [[ImageCache sharedInstance] imageForFileID:[file objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale];
         if(image) {
             [cell.thumbnail setImage:image];
@@ -283,22 +283,22 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized (self) {
         if (editingStyle == UITableViewCellEditingStyleDelete) {
-            [[NetworkConnection sharedInstance] deleteFile:[[_files objectAtIndex:indexPath.row] objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
+            [[NetworkConnection sharedInstance] deleteFile:[[self->_files objectAtIndex:indexPath.row] objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
                 if([[result objectForKey:@"success"] boolValue]) {
                     CLS_LOG(@"File deleted successfully");
                 } else {
                     CLS_LOG(@"Error deleting file: %@", result);
                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
-                    _pages = 0;
-                    _files = nil;
-                    _canLoadMore = YES;
+                    self->_pages = 0;
+                    self->_files = nil;
+                    self->_canLoadMore = YES;
                     [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
                 }
             }];
-            NSMutableArray *a = _files.mutableCopy;
+            NSMutableArray *a = self->_files.mutableCopy;
             [a removeObjectAtIndex:indexPath.row];
-            _files = [NSArray arrayWithArray:a];
+            self->_files = [NSArray arrayWithArray:a];
             [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
             if(!_files.count) {
                 UILabel *fail = [[UILabel alloc] init];
@@ -315,24 +315,24 @@
 }
 
 -(void)saveButtonPressed:(id)sender {
-    if(_delegate)
-        [_delegate filesTableViewControllerDidSelectFile:_selectedFile message:((FileMetadataViewController *)self.navigationController.topViewController).msg.text];
+    if(self->_delegate)
+        [self->_delegate filesTableViewControllerDidSelectFile:self->_selectedFile message:((FileMetadataViewController *)self.navigationController.topViewController).msg.text];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    _selectedFile = [_files objectAtIndex:indexPath.row];
-    if(_selectedFile) {
+    self->_selectedFile = [self->_files objectAtIndex:indexPath.row];
+    if(self->_selectedFile) {
         FileMetadataViewController *c = [[FileMetadataViewController alloc] initWithUploader:nil];
         c.navigationItem.title = @"Share a File";
         c.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(saveButtonPressed:)];
         [c loadView];
         [c viewDidLoad];
-        int bytes = [[_selectedFile objectForKey:@"size"] intValue];
+        int bytes = [[self->_selectedFile objectForKey:@"size"] intValue];
         int exp = (int)(log(bytes) / log(1024));
-        [c setFilename:[_selectedFile objectForKey:@"name"] metadata:[NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [_selectedFile objectForKey:@"mime_type"]]];
-        [c setImage:[[ImageCache sharedInstance] imageForFileID:[_selectedFile objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale]];
-        [c setURL:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:_selectedFile error:nil]];
+        [c setFilename:[self->_selectedFile objectForKey:@"name"] metadata:[NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], [self->_selectedFile objectForKey:@"mime_type"]]];
+        [c setImage:[[ImageCache sharedInstance] imageForFileID:[self->_selectedFile objectForKey:@"id"] width:(self.view.frame.size.width/2) * [UIScreen mainScreen].scale]];
+        [c setURL:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:self->_selectedFile error:nil]];
         [self.navigationController pushViewController:c animated:YES];
     }
     [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

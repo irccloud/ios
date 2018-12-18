@@ -40,230 +40,230 @@
         return NSOrderedSame;
 }
 -(BOOL)isImportant:(NSString *)bufferType {
-    if(_isSelf)
+    if(self->_isSelf)
         return NO;
     if(!_type)
         return NO;
-    if(_rowType == ROW_THUMBNAIL || _rowType == ROW_FILE)
+    if(self->_rowType == ROW_THUMBNAIL || _rowType == ROW_FILE)
         return NO;
-    if([_type isEqualToString:@"notice"] || [_type isEqualToString:@"channel_invite"]) {
+    if([self->_type isEqualToString:@"notice"] || [self->_type isEqualToString:@"channel_invite"]) {
         // Notices sent from the server (with no nick sender) aren't important
         // e.g. *** Looking up your hostname...
-        if(_from.length == 0)
+        if(self->_from.length == 0)
             return NO;
         
         // Notices and invites sent to a buffer shouldn't notify in the server buffer
-        if([bufferType isEqualToString:@"console"] && (_toChan || _toBuffer))
+        if([bufferType isEqualToString:@"console"] && (self->_toChan || _toBuffer))
             return NO;
     }
 
     return [self isMessage];
 }
 -(BOOL)isMessage {
-    return ([_type isEqualToString:@"buffer_msg"]
-            ||[_type isEqualToString:@"buffer_me_msg"]
-            ||[_type isEqualToString:@"notice"]
-            ||[_type isEqualToString:@"channel_invite"]
-            ||[_type isEqualToString:@"callerid"]
-            ||[_type isEqualToString:@"wallops"]);
+    return ([self->_type isEqualToString:@"buffer_msg"]
+            ||[self->_type isEqualToString:@"buffer_me_msg"]
+            ||[self->_type isEqualToString:@"notice"]
+            ||[self->_type isEqualToString:@"channel_invite"]
+            ||[self->_type isEqualToString:@"callerid"]
+            ||[self->_type isEqualToString:@"wallops"]);
 }
 -(NSString *)description {
     return [NSString stringWithFormat:@"{cid: %i, bid: %i, eid: %f, group: %f, type: %@, from: %@, msg: %@, self: %i, header: %i, reqid: %i, pending: %i, formatted: %@}", _cid, _bid, _eid, _groupEid, _type, _from, _msg, _isSelf, _isHeader, _reqid, _pending, _formatted];
 }
 -(NSString *)ignoreMask {
     if(!_ignoreMask) {
-        NSString *from = _from;
+        NSString *from = self->_from;
         if(!from.length)
-            from = _nick;
+            from = self->_nick;
         
         if(from) {
-            _ignoreMask = [NSString stringWithFormat:@"%@!%@", from, _hostmask];
+            self->_ignoreMask = [NSString stringWithFormat:@"%@!%@", from, _hostmask];
         }
     }
     return _ignoreMask;
 }
 -(Event *)copy {
-    BOOL pending = _pending;
-    _pending = NO;
+    BOOL pending = self->_pending;
+    self->_pending = NO;
     Event *e = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
-    _pending = e.pending = pending;
+    self->_pending = e.pending = pending;
     return e;
 }
 -(instancetype)initWithCoder:(NSCoder *)aDecoder{
     self = [super init];
     if(self) {
-        decodeInt(_cid);
-        decodeInt(_bid);
-        decodeDouble(_eid);
-        decodeObject(_type);
-        decodeObject(_msg);
-        decodeObject(_hostmask);
-        decodeObject(_from);
-        decodeObject(_fromMode);
-        decodeObject(_nick);
-        decodeObject(_oldNick);
-        decodeObject(_server);
-        decodeObject(_diff);
-        decodeObject(_realname);
-        decodeBool(_isHighlight);
-        decodeBool(_isSelf);
-        decodeBool(_toChan);
-        decodeBool(_toBuffer);
-        decodeObject(_color);
-        decodeObject(_ops);
-        decodeInt(_rowType);
-        decodeBool(_linkify);
-        decodeObject(_targetMode);
-        decodeInt(_reqid);
-        decodeBool(_pending);
-        decodeBool(_monospace);
-        decodeObject(_to);
-        decodeObject(_command);
-        decodeObject(_day);
-        decodeObject(_ignoreMask);
-        decodeObject(_chan);
-        decodeObject(_entities);
-        decodeFloat(_timestampPosition);
-        decodeDouble(_serverTime);
-        decodeObject(_avatar);
-        decodeObject(_avatarURL);
-        decodeObject(_fromNick);
-        decodeObject(_msgid);
-        decodeBool(_edited);
-        decodeDouble(_lastEditEID);
+        decodeInt(self->_cid);
+        decodeInt(self->_bid);
+        decodeDouble(self->_eid);
+        decodeObject(self->_type);
+        decodeObject(self->_msg);
+        decodeObject(self->_hostmask);
+        decodeObject(self->_from);
+        decodeObject(self->_fromMode);
+        decodeObject(self->_nick);
+        decodeObject(self->_oldNick);
+        decodeObject(self->_server);
+        decodeObject(self->_diff);
+        decodeObject(self->_realname);
+        decodeBool(self->_isHighlight);
+        decodeBool(self->_isSelf);
+        decodeBool(self->_toChan);
+        decodeBool(self->_toBuffer);
+        decodeObject(self->_color);
+        decodeObject(self->_ops);
+        decodeInt(self->_rowType);
+        decodeBool(self->_linkify);
+        decodeObject(self->_targetMode);
+        decodeInt(self->_reqid);
+        decodeBool(self->_pending);
+        decodeBool(self->_monospace);
+        decodeObject(self->_to);
+        decodeObject(self->_command);
+        decodeObject(self->_day);
+        decodeObject(self->_ignoreMask);
+        decodeObject(self->_chan);
+        decodeObject(self->_entities);
+        decodeFloat(self->_timestampPosition);
+        decodeDouble(self->_serverTime);
+        decodeObject(self->_avatar);
+        decodeObject(self->_avatarURL);
+        decodeObject(self->_fromNick);
+        decodeObject(self->_msgid);
+        decodeBool(self->_edited);
+        decodeDouble(self->_lastEditEID);
 
-        if(_rowType == ROW_TIMESTAMP)
-            _bgColor = [UIColor timestampBackgroundColor];
-        else if(_rowType == ROW_LASTSEENEID)
-            _bgColor = [UIColor contentBackgroundColor];
+        if(self->_rowType == ROW_TIMESTAMP)
+            self->_bgColor = [UIColor timestampBackgroundColor];
+        else if(self->_rowType == ROW_LASTSEENEID)
+            self->_bgColor = [UIColor contentBackgroundColor];
         else
-            decodeObject(_bgColor);
+            decodeObject(self->_bgColor);
         
-        if(_pending) {
-            _height = 0;
-            _pending = NO;
-            _rowType = ROW_FAILED;
-            _color = [UIColor networkErrorColor];
-            _bgColor = [UIColor errorBackgroundColor];
+        if(self->_pending) {
+            self->_height = 0;
+            self->_pending = NO;
+            self->_rowType = ROW_FAILED;
+            self->_color = [UIColor networkErrorColor];
+            self->_bgColor = [UIColor errorBackgroundColor];
         }
     }
     return self;
 }
 
 -(void)encodeWithCoder:(NSCoder *)aCoder {
-    encodeInt(_cid);
-    encodeInt(_bid);
-    encodeDouble(_eid);
-    encodeObject(_type);
-    encodeObject(_msg);
-    encodeObject(_hostmask);
-    encodeObject(_from);
-    encodeObject(_fromMode);
-    encodeObject(_nick);
-    encodeObject(_oldNick);
-    encodeObject(_server);
-    encodeObject(_diff);
-    encodeObject(_realname);
-    encodeBool(_isHighlight);
-    encodeBool(_isSelf);
-    encodeBool(_toChan);
-    encodeBool(_toBuffer);
+    encodeInt(self->_cid);
+    encodeInt(self->_bid);
+    encodeDouble(self->_eid);
+    encodeObject(self->_type);
+    encodeObject(self->_msg);
+    encodeObject(self->_hostmask);
+    encodeObject(self->_from);
+    encodeObject(self->_fromMode);
+    encodeObject(self->_nick);
+    encodeObject(self->_oldNick);
+    encodeObject(self->_server);
+    encodeObject(self->_diff);
+    encodeObject(self->_realname);
+    encodeBool(self->_isHighlight);
+    encodeBool(self->_isSelf);
+    encodeBool(self->_toChan);
+    encodeBool(self->_toBuffer);
     @try {
-        encodeObject(_color);
+        encodeObject(self->_color);
     }
     @catch (NSException *exception) {
-        _color = [UIColor blackColor];
-        encodeObject(_color);
+        self->_color = [UIColor blackColor];
+        encodeObject(self->_color);
     }
-    encodeObject(_ops);
-    encodeInt(_rowType);
-    encodeBool(_linkify);
-    encodeObject(_targetMode);
-    encodeInt(_reqid);
-    encodeBool(_pending);
-    encodeBool(_monospace);
-    encodeObject(_to);
-    encodeObject(_command);
-    encodeObject(_day);
-    encodeObject(_ignoreMask);
-    encodeObject(_chan);
-    encodeObject(_entities);
-    encodeFloat(_timestampPosition);
-    encodeDouble(_serverTime);
-    encodeObject(_avatar);
-    encodeObject(_avatarURL);
-    encodeObject(_fromNick);
-    encodeObject(_msgid);
-    encodeBool(_edited);
-    encodeDouble(_lastEditEID);
+    encodeObject(self->_ops);
+    encodeInt(self->_rowType);
+    encodeBool(self->_linkify);
+    encodeObject(self->_targetMode);
+    encodeInt(self->_reqid);
+    encodeBool(self->_pending);
+    encodeBool(self->_monospace);
+    encodeObject(self->_to);
+    encodeObject(self->_command);
+    encodeObject(self->_day);
+    encodeObject(self->_ignoreMask);
+    encodeObject(self->_chan);
+    encodeObject(self->_entities);
+    encodeFloat(self->_timestampPosition);
+    encodeDouble(self->_serverTime);
+    encodeObject(self->_avatar);
+    encodeObject(self->_avatarURL);
+    encodeObject(self->_fromNick);
+    encodeObject(self->_msgid);
+    encodeBool(self->_edited);
+    encodeDouble(self->_lastEditEID);
 
-    if(_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
-        encodeObject(_bgColor);
+    if(self->_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
+        encodeObject(self->_bgColor);
 }
 
 -(NSTimeInterval)time {
-    if(_serverTime > 0)
+    if(self->_serverTime > 0)
         return _serverTime / 1000;
     else
-        return (_eid / 1000000) + [NetworkConnection sharedInstance].clockOffset;
+        return (self->_eid / 1000000) + [NetworkConnection sharedInstance].clockOffset;
 }
 
 -(NSString *)UUID {
     if(!_UUID)
-        _UUID = [[NSUUID UUID] UUIDString];
+        self->_UUID = [[NSUUID UUID] UUIDString];
     return _UUID;
 }
 
 -(NSString *)reply {
-    if([_entities objectForKey:@"reply"])
-        return [_entities objectForKey:@"reply"];
+    if([self->_entities objectForKey:@"reply"])
+        return [self->_entities objectForKey:@"reply"];
     else
-        return [[_entities objectForKey:@"known_client_tags"] objectForKey:@"reply"];
+        return [[self->_entities objectForKey:@"known_client_tags"] objectForKey:@"reply"];
 }
 
 -(NSURL *)avatar:(int)size {
 #ifndef ENTERPRISE
     BOOL isIRCCloudAvatar = NO;
-    if([self isMessage] && (!_cachedAvatarURL || size != _cachedAvatarSize || ![[ImageCache sharedInstance] isValidURL:_cachedAvatarURL])) {
-        if(_avatar.length) {
-            _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":_avatar, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
-        } else if([_avatarURL hasPrefix:@"https://"]) {
-            if([_avatarURL containsString:@"{size}"]) {
-                CSURITemplate *template = [CSURITemplate URITemplateWithString:_avatarURL error:nil];
-                _cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@"72"} error:nil]];
+    if([self isMessage] && (!_cachedAvatarURL || size != self->_cachedAvatarSize || ![[ImageCache sharedInstance] isValidURL:self->_cachedAvatarURL])) {
+        if(self->_avatar.length) {
+            self->_cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":self->_avatar, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
+        } else if([self->_avatarURL hasPrefix:@"https://"]) {
+            if([self->_avatarURL containsString:@"{size}"]) {
+                CSURITemplate *template = [CSURITemplate URITemplateWithString:self->_avatarURL error:nil];
+                self->_cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@"72"} error:nil]];
             } else {
-                _cachedAvatarURL = [NSURL URLWithString:_avatarURL];
+                self->_cachedAvatarURL = [NSURL URLWithString:self->_avatarURL];
             }
         } else {
-            _cachedAvatarURL = nil;
-            if([_hostmask rangeOfString:@"@"].location != NSNotFound) {
-                NSString *ident = [_hostmask substringToIndex:[_hostmask rangeOfString:@"@"].location];
+            self->_cachedAvatarURL = nil;
+            if([self->_hostmask rangeOfString:@"@"].location != NSNotFound) {
+                NSString *ident = [self->_hostmask substringToIndex:[self->_hostmask rangeOfString:@"@"].location];
                 if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
                     ident = [ident substringFromIndex:3];
                     if(ident.length && [ident intValue]) {
-                        _cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
-                        if([[ImageCache sharedInstance] isValidURL:_cachedAvatarURL])
+                        self->_cachedAvatarURL = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarRedirectURITemplate relativeStringWithVariables:@{@"id":ident, @"modifiers":[NSString stringWithFormat:@"s%i", size]} error:nil]];
+                        if([[ImageCache sharedInstance] isValidURL:self->_cachedAvatarURL])
                             isIRCCloudAvatar = YES;
                         else
-                            _cachedAvatarURL = nil;
+                            self->_cachedAvatarURL = nil;
                     }
                 }
             }
             if(!_cachedAvatarURL) {
-                NSString *n = _realname.lowercaseString;
+                NSString *n = self->_realname.lowercaseString;
                 if(n.length) {
                     NSArray *results = [[ColorFormatter email] matchesInString:n options:0 range:NSMakeRange(0, n.length)];
                     if(results.count == 1) {
                         NSString *email = [n substringWithRange:[results.firstObject range]];
-                        _cachedAvatarURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.gravatar.com/avatar/%@?size=%i&default=404", [ImageCache md5:email].lowercaseString, size]];
+                        self->_cachedAvatarURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.gravatar.com/avatar/%@?size=%i&default=404", [ImageCache md5:email].lowercaseString, size]];
                         isIRCCloudAvatar = NO;
                     }
                 }
             }
         }
-        if(_cachedAvatarURL && !_avatar.length && !isIRCCloudAvatar && ![[ServersDataSource sharedInstance] getServer:_cid].isSlack) {
+        if(self->_cachedAvatarURL && !_avatar.length && !isIRCCloudAvatar && ![[ServersDataSource sharedInstance] getServer:self->_cid].isSlack) {
             BOOL inlineMediaPref = NO;
-            Buffer *buffer = [[BuffersDataSource sharedInstance] getBuffer:_bid];
+            Buffer *buffer = [[BuffersDataSource sharedInstance] getBuffer:self->_bid];
             NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
             if(buffer && prefs) {
                 inlineMediaPref = [[prefs objectForKey:@"inlineimages"] boolValue];
@@ -296,11 +296,11 @@
                 }
             }
             if(!inlineMediaPref)
-                _cachedAvatarURL = nil;
+                self->_cachedAvatarURL = nil;
         }
     }
-    if(_cachedAvatarURL)
-        _cachedAvatarSize = size;
+    if(self->_cachedAvatarURL)
+        self->_cachedAvatarSize = size;
 #endif
     return _cachedAvatarURL;
 }
@@ -330,7 +330,7 @@
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
             
             @try {
-                _events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                self->_events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
@@ -339,21 +339,21 @@
                 [[ChannelsDataSource sharedInstance] clear];
                 [[UsersDataSource sharedInstance] clear];
             }
-            [_events removeAllObjects];
+            [self->_events removeAllObjects];
         }
 #endif
-        _dirtyBIDs = [[NSMutableDictionary alloc] init];
-        _lastEIDs = [[NSMutableDictionary alloc] init];
-        _events_sorted = [[NSMutableDictionary alloc] init];
-        if(_events) {
+        self->_dirtyBIDs = [[NSMutableDictionary alloc] init];
+        self->_lastEIDs = [[NSMutableDictionary alloc] init];
+        self->_events_sorted = [[NSMutableDictionary alloc] init];
+        if(self->_events) {
             for(NSNumber *bid in _events) {
-                NSMutableArray *events = [_events objectForKey:bid];
+                NSMutableArray *events = [self->_events objectForKey:bid];
                 NSMutableDictionary *events_sorted = [[NSMutableDictionary alloc] init];
                 for(Event *e in events) {
                     [events_sorted setObject:e forKey:@(e.eid)];
                     if(!e.pending) {
-                        if(![_lastEIDs objectForKey:@(e.bid)] || [[_lastEIDs objectForKey:@(e.bid)] doubleValue] < e.eid)
-                            [_lastEIDs setObject:@(e.eid) forKey:@(e.bid)];
+                        if(![self->_lastEIDs objectForKey:@(e.bid)] || [[self->_lastEIDs objectForKey:@(e.bid)] doubleValue] < e.eid)
+                            [self->_lastEIDs setObject:@(e.eid) forKey:@(e.bid)];
                     }
                 }
                 
@@ -371,12 +371,12 @@
                         [events_sorted removeObjectForKey:@(e.eid)];
                     }
                 }
-                [_events_sorted setObject:events_sorted forKey:bid];
-                [[_events objectForKey:bid] sortUsingSelector:@selector(compare:)];
+                [self->_events_sorted setObject:events_sorted forKey:bid];
+                [[self->_events objectForKey:bid] sortUsingSelector:@selector(compare:)];
             }
             [self clearPendingAndFailed];
         } else {
-            _events = [[NSMutableDictionary alloc] init];
+            self->_events = [[NSMutableDictionary alloc] init];
         }
         
         void (^error)(Event *event, IRCCloudJSONObject *object) = ^(Event *event, IRCCloudJSONObject *object) {
@@ -489,7 +489,7 @@
             event.monospace = YES;
         };
         
-        _formatterMap = @{@"too_fast":error, @"sasl_fail":error, @"sasl_too_long":error, @"sasl_aborted":error,
+        self->_formatterMap = @{@"too_fast":error, @"sasl_fail":error, @"sasl_too_long":error, @"sasl_aborted":error,
                           @"sasl_already":error, @"no_bots":error, @"msg_services":error, @"bad_ping":error, @"error":status,
                           @"not_for_halfops":error, @"ambiguous_error_message":error, @"list_syntax":error, @"who_syntax":error,
                           @"wait":status, @"stats": status, @"statslinkinfo": status, @"statscommands": status, @"statscline": status, @"statsnline": status, @"statsiline": status, @"statskline": status, @"statsqline": status, @"statsyline": status, @"statsbline": status, @"statsgline": status, @"statstline": status, @"statseline": status, @"statsvline": status, @"statslline": status, @"statsuptime": status, @"statsoline": status, @"statshline": status, @"statssline": status, @"statsuline": status, @"statsdebug": status, @"endofstats": status, @"spamfilter": status,
@@ -983,14 +983,14 @@
     
     NSMutableDictionary *events = [[NSMutableDictionary alloc] init];
     NSArray *bids;
-    @synchronized(_events) {
-        bids = _events.allKeys;
+    @synchronized(self->_events) {
+        bids = self->_events.allKeys;
     }
     
     for(NSNumber *bid in bids) {
         NSMutableArray *e;
-        @synchronized(_events) {
-            e = [[_events objectForKey:bid] mutableCopy];
+        @synchronized(self->_events) {
+            e = [[self->_events objectForKey:bid] mutableCopy];
         }
         [e sortUsingSelector:@selector(compare:)];
         if(e.count > 50) {
@@ -1016,32 +1016,32 @@
 }
 
 -(void)clear {
-    @synchronized(_events) {
-        [_events removeAllObjects];
-        [_events_sorted removeAllObjects];
+    @synchronized(self->_events) {
+        [self->_events removeAllObjects];
+        [self->_events_sorted removeAllObjects];
         CLS_LOG(@"EventsDataSource cleared");
     }
 }
 
 -(void)addEvent:(Event *)event {
 #ifndef EXTENSION
-    @synchronized(_events) {
-        NSMutableArray *events = [_events objectForKey:@(event.bid)];
+    @synchronized(self->_events) {
+        NSMutableArray *events = [self->_events objectForKey:@(event.bid)];
         if(!events) {
             events = [[NSMutableArray alloc] init];
-            [_events setObject:events forKey:@(event.bid)];
+            [self->_events setObject:events forKey:@(event.bid)];
         }
         [events addObject:event];
-        NSMutableDictionary *events_sorted = [_events_sorted objectForKey:@(event.bid)];
+        NSMutableDictionary *events_sorted = [self->_events_sorted objectForKey:@(event.bid)];
         if(!events_sorted) {
             events_sorted = [[NSMutableDictionary alloc] init];
-            [_events_sorted setObject:events_sorted forKey:@(event.bid)];
+            [self->_events_sorted setObject:events_sorted forKey:@(event.bid)];
         }
         [events_sorted setObject:event forKey:@(event.eid)];
-        if(!event.pending && (![_lastEIDs objectForKey:@(event.bid)] || [[_lastEIDs objectForKey:@(event.bid)] doubleValue] < event.eid)) {
-            [_lastEIDs setObject:@(event.eid) forKey:@(event.bid)];
+        if(!event.pending && (![self->_lastEIDs objectForKey:@(event.bid)] || [[self->_lastEIDs objectForKey:@(event.bid)] doubleValue] < event.eid)) {
+            [self->_lastEIDs setObject:@(event.eid) forKey:@(event.bid)];
         } else {
-            [_dirtyBIDs setObject:@YES forKey:@(event.bid)];
+            [self->_dirtyBIDs setObject:@YES forKey:@(event.bid)];
         }
 
     }
@@ -1127,7 +1127,7 @@
         event.from = event.fromNick = event.server;
     }
 
-    void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:object.type];
+    void (^formatter)(Event *event, IRCCloudJSONObject *object) = [self->_formatterMap objectForKey:object.type];
     if(formatter)
         formatter(event, object);
         
@@ -1146,15 +1146,15 @@
 }
 
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid {
-    return [[_events_sorted objectForKey:@(bid)] objectForKey:@(eid)];
+    return [[self->_events_sorted objectForKey:@(bid)] objectForKey:@(eid)];
 }
 
 -(void)removeEvent:(NSTimeInterval)eid buffer:(int)bid {
-    @synchronized(_events) {
-        for(Event *event in [_events objectForKey:@(bid)]) {
+    @synchronized(self->_events) {
+        for(Event *event in [self->_events objectForKey:@(bid)]) {
             if(event.eid == eid) {
-                [[_events objectForKey:@(bid)] removeObject:event];
-                [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(eid)];
+                [[self->_events objectForKey:@(bid)] removeObject:event];
+                [[self->_events_sorted objectForKey:@(bid)] removeObjectForKey:@(eid)];
                 break;
             }
         }
@@ -1162,51 +1162,51 @@
 }
 
 -(void)removeEventsForBuffer:(int)bid {
-    @synchronized(_events) {
-        [_events removeObjectForKey:@(bid)];
-        [_events_sorted removeObjectForKey:@(bid)];
+    @synchronized(self->_events) {
+        [self->_events removeObjectForKey:@(bid)];
+        [self->_events_sorted removeObjectForKey:@(bid)];
         CLS_LOG(@"Removing all events for bid%i", bid);
     }
 }
 
 -(void)pruneEventsForBuffer:(int)bid maxSize:(int)size {
-    @synchronized(_events) {
-        if([[_events objectForKey:@(bid)] count] > size) {
-            CLS_LOG(@"Pruning events for bid%i (%lu, max = %i)", bid, (unsigned long)[[_events objectForKey:@(bid)] count], size);
+    @synchronized(self->_events) {
+        if([[self->_events objectForKey:@(bid)] count] > size) {
+            CLS_LOG(@"Pruning events for bid%i (%lu, max = %i)", bid, (unsigned long)[[self->_events objectForKey:@(bid)] count], size);
             NSMutableArray *events = [self eventsForBuffer:bid].mutableCopy;
             while(events.count > size) {
                 Event *e = [events objectAtIndex:0];
                 [events removeObject:e];
-                [[_events objectForKey:@(bid)] removeObject:e];
-                [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
+                [[self->_events objectForKey:@(bid)] removeObject:e];
+                [[self->_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
             }
         }
     }
 }
 
 -(NSArray *)eventsForBuffer:(int)bid {
-    @synchronized(_events) {
-        if([_dirtyBIDs objectForKey:@(bid)]) {
+    @synchronized(self->_events) {
+        if([self->_dirtyBIDs objectForKey:@(bid)]) {
             CLS_LOG(@"Buffer bid%i needs sorting", bid);
-            [[_events objectForKey:@(bid)] sortUsingSelector:@selector(compare:)];
-            [_dirtyBIDs removeObjectForKey:@(bid)];
+            [[self->_events objectForKey:@(bid)] sortUsingSelector:@selector(compare:)];
+            [self->_dirtyBIDs removeObjectForKey:@(bid)];
         }
-        return [NSArray arrayWithArray:[_events objectForKey:@(bid)]];
+        return [NSArray arrayWithArray:[self->_events objectForKey:@(bid)]];
     }
 }
 
 -(NSUInteger)sizeOfBuffer:(int)bid {
-    return [[_events objectForKey:@(bid)] count];
+    return [[self->_events objectForKey:@(bid)] count];
 }
 
 -(NSTimeInterval)lastEidForBuffer:(int)bid {
-    return [[_lastEIDs objectForKey:@(bid)] doubleValue];
+    return [[self->_lastEIDs objectForKey:@(bid)] doubleValue];
 }
 
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid {
     CLS_LOG(@"Removing events for bid%i older than %.0f", bid, min_eid);
-    @synchronized(_events) {
-        NSArray *events = [_events objectForKey:@(bid)];
+    @synchronized(self->_events) {
+        NSArray *events = [self->_events objectForKey:@(bid)];
         NSMutableArray *eventsToRemove = [[NSMutableArray alloc] init];
         for(Event *event in events) {
             if(event.eid < min_eid) {
@@ -1214,20 +1214,20 @@
             }
         }
         for(Event *event in eventsToRemove) {
-            [[_events objectForKey:@(bid)] removeObject:event];
-            [[_events_sorted objectForKey:@(bid)] removeObjectForKey:@(event.eid)];
+            [[self->_events objectForKey:@(bid)] removeObject:event];
+            [[self->_events_sorted objectForKey:@(bid)] removeObjectForKey:@(event.eid)];
         }
     }
 }
 
 -(int)unreadStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
-    if(![_events objectForKey:@(bid)])
+    if(![self->_events objectForKey:@(bid)])
         return 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = s.ignore;
     NSArray *copy;
-    @synchronized(_events) {
+    @synchronized(self->_events) {
         copy = [self eventsForBuffer:bid];
     }
     for(Event *event in copy.reverseObjectEnumerator) {
@@ -1243,14 +1243,14 @@
 }
 
 -(int)highlightCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
-    if(![_events objectForKey:@(bid)])
+    if(![self->_events objectForKey:@(bid)])
         return 0;
     int count = 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = s.ignore;
     NSArray *copy;
-    @synchronized(_events) {
+    @synchronized(self->_events) {
         copy = [self eventsForBuffer:bid];
     }
     for(Event *event in copy.reverseObjectEnumerator) {
@@ -1266,13 +1266,13 @@
 }
 
 -(int)highlightStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
-    if(![_events objectForKey:@(bid)])
+    if(![self->_events objectForKey:@(bid)])
         return 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = s.ignore;
     NSArray *copy;
-    @synchronized(_events) {
+    @synchronized(self->_events) {
         copy = [self eventsForBuffer:bid];
     }
     for(Event *event in copy.reverseObjectEnumerator) {
@@ -1288,9 +1288,9 @@
 }
 
 -(void)clearFormattingCache {
-    @synchronized(_events) {
+    @synchronized(self->_events) {
         for(NSNumber *bid in _events) {
-            NSArray *events = [_events objectForKey:bid];
+            NSArray *events = [self->_events objectForKey:bid];
             for(Event *e in events) {
                 e.formatted = nil;
                 e.formattedNick = nil;
@@ -1307,9 +1307,9 @@
 
 
 -(void)clearHeightCache {
-    @synchronized(_events) {
+    @synchronized(self->_events) {
         for(NSNumber *bid in _events) {
-            NSArray *events = [_events objectForKey:bid];
+            NSArray *events = [self->_events objectForKey:bid];
             for(Event *e in events) {
                 e.height = 0;
             }
@@ -1317,9 +1317,9 @@
     }
 }
 -(void)reformat {
-    @synchronized(_events) {
+    @synchronized(self->_events) {
         for(NSNumber *bid in _events) {
-            NSArray *events = [_events objectForKey:bid];
+            NSArray *events = [self->_events objectForKey:bid];
             for(Event *e in events) {
                 e.color = [UIColor messageTextColor];
                 if(e.rowType == ROW_LASTSEENEID)
@@ -1334,7 +1334,7 @@
                 e.timestamp = nil;
                 e.height = 0;
                 e.isHeader = NO;
-                void (^formatter)(Event *event, IRCCloudJSONObject *object) = [_formatterMap objectForKey:e.type];
+                void (^formatter)(Event *event, IRCCloudJSONObject *object) = [self->_formatterMap objectForKey:e.type];
                 if(formatter)
                     formatter(e, nil);
                 
@@ -1350,18 +1350,18 @@
 }
 
 -(void)clearPendingAndFailed {
-    @synchronized(_events) {
+    @synchronized(self->_events) {
         NSMutableArray *eventsToRemove = [[NSMutableArray alloc] init];
         for(NSNumber *bid in _events) {
-            NSArray *events = [[_events objectForKey:bid] copy];
+            NSArray *events = [[self->_events objectForKey:bid] copy];
             for(Event *e in events) {
                 if((e.pending || e.rowType == ROW_FAILED) && e.reqId != -1)
                     [eventsToRemove addObject:e];
             }
         }
         for(Event *e in eventsToRemove) {
-            [[_events objectForKey:@(e.bid)] removeObject:e];
-            [[_events_sorted objectForKey:@(e.bid)] removeObjectForKey:@(e.eid)];
+            [[self->_events objectForKey:@(e.bid)] removeObject:e];
+            [[self->_events_sorted objectForKey:@(e.bid)] removeObjectForKey:@(e.eid)];
             if(e.expirationTimer && [e.expirationTimer isValid])
                 [e.expirationTimer invalidate];
             e.expirationTimer = nil;

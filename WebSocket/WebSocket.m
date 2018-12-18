@@ -1093,7 +1093,7 @@ WebSocketWaitingState waitingState;
 - (void)socketDidSecure:(GCDAsyncSocket*)aSocket;{
     [aSocket performBlock:^{
         if (self.config.isSecure) {
-            SSLContextRef ctx = socket.sslContext;
+            SSLContextRef ctx = self->socket.sslContext;
             if(ctx != NULL) {
                 SecTrustRef tm;
                 SSLCopyPeerTrust(ctx, &tm);

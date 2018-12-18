@@ -43,7 +43,7 @@ NSLayoutManager *__LinkTextViewLayoutManager;
     if(sender.state == UIGestureRecognizerStateEnded) {
         NSTextCheckingResult *r = [self linkAtPoint:[sender locationInView:self]];
         if(r && _linkDelegate) {
-            [_linkDelegate LinkTextView:self didSelectLinkWithTextCheckingResult:r];
+            [self->_linkDelegate LinkTextView:self didSelectLinkWithTextCheckingResult:r];
         } else {
             UIView *obj = self;
             
@@ -74,14 +74,14 @@ NSLayoutManager *__LinkTextViewLayoutManager;
 
 - (void)addLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
     if(!_links) {
-        _links = [[NSMutableArray alloc] init];
+        self->_links = [[NSMutableArray alloc] init];
     }
     if(!_tapGesture) {
-        _tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
-        _tapGesture.delegate = self;
-        [self addGestureRecognizer:_tapGesture];
+        self->_tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(viewTapped:)];
+        self->_tapGesture.delegate = self;
+        [self addGestureRecognizer:self->_tapGesture];
     }
-    [_links addObject:result];
+    [self->_links addObject:result];
     [self.textStorage addAttributes:self.linkAttributes range:result.range];
 }
 
@@ -97,12 +97,12 @@ NSLayoutManager *__LinkTextViewLayoutManager;
 }
 
 -(void)setText:(NSString *)text {
-    [_links removeAllObjects];
+    [self->_links removeAllObjects];
     [super setText:text];
 }
 
 -(void)setAttributedText:(NSAttributedString *)attributedText {
-    [_links removeAllObjects];
+    [self->_links removeAllObjects];
     [super setAttributedText:attributedText];
 }
 

@@ -32,7 +32,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _kbSize = CGSizeZero;
+    self->_kbSize = CGSizeZero;
 
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
     tap.delegate = self;
@@ -193,8 +193,8 @@
     hostHint.alpha = 1;
 #endif
     [self transitionToSize:self.view.bounds.size];
-    if(_accessLink && IRCCLOUD_HOST.length) {
-        _gotCredentialsFromPasswordManager = YES;
+    if(self->_accessLink && IRCCLOUD_HOST.length) {
+        self->_gotCredentialsFromPasswordManager = YES;
         [self _loginWithAccessLink];
 #ifndef ENTERPRISE
     } else {
@@ -212,11 +212,11 @@
             }
             
             if (CFArrayGetCount(credentials) > 0) {
-                _gotCredentialsFromPasswordManager = YES;
+                self->_gotCredentialsFromPasswordManager = YES;
                 NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
-                    [password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
+                    [self->username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
+                    [self->password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
                     [self loginHintPressed:nil];
                     [self loginButtonPressed:nil];
                 }];
@@ -226,8 +226,8 @@
 }
 
 -(void)_loginWithAccessLink {
-    if([_accessLink.scheme hasPrefix:@"irccloud"] && [_accessLink.host isEqualToString:@"chat"] && [_accessLink.path isEqualToString:@"/access-link"])
-                _accessLink = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/%@%@?%@&format=json", IRCCLOUD_HOST, _accessLink.host, _accessLink.path, _accessLink.query]];
+    if([self->_accessLink.scheme hasPrefix:@"irccloud"] && [self->_accessLink.host isEqualToString:@"chat"] && [self->_accessLink.path isEqualToString:@"/access-link"])
+                self->_accessLink = [NSURL URLWithString:[NSString stringWithFormat:@"https://%@/%@%@?%@&format=json", IRCCLOUD_HOST, _accessLink.host, _accessLink.path, _accessLink.query]];
 
     loginView.alpha = 0;
     loadingView.alpha = 1;
@@ -236,8 +236,8 @@
     [activity startAnimating];
     activity.hidden = NO;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [[NetworkConnection sharedInstance] login:_accessLink];
-        _accessLink = nil;
+        NSDictionary *result = [[NetworkConnection sharedInstance] login:self->_accessLink];
+        self->_accessLink = nil;
         if([[result objectForKey:@"success"] intValue] == 1) {
             if([result objectForKey:@"websocket_host"])
                 IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
@@ -256,11 +256,11 @@
             [d setObject:IRCCLOUD_HOST forKey:@"host"];
             [d setObject:IRCCLOUD_PATH forKey:@"path"];
             [d synchronize];
-            loginHint.alpha = 0;
-            signupHint.alpha = 0;
-            enterpriseHint.alpha = 0;
-            forgotPasswordLogin.alpha = 0;
-            forgotPasswordSignup.alpha = 0;
+            self->loginHint.alpha = 0;
+            self->signupHint.alpha = 0;
+            self->enterpriseHint.alpha = 0;
+            self->forgotPasswordLogin.alpha = 0;
+            self->forgotPasswordSignup.alpha = 0;
             [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
 #ifndef ENTERPRISE
             [Answers logLoginWithMethod:@"access-link" success:@YES customAttributes:nil];
@@ -268,8 +268,8 @@
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [UIView beginAnimations:nil context:nil];
-                loginView.alpha = 1;
-                loadingView.alpha = 0;
+                self->loginView.alpha = 1;
+                self->loadingView.alpha = 0;
                 [UIView commitAnimations];
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:@"Invalid access link" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
@@ -304,7 +304,7 @@
     if(name.alpha)
         offset = 1;
     
-    if(_authURL)
+    if(self->_authURL)
         offset = -2;
     
     if(name.alpha > 0)
@@ -325,7 +325,7 @@
     loginYOffset.constant = signupYOffset.constant = 16 + ((offset + 2) * 39) + 15;
     sendAccessLinkYOffset.constant = 16 + 81;
     
-    OnePassword.hidden = _authURL || (login.alpha != 1 && signup.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
+    OnePassword.hidden = self->_authURL || (login.alpha != 1 && signup.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
 }
 
 -(UIImageView *)logo {
@@ -333,7 +333,7 @@
 }
 
 -(void)transitionToSize:(CGSize)size {
-    if(_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+    if(self->_kbSize.height && [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         self.view.window.backgroundColor = [UIColor colorWithRed:68.0/255.0 green:128.0/255.0 blue:250.0/255.0 alpha:1];
         loadingViewYOffset.constant = loginViewYOffset.constant = logo.frame.origin.y + logo.frame.size.height + 16;
     } else {
@@ -363,7 +363,7 @@
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
-    _kbSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
+    self->_kbSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     [self transitionToSize:self.view.bounds.size];
     [self.view layoutIfNeeded];
     [UIView commitAnimations];
@@ -374,7 +374,7 @@
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
     [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
-    _kbSize = CGSizeZero;
+    self->_kbSize = CGSizeZero;
     [self transitionToSize:self.view.bounds.size];
     [self.view layoutIfNeeded];
     [UIView commitAnimations];
@@ -474,10 +474,10 @@
             if([[result objectForKey:@"success"] intValue] == 1) {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [UIView beginAnimations:nil context:nil];
-                    loginView.alpha = 1;
-                    loadingView.alpha = 0;
+                    self->loginView.alpha = 1;
+                    self->loadingView.alpha = 0;
                     [UIView commitAnimations];
-                    [activity stopAnimating];
+                    [self->activity stopAnimating];
                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Email Sent" message:@"We've sent you an access link.  Check your email and follow the instructions to sign in." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
                     [self loginHintPressed:nil];
@@ -487,10 +487,10 @@
         }
         dispatch_async(dispatch_get_main_queue(), ^{
             [UIView beginAnimations:nil context:nil];
-            loginView.alpha = 1;
-            loadingView.alpha = 0;
+            self->loginView.alpha = 1;
+            self->loadingView.alpha = 0;
             [UIView commitAnimations];
-            [activity stopAnimating];
+            [self->activity stopAnimating];
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Request Failed" message:@"Unable to request an access link.  Please try again later." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
             [alert show];
         });
@@ -498,9 +498,9 @@
 }
 
 -(IBAction)onePasswordButtonPressed:(id)sender {
-    _gotCredentialsFromPasswordManager = YES;
+    self->_gotCredentialsFromPasswordManager = YES;
     dispatch_async(dispatch_get_main_queue(), ^{
-        if(login.alpha) {
+        if(self->login.alpha) {
 #ifdef ENTERPRISE
             NSString *url = [NSString stringWithFormat:@"https://%@", host.text];
 #else
@@ -514,16 +514,16 @@
                     return;
                 }
                 
-                loginView.alpha = 0;
+                self->loginView.alpha = 0;
                 if([loginDict[AppExtensionUsernameKey] length])
-                    username.text = loginDict[AppExtensionUsernameKey];
-                password.text = loginDict[AppExtensionPasswordKey];
-                enterpriseHint.alpha = 0;
-                host.alpha = 0;
-                hostHint.alpha = 0;
-                next.alpha = 0;
-                enterpriseLearnMore.alpha = 0;
-                username.alpha = 1;
+                    self->username.text = loginDict[AppExtensionUsernameKey];
+                self->password.text = loginDict[AppExtensionPasswordKey];
+                self->enterpriseHint.alpha = 0;
+                self->host.alpha = 0;
+                self->hostHint.alpha = 0;
+                self->next.alpha = 0;
+                self->enterpriseLearnMore.alpha = 0;
+                self->username.alpha = 1;
                 [self loginHintPressed:nil];
                 [self loginButtonPressed:nil];
             }];
@@ -535,11 +535,11 @@
 #endif
             NSDictionary *newLoginDetails = @{
                                               AppExtensionTitleKey: @"IRCCloud",
-                                              AppExtensionUsernameKey: username.text ? : @"",
-                                              AppExtensionPasswordKey: password.text ? : @"",
+                                              AppExtensionUsernameKey: self->username.text ? : @"",
+                                              AppExtensionPasswordKey: self->password.text ? : @"",
                                               AppExtensionSectionTitleKey: @"IRCCloud",
                                               AppExtensionFieldsKey: @{
-                                                      @"Name" : name.text ? : @""
+                                                      @"Name" : self->name.text ? : @""
                                                       }
                                               };
             
@@ -552,17 +552,17 @@
                     return;
                 }
                 if([loginDict[AppExtensionReturnedFieldsKey][@"Name"] length])
-                    name.text = loginDict[AppExtensionReturnedFieldsKey][@"Name"];
+                    self->name.text = loginDict[AppExtensionReturnedFieldsKey][@"Name"];
                 if([loginDict[AppExtensionUsernameKey] length])
-                    username.text = loginDict[AppExtensionUsernameKey];
-                password.text = loginDict[AppExtensionPasswordKey] ? : @"";
+                    self->username.text = loginDict[AppExtensionUsernameKey];
+                self->password.text = loginDict[AppExtensionPasswordKey] ? : @"";
                 
-                enterpriseHint.alpha = 0;
-                host.alpha = 0;
-                hostHint.alpha = 0;
-                next.alpha = 0;
-                enterpriseLearnMore.alpha = 0;
-                username.alpha = 1;
+                self->enterpriseHint.alpha = 0;
+                self->host.alpha = 0;
+                self->hostHint.alpha = 0;
+                self->next.alpha = 0;
+                self->enterpriseLearnMore.alpha = 0;
+                self->username.alpha = 1;
                 [self signupHintPressed:nil];
             }];
         }
@@ -605,25 +605,25 @@
             [self _stripIRCCloudHost];
             if([[result objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    enterpriseHint.text = [[result objectForKey:@"enterprise"] objectForKey:@"fullname"];
+                    self->enterpriseHint.text = [[result objectForKey:@"enterprise"] objectForKey:@"fullname"];
                 });
             }
             if(![[result objectForKey:@"auth_mechanism"] isEqualToString:@"internal"])
-                signupHint.enabled = YES;
+                self->signupHint.enabled = YES;
             
             if([[result objectForKey:@"auth_mechanism"] isEqualToString:@"saml"]) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [login setTitle:[NSString stringWithFormat:@"Login with %@", [result objectForKey:@"saml_provider"]] forState:UIControlStateNormal];
-                    login.enabled = YES;
+                    [self->login setTitle:[NSString stringWithFormat:@"Login with %@", [result objectForKey:@"saml_provider"]] forState:UIControlStateNormal];
+                    self->login.enabled = YES;
                 });
-                _authURL = [NSString stringWithFormat:@"https://%@/saml/auth", IRCCLOUD_HOST];
-                signupHint.enabled = NO;
+                self->_authURL = [NSString stringWithFormat:@"https://%@/saml/auth", IRCCLOUD_HOST];
+                self->signupHint.enabled = NO;
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [login setTitle:@"Login" forState:UIControlStateNormal];
-                    login.enabled = NO;
+                    [self->login setTitle:@"Login" forState:UIControlStateNormal];
+                    self->login.enabled = NO;
                 });
-                _authURL = nil;
+                self->_authURL = nil;
             }
         } else {
             IRCCLOUD_HOST = nil;
@@ -634,31 +634,31 @@
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            if(_accessLink && IRCCLOUD_HOST.length) {
+            if(self->_accessLink && IRCCLOUD_HOST.length) {
                 [self _loginWithAccessLink];
             } else {
                 if(IRCCLOUD_HOST.length) {
-                    enterpriseHint.alpha = 0;
-                    host.alpha = 0;
-                    hostHint.alpha = 0;
-                    next.alpha = 0;
-                    enterpriseLearnMore.alpha = 0;
+                    self->enterpriseHint.alpha = 0;
+                    self->host.alpha = 0;
+                    self->hostHint.alpha = 0;
+                    self->next.alpha = 0;
+                    self->enterpriseLearnMore.alpha = 0;
                     
-                    if(!_authURL) {
-                        username.alpha = 1;
-                        password.alpha = 1;
-                        forgotPasswordHint.alpha = 1;
+                    if(!self->_authURL) {
+                        self->username.alpha = 1;
+                        self->password.alpha = 1;
+                        self->forgotPasswordHint.alpha = 1;
                     }
-                    if(signupHint.enabled)
-                        signupHint.alpha = 1;
+                    if(self->signupHint.enabled)
+                        self->signupHint.alpha = 1;
                     else
-                        enterpriseHint.alpha = 1;
-                    login.alpha = 1;
+                        self->enterpriseHint.alpha = 1;
+                    self->login.alpha = 1;
                     [self transitionToSize:self.view.bounds.size];
                 }
                 [UIView beginAnimations:nil context:nil];
-                loginView.alpha = 1;
-                loadingView.alpha = 0;
+                self->loginView.alpha = 1;
+                self->loadingView.alpha = 0;
                 [UIView commitAnimations];
             }
         });
@@ -675,8 +675,8 @@
 }
 
 -(IBAction)loginButtonPressed:(id)sender {
-    if(_authURL) {
-        SamlLoginViewController *c = [[SamlLoginViewController alloc] initWithURL:_authURL];
+    if(self->_authURL) {
+        SamlLoginViewController *c = [[SamlLoginViewController alloc] initWithURL:self->_authURL];
         c.navigationItem.title = login.titleLabel.text;
         [self presentViewController:[[UINavigationController alloc] initWithRootViewController:c] animated:YES completion:nil];
         return;
@@ -709,7 +709,7 @@
         result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
             if(nameAlpha)
-                result = [[NetworkConnection sharedInstance] signup:user password:pass realname:realname token:[result objectForKey:@"token"] impression:_impression?_impression:@""];
+                result = [[NetworkConnection sharedInstance] signup:user password:pass realname:realname token:[result objectForKey:@"token"] impression:self->_impression?self->_impression:@""];
             else
                 result = [[NetworkConnection sharedInstance] login:user password:pass token:[result objectForKey:@"token"]];
             if([[result objectForKey:@"success"] intValue] == 1) {
@@ -736,7 +736,7 @@
                 } else {
                     [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
                 }
-                if(!_gotCredentialsFromPasswordManager) {
+                if(!self->_gotCredentialsFromPasswordManager) {
                     SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
                         if (error != NULL) {
                             NSLog(@"Unable to save shared credentials: %@", error);
@@ -746,20 +746,20 @@
                 }
 #endif
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    loginHint.alpha = 0;
-                    signupHint.alpha = 0;
-                    enterpriseHint.alpha = 0;
-                    forgotPasswordLogin.alpha = 0;
-                    forgotPasswordSignup.alpha = 0;
+                    self->loginHint.alpha = 0;
+                    self->signupHint.alpha = 0;
+                    self->enterpriseHint.alpha = 0;
+                    self->forgotPasswordLogin.alpha = 0;
+                    self->forgotPasswordSignup.alpha = 0;
                     [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
                 });
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [UIView beginAnimations:nil context:nil];
-                    loginView.alpha = 1;
-                    loadingView.alpha = 0;
+                    self->loginView.alpha = 1;
+                    self->loadingView.alpha = 0;
                     [UIView commitAnimations];
-                    NSString *message = name.alpha?@"Invalid email address or password. Please try again.":@"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
+                    NSString *message = self->name.alpha?@"Invalid email address or password. Please try again.":@"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
                     if([[result objectForKey:@"message"] isEqualToString:@"auth"]
                        || [[result objectForKey:@"message"] isEqualToString:@"email"]
                        || [[result objectForKey:@"message"] isEqualToString:@"password"]
@@ -781,7 +781,7 @@
                         message = @"No signups allowed from TOR exit nodes";
                     if([[result objectForKey:@"message"] isEqualToString:@"signup_ip_blocked"])
                         message = @"Your IP address has been blacklisted.";
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:name.alpha?@"Sign Up Failed":@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:self->name.alpha?@"Sign Up Failed":@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
                 });
 #ifndef ENTERPRISE
@@ -795,8 +795,8 @@
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [UIView beginAnimations:nil context:nil];
-                loginView.alpha = 1;
-                loadingView.alpha = 0;
+                self->loginView.alpha = 1;
+                self->loadingView.alpha = 0;
                 [UIView commitAnimations];
                 NSString *message = @"Unable to communicate with the IRCCloud servers.  Please try again shortly.";
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];

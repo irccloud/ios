@@ -28,36 +28,36 @@
 }
 
 -(void)setNick:(NSString *)nick {
-    _nick = nick;
-    _lowercase_nick = self.display_name.lowercaseString;
+    self->_nick = nick;
+    self->_lowercase_nick = self.display_name.lowercaseString;
 }
 
 -(NSString *)lowercase_nick {
     if(!_lowercase_nick)
-        _lowercase_nick = _nick.lowercaseString;
+        self->_lowercase_nick = self->_nick.lowercaseString;
     return _lowercase_nick;
 }
 
 -(NSString *)display_name {
-    if([_display_name isKindOfClass:NSString.class] &&_display_name.length)
+    if([self->_display_name isKindOfClass:NSString.class] &&_display_name.length)
         return _display_name;
     else
         return _nick;
 }
 
 -(void)setDisplay_name:(NSString *)display_name {
-    _display_name = display_name;
-    _lowercase_nick = self.display_name.lowercaseString;
+    self->_display_name = display_name;
+    self->_lowercase_nick = self.display_name.lowercaseString;
 }
 
 -(NSComparisonResult)compare:(User *)aUser {
-    return [_lowercase_nick localizedStandardCompare:aUser.lowercase_nick];
+    return [self->_lowercase_nick localizedStandardCompare:aUser.lowercase_nick];
 }
 
 -(NSComparisonResult)compareByMentionTime:(User *)aUser {
-    if(_lastMention == aUser.lastMention)
-        return [_lowercase_nick localizedStandardCompare:aUser.lowercase_nick];
-    else if(_lastMention > aUser.lastMention)
+    if(self->_lastMention == aUser.lastMention)
+        return [self->_lowercase_nick localizedStandardCompare:aUser.lowercase_nick];
+    else if(self->_lastMention > aUser.lastMention)
         return NSOrderedAscending;
     else
         return NSOrderedDescending;
@@ -66,33 +66,33 @@
 -(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
     if(self) {
-        decodeInt(_cid);
-        decodeInt(_bid);
-        decodeObject(_nick);
-        decodeObject(_old_nick);
-        decodeObject(_hostmask);
-        decodeObject(_mode);
-        decodeInt(_away);
-        decodeObject(_away_msg);
-        decodeDouble(_lastMention);
-        decodeObject(_ircserver);
-        decodeObject(_display_name);
+        decodeInt(self->_cid);
+        decodeInt(self->_bid);
+        decodeObject(self->_nick);
+        decodeObject(self->_old_nick);
+        decodeObject(self->_hostmask);
+        decodeObject(self->_mode);
+        decodeInt(self->_away);
+        decodeObject(self->_away_msg);
+        decodeDouble(self->_lastMention);
+        decodeObject(self->_ircserver);
+        decodeObject(self->_display_name);
     }
     return self;
 }
 
 -(void)encodeWithCoder:(NSCoder *)aCoder {
-    encodeInt(_cid);
-    encodeInt(_bid);
-    encodeObject(_nick);
-    encodeObject(_old_nick);
-    encodeObject(_hostmask);
-    encodeObject(_mode);
-    encodeInt(_away);
-    encodeObject(_away_msg);
-    encodeDouble(_lastMention);
-    encodeObject(_ircserver);
-    encodeObject(_display_name);
+    encodeInt(self->_cid);
+    encodeInt(self->_bid);
+    encodeObject(self->_nick);
+    encodeObject(self->_old_nick);
+    encodeObject(self->_hostmask);
+    encodeObject(self->_mode);
+    encodeInt(self->_away);
+    encodeObject(self->_away_msg);
+    encodeDouble(self->_lastMention);
+    encodeObject(self->_ircserver);
+    encodeObject(self->_display_name);
 }
 
 -(NSString *)description {
@@ -123,7 +123,7 @@
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
             
             @try {
-                _users = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                self->_users = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
@@ -134,7 +134,7 @@
             }
         }
         if(!_users)
-            _users = [[NSMutableDictionary alloc] init];
+            self->_users = [[NSMutableDictionary alloc] init];
     }
     return self;
 }
@@ -143,9 +143,9 @@
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
     
     NSMutableDictionary *users = [[NSMutableDictionary alloc] init];
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         for(NSNumber *bid in _users) {
-            [users setObject:[[_users objectForKey:bid] mutableCopy] forKey:bid];
+            [users setObject:[[self->_users objectForKey:bid] mutableCopy] forKey:bid];
         }
     }
     
@@ -161,18 +161,18 @@
 }
 
 -(void)clear {
-    @synchronized(_users) {
-        [_users removeAllObjects];
+    @synchronized(self->_users) {
+        [self->_users removeAllObjects];
     }
 }
 
 -(void)addUser:(User *)user {
 #ifndef EXTENSION
-    @synchronized(_users) {
-        NSMutableDictionary *users = [_users objectForKey:@(user.bid)];
+    @synchronized(self->_users) {
+        NSMutableDictionary *users = [self->_users objectForKey:@(user.bid)];
         if(!users) {
             users = [[NSMutableDictionary alloc] init];
-            [_users setObject:users forKey:@(user.bid)];
+            [self->_users setObject:users forKey:@(user.bid)];
         }
         [users setObject:user forKey:user.lowercase_nick];
     }
@@ -180,19 +180,19 @@
 }
 
 -(NSArray *)usersForBuffer:(int)bid {
-    @synchronized(_users) {
-        return [[[_users objectForKey:@(bid)] allValues] sortedArrayUsingSelector:@selector(compare:)];
+    @synchronized(self->_users) {
+        return [[[self->_users objectForKey:@(bid)] allValues] sortedArrayUsingSelector:@selector(compare:)];
     }
 }
 
 -(User *)getUser:(NSString *)nick cid:(int)cid bid:(int)bid {
-    @synchronized(_users) {
-        return [[_users objectForKey:@(bid)] objectForKey:[nick lowercaseString]];
+    @synchronized(self->_users) {
+        return [[self->_users objectForKey:@(bid)] objectForKey:[nick lowercaseString]];
     }
 }
 
 -(User *)getUser:(NSString *)nick cid:(int)cid {
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         for(NSDictionary *buffer in _users.allValues) {
             User *u = [buffer objectForKey:[nick lowercaseString]];
             if(u && u.cid == cid)
@@ -203,7 +203,7 @@
 }
 
 -(NSString *)getDisplayName:(NSString *)nick cid:(int)cid {
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         for(NSDictionary *buffer in _users.allValues) {
             for(User *u in buffer.allValues) {
                 if(u && u.cid != cid)
@@ -217,38 +217,38 @@
 }
 
 -(void)removeUser:(NSString *)nick cid:(int)cid bid:(int)bid {
-    @synchronized(_users) {
-        [[_users objectForKey:@(bid)] removeObjectForKey:[nick lowercaseString]];
+    @synchronized(self->_users) {
+        [[self->_users objectForKey:@(bid)] removeObjectForKey:[nick lowercaseString]];
     }
 }
 
 -(void)removeUsersForBuffer:(int)bid {
-    @synchronized(_users) {
-        [_users removeObjectForKey:@(bid)];
+    @synchronized(self->_users) {
+        [self->_users removeObjectForKey:@(bid)];
     }
 }
 
 -(void)updateNick:(NSString *)nick oldNick:(NSString *)oldNick cid:(int)cid bid:(int)bid {
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         User *user = [self getUser:oldNick cid:cid bid:bid];
         if(user) {
             user.nick = nick;
             user.old_nick = oldNick;
-            [[_users objectForKey:@(bid)] removeObjectForKey:[oldNick lowercaseString]];
-            [[_users objectForKey:@(bid)] setObject:user forKey:[nick lowercaseString]];
+            [[self->_users objectForKey:@(bid)] removeObjectForKey:[oldNick lowercaseString]];
+            [[self->_users objectForKey:@(bid)] setObject:user forKey:[nick lowercaseString]];
         }
     }
 }
 
 -(void)updateDisplayName:(NSString *)displayName nick:(NSString *)nick cid:(int)cid {
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         for(NSDictionary *d in _users.allValues) {
             for(User *u in d.allValues) {
                 if(u.cid == cid && [u.nick isEqualToString:nick]) {
-                    [[_users objectForKey:@(u.bid)] removeObjectForKey:u.lowercase_nick];
+                    [[self->_users objectForKey:@(u.bid)] removeObjectForKey:u.lowercase_nick];
                     if([displayName isKindOfClass:NSString.class]) {
                         u.display_name = displayName;
-                        [[_users objectForKey:@(u.bid)] setObject:u forKey:u.lowercase_nick];
+                        [[self->_users objectForKey:@(u.bid)] setObject:u forKey:u.lowercase_nick];
                     }
                     break;
                 }
@@ -258,7 +258,7 @@
 }
 
 -(void)updateAway:(int)away msg:(NSString *)msg nick:(NSString *)nick cid:(int)cid {
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         for(NSDictionary *buffer in _users.allValues) {
             User *user = [buffer objectForKey:[nick lowercaseString]];
             if(user && user.cid == cid) {
@@ -270,7 +270,7 @@
 }
 
 -(void)updateAway:(int)away nick:(NSString *)nick cid:(int)cid {
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         for(NSDictionary *buffer in _users.allValues) {
             User *user = [buffer objectForKey:[nick lowercaseString]];
             if(user && user.cid == cid) {
@@ -281,7 +281,7 @@
 }
 
 -(void)updateHostmask:(NSString *)hostmask nick:(NSString *)nick cid:(int)cid bid:(int)bid {
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         User *user = [self getUser:nick cid:cid bid:bid];
         if(user)
             user.hostmask = hostmask;
@@ -289,7 +289,7 @@
 }
 
 -(void)updateMode:(NSString *)mode nick:(NSString *)nick cid:(int)cid bid:(int)bid {
-    @synchronized(_users) {
+    @synchronized(self->_users) {
         User *user = [self getUser:nick cid:cid bid:bid];
         if(user)
             user.mode = mode;

@@ -156,7 +156,7 @@
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"useChrome"];
     }
     
-    _conn = [NetworkConnection sharedInstance];
+    self->_conn = [NetworkConnection sharedInstance];
 #ifdef DEBUG
     if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:[[NSBundle mainBundle] bundleIdentifier]];
@@ -535,15 +535,15 @@
     
 - (void)launchURL:(NSURL *)url {
     if (!_urlHandler) {
-        _urlHandler = [[URLHandler alloc] init];
+        self->_urlHandler = [[URLHandler alloc] init];
 #ifdef ENTERPRISE
-        _urlHandler.appCallbackURL = [NSURL URLWithString:@"irccloud-enterprise://"];
+        self->_urlHandler.appCallbackURL = [NSURL URLWithString:@"irccloud-enterprise://"];
 #else
-        _urlHandler.appCallbackURL = [NSURL URLWithString:@"irccloud://"];
+        self->_urlHandler.appCallbackURL = [NSURL URLWithString:@"irccloud://"];
 #endif
         
     }
-    [_urlHandler launchURL:url];
+    [self->_urlHandler launchURL:url];
 }
 
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
@@ -551,13 +551,13 @@
     if(oldToken && ![devToken isEqualToData:oldToken]) {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             CLS_LOG(@"Unregistering old APNs token");
-            NSDictionary *result = [_conn unregisterAPNs:oldToken session:_conn.session];
+            NSDictionary *result = [self->_conn unregisterAPNs:oldToken session:self->_conn.session];
             NSLog(@"Unregistration result: %@", result);
         });
     }
     [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [_conn registerAPNs:devToken];
+        NSDictionary *result = [self->_conn registerAPNs:devToken];
         NSLog(@"Registration result: %@", result);
     });
 }
@@ -573,8 +573,8 @@
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
     if([userInfo objectForKey:@"view_logs"]) {
         LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        lvc.buffer = _mainViewController.buffer;
-        lvc.server = [[ServersDataSource sharedInstance] getServer:_mainViewController.buffer.cid];
+        lvc.buffer = self->_mainViewController.buffer;
+        lvc.server = [[ServersDataSource sharedInstance] getServer:self->_mainViewController.buffer.cid];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -582,7 +582,7 @@
         else
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self showMainView:YES];
-        [_mainViewController presentViewController:nc animated:YES completion:nil];
+        [self->_mainViewController presentViewController:nc animated:YES completion:nil];
     } else {
         if([userInfo objectForKey:@"d"]) {
             self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
@@ -602,11 +602,11 @@
         int bid = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         NSTimeInterval eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         
-        if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
+        if(application.applicationState == UIApplicationStateBackground && (!_conn || (self->_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
             [[NotificationsDataSource sharedInstance] notify:nil category:nil cid:cid bid:bid eid:eid];
         }
         
-        if(_movedToBackground && application.applicationState == UIApplicationStateInactive) {
+        if(self->_movedToBackground && application.applicationState == UIApplicationStateInactive) {
             self.mainViewController.bidToOpen = bid;
             self.mainViewController.eidToOpen = eid;
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
@@ -614,7 +614,7 @@
             [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:bid];
             [self showMainView:YES];
-        } else if(application.applicationState == UIApplicationStateBackground && (!_conn || (_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
+        } else if(application.applicationState == UIApplicationStateBackground && (!_conn || (self->_conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting))) {
             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
                 CLS_LOG(@"Preloading backlog for bid%i from notification", bid);
                 [[NetworkConnection sharedInstance] requestBacklogForBuffer:bid server:cid completion:^(BOOL success) {
@@ -661,12 +661,12 @@
         int bid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         NSTimeInterval eid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
-        if(_mainViewController.buffer.bid != bid && eid > b.last_seen_eid) {
+        if(self->_mainViewController.buffer.bid != bid && eid > b.last_seen_eid) {
             completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
             return;
         }
     } else if([notification.request.content.userInfo objectForKey:@"view_logs"]) {
-        if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && [_mainViewController.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)_mainViewController.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
+        if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && [self->_mainViewController.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)_mainViewController.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
             completionHandler(UNNotificationPresentationOptionNone);
         else
             completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
@@ -837,11 +837,11 @@
         }
     }
 #endif
-    _conn = [NetworkConnection sharedInstance];
-    _movedToBackground = YES;
-    _conn.failCount = 0;
-    _conn.reconnectTimestamp = 0;
-    [_conn cancelIdleTimer];
+    self->_conn = [NetworkConnection sharedInstance];
+    self->_movedToBackground = YES;
+    self->_conn.failCount = 0;
+    self->_conn.reconnectTimestamp = 0;
+    [self->_conn cancelIdleTimer];
     if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
         ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
         [evc.topViewController viewWillDisappear:NO];
@@ -850,26 +850,26 @@
     }
     
     __block UIBackgroundTaskIdentifier background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
-        if(background_task == _background_task) {
+        if(background_task == self->_background_task) {
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
                 CLS_LOG(@"Background task expired, disconnecting websocket");
-                [_conn performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
-                [_conn serialize];
+                [self->_conn performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
+                [self->_conn serialize];
                 [NetworkConnection sync];
             }
-            _background_task = UIBackgroundTaskInvalid;
+            self->_background_task = UIBackgroundTaskInvalid;
         }
     }];
-    _background_task = background_task;
+    self->_background_task = background_task;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
             if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
-        [_conn serialize];
+        [self->_conn serialize];
         [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 60];
-        if(background_task == _background_task) {
-            _background_task = UIBackgroundTaskInvalid;
+        if(background_task == self->_background_task) {
+            self->_background_task = UIBackgroundTaskInvalid;
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
                 CLS_LOG(@"Background task timed out, disconnecting websocket");
                 [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
@@ -879,7 +879,7 @@
             [application endBackgroundTask: background_task];
         }
     });
-    if(self.window.rootViewController != _slideViewController && [ServersDataSource sharedInstance].count) {
+    if(self.window.rootViewController != self->_slideViewController && [ServersDataSource sharedInstance].count) {
         [self showMainView:NO];
         self.window.backgroundColor = [UIColor blackColor];
     }
@@ -889,47 +889,47 @@
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-    _conn = [NetworkConnection sharedInstance];
+    self->_conn = [NetworkConnection sharedInstance];
     CLS_LOG(@"App became active, state: %i notifier: %i movedToBackground: %i", _conn.state, _conn.notifier, _movedToBackground);
     
-    if(_backlogCompletedObserver) {
+    if(self->_backlogCompletedObserver) {
         CLS_LOG(@"Backlog completed observer was registered, removing");
-        [[NSNotificationCenter defaultCenter] removeObserver:_backlogCompletedObserver];
-        _backlogCompletedObserver = nil;
+        [[NSNotificationCenter defaultCenter] removeObserver:self->_backlogCompletedObserver];
+        self->_backlogCompletedObserver = nil;
     }
-    if(_backlogFailedObserver) {
+    if(self->_backlogFailedObserver) {
         CLS_LOG(@"Backlog failed observer was registered, removing");
-        [[NSNotificationCenter defaultCenter] removeObserver:_backlogFailedObserver];
-        _backlogFailedObserver = nil;
+        [[NSNotificationCenter defaultCenter] removeObserver:self->_backlogFailedObserver];
+        self->_backlogFailedObserver = nil;
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-    if(_conn.reconnectTimestamp == 0)
-        _conn.reconnectTimestamp = -1;
-    _conn.failCount = 0;
-    _conn.reachabilityValid = NO;
-    if(_conn.session.length && _conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting)
-        [_conn connect:NO];
-    else if(_conn.notifier)
-        _conn.notifier = NO;
+    if(self->_conn.reconnectTimestamp == 0)
+        self->_conn.reconnectTimestamp = -1;
+    self->_conn.failCount = 0;
+    self->_conn.reachabilityValid = NO;
+    if(self->_conn.session.length && _conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting)
+        [self->_conn connect:NO];
+    else if(self->_conn.notifier)
+        self->_conn.notifier = NO;
     
-    if(_movedToBackground) {
-        _movedToBackground = NO;
+    if(self->_movedToBackground) {
+        self->_movedToBackground = NO;
         if([ColorFormatter shouldClearFontCache]) {
             [ColorFormatter clearFontCache];
             [[EventsDataSource sharedInstance] clearFormattingCache];
             [[AvatarsDataSource sharedInstance] clear];
             [ColorFormatter loadFonts];
         }
-        _conn.reconnectTimestamp = -1;
+        self->_conn.reconnectTimestamp = -1;
         if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
             ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
             [evc.topViewController viewWillAppear:NO];
         } else {
             [self.window.rootViewController viewWillAppear:NO];
         }
-        if(_background_task != UIBackgroundTaskInvalid) {
-            [application endBackgroundTask:_background_task];
-            _background_task = UIBackgroundTaskInvalid;
+        if(self->_background_task != UIBackgroundTaskInvalid) {
+            [application endBackgroundTask:self->_background_task];
+            self->_background_task = UIBackgroundTaskInvalid;
         }
     }
     
@@ -942,8 +942,8 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
     CLS_LOG(@"Application terminating, disconnecting websocket");
-    [_conn disconnect];
-    [_conn serialize];
+    [self->_conn disconnect];
+    [self->_conn serialize];
 }
 
 - (void)application:(UIApplication *)application handleEventsForBackgroundURLSession:(NSString *)identifier completionHandler:(void (^)(void))completionHandler {
@@ -961,7 +961,7 @@
     if([identifier hasPrefix:@"com.irccloud.logs."]) {
         LogExportsTableViewController *lvc;
         
-        if([_mainViewController.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)_mainViewController.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
+        if([self->_mainViewController.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)_mainViewController.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
             lvc = (LogExportsTableViewController *)(((UINavigationController *)_mainViewController.presentedViewController).topViewController);
         else
             lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
@@ -978,7 +978,7 @@
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
-    _conn = [NetworkConnection sharedInstance];
+    self->_conn = [NetworkConnection sharedInstance];
     NSData *response = [NSData dataWithContentsOfURL:location];
     if(session.configuration.identifier) {
 #ifdef ENTERPRISE
@@ -1018,7 +1018,7 @@
                 } else {
                     CLS_LOG(@"IRCCloud upload failed");
                     [self.mainViewController fileUploadDidFail:[o objectForKey:@"message"]];
-                    [[NSNotificationCenter defaultCenter] removeObserver:_IRCEventObserver];
+                    [[NSNotificationCenter defaultCenter] removeObserver:self->_IRCEventObserver];
                     UILocalNotification *alert = [[UILocalNotification alloc] init];
                     alert.fireDate = [NSDate date];
                     if([[o objectForKey:@"message"] isEqualToString:@"upload_limit_reached"]) {

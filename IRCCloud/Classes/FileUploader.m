@@ -25,13 +25,13 @@
 @implementation FileUploader
 
 -(void)setFilename:(NSString *)filename message:(NSString *)message {
-    _filename = filename;
-    _msg = message;
-    _filenameSet = YES;
-    if(_finished && _id.length) {
-        [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename originalFilename:_originalFilename avatar:_avatar orgId:_orgId]];
+    self->_filename = filename;
+    self->_msg = message;
+    self->_filenameSet = YES;
+    if(self->_finished && _id.length) {
+        [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename originalFilename:self->_originalFilename avatar:self->_avatar orgId:self->_orgId]];
     } else {
-        if(_backgroundID)
+        if(self->_backgroundID)
             [self _updateBackgroundUploadMetadata];
     }
 }
@@ -41,36 +41,36 @@
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     CLS_LOG(@"File upload cancelled");
-    _cancelled = YES;
-    _bid = -1;
-    _msg = _filename = _originalFilename = _mimeType = nil;
-    [_connection cancel];
-    if(_delegate)
-        [_delegate fileUploadWasCancelled];
+    self->_cancelled = YES;
+    self->_bid = -1;
+    self->_msg = self->_filename = self->_originalFilename = self->_mimeType = nil;
+    [self->_connection cancel];
+    if(self->_delegate)
+        [self->_delegate fileUploadWasCancelled];
 }
 
 - (void)handleResult:(NSDictionary *)result {
     if([[result objectForKey:@"success"] intValue] == 1 && [[result objectForKey:@"file"] objectForKey:@"url"]) {
         CLS_LOG(@"Finalize success: %@", result);
-        if(_avatar) {
-            [_delegate fileUploadDidFinish];
+        if(self->_avatar) {
+            [self->_delegate fileUploadDidFinish];
         } else {
-            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:_bid];
+            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:self->_bid];
             if(b) {
-                if(_msg.length) {
-                    if(![_msg hasSuffix:@" "])
-                        _msg = [_msg stringByAppendingString:@" "];
+                if(self->_msg.length) {
+                    if(![self->_msg hasSuffix:@" "])
+                        self->_msg = [self->_msg stringByAppendingString:@" "];
                 } else {
-                    _msg = @"";
+                    self->_msg = @"";
                 }
-                _msg = [_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
-                [[NetworkConnection sharedInstance] POSTsay:_msg to:b.name cid:b.cid];
-                [_delegate fileUploadDidFinish];
+                self->_msg = [self->_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
+                [[NetworkConnection sharedInstance] POSTsay:self->_msg to:b.name cid:b.cid];
+                [self->_delegate fileUploadDidFinish];
             }
         }
     } else {
         CLS_LOG(@"Finalize failed: %@", result);
-        [_delegate fileUploadDidFail:[result objectForKey:@"message"]];
+        [self->_delegate fileUploadDidFail:[result objectForKey:@"message"]];
     }
 }
 
@@ -100,7 +100,7 @@
     }
 
     if(!_originalFilename)
-        _originalFilename = [[videoURL lastPathComponent] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@".%@", [videoURL pathExtension]] withString:@".mp4"];
+        self->_originalFilename = [[videoURL lastPathComponent] stringByReplacingOccurrencesOfString:[NSString stringWithFormat:@".%@", [videoURL pathExtension]] withString:@".mp4"];
 
     // Insert the tracks in the composition's tracks
     AVAssetTrack *assetVideoTrack = [assetVideoTracks firstObject];
@@ -134,11 +134,11 @@
                 break;
             case AVAssetExportSessionStatusFailed:
                 NSLog(@"Export failed: %@", [[exportSession error] localizedDescription]);
-                [_delegate fileUploadDidFail:[[exportSession error] localizedDescription]];
+                [self->_delegate fileUploadDidFail:[[exportSession error] localizedDescription]];
                 break;
             case AVAssetExportSessionStatusCancelled:
                 NSLog(@"Export canceled");
-                [_delegate fileUploadDidFail:@"Export cancelled"];
+                [self->_delegate fileUploadDidFail:@"Export cancelled"];
                 break;
             default:
                 break;
@@ -162,14 +162,14 @@
         if(!_mimeType) {
             CFStringRef extension = (__bridge CFStringRef)[file pathExtension];
             CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extension, NULL);
-            _mimeType = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType));
+            self->_mimeType = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType));
             if(!_mimeType)
-                _mimeType = @"application/octet-stream";
+                self->_mimeType = @"application/octet-stream";
             CFRelease(UTI);
         }
         
         if(!_originalFilename)
-            _originalFilename = wrapper.filename;
+            self->_originalFilename = wrapper.filename;
     
         [self performSelectorInBackground:@selector(_upload:) withObject:wrapper.regularFileContents];
     } else {
@@ -178,12 +178,12 @@
         CLS_LOG(@"Creating %@", tempFile);
         
         [SSZipArchive createZipFileAtPath:tempFile withContentsOfDirectory:file.path keepParentDirectory:YES];
-        _mimeType = @"application/zip";
+        self->_mimeType = @"application/zip";
 
         if(!_originalFilename)
-            _originalFilename = wrapper.filename;
+            self->_originalFilename = wrapper.filename;
         
-        _originalFilename = [_originalFilename stringByAppendingString:@".zip"];
+        self->_originalFilename = [self->_originalFilename stringByAppendingString:@".zip"];
         NSData *data = [NSData dataWithContentsOfFile:tempFile];
         [self performSelectorInBackground:@selector(_upload:) withObject:data];
         
@@ -193,23 +193,23 @@
 
 -(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data {
     CLS_LOG(@"Uploading data with filename: %@", filename);
-    _originalFilename = filename;
-    _mimeType = UTI;
+    self->_originalFilename = filename;
+    self->_mimeType = UTI;
     [self performSelectorInBackground:@selector(_upload:) withObject:data];
 }
 
 
 -(void)uploadImage:(UIImage *)img {
     CLS_LOG(@"Uploading UIImage");
-    _mimeType = @"image/jpeg";
-    if(_originalFilename) {
-        if([_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location != NSNotFound) {
-            _originalFilename = [NSString stringWithFormat:@"%@.JPG", [_originalFilename substringToIndex:[_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location]];
+    self->_mimeType = @"image/jpeg";
+    if(self->_originalFilename) {
+        if([self->_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location != NSNotFound) {
+            self->_originalFilename = [NSString stringWithFormat:@"%@.JPG", [self->_originalFilename substringToIndex:[self->_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location]];
         } else {
-            _originalFilename = [_originalFilename stringByAppendingString:@".JPG"];
+            self->_originalFilename = [self->_originalFilename stringByAppendingString:@".JPG"];
         }
     } else {
-        _originalFilename = [NSString stringWithFormat:@"%li.JPG", time(NULL)];
+        self->_originalFilename = [NSString stringWithFormat:@"%li.JPG", time(NULL)];
     }
     [self performSelectorInBackground:@selector(_uploadImage:) withObject:img];
 }
@@ -366,25 +366,25 @@
     if(file.length > 15000000) {
         CLS_LOG(@"File exceeds 15M");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [_delegate fileUploadTooLarge];
+            [self->_delegate fileUploadTooLarge];
         }];
         return;
     }
-    if(_delegate)
-        [_delegate fileUploadProgress:0.0f];
+    if(self->_delegate)
+        [self->_delegate fileUploadProgress:0.0f];
     if(!_originalFilename)
-        _originalFilename = [NSString stringWithFormat:@"%li", time(NULL)];
-    _boundary = [self boundaryString];
-    _response = [[NSMutableData alloc] init];
-    _body = [[NSMutableData alloc] init];
+        self->_originalFilename = [NSString stringWithFormat:@"%li", time(NULL)];
+    self->_boundary = [self boundaryString];
+    self->_response = [[NSMutableData alloc] init];
+    self->_body = [[NSMutableData alloc] init];
     
-    [_body appendData:[[NSString stringWithFormat:@"--%@\r\n", _boundary] dataUsingEncoding:NSUTF8StringEncoding]];
-    [_body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"file\"; filename=\"%@\"\r\n", _originalFilename] dataUsingEncoding:NSUTF8StringEncoding]];
-    [_body appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n", _mimeType] dataUsingEncoding:NSUTF8StringEncoding]];
-    [_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-    [_body appendData:file];
-    [_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
-    [_body appendData:[[NSString stringWithFormat:@"--%@--\r\n", _boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self->_body appendData:[[NSString stringWithFormat:@"--%@\r\n", _boundary] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self->_body appendData:[[NSString stringWithFormat:@"Content-Disposition: form-data; name=\"file\"; filename=\"%@\"\r\n", _originalFilename] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self->_body appendData:[[NSString stringWithFormat:@"Content-Type: %@\r\n", _mimeType] dataUsingEncoding:NSUTF8StringEncoding]];
+    [self->_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    [self->_body appendData:file];
+    [self->_body appendData:[@"\r\n" dataUsingEncoding:NSUTF8StringEncoding]];
+    [self->_body appendData:[[NSString stringWithFormat:@"--%@--\r\n", _boundary] dataUsingEncoding:NSUTF8StringEncoding]];
 
     CLS_LOG(@"Uploading %@ with boundary %@ (%lu bytes)", _originalFilename, _boundary, (unsigned long)_body.length);
     
@@ -397,10 +397,10 @@
     [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
     [request setValue:[NetworkConnection sharedInstance].session forHTTPHeaderField:@"x-irccloud-session"];
     [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:_body];
+    [request setHTTPBody:self->_body];
     
-    if(_metadatadelegate)
-        [_metadatadelegate fileUploadWillUpload:file.length mimeType:_mimeType];
+    if(self->_metadatadelegate)
+        [self->_metadatadelegate fileUploadWillUpload:file.length mimeType:self->_mimeType];
 
 #ifndef APPSTORE
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"]) {
@@ -421,7 +421,7 @@
         NSURLSessionTask *task = [session downloadTaskWithRequest:request];
         
         if(session.configuration.identifier) {
-            _backgroundID = session.configuration.identifier;
+            self->_backgroundID = session.configuration.identifier;
             [self _updateBackgroundUploadMetadata];
         }
 
@@ -429,8 +429,8 @@
 #ifndef APPSTORE
     } else {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            _connection = [NSURLConnection connectionWithRequest:request delegate:self];
-            [_connection start];
+            self->_connection = [NSURLConnection connectionWithRequest:request delegate:self];
+            [self->_connection start];
         }];
     }
 #endif
@@ -447,7 +447,7 @@
     if(!tasks)
         tasks = [[NSMutableDictionary alloc] init];
     
-    [tasks setObject:@{@"service":@"irccloud", @"bid":@(_bid), @"original_filename":_originalFilename?_originalFilename:@"", @"msg":_msg?_msg:@"", @"filename":_filename?_filename:@"", @"avatar":@(_avatar), @"orgId":@(_orgId)} forKey:_backgroundID];
+    [tasks setObject:@{@"service":@"irccloud", @"bid":@(self->_bid), @"original_filename":self->_originalFilename?_originalFilename:@"", @"msg":self->_msg?_msg:@"", @"filename":self->_filename?_filename:@"", @"avatar":@(self->_avatar), @"orgId":@(self->_orgId)} forKey:self->_backgroundID];
     
     [d setObject:tasks forKey:@"uploadtasks"];
     
@@ -461,12 +461,12 @@
 }
 
 -(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
-    if(_delegate && !_cancelled)
-        [_delegate fileUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
+    if(self->_delegate && !_cancelled)
+        [self->_delegate fileUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
 }
 
 -(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [_response appendData:data];
+    [self->_response appendData:data];
 }
 
 -(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
@@ -474,38 +474,38 @@
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
     CLS_LOG(@"Error: %@", error);
-    [_delegate fileUploadDidFail:error.localizedDescription];
+    [self->_delegate fileUploadDidFail:error.localizedDescription];
 }
 
 -(void)connectionDidFinishLoading:(NSURLConnection *)connection {
 #ifndef EXTENSION
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
-    if(_cancelled) {
+    if(self->_cancelled) {
         CLS_LOG(@"Upload finished but it was cancelled");
         return;
     }
-    NSDictionary *d = [NSJSONSerialization JSONObjectWithData:_response options:kNilOptions error:nil];
+    NSDictionary *d = [NSJSONSerialization JSONObjectWithData:self->_response options:kNilOptions error:nil];
     if(d) {
         CLS_LOG(@"Upload finished: %@", d);
         if([[d objectForKey:@"success"] intValue] == 1) {
-            _id = [d objectForKey:@"id"];
-            _finished = YES;
-            if(_filenameSet || _avatar) {
-                [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:_id filename:_filename?_filename:@"" originalFilename:_originalFilename?_originalFilename:@"" avatar:_avatar orgId:_orgId]];
+            self->_id = [d objectForKey:@"id"];
+            self->_finished = YES;
+            if(self->_filenameSet || _avatar) {
+                [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename?_filename:@"" originalFilename:self->_originalFilename?_originalFilename:@"" avatar:self->_avatar orgId:self->_orgId]];
             }
         } else {
-            [_delegate fileUploadDidFail:[d objectForKey:@"message"]];
+            [self->_delegate fileUploadDidFail:[d objectForKey:@"message"]];
         }
     } else {
-        CLS_LOG(@"UPLOAD: Invalid JSON response: %@", [[NSString alloc] initWithData:_response encoding:NSUTF8StringEncoding]);
-        [_delegate fileUploadDidFail:nil];
+        CLS_LOG(@"UPLOAD: Invalid JSON response: %@", [[NSString alloc] initWithData:self->_response encoding:NSUTF8StringEncoding]);
+        [self->_delegate fileUploadDidFail:nil];
     }
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend {
     CLS_LOG(@"Sent body data: %lli / %lli", totalBytesSent, totalBytesExpectedToSend);
-    [self connection:_connection didSendBodyData:(NSInteger)bytesSent totalBytesWritten:(NSInteger)totalBytesSent totalBytesExpectedToWrite:(NSInteger)_body.length];
+    [self connection:self->_connection didSendBodyData:(NSInteger)bytesSent totalBytesWritten:(NSInteger)totalBytesSent totalBytesExpectedToWrite:(NSInteger)_body.length];
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
@@ -514,10 +514,10 @@
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
-    _response = [NSData dataWithContentsOfURL:location].mutableCopy;
+    self->_response = [NSData dataWithContentsOfURL:location].mutableCopy;
     CLS_LOG(@"Did finish downloading to URL: %@", location);
     [[NSFileManager defaultManager] removeItemAtURL:location error:nil];
-    [self connectionDidFinishLoading:_connection];
+    [self connectionDidFinishLoading:self->_connection];
     NSUserDefaults *d;
 #ifdef ENTERPRISE
     d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
@@ -555,11 +555,11 @@
                 [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
                 [request setValue:[NetworkConnection sharedInstance].session forHTTPHeaderField:@"x-irccloud-session"];
                 [request setHTTPMethod:@"POST"];
-                [request setHTTPBody:_body];
+                [request setHTTPBody:self->_body];
                 
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    _connection = [NSURLConnection connectionWithRequest:request delegate:self];
-                    [_connection start];
+                    self->_connection = [NSURLConnection connectionWithRequest:request delegate:self];
+                    [self->_connection start];
                     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
                 }];
                 return;
@@ -569,7 +569,7 @@
         CLS_LOG(@"Upload error: %@", error);
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [_delegate fileUploadDidFail:error.localizedDescription];
+            [self->_delegate fileUploadDidFail:error.localizedDescription];
         }];
     }
     [session finishTasksAndInvalidate];

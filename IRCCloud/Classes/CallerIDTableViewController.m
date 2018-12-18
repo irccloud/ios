@@ -25,13 +25,13 @@
 -(id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        _addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
-        _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-        _placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        _placeholder.numberOfLines = 0;
-        _placeholder.text = @"No accepted nicks.\n\nYou can accept someone by tapping their message request or by using `/accept`.\n";
-        _placeholder.attributedText = [ColorFormatter format:[_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
-        _placeholder.textAlignment = NSTextAlignmentCenter;
+        self->_addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
+        self->_placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
+        self->_placeholder.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        self->_placeholder.numberOfLines = 0;
+        self->_placeholder.text = @"No accepted nicks.\n\nYou can accept someone by tapping their message request or by using `/accept`.\n";
+        self->_placeholder.attributedText = [ColorFormatter format:[self->_placeholder.text insertCodeSpans] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
+        self->_placeholder.textAlignment = NSTextAlignmentCenter;
     }
     return self;
 }
@@ -43,7 +43,7 @@
 -(void)viewDidLoad {
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    self.navigationItem.leftBarButtonItem = _addButton;
+    self.navigationItem.leftBarButtonItem = self->_addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
     self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
 }
@@ -51,11 +51,11 @@
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    _placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);
-    if(_nicks.count)
-        [_placeholder removeFromSuperview];
+    self->_placeholder.frame = CGRectInset(self.tableView.frame, 12, 0);
+    if(self->_nicks.count)
+        [self->_placeholder removeFromSuperview];
     else
-        [self.tableView.superview addSubview:_placeholder];
+        [self.tableView.superview addSubview:self->_placeholder];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -70,13 +70,13 @@
     switch(event) {
         case kIRCEventAcceptList:
             o = notification.object;
-            if(o.cid == _event.cid) {
-                _event = o;
-                _nicks = [o objectForKey:@"nicks"];
-                if(_nicks.count)
-                    [_placeholder removeFromSuperview];
+            if(o.cid == self->_event.cid) {
+                self->_event = o;
+                self->_nicks = [o objectForKey:@"nicks"];
+                if(self->_nicks.count)
+                    [self->_placeholder removeFromSuperview];
                 else
-                    [self.tableView.superview addSubview:_placeholder];
+                    [self.tableView.superview addSubview:self->_placeholder];
                 [self.tableView reloadData];
             }
             break;
@@ -91,12 +91,12 @@
 
 -(void)addButtonPressed {
     [self.view endEditing:YES];
-    Server *s = [[ServersDataSource sharedInstance] getServer:_event.cid];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Allow messages from this user" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Allow", nil];
-    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [_alertView textFieldAtIndex:0].delegate = self;
-    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [_alertView show];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_event.cid];
+    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Allow messages from this user" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Allow", nil];
+    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [self->_alertView textFieldAtIndex:0].delegate = self;
+    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [self->_alertView show];
 }
 
 -(void)didReceiveMemoryWarning {
@@ -104,8 +104,8 @@
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
-    [self alertView:_alertView clickedButtonAtIndex:1];
+    [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:self->_alertView clickedButtonAtIndex:1];
     return NO;
 }
 
@@ -120,14 +120,14 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_nicks count];
+    return [self->_nicks count];
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"calleridcell"];
     if(!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"calleridcell"];
-    id nick = [_nicks objectAtIndex:[indexPath row]];
+    id nick = [self->_nicks objectAtIndex:[indexPath row]];
     if([nick isKindOfClass:[NSArray class]])
         cell.textLabel.text = [nick objectAtIndex:0];
     else
@@ -141,9 +141,9 @@
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        NSString *nick = [[_nicks objectAtIndex:indexPath.row] objectAtIndex:0];
-        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept -%@", nick] to:nil cid:_event.cid handler:nil];
-        [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:_event.cid handler:nil];
+        NSString *nick = [[self->_nicks objectAtIndex:indexPath.row] objectAtIndex:0];
+        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept -%@", nick] to:nil cid:self->_event.cid handler:nil];
+        [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:self->_event.cid handler:nil];
     }
 }
 
@@ -157,11 +157,11 @@
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
     if([title isEqualToString:@"Allow"]) {
-        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept %@", [alertView textFieldAtIndex:0].text] to:nil cid:_event.cid handler:nil];
-        [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:_event.cid handler:nil];
+        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/accept %@", [alertView textFieldAtIndex:0].text] to:nil cid:self->_event.cid handler:nil];
+        [[NetworkConnection sharedInstance] say:@"/accept *" to:nil cid:self->_event.cid handler:nil];
     }
     
-    _alertView = nil;
+    self->_alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {

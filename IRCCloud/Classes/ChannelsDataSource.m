@@ -25,26 +25,26 @@
 -(void)addMode:(NSString *)mode param:(NSString *)param {
     [self removeMode:mode];
     if([mode isEqualToString:@"k"])
-        _key = YES;
-    @synchronized(_modes) {
-        [_modes addObject:@{@"mode":mode,@"param":param}];
+        self->_key = YES;
+    @synchronized(self->_modes) {
+        [self->_modes addObject:@{@"mode":mode,@"param":param}];
     }
 }
 
 -(void)removeMode:(NSString *)mode {
-    @synchronized(_modes) {
+    @synchronized(self->_modes) {
         if([mode isEqualToString:@"k"])
-            _key = NO;
+            self->_key = NO;
         for(NSDictionary *m in _modes) {
             if([[[m objectForKey:@"mode"] lowercaseString] isEqualToString:mode]) {
-                [_modes removeObject:m];
+                [self->_modes removeObject:m];
                 return;
             }
         }
     }
 }
 -(BOOL)hasMode:(NSString *)mode {
-    @synchronized(_modes) {
+    @synchronized(self->_modes) {
         for(NSDictionary *m in _modes) {
             if([[[m objectForKey:@"mode"] lowercaseString] isEqualToString:mode])
                 return YES;
@@ -53,41 +53,41 @@
     return NO;
 }
 -(NSComparisonResult)compare:(Channel *)aChannel {
-    return [[_name lowercaseString] compare:[aChannel.name lowercaseString]];
+    return [[self->_name lowercaseString] compare:[aChannel.name lowercaseString]];
 }
 -(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
     if(self) {
-        decodeInt(_cid);
-        decodeInt(_bid);
-        decodeObject(_name);
-        decodeObject(_topic_text);
-        decodeDouble(_topic_time);
-        decodeObject(_topic_author);
-        decodeObject(_type);
-        decodeObject(_modes);
-        decodeObject(_mode);
-        decodeDouble(_timestamp);
-        decodeObject(_url);
-        decodeBool(_valid);
-        decodeBool(_key);
+        decodeInt(self->_cid);
+        decodeInt(self->_bid);
+        decodeObject(self->_name);
+        decodeObject(self->_topic_text);
+        decodeDouble(self->_topic_time);
+        decodeObject(self->_topic_author);
+        decodeObject(self->_type);
+        decodeObject(self->_modes);
+        decodeObject(self->_mode);
+        decodeDouble(self->_timestamp);
+        decodeObject(self->_url);
+        decodeBool(self->_valid);
+        decodeBool(self->_key);
     }
     return self;
 }
 -(void)encodeWithCoder:(NSCoder *)aCoder {
-    encodeInt(_cid);
-    encodeInt(_bid);
-    encodeObject(_name);
-    encodeObject(_topic_text);
-    encodeDouble(_topic_time);
-    encodeObject(_topic_author);
-    encodeObject(_type);
-    encodeObject(_modes);
-    encodeObject(_mode);
-    encodeDouble(_timestamp);
-    encodeObject(_url);
-    encodeBool(_valid);
-    encodeBool(_key);
+    encodeInt(self->_cid);
+    encodeInt(self->_bid);
+    encodeObject(self->_name);
+    encodeObject(self->_topic_text);
+    encodeDouble(self->_topic_time);
+    encodeObject(self->_topic_author);
+    encodeObject(self->_type);
+    encodeObject(self->_modes);
+    encodeObject(self->_mode);
+    encodeDouble(self->_timestamp);
+    encodeObject(self->_url);
+    encodeBool(self->_valid);
+    encodeBool(self->_key);
 }
 @end
 
@@ -114,7 +114,7 @@
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"channels"];
             
             @try {
-                _channels = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                self->_channels = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
@@ -125,7 +125,7 @@
             }
         }
         if(!_channels)
-            _channels = [[NSMutableArray alloc] init];
+            self->_channels = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -134,8 +134,8 @@
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"channels"];
     
     NSArray *channels;
-    @synchronized(_channels) {
-        channels = [_channels copy];
+    @synchronized(self->_channels) {
+        channels = [self->_channels copy];
     }
     
     @synchronized(self) {
@@ -150,13 +150,13 @@
 }
 
 -(void)clear {
-    @synchronized(_channels) {
-        [_channels removeAllObjects];
+    @synchronized(self->_channels) {
+        [self->_channels removeAllObjects];
     }
 }
 
 -(void)invalidate {
-    @synchronized(_channels) {
+    @synchronized(self->_channels) {
         for(Channel *channel in _channels) {
             channel.valid = NO;
         }
@@ -164,21 +164,21 @@
 }
 
 -(void)addChannel:(Channel *)channel {
-    @synchronized(_channels) {
-        [_channels addObject:channel];
+    @synchronized(self->_channels) {
+        [self->_channels addObject:channel];
     }
 }
 
 -(void)removeChannelForBuffer:(int)bid {
-    @synchronized(_channels) {
+    @synchronized(self->_channels) {
         Channel *channel = [self channelForBuffer:bid];
         if(channel)
-            [_channels removeObject:channel];
+            [self->_channels removeObject:channel];
     }
 }
 
 -(void)updateTopic:(NSString *)text time:(NSTimeInterval)time author:(NSString *)author buffer:(int)bid {
-    @synchronized(_channels) {
+    @synchronized(self->_channels) {
         Channel *channel = [self channelForBuffer:bid];
         if(channel) {
             channel.topic_text = text;
@@ -189,7 +189,7 @@
 }
 
 -(void)updateMode:(NSString *)mode buffer:(int)bid ops:(NSDictionary *)ops {
-    @synchronized(_channels) {
+    @synchronized(self->_channels) {
         Channel *channel = [self channelForBuffer:bid];
         if(channel) {
             NSArray *add = [ops objectForKey:@"add"];
@@ -206,7 +206,7 @@
 }
 
 -(void)updateURL:(NSString *)url buffer:(int)bid {
-    @synchronized(_channels) {
+    @synchronized(self->_channels) {
         Channel *channel = [self channelForBuffer:bid];
         if(channel)
             channel.url = url;
@@ -214,7 +214,7 @@
 }
 
 -(void)updateTimestamp:(NSTimeInterval)timestamp buffer:(int)bid {
-    @synchronized(_channels) {
+    @synchronized(self->_channels) {
         Channel *channel = [self channelForBuffer:bid];
         if(channel)
             channel.timestamp = timestamp;
@@ -222,9 +222,9 @@
 }
 
 -(Channel *)channelForBuffer:(int)bid {
-    @synchronized(_channels) {
+    @synchronized(self->_channels) {
         for(int i = 0; i < _channels.count; i++) {
-            Channel *channel = [_channels objectAtIndex:i];
+            Channel *channel = [self->_channels objectAtIndex:i];
             if(channel.bid == bid)
                 return channel;
         }
@@ -234,9 +234,9 @@
 
 -(NSArray *)channelsForServer:(int)cid {
     NSMutableArray *channels = [[NSMutableArray alloc] init];
-    @synchronized(_channels) {
+    @synchronized(self->_channels) {
         for(int i = 0; i < _channels.count; i++) {
-            Channel *channel = [_channels objectAtIndex:i];
+            Channel *channel = [self->_channels objectAtIndex:i];
             if(channel.cid == cid)
                 [channels addObject:channel];
         }
@@ -251,13 +251,13 @@
 -(void)purgeInvalidChannels {
     NSLog(@"Cleaning up invalid channels");
     NSArray *copy;
-    @synchronized(_channels) {
-        copy = _channels.copy;
+    @synchronized(self->_channels) {
+        copy = self->_channels.copy;
     }
     for(Channel *channel in copy) {
         if(!channel.valid) {
             NSLog(@"Removing invalid channel: %@", channel.name);
-            [_channels removeObject:channel];
+            [self->_channels removeObject:channel];
             [[UsersDataSource sharedInstance] removeUsersForBuffer:channel.bid];
         }
     }

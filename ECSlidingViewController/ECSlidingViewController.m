@@ -356,7 +356,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     }
     [self updateTopViewHorizontalCenter:newCenter];
   } completion:^(BOOL finished){
-    if (_resetStrategy & ECPanning) {
+      if (self->_resetStrategy & ECPanning) {
       self.panGesture.enabled = YES;
     } else {
       self.panGesture.enabled = NO;
@@ -364,12 +364,12 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if (complete) {
       complete();
     }
-    _topViewIsOffScreen = NO;
+      self->_topViewIsOffScreen = NO;
     [self addTopViewSnapshot];
     dispatch_async(dispatch_get_main_queue(), ^{
       NSString *key = (side == ECLeft) ? ECSlidingViewTopDidAnchorLeft : ECSlidingViewTopDidAnchorRight;
       [[NSNotificationCenter defaultCenter] postNotificationName:key object:self userInfo:nil];
-      (side == ECRight) ? [_underLeftViewController viewDidAppear:NO] : [_underRightViewController viewDidAppear:NO];
+        (side == ECRight) ? [self->_underLeftViewController viewDidAppear:NO] : [self->_underRightViewController viewDidAppear:NO];
     });
   }];
 }
@@ -400,7 +400,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if (complete) {
       complete();
     }
-    _topViewIsOffScreen = YES;
+      self->_topViewIsOffScreen = YES;
     [self addTopViewSnapshot];
     dispatch_async(dispatch_get_main_queue(), ^{
       NSString *key = (side == ECLeft) ? ECSlidingViewTopDidAnchorLeft : ECSlidingViewTopDidAnchorRight;

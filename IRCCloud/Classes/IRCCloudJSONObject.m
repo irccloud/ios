@@ -21,20 +21,20 @@
 -(id)initWithDictionary:(NSDictionary *)dict {
     self = [super init];
     if(self) {
-        _dict = dict;
-        _type = [_dict objectForKey:@"type"];
-        if([_dict objectForKey:@"cid"])
-            _cid = [[_dict objectForKey:@"cid"] intValue];
+        self->_dict = dict;
+        self->_type = [self->_dict objectForKey:@"type"];
+        if([self->_dict objectForKey:@"cid"])
+            self->_cid = [[self->_dict objectForKey:@"cid"] intValue];
         else
-            _cid = -1;
-        if([_dict objectForKey:@"bid"])
-            _bid = [[_dict objectForKey:@"bid"] intValue];
+            self->_cid = -1;
+        if([self->_dict objectForKey:@"bid"])
+            self->_bid = [[self->_dict objectForKey:@"bid"] intValue];
         else
-            _bid = -1;
-        if([_dict objectForKey:@"eid"])
-            _eid = [[_dict objectForKey:@"eid"] doubleValue];
+            self->_bid = -1;
+        if([self->_dict objectForKey:@"eid"])
+            self->_eid = [[self->_dict objectForKey:@"eid"] doubleValue];
         else
-            _eid = -1;
+            self->_eid = -1;
     }
     return self;
 }
@@ -51,7 +51,7 @@
     return _eid;
 }
 -(id)objectForKey:(NSString *)key {
-    id obj = [_dict objectForKey:key];
+    id obj = [self->_dict objectForKey:key];
     if(obj)
         return obj;
     if([key isEqualToString:@"success"])
@@ -59,7 +59,7 @@
     return nil;
 }
 -(NSString *)description {
-    return [_dict description];
+    return [self->_dict description];
 }
 -(NSDictionary *)dictionary {
     return _dict;

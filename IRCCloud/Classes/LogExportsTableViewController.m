@@ -32,22 +32,22 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _progress = [[UIProgressView alloc] initWithFrame:CGRectZero];
-        _progress.tintColor = UITableViewCell.appearance.detailTextLabelColor;
-        _progress.trackTintColor = UITableViewCell.appearance.backgroundColor;
-        [self.contentView addSubview:_progress];
+        self->_progress = [[UIProgressView alloc] initWithFrame:CGRectZero];
+        self->_progress.tintColor = UITableViewCell.appearance.detailTextLabelColor;
+        self->_progress.trackTintColor = UITableViewCell.appearance.backgroundColor;
+        [self.contentView addSubview:self->_progress];
     }
     return self;
 }
 
 -(void)layoutSubviews {
     [super layoutSubviews];
-    [_progress sizeToFit];
-    CGRect frame = _progress.frame;
+    [self->_progress sizeToFit];
+    CGRect frame = self->_progress.frame;
     frame.origin.x = 0;
     frame.origin.y = self.contentView.bounds.size.height - frame.size.height;
     frame.size.width = self.contentView.bounds.size.width;
-    _progress.frame = frame;
+    self->_progress.frame = frame;
 }
 @end
 
@@ -55,11 +55,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    _fileSizes = [[NSMutableDictionary alloc] init];
-    _downloadingURLs = [[NSMutableDictionary alloc] init];
-    _iCloudLogs = [[UISwitch alloc] init];
-    _pendingExport = -1;
-    [_iCloudLogs addTarget:self action:@selector(iCloudLogsChanged:) forControlEvents:UIControlEventValueChanged];
+    self->_fileSizes = [[NSMutableDictionary alloc] init];
+    self->_downloadingURLs = [[NSMutableDictionary alloc] init];
+    self->_iCloudLogs = [[UISwitch alloc] init];
+    self->_pendingExport = -1;
+    [self->_iCloudLogs addTarget:self action:@selector(iCloudLogsChanged:) forControlEvents:UIControlEventValueChanged];
     self.navigationItem.title = @"Download Logs";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
 }
@@ -69,7 +69,7 @@
 }
 
 -(void)iCloudLogsChanged:(id)sender {
-    BOOL on = _iCloudLogs.on;
+    BOOL on = self->_iCloudLogs.on;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         @synchronized(self) {
@@ -120,15 +120,15 @@
 -(void)cacheFileSize:(NSDictionary *)d {
     NSUInteger bytes = [[[[NSFileManager defaultManager] attributesOfItemAtPath:[[self downloadsPath] URLByAppendingPathComponent:[d objectForKey:@"file_name"]].path error:nil] objectForKey:NSFileSize] intValue];
     if(bytes < 1024) {
-        [_fileSizes setObject:[NSString stringWithFormat:@"%li B", (long)bytes] forKey:[d objectForKey:@"file_name"]];
+        [self->_fileSizes setObject:[NSString stringWithFormat:@"%li B", (long)bytes] forKey:[d objectForKey:@"file_name"]];
     } else {
         int exp = (int)(log(bytes) / log(1024));
-        [_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:[d objectForKey:@"file_name"]];
+        [self->_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:[d objectForKey:@"file_name"]];
     }
 }
 
 -(void)refresh:(NSDictionary *)logs {
-    _inprogress = [logs objectForKey:@"inprogress"];
+    self->_inprogress = [logs objectForKey:@"inprogress"];
     NSMutableArray *available = [[logs objectForKey:@"available"] mutableCopy];
     NSMutableArray *expired = [[logs objectForKey:@"expired"] mutableCopy];
     NSMutableArray *downloaded = [[NSMutableArray alloc] init];
@@ -154,8 +154,8 @@
     }
     
     @synchronized (self.tableView) {
-        _available = available;
-        _downloaded = downloaded;
+        self->_available = available;
+        self->_downloaded = downloaded;
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self.tableView reloadData];
@@ -176,7 +176,7 @@
 -(void)viewWillAppear:(BOOL)animated {
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [super viewWillAppear:animated];
-    _iCloudLogs.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"];
+    self->_iCloudLogs.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"])
         [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
@@ -224,7 +224,7 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     @synchronized (self.tableView) {
-        return 1 + (_inprogress.count > 0) + (_downloaded.count > 0) + (_available.count > 0);
+        return 1 + (self->_inprogress.count > 0) + (self->_downloaded.count > 0) + (self->_available.count > 0);
     }
 }
 
@@ -376,19 +376,19 @@
             switch(indexPath.row) {
                 case 0:
                     cell.textLabel.text = @"This Network";
-                    cell.detailTextLabel.text = _server.name.length ? _server.name : _server.hostname;
+                    cell.detailTextLabel.text = self->_server.name.length ? _server.name : _server.hostname;
                     break;
                 case 1:
-                    if([_buffer.type isEqualToString:@"channel"])
+                    if([self->_buffer.type isEqualToString:@"channel"])
                         cell.textLabel.text = @"This Channel";
-                    else if([_buffer.type isEqualToString:@"console"])
+                    else if([self->_buffer.type isEqualToString:@"console"])
                         cell.textLabel.text = @"This Network Console";
                     else
                         cell.textLabel.text = @"This Conversation";
-                    if([_buffer.type isEqualToString:@"console"])
-                        cell.detailTextLabel.text = _server.name.length ? _server.name : _server.hostname;
+                    if([self->_buffer.type isEqualToString:@"console"])
+                        cell.detailTextLabel.text = self->_server.name.length ? _server.name : _server.hostname;
                     else
-                        cell.detailTextLabel.text = _buffer.name;
+                        cell.detailTextLabel.text = self->_buffer.name;
                     break;
                 case 2:
                     cell.textLabel.text = @"All Networks";
@@ -397,10 +397,10 @@
                 case 3:
                     cell.textLabel.text = @"iCloud Drive Sync";
                     cell.detailTextLabel.text = nil;
-                    cell.accessoryView = _iCloudLogs;
+                    cell.accessoryView = self->_iCloudLogs;
                     break;
             }
-            if(_pendingExport == indexPath.row) {
+            if(self->_pendingExport == indexPath.row) {
                 spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
                 [spinner sizeToFit];
                 [spinner startAnimating];
@@ -424,17 +424,17 @@
             switch(section) {
                 case 1:
                     if(indexPath.row < _inprogress.count) {
-                        row = [_inprogress objectAtIndex:indexPath.row];
+                        row = [self->_inprogress objectAtIndex:indexPath.row];
                     }
                     break;
                 case 2:
                     if(indexPath.row < _downloaded.count) {
-                        row = [_downloaded objectAtIndex:indexPath.row];
+                        row = [self->_downloaded objectAtIndex:indexPath.row];
                     }
                     break;
                 case 3:
                     if(indexPath.row < _available.count) {
-                        row = [_available objectAtIndex:indexPath.row];
+                        row = [self->_available objectAtIndex:indexPath.row];
                     }
                     break;
             }
@@ -455,8 +455,8 @@
 
                 if(section > 1) {
                     if(section == 2 || [[row objectForKey:@"expirydate"] isKindOfClass:[NSNull class]]) {
-                        if([_fileSizes objectForKey:[row objectForKey:@"file_name"]])
-                            cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago\n%@", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [_fileSizes objectForKey:[row objectForKey:@"file_name"]]];
+                        if([self->_fileSizes objectForKey:[row objectForKey:@"file_name"]])
+                            cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago\n%@", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]], [self->_fileSizes objectForKey:[row objectForKey:@"file_name"]]];
                         else
                             cell.detailTextLabel.text = [NSString stringWithFormat:@"Exported %@ ago", [self relativeTime:[NSDate date].timeIntervalSince1970 - [[row objectForKey:@"startdate"] doubleValue]]];
                     } else {
@@ -467,9 +467,9 @@
                 }
                 cell.detailTextLabel.numberOfLines = 0;
                 
-                if(section == 1 || [_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
+                if(section == 1 || [self->_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]]) {
                     cell.accessoryType = UITableViewCellAccessoryNone;
-                    [cell.progress setProgress:[[_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]] floatValue] animated:YES];
+                    [cell.progress setProgress:[[self->_downloadingURLs objectForKey:[row objectForKey:@"redirect_url"]] floatValue] animated:YES];
                     if(cell.progress.progress > 0) {
                         cell.progress.hidden = NO;
                     } else {
@@ -504,7 +504,7 @@
         
         if(cid == e_cid && bid == e_bid) {
             [[[UIAlertView alloc] initWithTitle:@"Export In Progress" message:@"This export is already in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
-            _pendingExport = -1;
+            self->_pendingExport = -1;
             return;
         }
     }
@@ -512,14 +512,14 @@
     [[NetworkConnection sharedInstance] exportLog:[NSTimeZone localTimeZone].name cid:cid bid:bid handler:^(IRCCloudJSONObject *result) {
         @synchronized (self.tableView) {
             if([[result objectForKey:@"success"] boolValue]) {
-                NSMutableArray *inprogress = _inprogress.mutableCopy;
+                NSMutableArray *inprogress = self->_inprogress.mutableCopy;
                 [inprogress insertObject:[result objectForKey:@"export"] atIndex:0];
-                _inprogress = inprogress;
+                self->_inprogress = inprogress;
                 [[[UIAlertView alloc] initWithTitle:@"Exporting" message:@"Your log export is in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
             } else {
                 [[[UIAlertView alloc] initWithTitle:@"Export Failed" message:[NSString stringWithFormat:@"Unable to export log: %@.  Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
             }
-            _pendingExport = -1;
+            self->_pendingExport = -1;
             [self.tableView reloadData];
         }
     }];
@@ -543,17 +543,17 @@
         switch(section) {
             case 0:
                 if(indexPath.row < 3) {
-                    if(_pendingExport != -1)
+                    if(self->_pendingExport != -1)
                         break;
-                    _pendingExport = indexPath.row;
+                    self->_pendingExport = indexPath.row;
                     [self.tableView reloadData];
                 }
                 switch(indexPath.row) {
                     case 0:
-                        [self requestExport:_server.cid bid:-1];
+                        [self requestExport:self->_server.cid bid:-1];
                         break;
                     case 1:
-                        [self requestExport:_server.cid bid:_buffer.bid];
+                        [self requestExport:self->_server.cid bid:self->_buffer.bid];
                         break;
                     case 2:
                         [self requestExport:-1 bid:-1];
@@ -566,13 +566,13 @@
             case 2:
             {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-                NSURL *file = [self fileForDownload:[_downloaded objectAtIndex:indexPath.row]];
-                NSURL *url = [[_downloaded objectAtIndex:indexPath.row] objectForKey:@"redirect_url"];
+                NSURL *file = [self fileForDownload:[self->_downloaded objectAtIndex:indexPath.row]];
+                NSURL *url = [[self->_downloaded objectAtIndex:indexPath.row] objectForKey:@"redirect_url"];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Open" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        _interactionController = [UIDocumentInteractionController interactionControllerWithURL:file];
-                        _interactionController.delegate = self;
-                        [_interactionController presentOpenInMenuFromRect:[self.view convertRect:[self.tableView rectForRowAtIndexPath:indexPath] fromView:self.tableView] inView:self.view animated:YES];
+                        self->_interactionController = [UIDocumentInteractionController interactionControllerWithURL:file];
+                        self->_interactionController.delegate = self;
+                        [self->_interactionController presentOpenInMenuFromRect:[self.view convertRect:[self.tableView rectForRowAtIndexPath:indexPath] fromView:self.tableView] inView:self.view animated:YES];
                     }];
                 }]];
                 
@@ -580,7 +580,7 @@
                     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Download" message:[[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"]?@"Are you sure you want to delete this download?  It will be removed from your device and all other devices that are syncing with iCloud Drive.":@"Are you sure you want to delete this download from your device?" preferredStyle:UIAlertControllerStyleAlert];
                     
                     [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                        [_downloadingURLs setObject:@(0) forKey:url];
+                        [self->_downloadingURLs setObject:@(0) forKey:url];
                         [self.tableView reloadData];
                         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                             NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
@@ -590,7 +590,7 @@
                                 if(error)
                                     NSLog(@"Error: %@", error);
                                 [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
-                                [_downloadingURLs removeObjectForKey:url];
+                                [self->_downloadingURLs removeObjectForKey:url];
                                 [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
                                 [self refresh];
                             }];
@@ -610,14 +610,14 @@
                 break;
             }
             case 3:
-                [self download:[NSURL URLWithString:[[_available objectAtIndex:indexPath.row] objectForKey:@"redirect_url"]]];
+                [self download:[NSURL URLWithString:[[self->_available objectAtIndex:indexPath.row] objectForKey:@"redirect_url"]]];
                 break;
         }
     }
 }
 
 -(void)download:(NSURL *)url {
-    if([_downloadingURLs objectForKey:url.absoluteString]) {
+    if([self->_downloadingURLs objectForKey:url.absoluteString]) {
         CLS_LOG(@"Ignoring duplicate download request for %@", url);
         return;
     }
@@ -642,18 +642,18 @@
     [[session downloadTaskWithRequest:request] resume];
 
     @synchronized (self.tableView) {
-        [_downloadingURLs setObject:@(0) forKey:url.absoluteString];
+        [self->_downloadingURLs setObject:@(0) forKey:url.absoluteString];
     }
     [self.tableView reloadData];
 }
 
 -(void)URLSession:(NSURLSession *)session downloadTask:(nonnull NSURLSessionDownloadTask *)downloadTask didWriteData:(int64_t)bytesWritten totalBytesWritten:(int64_t)totalBytesWritten totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite {
-    [_downloadingURLs setObject:@((float)totalBytesWritten / (float)totalBytesExpectedToWrite) forKey:downloadTask.originalRequest.URL.absoluteString];
+    [self->_downloadingURLs setObject:@((float)totalBytesWritten / (float)totalBytesExpectedToWrite) forKey:downloadTask.originalRequest.URL.absoluteString];
     [self.tableView reloadData];
 }
 
 -(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    [_downloadingURLs removeObjectForKey:task.originalRequest.URL.absoluteString];
+    [self->_downloadingURLs removeObjectForKey:task.originalRequest.URL.absoluteString];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self.tableView reloadData];
         UILocalNotification *alert = [[UILocalNotification alloc] init];
@@ -692,29 +692,29 @@
         [fm copyItemAtPath:newReadingURL.path toPath:newWritingURL.path error:&error];
         NSUInteger bytes = [[[[NSFileManager defaultManager] attributesOfItemAtPath:newWritingURL.path error:nil] objectForKey:NSFileSize] intValue];
         if(bytes < 1024) {
-            [_fileSizes setObject:[NSString stringWithFormat:@"%li B", (long)bytes] forKey:downloadTask.originalRequest.URL.lastPathComponent];
+            [self->_fileSizes setObject:[NSString stringWithFormat:@"%li B", (long)bytes] forKey:downloadTask.originalRequest.URL.lastPathComponent];
         } else {
             int exp = (int)(log(bytes) / log(1024));
-            [_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:downloadTask.originalRequest.URL.lastPathComponent];
+            [self->_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:downloadTask.originalRequest.URL.lastPathComponent];
         }
         if(error)
             NSLog(@"Error: %@", error);
     }];
     
-    [_downloadingURLs removeObjectForKey:downloadTask.originalRequest.URL];
+    [self->_downloadingURLs removeObjectForKey:downloadTask.originalRequest.URL];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         @synchronized (self.tableView) {
-            NSMutableArray *available = _available.mutableCopy;
+            NSMutableArray *available = self->_available.mutableCopy;
             
             for(int i = 0; i < available.count; i++) {
                 if([[[available objectAtIndex:i] objectForKey:@"redirect_url"] isEqualToString:downloadTask.originalRequest.URL.absoluteString]) {
-                    [_downloaded addObject:[available objectAtIndex:i]];
+                    [self->_downloaded addObject:[available objectAtIndex:i]];
                     [available removeObjectAtIndex:i];
                     break;
                 }
             }
             
-            _available = available;
+            self->_available = available;
         }
         [self.tableView reloadData];
         if(self.completionHandler)

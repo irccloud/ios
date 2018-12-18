@@ -25,7 +25,7 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         uploader.metadatadelegate = self;
-        _uploader = uploader;
+        self->_uploader = uploader;
         self.navigationItem.title = @"Upload a File";
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(saveButtonPressed:)];
     }
@@ -34,10 +34,10 @@
 
 -(void)fileUploadWillUpload:(NSUInteger)bytes mimeType:(NSString *)mimeType {
     if(bytes < 1024) {
-        _metadata = [NSString stringWithFormat:@"%lu B • %@", (unsigned long)bytes, mimeType];
+        self->_metadata = [NSString stringWithFormat:@"%lu B • %@", (unsigned long)bytes, mimeType];
     } else {
         int exp = (int)(log(bytes) / log(1024));
-        _metadata = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], mimeType];
+        self->_metadata = [NSString stringWithFormat:@"%.1f %cB • %@", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp -1], mimeType];
     }
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self.tableView reloadData];
@@ -45,16 +45,16 @@
 }
 
 -(void)saveButtonPressed:(id)sender {
-    _done = YES;
+    self->_done = YES;
     [self.tableView endEditing:YES];
-    [_uploader setFilename:_filename.text message:_msg.text];
+    [self->_uploader setFilename:self->_filename.text message:self->_msg.text];
     [self dismissViewControllerAnimated:YES completion:nil];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
 }
 
 -(void)didMoveToParentViewController:(UIViewController *)parent {
     if(!parent && !_done)
-        [_uploader cancel];
+        [self->_uploader cancel];
 }
 
 -(void)_resetStatusBar {
@@ -63,7 +63,7 @@
 
 -(void)cancelButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
-    [_uploader cancel];
+    [self->_uploader cancel];
     
     [self dismissViewControllerAnimated:YES completion:nil];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
@@ -75,7 +75,7 @@
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    if(_uploader) {
+    if(self->_uploader) {
         if(self.navigationController.viewControllers.count == 1) {
             self.navigationController.navigationBar.clipsToBounds = YES;
             
@@ -87,12 +87,12 @@
     }
     
     if(!_filename.text.length)
-        _filename.text = _uploader.originalFilename;
+        self->_filename.text = self->_uploader.originalFilename;
     if(!_metadata) {
-        if(_uploader.mimeType.length)
-            _metadata = [NSString stringWithFormat:@"Calculating size… • %@", _uploader.mimeType];
+        if(self->_uploader.mimeType.length)
+            self->_metadata = [NSString stringWithFormat:@"Calculating size… • %@", _uploader.mimeType];
         else
-            _metadata = @"Calculating size…";
+            self->_metadata = @"Calculating size…";
     }
     [self.tableView reloadData];
 }
@@ -109,36 +109,36 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
-    _filename.textAlignment = NSTextAlignmentRight;
-    _filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _filename.autocorrectionType = UITextAutocorrectionTypeNo;
-    _filename.keyboardType = UIKeyboardTypeDefault;
-    _filename.adjustsFontSizeToFitWidth = YES;
-    _filename.returnKeyType = UIReturnKeyDone;
-    _filename.delegate = self;
+    self->_filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
+    self->_filename.textAlignment = NSTextAlignmentRight;
+    self->_filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_filename.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_filename.keyboardType = UIKeyboardTypeDefault;
+    self->_filename.adjustsFontSizeToFitWidth = YES;
+    self->_filename.returnKeyType = UIReturnKeyDone;
+    self->_filename.delegate = self;
     
-    _msg = [[UITextView alloc] initWithFrame:CGRectZero];
-    _msg.text = @"";
-    _msg.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _msg.backgroundColor = [UIColor clearColor];
-    _msg.returnKeyType = UIReturnKeyDone;
-    _msg.delegate = self;
-    _msg.font = _filename.font;
-    _msg.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _msg.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_msg = [[UITextView alloc] initWithFrame:CGRectZero];
+    self->_msg.text = @"";
+    self->_msg.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_msg.backgroundColor = [UIColor clearColor];
+    self->_msg.returnKeyType = UIReturnKeyDone;
+    self->_msg.delegate = self;
+    self->_msg.font = self->_filename.font;
+    self->_msg.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_msg.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
-        _msg.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+        self->_msg.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     } else {
-        _msg.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        self->_msg.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
     
-    _imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
-    _imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _imageView.contentMode = UIViewContentModeScaleAspectFit;
+    self->_imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    self->_imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_imageView.contentMode = UIViewContentModeScaleAspectFit;
     if(@available(iOS 11, *))
-        _imageView.accessibilityIgnoresInvertColors = YES;
+        self->_imageView.accessibilityIgnoresInvertColors = YES;
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     if(!self.view.backgroundColor)
@@ -146,13 +146,13 @@
 }
 
 - (void)setURL:(NSString *)url {
-    _url = url;
+    self->_url = url;
 }
 
 - (void)setFilename:(NSString *)filename metadata:(NSString *)metadata {
-    _filename.text = filename;
-    _filename.enabled = NO;
-    _metadata = metadata;
+    self->_filename.text = filename;
+    self->_filename.enabled = NO;
+    self->_metadata = metadata;
     [self.tableView reloadData];
 }
 
@@ -167,14 +167,14 @@
         height = 240;
     }
     
-    _imageView.image = image;
-    _imageHeight = height;
+    self->_imageView.image = image;
+    self->_imageHeight = height;
     
     [self.tableView reloadData];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    if(_imageView)
+    if(self->_imageView)
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:2] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     else
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
@@ -189,7 +189,7 @@
 }
 
 -(void)textFieldDidBeginEditing:(UITextField *)textField {
-    if(_imageView)
+    if(self->_imageView)
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
     else
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:YES];
@@ -226,7 +226,7 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return (_imageView)?3:2;
+    return (self->_imageView)?3:2;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -234,7 +234,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
-    if(_imageView && section > 0)
+    if(self->_imageView && section > 0)
         section--;
     
     switch (section) {
@@ -265,7 +265,7 @@
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section {
-    if(section == ((_imageView)?1:0))
+    if(section == ((self->_imageView)?1:0))
         return _metadata;
     else
         return nil;
@@ -290,18 +290,18 @@
     
     switch(section) {
         case 0:
-            cell.backgroundView = _imageView;
+            cell.backgroundView = self->_imageView;
             cell.backgroundColor = [UIColor clearColor];
             break;
         case 1:
             cell.textLabel.text = @"Filename";
-            cell.accessoryView = _filename;
+            cell.accessoryView = self->_filename;
             break;
         case 2:
             cell.textLabel.text = nil;
-            [_msg removeFromSuperview];
-            _msg.frame = CGRectInset(cell.contentView.bounds, 4, 4);
-            [cell.contentView addSubview:_msg];
+            [self->_msg removeFromSuperview];
+            self->_msg.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:self->_msg];
             break;
     }
     return cell;
@@ -313,8 +313,8 @@
     [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self.tableView endEditing:YES];
     
-    if(_imageView && _url && indexPath.section == 0) {
-        ImageViewController *ivc = [[ImageViewController alloc] initWithURL:[NSURL URLWithString:_url]];
+    if(self->_imageView && _url && indexPath.section == 0) {
+        ImageViewController *ivc = [[ImageViewController alloc] initWithURL:[NSURL URLWithString:self->_url]];
         AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = ivc;

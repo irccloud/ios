@@ -24,13 +24,13 @@
 -(id)init {
     self = [super init];
     if(self) {
-        _MODE_OPER = @"Y";
-        _MODE_OWNER = @"q";
-        _MODE_ADMIN = @"a";
-        _MODE_OP = @"o";
-        _MODE_HALFOP = @"h";
-        _MODE_VOICED = @"v";
-        _ignore = [[Ignore alloc] init];
+        self->_MODE_OPER = @"Y";
+        self->_MODE_OWNER = @"q";
+        self->_MODE_ADMIN = @"a";
+        self->_MODE_OP = @"o";
+        self->_MODE_HALFOP = @"h";
+        self->_MODE_VOICED = @"v";
+        self->_ignore = [[Ignore alloc] init];
     }
     return self;
 }
@@ -50,69 +50,69 @@
     return [NSString stringWithFormat:@"{cid: %i, name: %@, hostname: %@, port: %i}", _cid, _name, _hostname, _port];
 }
 -(void)encodeWithCoder:(NSCoder *)aCoder {
-    encodeInt(_cid);
-    encodeObject(_name);
-    encodeObject(_hostname);
-    encodeInt(_port);
-    encodeObject(_nick);
-    encodeObject(_status);
-    encodeInt(_ssl);
-    encodeObject(_realname);
-    encodeObject(_join_commands);
-    encodeObject(_fail_info);
-    encodeObject(_away);
-    encodeObject(_usermask);
-    encodeObject(_mode);
-    encodeObject(_isupport);
-    encodeObject(_ignores);
-    encodeObject(_CHANTYPES);
-    encodeObject(_PREFIX);
-    encodeInt(_order);
-    encodeObject(_MODE_OPER);
-    encodeObject(_MODE_OWNER);
-    encodeObject(_MODE_ADMIN);
-    encodeObject(_MODE_OP);
-    encodeObject(_MODE_HALFOP);
-    encodeObject(_MODE_VOICED);
-    encodeObject(_ircserver);
-    encodeInt(_orgId);
-    encodeObject(_avatar);
-    encodeInt(_avatars_supported);
+    encodeInt(self->_cid);
+    encodeObject(self->_name);
+    encodeObject(self->_hostname);
+    encodeInt(self->_port);
+    encodeObject(self->_nick);
+    encodeObject(self->_status);
+    encodeInt(self->_ssl);
+    encodeObject(self->_realname);
+    encodeObject(self->_join_commands);
+    encodeObject(self->_fail_info);
+    encodeObject(self->_away);
+    encodeObject(self->_usermask);
+    encodeObject(self->_mode);
+    encodeObject(self->_isupport);
+    encodeObject(self->_ignores);
+    encodeObject(self->_CHANTYPES);
+    encodeObject(self->_PREFIX);
+    encodeInt(self->_order);
+    encodeObject(self->_MODE_OPER);
+    encodeObject(self->_MODE_OWNER);
+    encodeObject(self->_MODE_ADMIN);
+    encodeObject(self->_MODE_OP);
+    encodeObject(self->_MODE_HALFOP);
+    encodeObject(self->_MODE_VOICED);
+    encodeObject(self->_ircserver);
+    encodeInt(self->_orgId);
+    encodeObject(self->_avatar);
+    encodeInt(self->_avatars_supported);
 }
 -(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
     if(self) {
-        decodeInt(_cid);
-        decodeObject(_name);
-        decodeObject(_hostname);
-        decodeInt(_port);
-        decodeObject(_nick);
-        decodeObject(_status);
-        decodeInt(_ssl);
-        decodeObject(_realname);
-        decodeObject(_join_commands);
-        decodeObject(_fail_info);
-        decodeObject(_away);
-        decodeObject(_usermask);
-        decodeObject(_mode);
-        decodeObject(_isupport);
-        _isupport = _isupport.mutableCopy;
-        decodeObject(_ignores);
-        decodeObject(_CHANTYPES);
-        decodeObject(_PREFIX);
-        decodeInt(_order);
-        decodeObject(_MODE_OPER);
-        decodeObject(_MODE_OWNER);
-        decodeObject(_MODE_ADMIN);
-        decodeObject(_MODE_OP);
-        decodeObject(_MODE_HALFOP);
-        decodeObject(_MODE_VOICED);
-        decodeObject(_ircserver);
-        decodeInt(_orgId);
-        decodeObject(_avatar);
-        decodeInt(_avatars_supported);
-        _ignore = [[Ignore alloc] init];
-        [_ignore setIgnores:_ignores];
+        decodeInt(self->_cid);
+        decodeObject(self->_name);
+        decodeObject(self->_hostname);
+        decodeInt(self->_port);
+        decodeObject(self->_nick);
+        decodeObject(self->_status);
+        decodeInt(self->_ssl);
+        decodeObject(self->_realname);
+        decodeObject(self->_join_commands);
+        decodeObject(self->_fail_info);
+        decodeObject(self->_away);
+        decodeObject(self->_usermask);
+        decodeObject(self->_mode);
+        decodeObject(self->_isupport);
+        self->_isupport = self->_isupport.mutableCopy;
+        decodeObject(self->_ignores);
+        decodeObject(self->_CHANTYPES);
+        decodeObject(self->_PREFIX);
+        decodeInt(self->_order);
+        decodeObject(self->_MODE_OPER);
+        decodeObject(self->_MODE_OWNER);
+        decodeObject(self->_MODE_ADMIN);
+        decodeObject(self->_MODE_OP);
+        decodeObject(self->_MODE_HALFOP);
+        decodeObject(self->_MODE_VOICED);
+        decodeObject(self->_ircserver);
+        decodeInt(self->_orgId);
+        decodeObject(self->_avatar);
+        decodeInt(self->_avatars_supported);
+        self->_ignore = [[Ignore alloc] init];
+        [self->_ignore setIgnores:self->_ignores];
     }
     return self;
 }
@@ -120,18 +120,18 @@
     return _ignores;
 }
 -(void)setIgnores:(NSArray *)ignores {
-    _ignores = ignores;
-    [_ignore setIgnores:_ignores];
+    self->_ignores = ignores;
+    [self->_ignore setIgnores:self->_ignores];
 }
 
 -(BOOL)isSlack {
-    return _slack || [_hostname hasSuffix:@".slack.com"] || [_ircserver hasSuffix:@".slack.com"];
+    return _slack || [self->_hostname hasSuffix:@".slack.com"] || [self->_ircserver hasSuffix:@".slack.com"];
 }
 
 -(NSString *)slackBaseURL {
-    NSString *host = _hostname;
+    NSString *host = self->_hostname;
     if(![host hasSuffix:@".slack.com"])
-        host = _ircserver;
+        host = self->_ircserver;
     if([host hasSuffix:@".slack.com"])
         return [NSString stringWithFormat:@"https://%@", host];
     return nil;
@@ -161,7 +161,7 @@
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
             
             @try {
-                _servers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                self->_servers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
             } @catch(NSException *e) {
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
@@ -172,7 +172,7 @@
             }
         }
         if(!_servers)
-            _servers = [[NSMutableArray alloc] init];
+            self->_servers = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -181,8 +181,8 @@
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
     
     NSArray *servers;
-    @synchronized(_servers) {
-        servers = [_servers copy];
+    @synchronized(self->_servers) {
+        servers = [self->_servers copy];
     }
     
     @synchronized(self) {
@@ -197,27 +197,27 @@
 }
 
 -(void)clear {
-    @synchronized(_servers) {
-        [_servers removeAllObjects];
+    @synchronized(self->_servers) {
+        [self->_servers removeAllObjects];
     }
 }
 
 -(void)addServer:(Server *)server {
-    @synchronized(_servers) {
-        [_servers addObject:server];
+    @synchronized(self->_servers) {
+        [self->_servers addObject:server];
     }
 }
 
 -(NSArray *)getServers {
-    @synchronized(_servers) {
-        return [_servers sortedArrayUsingSelector:@selector(compare:)];
+    @synchronized(self->_servers) {
+        return [self->_servers sortedArrayUsingSelector:@selector(compare:)];
     }
 }
 
 -(Server *)getServer:(int)cid {
     NSArray *copy;
-    @synchronized(_servers) {
-        copy = _servers.copy;
+    @synchronized(self->_servers) {
+        copy = self->_servers.copy;
     }
     for(Server *server in copy) {
         if(server.cid == cid)
@@ -228,8 +228,8 @@
 
 -(Server *)getServer:(NSString *)hostname port:(int)port {
     NSArray *copy;
-    @synchronized(_servers) {
-        copy = _servers.copy;
+    @synchronized(self->_servers) {
+        copy = self->_servers.copy;
     }
     for(Server *server in copy) {
         if([server.hostname isEqualToString:hostname] && (port == -1 || server.port == port))
@@ -240,8 +240,8 @@
 
 -(Server *)getServer:(NSString *)hostname SSL:(BOOL)ssl {
     NSArray *copy;
-    @synchronized(_servers) {
-        copy = _servers.copy;
+    @synchronized(self->_servers) {
+        copy = self->_servers.copy;
     }
     for(Server *server in copy) {
         if([server.hostname isEqualToString:hostname] && ((ssl == YES && server.ssl > 0) || (ssl == NO && server.ssl == 0)))
@@ -251,10 +251,10 @@
 }
 
 -(void)removeServer:(int)cid {
-    @synchronized(_servers) {
+    @synchronized(self->_servers) {
         Server *server = [self getServer:cid];
         if(server)
-            [_servers removeObject:server];
+            [self->_servers removeObject:server];
     }
 }
 
@@ -264,14 +264,14 @@
         for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:cid]) {
             [[BuffersDataSource sharedInstance] removeAllDataForBuffer:b.bid];
         }
-        @synchronized(_servers) {
-            [_servers removeObject:server];
+        @synchronized(self->_servers) {
+            [self->_servers removeObject:server];
         }
     }
 }
 
 -(NSUInteger)count {
-    @synchronized(_servers) {
+    @synchronized(self->_servers) {
         return _servers.count;
     }
 }

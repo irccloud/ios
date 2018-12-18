@@ -33,15 +33,15 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _info = [[LinkTextView alloc] init];
-        _info.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _info.editable = NO;
-        _info.scrollEnabled = NO;
-        _info.selectable = NO;
-        _info.textContainerInset = UIEdgeInsetsZero;
-        _info.backgroundColor = [UIColor clearColor];
-        _info.textColor = [UIColor messageTextColor];
-        [self.contentView addSubview:_info];
+        self->_info = [[LinkTextView alloc] init];
+        self->_info.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_info.editable = NO;
+        self->_info.scrollEnabled = NO;
+        self->_info.selectable = NO;
+        self->_info.textContainerInset = UIEdgeInsetsZero;
+        self->_info.backgroundColor = [UIColor clearColor];
+        self->_info.textColor = [UIColor messageTextColor];
+        [self.contentView addSubview:self->_info];
     }
     return self;
 }
@@ -53,7 +53,7 @@
     frame.origin.x = 6;
     frame.origin.y = 6;
     frame.size.width -= 12;
-    _info.frame = frame;
+    self->_info.frame = frame;
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -79,7 +79,7 @@
 -(void)refresh {
     NSMutableArray *data = [[NSMutableArray alloc] init];
     
-    for(NSDictionary *user in [_event objectForKey:@"members"]) {
+    for(NSDictionary *user in [self->_event objectForKey:@"members"]) {
         NSMutableDictionary *u = [[NSMutableDictionary alloc] initWithDictionary:user];
         NSString *name;
         if([[user objectForKey:@"mode"] length])
@@ -95,7 +95,7 @@
         [data addObject:u];
     }
     
-    _data = data;
+    self->_data = data;
     [self.tableView reloadData];
 }
 
@@ -110,7 +110,7 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     return [[row objectForKey:@"height"] floatValue] + 12;
 }
 
@@ -119,14 +119,14 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_data count];
+    return [self->_data count];
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NamesTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"namecell"];
     if(!cell)
         cell = [[NamesTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"namecell"];
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     cell.info.attributedText = [row objectForKey:@"formatted"];
     return cell;
 }
@@ -136,8 +136,8 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
     [self dismissViewControllerAnimated:YES completion:nil];
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
-    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [row objectForKey:@"nick"]] to:nil cid:_event.cid handler:nil];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
+    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [row objectForKey:@"nick"]] to:nil cid:self->_event.cid handler:nil];
 }
 
 @end

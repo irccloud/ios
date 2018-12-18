@@ -35,27 +35,27 @@
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        _name = [[UILabel alloc] init];
-        _name.backgroundColor = [UIColor clearColor];
-        _name.textColor = [UITableViewCell appearance].textLabelColor;
-        _name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
-        _name.textAlignment = NSTextAlignmentLeft;
-        [self.contentView addSubview:_name];
+        self->_name = [[UILabel alloc] init];
+        self->_name.backgroundColor = [UIColor clearColor];
+        self->_name.textColor = [UITableViewCell appearance].textLabelColor;
+        self->_name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        self->_name.textAlignment = NSTextAlignmentLeft;
+        [self.contentView addSubview:self->_name];
         
-        _date = [[UILabel alloc] init];
-        _date.backgroundColor = [UIColor clearColor];
-        _date.textColor = [UITableViewCell appearance].textLabelColor;
-        _date.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _date.textAlignment = NSTextAlignmentRight;
-        [self.contentView addSubview:_date];
+        self->_date = [[UILabel alloc] init];
+        self->_date.backgroundColor = [UIColor clearColor];
+        self->_date.textColor = [UITableViewCell appearance].textLabelColor;
+        self->_date.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_date.textAlignment = NSTextAlignmentRight;
+        [self.contentView addSubview:self->_date];
         
-        _text = [[UILabel alloc] init];
-        _text.backgroundColor = [UIColor clearColor];
-        _text.textColor = [UITableViewCell appearance].detailTextLabelColor;
-        _text.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _text.lineBreakMode = NSLineBreakByTruncatingTail;
-        _text.numberOfLines = 0;
-        [self.contentView addSubview:_text];
+        self->_text = [[UILabel alloc] init];
+        self->_text.backgroundColor = [UIColor clearColor];
+        self->_text.textColor = [UITableViewCell appearance].detailTextLabelColor;
+        self->_text.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_text.lineBreakMode = NSLineBreakByTruncatingTail;
+        self->_text.numberOfLines = 0;
+        [self.contentView addSubview:self->_text];
     }
     return self;
 }
@@ -69,14 +69,14 @@
     frame.size.width -= 20;
     frame.size.height -= 16;
     
-    [_date sizeToFit];
-    _date.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height - FONT_SIZE - 6, _date.frame.size.width, FONT_SIZE + 6);
+    [self->_date sizeToFit];
+    self->_date.frame = CGRectMake(frame.origin.x, frame.origin.y + frame.size.height - FONT_SIZE - 6, _date.frame.size.width, FONT_SIZE + 6);
 
-    if(_name.text.length) {
-        _name.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - 4, FONT_SIZE + 6);
-        _text.frame = CGRectMake(frame.origin.x, _name.frame.origin.y + _name.frame.size.height, frame.size.width, frame.size.height - _date.frame.size.height - _name.frame.size.height);
+    if(self->_name.text.length) {
+        self->_name.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - 4, FONT_SIZE + 6);
+        self->_text.frame = CGRectMake(frame.origin.x, _name.frame.origin.y + _name.frame.size.height, frame.size.width, frame.size.height - _date.frame.size.height - _name.frame.size.height);
     } else {
-        _text.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height - _date.frame.size.height);
+        self->_text.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height - _date.frame.size.height);
     }
 }
 
@@ -94,8 +94,8 @@
         self.navigationItem.title = @"Text Snippets";
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
-        _extensions = [[NSMutableDictionary alloc] init];
-        _fileTypeMap = @{
+        self->_extensions = [[NSMutableDictionary alloc] init];
+        self->_fileTypeMap = @{
      @"ABAP":        [NSRegularExpression regularExpressionWithPattern:@"abap" options:NSRegularExpressionCaseInsensitive error:nil],
      @"ActionScript":[NSRegularExpression regularExpressionWithPattern:@"as" options:NSRegularExpressionCaseInsensitive error:nil],
      @"ADA":         [NSRegularExpression regularExpressionWithPattern:@"ada|adb" options:NSRegularExpressionCaseInsensitive error:nil],
@@ -215,19 +215,19 @@
     self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
     self.navigationController.navigationBar.clipsToBounds = YES;
     
-    _footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
-    _footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
+    self->_footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     UIActivityIndicatorView *a = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-    a.center = _footerView.center;
+    a.center = self->_footerView.center;
     a.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
     [a startAnimating];
-    [_footerView addSubview:a];
+    [self->_footerView addSubview:a];
     
-    self.tableView.tableFooterView = _footerView;
+    self.tableView.tableFooterView = self->_footerView;
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLine;
-    _pages = 0;
-    _pastes = nil;
-    _canLoadMore = YES;
+    self->_pages = 0;
+    self->_pastes = nil;
+    self->_canLoadMore = YES;
     [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
 }
 
@@ -239,8 +239,8 @@
 -(void)doneButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
     [self dismissViewControllerAnimated:YES completion:nil];
-    _pastes = nil;
-    _canLoadMore = NO;
+    self->_pastes = nil;
+    self->_canLoadMore = NO;
 }
 
 -(void)setFooterView:(UIView *)v {
@@ -253,13 +253,13 @@
     NSDictionary *d = [[NetworkConnection sharedInstance] getPastebins:++_pages];
     if([[d objectForKey:@"success"] boolValue]) {
         CLS_LOG(@"Loaded pastebin list for page %i", _pages);
-        if(_pastes)
-            _pastes = [_pastes arrayByAddingObjectsFromArray:[d objectForKey:@"pastebins"]];
+        if(self->_pastes)
+            self->_pastes = [self->_pastes arrayByAddingObjectsFromArray:[d objectForKey:@"pastebins"]];
         else
-            _pastes = [d objectForKey:@"pastebins"];
+            self->_pastes = [d objectForKey:@"pastebins"];
         
-        _canLoadMore = _pastes.count < [[d objectForKey:@"total"] intValue];
-        [self setFooterView:_canLoadMore?_footerView:nil];
+        self->_canLoadMore = self->_pastes.count < [[d objectForKey:@"total"] intValue];
+        [self setFooterView:self->_canLoadMore?_footerView:nil];
         if(!_pastes.count) {
             CLS_LOG(@"Pastebin list is empty");
             UILabel *fail = [[UILabel alloc] init];
@@ -273,7 +273,7 @@
         }
     } else {
         CLS_LOG(@"Failed to load pastebin list for page %i: %@", _pages, d);
-        _canLoadMore = NO;
+        self->_canLoadMore = NO;
         UILabel *fail = [[UILabel alloc] init];
         fail.text = @"\nUnable to load snippet.\nPlease try again later.\n";
         fail.numberOfLines = 4;
@@ -294,17 +294,17 @@
 }
 
 - (NSString *)fileType:(NSString *)extension {
-    if([_extensions objectForKey:extension.lowercaseString])
-        return [_extensions objectForKey:extension.lowercaseString];
+    if([self->_extensions objectForKey:extension.lowercaseString])
+        return [self->_extensions objectForKey:extension.lowercaseString];
     
     if(extension.length) {
         NSRange range = NSMakeRange(0, extension.length);
         for(NSString *type in _fileTypeMap.allKeys) {
-            NSRegularExpression *regex = [_fileTypeMap objectForKey:type];
+            NSRegularExpression *regex = [self->_fileTypeMap objectForKey:type];
             NSArray *matches = [regex matchesInString:extension options:NSMatchingAnchored range:range];
             for(NSTextCheckingResult *result in matches) {
                 if(result.range.location == 0 && result.range.length == range.length) {
-                    [_extensions setObject:type forKey:extension.lowercaseString];
+                    [self->_extensions setObject:type forKey:extension.lowercaseString];
                     return type;
                 }
             }
@@ -324,15 +324,15 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return FONT_SIZE + 24 + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"body"] boundingRectWithSize:CGRectMake(0,0,self.tableView.frame.size.width - 26,(FONT_SIZE + 4) * MAX_LINES).size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:FONT_SIZE]} context:nil].size.height) + ([[[_pastes objectAtIndex:indexPath.row] objectForKey:@"name"] length]?(FONT_SIZE + 6):0);
+    return FONT_SIZE + 24 + ([[[self->_pastes objectAtIndex:indexPath.row] objectForKey:@"body"] boundingRectWithSize:CGRectMake(0,0,self.tableView.frame.size.width - 26,(FONT_SIZE + 4) * MAX_LINES).size options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:FONT_SIZE]} context:nil].size.height) + ([[[self->_pastes objectAtIndex:indexPath.row] objectForKey:@"name"] length]?(FONT_SIZE + 6):0);
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {
-    if(_pastes.count && _canLoadMore) {
+    if(self->_pastes.count && _canLoadMore) {
         NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
         
-        if([[rows lastObject] row] >= _pastes.count - 5) {
-            _canLoadMore = NO;
+        if([[rows lastObject] row] >= self->_pastes.count - 5) {
+            self->_canLoadMore = NO;
             [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
         }
     }
@@ -343,7 +343,7 @@
     if(!cell)
         cell = [[PastebinsTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"pastebincell"];
 
-    NSDictionary *pastebin = [_pastes objectAtIndex:indexPath.row];
+    NSDictionary *pastebin = [self->_pastes objectAtIndex:indexPath.row];
     
     NSString *date = nil;
     double seconds = [[NSDate date] timeIntervalSince1970] - [[pastebin objectForKey:@"date"] doubleValue];
@@ -416,22 +416,22 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [[NetworkConnection sharedInstance] deletePaste:[[_pastes objectAtIndex:indexPath.row] objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
+        [[NetworkConnection sharedInstance] deletePaste:[[self->_pastes objectAtIndex:indexPath.row] objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] boolValue]) {
                 CLS_LOG(@"Pastebin deleted successfully");
             } else {
                 CLS_LOG(@"Error deleting pastebin: %@", result);
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete snippet, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
-                _pages = 0;
-                _pastes = nil;
-                _canLoadMore = YES;
+                self->_pages = 0;
+                self->_pastes = nil;
+                self->_canLoadMore = YES;
                 [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
             }
         }];
-        NSMutableArray *a = _pastes.mutableCopy;
+        NSMutableArray *a = self->_pastes.mutableCopy;
         [a removeObjectAtIndex:indexPath.row];
-        _pastes = [NSArray arrayWithArray:a];
+        self->_pastes = [NSArray arrayWithArray:a];
         [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
         if(!_pastes.count) {
             UILabel *fail = [[UILabel alloc] init];
@@ -447,10 +447,10 @@
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    _selectedPaste = [_pastes objectAtIndex:indexPath.row];
-    if(_selectedPaste) {
-        NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:_selectedPaste error:nil];
-        url = [url stringByAppendingFormat:@"?id=%@&own_paste=%@", [_selectedPaste objectForKey:@"id"], [_selectedPaste objectForKey:@"own_paste"]];
+    self->_selectedPaste = [self->_pastes objectAtIndex:indexPath.row];
+    if(self->_selectedPaste) {
+        NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:self->_selectedPaste error:nil];
+        url = [url stringByAppendingFormat:@"?id=%@&own_paste=%@", [self->_selectedPaste objectForKey:@"id"], [self->_selectedPaste objectForKey:@"own_paste"]];
         PastebinViewController *c = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"PastebinViewController"];
         [c setUrl:[NSURL URLWithString:url]];
         [self.navigationController pushViewController:c animated:YES];

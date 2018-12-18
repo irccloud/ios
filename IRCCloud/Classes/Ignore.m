@@ -21,22 +21,22 @@
 -(void)addMask:(NSString *)mask {
     @synchronized(self) {
         if(!_ignores)
-            _ignores = [[NSMutableArray alloc] init];
+            self->_ignores = [[NSMutableArray alloc] init];
         if(!_ignoreCache)
-            _ignoreCache = [[NSMutableDictionary alloc] init];
-        [_ignores addObject:mask];
-        [_ignoreCache removeAllObjects];
+            self->_ignoreCache = [[NSMutableDictionary alloc] init];
+        [self->_ignores addObject:mask];
+        [self->_ignoreCache removeAllObjects];
     }
 }
 
 -(void)setIgnores:(NSArray *)ignores {
     @synchronized(self) {
         if(!_ignores)
-            _ignores = [[NSMutableArray alloc] init];
+            self->_ignores = [[NSMutableArray alloc] init];
         if(!_ignoreCache)
-            _ignoreCache = [[NSMutableDictionary alloc] init];
-        [_ignores removeAllObjects];
-        [_ignoreCache removeAllObjects];
+            self->_ignoreCache = [[NSMutableDictionary alloc] init];
+        [self->_ignores removeAllObjects];
+        [self->_ignoreCache removeAllObjects];
     }
     for(NSString *ignore in ignores) {
         NSString *mask = [ignore lowercaseString];
@@ -75,27 +75,27 @@
         if([mask isEqualToString:@".*!.*@.*"])
             continue;
         @synchronized(self) {
-            [_ignores addObject:mask];
+            [self->_ignores addObject:mask];
         }
     }
 }
 
 -(BOOL)match:(NSString *)usermask {
     @synchronized(self) {
-        if(usermask && [_ignoreCache objectForKey:usermask])
-            return [[_ignoreCache objectForKey:usermask] boolValue];
+        if(usermask && [self->_ignoreCache objectForKey:usermask])
+            return [[self->_ignoreCache objectForKey:usermask] boolValue];
         if(usermask && _ignores.count) {
             for(NSString *ignore in _ignores) {
                 if(ignore) {
                     usermask = [[usermask stringByReplacingOccurrencesOfString:@"!~" withString:@"!"] lowercaseString];
                     NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:[NSString stringWithFormat:@"^%@$",ignore] options:0 error:NULL];
                     if([regex rangeOfFirstMatchInString:usermask options:0 range:NSMakeRange(0, [usermask length])].location != NSNotFound) {
-                        [_ignoreCache setObject:@(YES) forKey:usermask];
+                        [self->_ignoreCache setObject:@(YES) forKey:usermask];
                         return YES;
                     }
                 }
             }
-            [_ignoreCache setObject:@(NO) forKey:usermask];
+            [self->_ignoreCache setObject:@(NO) forKey:usermask];
         }
         return NO;
     }

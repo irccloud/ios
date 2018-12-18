@@ -24,8 +24,8 @@
 - (id)initWithCid:(int)cid {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if(self) {
-        _cid = cid;
-        _buffersToDelete = [[NSMutableArray alloc] init];
+        self->_cid = cid;
+        self->_buffersToDelete = [[NSMutableArray alloc] init];
         
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(deleteButtonPressed:)];
@@ -38,22 +38,22 @@
 
     NSMutableArray *buffers = [[NSMutableArray alloc] init];
     
-    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:_cid]) {
+    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:self->_cid]) {
         if([b.type isEqualToString:@"conversation"] && !b.archived) {
             [buffers addObject:b];
-            [_buffersToDelete addObject:b];
+            [self->_buffersToDelete addObject:b];
         }
     }
     
-    _buffers = buffers;
+    self->_buffers = buffers;
     
-    _header = [[UILabel alloc] init];
-    _header.frame = CGRectMake(8,0,self.tableView.frame.size.width - 16,64);
-    _header.text = @"Uncheck any conversations you'd prefer to keep before continuing.";
-    _header.numberOfLines = 0;
-    _header.lineBreakMode = NSLineBreakByWordWrapping;
-    _header.textAlignment = NSTextAlignmentCenter;
-    _header.textColor = [UIColor timestampColor];
+    self->_header = [[UILabel alloc] init];
+    self->_header.frame = CGRectMake(8,0,self.tableView.frame.size.width - 16,64);
+    self->_header.text = @"Uncheck any conversations you'd prefer to keep before continuing.";
+    self->_header.numberOfLines = 0;
+    self->_header.lineBreakMode = NSLineBreakByWordWrapping;
+    self->_header.textAlignment = NSTextAlignmentCenter;
+    self->_header.textColor = [UIColor timestampColor];
 
     [self.tableView reloadData];
 }
@@ -67,9 +67,9 @@
         [[NetworkConnection sharedInstance] deleteBuffer:b.bid cid:b.cid handler:nil];
     }
     [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
-        if(_buffersToDelete.count) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_cid];
-            UIAlertView *a = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"%lu conversations were deleted", (unsigned long)_buffersToDelete.count] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+        if(self->_buffersToDelete.count) {
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_cid];
+            UIAlertView *a = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"%lu conversations were deleted", (unsigned long)self->_buffersToDelete.count] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
             [a show];
         }
     }];
@@ -83,9 +83,9 @@
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     if(@available(iOS 11, *)) {
-        CGRect frame = _header.frame;
+        CGRect frame = self->_header.frame;
         frame.origin.x = self.view.safeAreaInsets.left + 8;
-        _header.frame = frame;
+        self->_header.frame = frame;
     }
 
     return _header;
@@ -108,10 +108,10 @@
     if(!cell)
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"buffercell"];
     
-    Buffer *b = [_buffers objectAtIndex:indexPath.row];
+    Buffer *b = [self->_buffers objectAtIndex:indexPath.row];
     cell.textLabel.text = b.name;
     
-    if([_buffersToDelete containsObject:b])
+    if([self->_buffersToDelete containsObject:b])
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     else
         cell.accessoryType = UITableViewCellAccessoryNone;
@@ -120,11 +120,11 @@
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    Buffer *b = [_buffers objectAtIndex:indexPath.row];
-    if([_buffersToDelete containsObject:b])
-        [_buffersToDelete removeObject:b];
+    Buffer *b = [self->_buffers objectAtIndex:indexPath.row];
+    if([self->_buffersToDelete containsObject:b])
+        [self->_buffersToDelete removeObject:b];
     else
-        [_buffersToDelete addObject:b];
+        [self->_buffersToDelete addObject:b];
     
     [self.tableView reloadData];
 }

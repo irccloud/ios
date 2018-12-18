@@ -33,14 +33,14 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _info = [[LinkTextView alloc] init];
-        _info.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _info.editable = NO;
-        _info.scrollEnabled = NO;
-        _info.textContainerInset = UIEdgeInsetsZero;
-        _info.backgroundColor = [UIColor clearColor];
-        _info.textColor = [UIColor messageTextColor];
-        [self.contentView addSubview:_info];
+        self->_info = [[LinkTextView alloc] init];
+        self->_info.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_info.editable = NO;
+        self->_info.scrollEnabled = NO;
+        self->_info.textContainerInset = UIEdgeInsetsZero;
+        self->_info.backgroundColor = [UIColor clearColor];
+        self->_info.textColor = [UIColor messageTextColor];
+        [self.contentView addSubview:self->_info];
     }
     return self;
 }
@@ -52,7 +52,7 @@
     frame.origin.x = 6;
     frame.size.width -= 12;
     
-    _info.frame = frame;
+    self->_info.frame = frame;
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -78,7 +78,7 @@
 -(void)refresh {
     NSMutableArray *data = [[NSMutableArray alloc] init];
     
-    for(NSDictionary *link in [_event objectForKey:@"links"]) {
+    for(NSDictionary *link in [self->_event objectForKey:@"links"]) {
         NSMutableDictionary *d = [[NSMutableDictionary alloc] init];
         NSAttributedString *formatted = [ColorFormatter format:[NSString stringWithFormat:@"%c%@%c\n%@\nHops: %@", BOLD, [link objectForKey:@"server"], CLEAR, [link objectForKey:@"info"], [link objectForKey:@"hopcount"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:nil links:nil];
         [d setObject:formatted forKey:@"formatted"];
@@ -86,7 +86,7 @@
         [data addObject:d];
     }
     
-    _data = data;
+    self->_data = data;
     [self.tableView reloadData];
 }
 
@@ -104,7 +104,7 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     return [[row objectForKey:@"height"] floatValue];
 }
 
@@ -113,14 +113,14 @@
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_data count];
+    return [self->_data count];
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     LinkTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"linkcell"];
     if(!cell)
         cell = [[LinkTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"linkcell"];
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     cell.info.attributedText = [row objectForKey:@"formatted"];
     return cell;
 }

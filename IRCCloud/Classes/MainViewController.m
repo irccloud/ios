@@ -85,12 +85,12 @@ NSArray *_sortedChannels;
 }
 
 -(void)setMessage:(UIExpandingTextView *)message {
-    _message = message;
-    _text = message.text;
+    self->_message = message;
+    self->_text = message.text;
 }
 
 -(void)cancel {
-    _cancelled = YES;
+    self->_cancelled = YES;
 }
 
 -(void)run {
@@ -98,8 +98,8 @@ NSArray *_sortedChannels;
     NSMutableSet *suggestions_set = [[NSMutableSet alloc] init];
     NSMutableArray *suggestions = [[NSMutableArray alloc] init];
     
-    if(_text.length > 0) {
-        NSString *text = _text.lowercaseString;
+    if(self->_text.length > 0) {
+        NSString *text = self->_text.lowercaseString;
         NSUInteger lastSpace = [text rangeOfString:@" " options:NSBackwardsSearch].location;
         if(lastSpace != NSNotFound && lastSpace != text.length) {
             text = [text substringFromIndex:lastSpace + 1];
@@ -107,17 +107,17 @@ NSArray *_sortedChannels;
         if([text hasSuffix:@":"])
             text = [text substringToIndex:text.length - 1];
         if([text hasPrefix:@"@"]) {
-            _atMention = YES;
+            self->_atMention = YES;
             text = [text substringFromIndex:1];
         } else {
-            _atMention = NO;
+            self->_atMention = NO;
         }
         
         if(!_sortedChannels)
             _sortedChannels = [[[ChannelsDataSource sharedInstance] channels] sortedArrayUsingSelector:@selector(compare:)];
         
         if([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]) {
-            if(_atMention || _force) {
+            if(self->_atMention || _force) {
                 if(_sortedUsers.count == 0)
                     _sortedUsers = nil;
             } else {
@@ -125,20 +125,20 @@ NSArray *_sortedChannels;
             }
         }
         if(!_sortedUsers)
-            _sortedUsers = [[[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
-        if(_cancelled)
+            _sortedUsers = [[[UsersDataSource sharedInstance] usersForBuffer:self->_buffer.bid] sortedArrayUsingSelector:@selector(compareByMentionTime:)];
+        if(self->_cancelled)
             return;
         
         if(text.length > 1 || _force) {
-            if([_buffer.type isEqualToString:@"channel"] && [[_buffer.name lowercaseString] hasPrefix:text]) {
-                [suggestions_set addObject:_buffer.name.lowercaseString];
-                [suggestions addObject:_buffer.name];
+            if([self->_buffer.type isEqualToString:@"channel"] && [[self->_buffer.name lowercaseString] hasPrefix:text]) {
+                [suggestions_set addObject:self->_buffer.name.lowercaseString];
+                [suggestions addObject:self->_buffer.name];
             }
             for(Channel *channel in _sortedChannels) {
-                if(_cancelled)
+                if(self->_cancelled)
                     return;
                 
-                if(text.length > 0 && channel.name.length > 0 && [channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != _buffer.bid && [[channel.name lowercaseString] hasPrefix:text] && ![suggestions_set containsObject:channel.name.lowercaseString] && ![[BuffersDataSource sharedInstance] getBuffer:channel.bid].isMPDM) {
+                if(text.length > 0 && channel.name.length > 0 && [channel.name characterAtIndex:0] == [text characterAtIndex:0] && channel.bid != self->_buffer.bid && [[channel.name lowercaseString] hasPrefix:text] && ![suggestions_set containsObject:channel.name.lowercaseString] && ![[BuffersDataSource sharedInstance] getBuffer:channel.bid].isMPDM) {
                     [suggestions_set addObject:channel.name.lowercaseString];
                     [suggestions addObject:channel.name];
                     self.isEmoji = YES;
@@ -146,7 +146,7 @@ NSArray *_sortedChannels;
             }
             
             for(User *user in _sortedUsers) {
-                if(_cancelled)
+                if(self->_cancelled)
                     return;
                 
                 NSString *nick = user.nick.lowercaseString;
@@ -170,7 +170,7 @@ NSArray *_sortedChannels;
             NSString *q = [text substringFromIndex:1];
             
             for(NSString *emocode in emojiMap.keyEnumerator) {
-                if(_cancelled)
+                if(self->_cancelled)
                     return;
                 
                 if([emocode hasPrefix:q]) {
@@ -185,22 +185,22 @@ NSArray *_sortedChannels;
         }
     }
     
-    if(_cancelled)
+    if(self->_cancelled)
         return;
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if(_nickCompletionView.selection == -1 || suggestions.count == 0)
-            [_nickCompletionView setSuggestions:suggestions];
+        if(self->_nickCompletionView.selection == -1 || suggestions.count == 0)
+            [self->_nickCompletionView setSuggestions:suggestions];
         
-        if(_cancelled)
+        if(self->_cancelled)
             return;
         
         if(suggestions.count == 0) {
-            if(_nickCompletionView.alpha > 0) {
-                [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 0; } completion:nil];
+            if(self->_nickCompletionView.alpha > 0) {
+                [UIView animateWithDuration:0.25 animations:^{ self->_nickCompletionView.alpha = 0; } completion:nil];
                 if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-                    _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
-                    [_message.internalTextView reloadInputViews];
+                    self->_message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
+                    [self->_message.internalTextView reloadInputViews];
                     id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
                     if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
                         objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
@@ -209,45 +209,45 @@ NSArray *_sortedChannels;
                 _sortedChannels = nil;
                 _sortedUsers = nil;
             }
-            _atMention = NO;
+            self->_atMention = NO;
         } else {
-            if(_nickCompletionView.alpha == 0) {
-                [UIView animateWithDuration:0.25 animations:^{ _nickCompletionView.alpha = 1; } completion:nil];
-                NSString *text = _message.text;
-                id delegate = _message.delegate;
-                _message.delegate = nil;
-                _message.text = text;
-                _message.selectedRange = NSMakeRange(text.length, 0);
+            if(self->_nickCompletionView.alpha == 0) {
+                [UIView animateWithDuration:0.25 animations:^{ self->_nickCompletionView.alpha = 1; } completion:nil];
+                NSString *text = self->_message.text;
+                id delegate = self->_message.delegate;
+                self->_message.delegate = nil;
+                self->_message.text = text;
+                self->_message.selectedRange = NSMakeRange(text.length, 0);
                 if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-                    _message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
-                    [_message.internalTextView reloadInputViews];
+                    self->_message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
+                    [self->_message.internalTextView reloadInputViews];
                     id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
                     if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
                         objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
                         objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
                     }
                 }
-                if(_force && _nickCompletionView.selection == -1) {
-                    [_nickCompletionView setSelection:0];
-                    NSString *text = _message.text;
+                if(self->_force && self->_nickCompletionView.selection == -1) {
+                    [self->_nickCompletionView setSelection:0];
+                    NSString *text = self->_message.text;
                     if(text.length == 0) {
-                        if(_buffer.serverIsSlack)
-                            _message.text = [NSString stringWithFormat:@"@%@",[_nickCompletionView suggestion]];
+                        if(self->_buffer.serverIsSlack)
+                            self->_message.text = [NSString stringWithFormat:@"@%@",[self->_nickCompletionView suggestion]];
                         else
-                            _message.text = [_nickCompletionView suggestion];
+                            self->_message.text = [self->_nickCompletionView suggestion];
                     } else {
                         while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
                             text = [text substringToIndex:text.length - 1];
                         }
-                        if(_buffer.serverIsSlack)
+                        if(self->_buffer.serverIsSlack)
                             text = [text stringByAppendingString:@"@"];
-                        text = [text stringByAppendingString:[_nickCompletionView suggestion]];
-                        _message.text = text;
+                        text = [text stringByAppendingString:[self->_nickCompletionView suggestion]];
+                        self->_message.text = text;
                     }
-                    if([text rangeOfString:@" "].location == NSNotFound && !_buffer.serverIsSlack)
-                        _message.text = [_message.text stringByAppendingString:@":"];
+                    if([text rangeOfString:@" "].location == NSNotFound && !self->_buffer.serverIsSlack)
+                        self->_message.text = [self->_message.text stringByAppendingString:@":"];
                 }
-                _message.delegate = delegate;
+                self->_message.delegate = delegate;
             }
         }
     }];
@@ -258,9 +258,9 @@ NSArray *_sortedChannels;
 
 -(instancetype)initWithCoder:(NSCoder *)aDecoder {
     if(self = [super initWithCoder:aDecoder]) {
-        _cidToOpen = -1;
-        _bidToOpen = -1;
-        _pendingEvents = [[NSMutableArray alloc] init];
+        self->_cidToOpen = -1;
+        self->_bidToOpen = -1;
+        self->_pendingEvents = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -271,8 +271,8 @@ NSArray *_sortedChannels;
 }
 
 - (void)_themeChanged {
-    if(![_currentTheme isEqualToString:[UIColor currentTheme]]) {
-        _currentTheme = [UIColor currentTheme];
+    if(![self->_currentTheme isEqualToString:[UIColor currentTheme]]) {
+        self->_currentTheme = [UIColor currentTheme];
         UIView *v = self.navigationController.view.superview;
         if(v) {
             [self.navigationController.view removeFromSuperview];
@@ -284,27 +284,27 @@ NSArray *_sortedChannels;
 }
 
 - (void)applyTheme {
-    _currentTheme = [UIColor currentTheme];
+    self->_currentTheme = [UIColor currentTheme];
     self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
     self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
-    _bottomBar.backgroundColor = [UIColor contentBackgroundColor];
+    self->_bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-    [_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
+    [self->_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
-    [_sendBtn setTitleColor:c forState:UIControlStateNormal];
-    [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
-    [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
-    [_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
-    [_message setBackgroundImage:[UIColor textareaBackgroundImage]];
-    _message.textColor = [UIColor textareaTextColor];
-    _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
-    _defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateNormal];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateDisabled];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
+    [self->_settingsBtn setTintColor:[UIColor textareaBackgroundColor]];
+    [self->_message setBackgroundImage:[UIColor textareaBackgroundImage]];
+    self->_message.textColor = [UIColor textareaTextColor];
+    self->_message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
     if(!_message.text.length)
-        _message.font = _defaultTextareaFont;
-    _message.minimumHeight = FONT_SIZE + 22;
-    if(_message.minimumHeight < 35)
-        _message.minimumHeight = 35;
+        self->_message.font = self->_defaultTextareaFont;
+    self->_message.minimumHeight = FONT_SIZE + 22;
+    if(self->_message.minimumHeight < 35)
+        self->_message.minimumHeight = 35;
     
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
@@ -312,31 +312,31 @@ NSArray *_sortedChannels;
     users.frame = CGRectMake(0,0,24,22);
     [users setTintColor:[UIColor navBarSubheadingColor]];
     users.accessibilityLabel = @"Channel members list";
-    _usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
+    self->_usersButtonItem = [[UIBarButtonItem alloc] initWithCustomView:users];
     
-    _menuBtn.tintColor = [UIColor navBarSubheadingColor];
+    self->_menuBtn.tintColor = [UIColor navBarSubheadingColor];
     
-    _eventsView.topUnreadView.backgroundColor = [UIColor chatterBarColor];
-    _eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
-    _eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
-    _eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
-    _eventsView.topUnreadArrow.textColor = _eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
+    self->_eventsView.topUnreadView.backgroundColor = [UIColor chatterBarColor];
+    self->_eventsView.bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
+    self->_eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    self->_eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
+    self->_eventsView.topUnreadArrow.textColor = self->_eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
     
-    _borders.backgroundColor = [UIColor iPadBordersColor];
-    [[_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
+    self->_borders.backgroundColor = [UIColor iPadBordersColor];
+    [[self->_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
     
-    _eventActivity.activityIndicatorViewStyle = _headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
+    self->_eventActivity.activityIndicatorViewStyle = self->_headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
     
     [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
 
-    _globalMsg.linkAttributes = [UIColor lightLinkAttributes];
+    self->_globalMsg.linkAttributes = [UIColor lightLinkAttributes];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.slidingViewController.view.frame = self.view.window.bounds;
 
-    [_eventsView viewDidLoad];
+    [self->_eventsView viewDidLoad];
 
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     
@@ -386,78 +386,78 @@ NSArray *_sortedChannels;
                                              selector:@selector(statusBarFrameWillChange:)
                                                  name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     [super viewDidLoad];
-    [self addChildViewController:_eventsView];
+    [self addChildViewController:self->_eventsView];
     
     AudioServicesCreateSystemSoundID((__bridge CFURLRef)[NSURL fileURLWithPath:[[NSBundle mainBundle] pathForResource:@"a" ofType:@"caf"]], &alertSound);
     
-    _globalMsg.linkDelegate = self;
-    [_globalMsg addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(globalMsgPressed:)]];
+    self->_globalMsg.linkDelegate = self;
+    [self->_globalMsg addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(globalMsgPressed:)]];
     
     if(!_buffersView) {
-        _buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
-        _buffersView.view.autoresizingMask = UIViewAutoresizingNone;
-        _buffersView.view.translatesAutoresizingMaskIntoConstraints = NO;
-        _buffersView.delegate = self;
+        self->_buffersView = [[BuffersTableView alloc] initWithStyle:UITableViewStylePlain];
+        self->_buffersView.view.autoresizingMask = UIViewAutoresizingNone;
+        self->_buffersView.view.translatesAutoresizingMaskIntoConstraints = NO;
+        self->_buffersView.delegate = self;
     }
 
     if(!_usersView) {
-        _usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
-        _usersView.view.autoresizingMask = UIViewAutoresizingNone;
-        _usersView.view.translatesAutoresizingMaskIntoConstraints = NO;
-        _usersView.delegate = self;
+        self->_usersView = [[UsersTableView alloc] initWithStyle:UITableViewStylePlain];
+        self->_usersView.view.autoresizingMask = UIViewAutoresizingNone;
+        self->_usersView.view.translatesAutoresizingMaskIntoConstraints = NO;
+        self->_usersView.delegate = self;
     }
     
-    if(_swipeTip)
-        _swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
+    if(self->_swipeTip)
+        self->_swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
     if(_2swipeTip)
         _2swipeTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
-    if(_mentionTip)
-        _mentionTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
+    if(self->_mentionTip)
+        self->_mentionTip.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"tip_bg"]];
     
-    _lock.font = [UIFont fontWithName:@"FontAwesome" size:18];
+    self->_lock.font = [UIFont fontWithName:@"FontAwesome" size:18];
 
-    _uploadsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _uploadsBtn.contentMode = UIViewContentModeCenter;
-    _uploadsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    [_uploadsBtn setImage:[[UIImage imageNamed:@"upload_arrow"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [_uploadsBtn sizeToFit];
-    _uploadsBtn.frame = CGRectMake(9,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
-    _uploadsBtn.accessibilityLabel = @"Uploads";
-    [_bottomBar addSubview:_uploadsBtn];
+    self->_uploadsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self->_uploadsBtn.contentMode = UIViewContentModeCenter;
+    self->_uploadsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
+    [self->_uploadsBtn setImage:[[UIImage imageNamed:@"upload_arrow"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self->_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [self->_uploadsBtn sizeToFit];
+    self->_uploadsBtn.frame = CGRectMake(9,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
+    self->_uploadsBtn.accessibilityLabel = @"Uploads";
+    [self->_bottomBar addSubview:self->_uploadsBtn];
 
-    _sendBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _sendBtn.contentMode = UIViewContentModeCenter;
-    _sendBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
-    [_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
-    [_sendBtn sizeToFit];
-    _sendBtn.frame = CGRectMake(_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,4,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
-    [_sendBtn addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [_sendBtn sizeToFit];
-    _sendBtn.enabled = NO;
-    _sendBtn.adjustsImageWhenHighlighted = NO;
-    [_bottomBar addSubview:_sendBtn];
+    self->_sendBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self->_sendBtn.contentMode = UIViewContentModeCenter;
+    self->_sendBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
+    [self->_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
+    [self->_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
+    [self->_sendBtn sizeToFit];
+    self->_sendBtn.frame = CGRectMake(self->_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,4,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
+    [self->_sendBtn addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [self->_sendBtn sizeToFit];
+    self->_sendBtn.enabled = NO;
+    self->_sendBtn.adjustsImageWhenHighlighted = NO;
+    [self->_bottomBar addSubview:self->_sendBtn];
 
-    _settingsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _settingsBtn.contentMode = UIViewContentModeCenter;
-    _settingsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
-    [_settingsBtn setImage:[[UIImage imageNamed:@"settings"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [_settingsBtn addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    [_settingsBtn sizeToFit];
-    _settingsBtn.accessibilityLabel = @"Menu";
-    _settingsBtn.enabled = NO;
-    _settingsBtn.alpha = 0;
-    _settingsBtn.frame = CGRectMake(_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 24,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
-    [_bottomBar addSubview:_settingsBtn];
+    self->_settingsBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    self->_settingsBtn.contentMode = UIViewContentModeCenter;
+    self->_settingsBtn.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin;
+    [self->_settingsBtn setImage:[[UIImage imageNamed:@"settings"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self->_settingsBtn addTarget:self action:@selector(settingsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    [self->_settingsBtn sizeToFit];
+    self->_settingsBtn.accessibilityLabel = @"Menu";
+    self->_settingsBtn.enabled = NO;
+    self->_settingsBtn.alpha = 0;
+    self->_settingsBtn.frame = CGRectMake(self->_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 24,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
+    [self->_bottomBar addSubview:self->_settingsBtn];
     
     self.slidingViewController.shouldAllowPanningPastAnchor = NO;
     if(self.slidingViewController.underLeftViewController == nil)
-        self.slidingViewController.underLeftViewController = _buffersView;
+        self.slidingViewController.underLeftViewController = self->_buffersView;
     if(self.slidingViewController.underRightViewController == nil)
-        self.slidingViewController.underRightViewController = _usersView;
+        self.slidingViewController.underRightViewController = self->_usersView;
     self.slidingViewController.anchorLeftRevealAmount = 240;
     self.slidingViewController.anchorRightRevealAmount = 240;
     self.slidingViewController.underLeftWidthLayout = ECFixedRevealWidth;
@@ -467,60 +467,60 @@ NSArray *_sortedChannels;
     self.navigationController.view.layer.shadowRadius = 2.0f;
     self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
 
-    _menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    [_menuBtn setImage:[[UIImage imageNamed:@"menu"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
-    [_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-    _menuBtn.frame = CGRectMake(0,0,20,18);
-    _menuBtn.accessibilityLabel = @"Channels list";
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
+    self->_menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    [self->_menuBtn setImage:[[UIImage imageNamed:@"menu"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
+    [self->_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+    self->_menuBtn.frame = CGRectMake(0,0,20,18);
+    self->_menuBtn.accessibilityLabel = @"Channels list";
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_menuBtn];
     
-    _message = [[UIExpandingTextView alloc] initWithFrame:CGRectZero];
-    _message.delegate = self;
-    _message.returnKeyType = UIReturnKeySend;
-    _message.autoresizesSubviews = NO;
-    _message.translatesAutoresizingMaskIntoConstraints = NO;
-    //    _message.internalTextView.font = _defaultTextareaFont = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:FONT_SIZE];
-    _message.internalTextView.font = _defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
-    _messageWidthConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
-    _messageHeightConstraint = [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
-    [_message addConstraints:@[_messageWidthConstraint, _messageHeightConstraint]];
+    self->_message = [[UIExpandingTextView alloc] initWithFrame:CGRectZero];
+    self->_message.delegate = self;
+    self->_message.returnKeyType = UIReturnKeySend;
+    self->_message.autoresizesSubviews = NO;
+    self->_message.translatesAutoresizingMaskIntoConstraints = NO;
+    //    _message.internalTextView.font = self->_defaultTextareaFont = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:FONT_SIZE];
+    self->_message.internalTextView.font = self->_defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
+    self->_messageWidthConstraint = [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
+    self->_messageHeightConstraint = [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
+    [self->_message addConstraints:@[self->_messageWidthConstraint, _messageHeightConstraint]];
 
-    [_bottomBar addSubview:_message];
-    [_bottomBar addConstraints:@[
-                             [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:50.0f],
-                             [NSLayoutConstraint constraintWithItem:_message attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-2.0f]
+    [self->_bottomBar addSubview:self->_message];
+    [self->_bottomBar addConstraints:@[
+                             [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:50.0f],
+                             [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-2.0f]
                              ]];
-    _nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
-    _nickCompletionView.translatesAutoresizingMaskIntoConstraints = NO;
-    _nickCompletionView.completionDelegate = self;
-    _nickCompletionView.alpha = 0;
-    [self.view addSubview:_nickCompletionView];
+    self->_nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
+    self->_nickCompletionView.translatesAutoresizingMaskIntoConstraints = NO;
+    self->_nickCompletionView.completionDelegate = self;
+    self->_nickCompletionView.alpha = 0;
+    [self.view addSubview:self->_nickCompletionView];
     [self.view addConstraints:@[
-                                [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f],
-                                [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeWidth multiplier:1.0f constant:-20.0f],
-                                 [NSLayoutConstraint constraintWithItem:_nickCompletionView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_eventsView.bottomUnreadView attribute:NSLayoutAttributeTop multiplier:1.0f constant:-6.0f]
+                                [NSLayoutConstraint constraintWithItem:self->_nickCompletionView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self->_eventsView.tableView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f],
+                                [NSLayoutConstraint constraintWithItem:self->_nickCompletionView attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self->_eventsView.tableView attribute:NSLayoutAttributeWidth multiplier:1.0f constant:-20.0f],
+                                 [NSLayoutConstraint constraintWithItem:self->_nickCompletionView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self->_eventsView.bottomUnreadView attribute:NSLayoutAttributeTop multiplier:1.0f constant:-6.0f]
                                  ]];
 
-    _colorPickerView = [[IRCColorPickerView alloc] initWithFrame:CGRectZero];
-    _colorPickerView.translatesAutoresizingMaskIntoConstraints = NO;
-    _colorPickerView.delegate = self;
-    _colorPickerView.alpha = 0;
-    [self.view addSubview:_colorPickerView];
+    self->_colorPickerView = [[IRCColorPickerView alloc] initWithFrame:CGRectZero];
+    self->_colorPickerView.translatesAutoresizingMaskIntoConstraints = NO;
+    self->_colorPickerView.delegate = self;
+    self->_colorPickerView.alpha = 0;
+    [self.view addSubview:self->_colorPickerView];
     [self.view addConstraints:@[
-                                [NSLayoutConstraint constraintWithItem:_colorPickerView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:_eventsView.tableView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f],
-                                [NSLayoutConstraint constraintWithItem:_colorPickerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:-2.0f]
+                                [NSLayoutConstraint constraintWithItem:self->_colorPickerView attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:self->_eventsView.tableView attribute:NSLayoutAttributeCenterX multiplier:1.0f constant:0.0f],
+                                [NSLayoutConstraint constraintWithItem:self->_colorPickerView attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:-2.0f]
                                 ]];
     
-    _connectingProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
-    [_connectingProgress sizeToFit];
-    _connectingProgress.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-    _connectingProgress.frame = CGRectMake(0,self.navigationController.navigationBar.bounds.size.height - _connectingProgress.bounds.size.height,self.navigationController.navigationBar.bounds.size.width,_connectingProgress.bounds.size.height);
-    [self.navigationController.navigationBar addSubview:_connectingProgress];
+    self->_connectingProgress = [[UIProgressView alloc] initWithProgressViewStyle:UIProgressViewStyleBar];
+    [self->_connectingProgress sizeToFit];
+    self->_connectingProgress.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+    self->_connectingProgress.frame = CGRectMake(0,self.navigationController.navigationBar.bounds.size.height - _connectingProgress.bounds.size.height,self.navigationController.navigationBar.bounds.size.width,_connectingProgress.bounds.size.height);
+    [self.navigationController.navigationBar addSubview:self->_connectingProgress];
     
-    _connectingStatus.font = [UIFont boldSystemFontOfSize:20];
-    self.navigationItem.titleView = _titleView;
-    _connectingProgress.hidden = YES;
-    _connectingProgress.progress = 0;
+    self->_connectingStatus.font = [UIFont boldSystemFontOfSize:20];
+    self.navigationItem.titleView = self->_titleView;
+    self->_connectingProgress.hidden = YES;
+    self->_connectingProgress.progress = 0;
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [self _themeChanged];
     [self connectivityChanged:nil];
@@ -564,7 +564,7 @@ NSArray *_sortedChannels;
         
         FileUploader *u = [[FileUploader alloc] init];
         u.delegate = self;
-        u.bid = _buffer.bid;
+        u.bid = self->_buffer.bid;
         NSString *UTI = i.registeredTypeIdentifiers.lastObject;
         u.originalFilename = i.suggestedName;
         if(![u.originalFilename containsString:@"."] && ![UTI hasPrefix:@"dyn."]) {
@@ -596,7 +596,7 @@ NSArray *_sortedChannels;
                     CLS_LOG(@"Uploading dropped image to imgur");
                     ImageUploader *img = [[ImageUploader alloc] init];
                     img.delegate = self;
-                    img.bid = _buffer.bid;
+                    img.bid = self->_buffer.bid;
                     [img upload:item];
                 }
             } else {
@@ -646,10 +646,10 @@ NSArray *_sortedChannels;
 }
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
-    if(CGRectContainsPoint(_titleView.frame, [_titleView convertPoint:location fromView:self.navigationController.view])) {
-        if(_buffer && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-            previewingContext.sourceRect = [self.navigationController.view convertRect:_titleView.frame fromView:self.navigationController.navigationBar];
-            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithChannel:[[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]];
+    if(CGRectContainsPoint(self->_titleView.frame, [self->_titleView convertPoint:location fromView:self.navigationController.view])) {
+        if(self->_buffer && [self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
+            previewingContext.sourceRect = [self.navigationController.view convertRect:self->_titleView.frame fromView:self.navigationController.navigationBar];
+            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithChannel:[[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             nc.navigationBarHidden = YES;
@@ -676,14 +676,14 @@ NSArray *_sortedChannels;
 }
 
 - (void) observeValueForKeyPath:(NSString*)keyPath ofObject:(id)object change:(NSDictionary*)change context:(void*)context {
-    if (object == _eventsView.topUnreadView) {
+    if (object == self->_eventsView.topUnreadView) {
         if(![[change objectForKey:NSKeyValueChangeOldKey] isEqualToNumber:[change objectForKey:NSKeyValueChangeNewKey]])
             [self _updateEventsInsets];
-    } else if(object == _eventsView.tableView.layer) {
+    } else if(object == self->_eventsView.tableView.layer) {
         CGRect old = [[change objectForKey:NSKeyValueChangeOldKey] CGRectValue];
         CGRect new = [[change objectForKey:NSKeyValueChangeNewKey] CGRectValue];
         if(new.size.height > 0 && old.size.width != new.size.width) {
-            [_eventsView clearCachedHeights];
+            [self->_eventsView clearCachedHeights];
         }
     } else {
         NSLog(@"Change: %@", change);
@@ -691,30 +691,30 @@ NSArray *_sortedChannels;
 }
 
 - (void)swipeBack:(UISwipeGestureRecognizer *)sender {
-    if(_buffer.lastBuffer) {
-        Buffer *b = _buffer;
-        Buffer *last = _buffer.lastBuffer.lastBuffer;
+    if(self->_buffer.lastBuffer) {
+        Buffer *b = self->_buffer;
+        Buffer *last = self->_buffer.lastBuffer.lastBuffer;
         [self bufferSelected:b.lastBuffer.bid];
-        _buffer.lastBuffer = last;
-        _buffer.nextBuffer = b;
+        self->_buffer.lastBuffer = last;
+        self->_buffer.nextBuffer = b;
     }
 }
 
 - (void)swipeForward:(UISwipeGestureRecognizer *)sender {
-    if(_buffer.nextBuffer) {
-        Buffer *b = _buffer;
-        Buffer *last = _buffer.lastBuffer;
-        Buffer *next = _buffer.nextBuffer;
-        Buffer *nextnext = _buffer.nextBuffer.nextBuffer;
+    if(self->_buffer.nextBuffer) {
+        Buffer *b = self->_buffer;
+        Buffer *last = self->_buffer.lastBuffer;
+        Buffer *next = self->_buffer.nextBuffer;
+        Buffer *nextnext = self->_buffer.nextBuffer.nextBuffer;
         [self bufferSelected:next.bid];
-        _buffer.nextBuffer = nextnext;
+        self->_buffer.nextBuffer = nextnext;
         b.nextBuffer = next;
         b.lastBuffer = last;
     }
 }
 
 - (void)_updateUnreadIndicator {
-    @synchronized(_buffer) {
+    @synchronized(self->_buffer) {
         int unreadCount = 0;
         int highlightCount = 0;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
@@ -758,7 +758,7 @@ NSArray *_sortedChannels;
                             highlights = 0;
                     }
                 }
-                if(buffer.bid != _buffer.bid) {
+                if(buffer.bid != self->_buffer.bid) {
                     unreadCount += unread;
                     highlightCount += highlights;
                 }
@@ -769,16 +769,16 @@ NSArray *_sortedChannels;
         
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(highlightCount) {
-                _menuBtn.tintColor = [UIColor redColor];
-                _menuBtn.accessibilityValue = @"Unread highlights";
+                self->_menuBtn.tintColor = [UIColor redColor];
+                self->_menuBtn.accessibilityValue = @"Unread highlights";
             } else if(unreadCount) {
-                if(![_menuBtn.tintColor isEqual:[UIColor unreadBlueColor]])
+                if(![self->_menuBtn.tintColor isEqual:[UIColor unreadBlueColor]])
                     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
-                _menuBtn.tintColor = [UIColor unreadBlueColor];
-                _menuBtn.accessibilityValue = @"Unread messages";
+                self->_menuBtn.tintColor = [UIColor unreadBlueColor];
+                self->_menuBtn.accessibilityValue = @"Unread messages";
             } else {
-                _menuBtn.tintColor = [UIColor navBarSubheadingColor];
-                _menuBtn.accessibilityValue = nil;
+                self->_menuBtn.tintColor = [UIColor navBarSubheadingColor];
+                self->_menuBtn.accessibilityValue = nil;
             }
         }];
     }
@@ -860,17 +860,17 @@ NSArray *_sortedChannels;
             [self _updateUserListVisibility];
             break;
         case kIRCEventBadChannelKey: {
-            _alertObject = notification.object;
-            s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
+            self->_alertObject = notification.object;
+            s = [[ServersDataSource sharedInstance] getServer:self->_alertObject.cid];
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self dismissKeyboard];
                 [self.view.window endEditing:YES];
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[_alertObject objectForKey:@"chan"]] preferredStyle:UIAlertControllerStyleAlert];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"Password for %@",[self->_alertObject objectForKey:@"chan"]] preferredStyle:UIAlertControllerStyleAlert];
                 
                 [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                     if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
-                        [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:_alertObject.cid handler:^(IRCCloudJSONObject *result) {
+                        [[NetworkConnection sharedInstance] join:[self->_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:self->_alertObject.cid handler:^(IRCCloudJSONObject *result) {
                             UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to join channel: %@. Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
                             [v show];
                         }];
@@ -890,8 +890,8 @@ NSArray *_sortedChannels;
             }];}
             break;
         case kIRCEventInvalidNick: {
-            _alertObject = notification.object;
-            s = [[ServersDataSource sharedInstance] getServer:_alertObject.cid];
+            self->_alertObject = notification.object;
+            s = [[ServersDataSource sharedInstance] getServer:self->_alertObject.cid];
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self dismissKeyboard];
                 [self.view.window endEditing:YES];
@@ -902,7 +902,7 @@ NSArray *_sortedChannels;
                 if(s) {
                     [alert addAction:[UIAlertAction actionWithTitle:@"Change" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                         if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
-                            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:_alertObject.cid handler:nil];
+                            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:self->_alertObject.cid handler:nil];
                     }]];
                 }
                 
@@ -947,7 +947,7 @@ NSArray *_sortedChannels;
                         tv.navigationItem.title = [NSString stringWithFormat:@"HELP For %@", [o objectForKey:@"command"]];
                     else
                         tv.navigationItem.title = type.uppercaseString;
-                    tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                    tv.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
                     tv.type = type;
                     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
                     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
@@ -1088,8 +1088,8 @@ NSArray *_sortedChannels;
                     msg = [o objectForKey:@"msg"];
 
                 s = [[ServersDataSource sharedInstance] getServer:o.cid];
-                _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [_alertView show];
+                self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [self->_alertView show];
             }
             break;
         case kIRCEventStatusChanged:
@@ -1102,8 +1102,8 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventBanList:
             o = notification.object;
-            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"b" param:@"bans" placeholder:@"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using `/ban`.\n" bid:_buffer.bid];
+            if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"b" param:@"bans" placeholder:@"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using `/ban`.\n" bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"bans"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
@@ -1120,8 +1120,8 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventQuietList:
             o = notification.object;
-            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"q" param:@"list" placeholder:@"Empty quiet list." bid:_buffer.bid];
+            if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"q" param:@"list" placeholder:@"Empty quiet list." bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"list"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Quiet list for %@", [o objectForKey:@"channel"]];
@@ -1139,8 +1139,8 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventInviteList:
             o = notification.object;
-            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"I" param:@"list" placeholder:@"Empty invite list." bid:_buffer.bid];
+            if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"I" param:@"list" placeholder:@"Empty invite list." bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"list"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Invite list for %@", [o objectForKey:@"channel"]];
@@ -1157,8 +1157,8 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventBanExceptionList:
             o = notification.object;
-            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"e" param:@"exceptions" placeholder:@"Empty exception list." bid:_buffer.bid];
+            if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"e" param:@"exceptions" placeholder:@"Empty exception list." bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"exceptions"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Exception list for %@", [o objectForKey:@"channel"]];
@@ -1175,8 +1175,8 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventChanFilterList:
             o = notification.object;
-            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"g" param:@"list" placeholder:@"No channel filter patterns." bid:_buffer.bid];
+            if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"g" param:@"list" placeholder:@"No channel filter patterns." bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"list"];
                 cmltv.mask = @"pattern";
@@ -1194,7 +1194,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventListResponseFetching:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 ctv = [[ChannelListTableViewController alloc] initWithStyle:UITableViewStylePlain];
                 ctv.event = o;
                 ctv.navigationItem.title = @"Channel List";
@@ -1211,7 +1211,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventAcceptList:
             o = notification.object;
-            if(o.cid == _buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[CallerIDTableViewController class]])) {
+            if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[CallerIDTableViewController class]])) {
                 citv = [[CallerIDTableViewController alloc] initWithStyle:UITableViewStylePlain];
                 citv.event = o;
                 citv.nicks = [o objectForKey:@"nicks"];
@@ -1229,7 +1229,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventWhoList:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 wtv = [[WhoListTableViewController alloc] initWithStyle:UITableViewStylePlain];
                 wtv.event = o;
                 wtv.navigationItem.title = [NSString stringWithFormat:@"WHO For %@", [o objectForKey:@"subject"]];
@@ -1246,10 +1246,10 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventWhoSpecialResponse:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 TextTableViewController *tv = [[TextTableViewController alloc] initWithData:[o objectForKey:@"users"]];
                 tv.navigationItem.title = [NSString stringWithFormat:@"WHO For %@", [o objectForKey:@"subject"]];
-                tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                tv.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -1263,9 +1263,9 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventModulesList:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 TextTableViewController *tv = [[TextTableViewController alloc] initWithData:[o objectForKey:@"modules"]];
-                tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                tv.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
                 tv.navigationItem.title = [NSString stringWithFormat:@"Modules list for %@", tv.server.hostname];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
@@ -1280,7 +1280,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventTraceResponse:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 TextTableViewController *tv = [[TextTableViewController alloc] initWithData:[o objectForKey:@"trace"]];
                 tv.navigationItem.title = [NSString stringWithFormat:@"Trace for %@", [o objectForKey:@"server"]];
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
@@ -1296,7 +1296,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventLinksResponse:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 LinksListTableViewController *lv = [[LinksListTableViewController alloc] init];
                 lv.event = o;
                 lv.navigationItem.title = [o objectForKey:@"server"];
@@ -1313,7 +1313,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventChannelQuery:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 NSString *type = [o objectForKey:@"query_type"];
                 NSString *msg = nil;
                 
@@ -1334,7 +1334,7 @@ NSArray *_sortedChannels;
                         [tv appendData:@[msg]];
                     } else {
                         TextTableViewController *tv = [[TextTableViewController alloc] initWithData:@[msg]];
-                        tv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                        tv.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
                         tv.type = @"channel_query";
                         tv.navigationItem.title = tv.server.hostname;
                         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
@@ -1352,7 +1352,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventNamesList:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 ntv = [[NamesListTableViewController alloc] initWithStyle:UITableViewStylePlain];
                 ntv.event = o;
                 ntv.navigationItem.title = [NSString stringWithFormat:@"NAMES For %@", [o objectForKey:@"chan"]];
@@ -1369,9 +1369,9 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventServerMap:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 TextTableViewController *smtv = [[TextTableViewController alloc] initWithData:[o objectForKey:@"servers"]];
-                smtv.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                smtv.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
                 smtv.navigationItem.title = @"Server Map";
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:smtv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
@@ -1386,7 +1386,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventWhoWas:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
+            if(o.cid == self->_buffer.cid) {
                 if([self.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[WhoWasTableViewController class]]) {
                     WhoWasTableViewController *tv = ((WhoWasTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController));
                     tv.event = o;
@@ -1408,40 +1408,40 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventLinkChannel:
             o = notification.object;
-            if(_cidToOpen == o.cid && [[o objectForKey:@"invalid_chan"] isKindOfClass:[NSString class]] && [[[o objectForKey:@"invalid_chan"] lowercaseString] isEqualToString:[_bufferToOpen lowercaseString]]) {
+            if(self->_cidToOpen == o.cid && [[o objectForKey:@"invalid_chan"] isKindOfClass:[NSString class]] && [[[o objectForKey:@"invalid_chan"] lowercaseString] isEqualToString:[self->_bufferToOpen lowercaseString]]) {
                 if([[o objectForKey:@"valid_chan"] isKindOfClass:[NSString class]] && [[o objectForKey:@"valid_chan"] length]) {
-                    _bufferToOpen = [o objectForKey:@"valid_chan"];
+                    self->_bufferToOpen = [o objectForKey:@"valid_chan"];
                     b = [[BuffersDataSource sharedInstance] getBuffer:o.bid];
                 }
             } else {
-                _cidToOpen = o.cid;
-                _bufferToOpen = nil;
+                self->_cidToOpen = o.cid;
+                self->_bufferToOpen = nil;
             }
             if(!b)
                 break;
         case kIRCEventMakeBuffer:
             if(!b)
                 b = notification.object;
-            if(_cidToOpen == b.cid && [[b.name lowercaseString] isEqualToString:[_bufferToOpen lowercaseString]] && ![[_buffer.name lowercaseString] isEqualToString:[_bufferToOpen lowercaseString]]) {
+            if(self->_cidToOpen == b.cid && [[b.name lowercaseString] isEqualToString:[self->_bufferToOpen lowercaseString]] && ![[self->_buffer.name lowercaseString] isEqualToString:[self->_bufferToOpen lowercaseString]]) {
                 [self bufferSelected:b.bid];
-                _bufferToOpen = nil;
-                _cidToOpen = -1;
-            } else if(_buffer.bid == -1 && b.cid == _buffer.cid && [b.name isEqualToString:_buffer.name]) {
+                self->_bufferToOpen = nil;
+                self->_cidToOpen = -1;
+            } else if(self->_buffer.bid == -1 && b.cid == self->_buffer.cid && [b.name isEqualToString:self->_buffer.name]) {
                 [self bufferSelected:b.bid];
-                _bufferToOpen = nil;
-                _cidToOpen = -1;
-            } else if(_cidToOpen == b.cid && _bufferToOpen == nil) {
+                self->_bufferToOpen = nil;
+                self->_cidToOpen = -1;
+            } else if(self->_cidToOpen == b.cid && _bufferToOpen == nil) {
                 [self bufferSelected:b.bid];
             }
             break;
         case kIRCEventOpenBuffer:
             o = notification.object;
             b = [[BuffersDataSource sharedInstance] getBufferWithName:[o objectForKey:@"name"] server:o.cid];
-            if(b != nil && ![[b.name lowercaseString] isEqualToString:[_buffer.name lowercaseString]]) {
+            if(b != nil && ![[b.name lowercaseString] isEqualToString:[self->_buffer.name lowercaseString]]) {
                 [self bufferSelected:b.bid];
             } else {
-                _bufferToOpen = [o objectForKey:@"name"];
-                _cidToOpen = o.cid;
+                self->_bufferToOpen = [o objectForKey:@"name"];
+                self->_cidToOpen = o.cid;
             }
             break;
         case kIRCEventUserInfo:
@@ -1463,7 +1463,7 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventBufferMsg:
             e = notification.object;
-            if(e.bid == _buffer.bid) {
+            if(e.bid == self->_buffer.bid) {
                 if(e.isHighlight) {
                     [self showMentionTip];
                     User *u = [[UsersDataSource sharedInstance] getUser:e.from cid:e.cid bid:e.bid];
@@ -1488,13 +1488,13 @@ NSArray *_sortedChannels;
                         break;
                     if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
                         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10 && [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
-                            _lastNotificationTime = [NSDate date].timeIntervalSince1970;
+                            self->_lastNotificationTime = [NSDate date].timeIntervalSince1970;
                             AudioServicesPlaySystemSound(alertSound);
                             AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
                         }
-                        _menuBtn.tintColor = [UIColor redColor];
-                        _menuBtn.accessibilityValue = @"Unread highlights";
-                    } else if(_menuBtn.accessibilityValue == nil) {
+                        self->_menuBtn.tintColor = [UIColor redColor];
+                        self->_menuBtn.accessibilityValue = @"Unread highlights";
+                    } else if(self->_menuBtn.accessibilityValue == nil) {
                         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
                         if([b.type isEqualToString:@"channel"]) {
                             if([[prefs objectForKey:@"channel-disableTrackUnread"] isKindOfClass:[NSDictionary class]] && [[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
@@ -1513,18 +1513,18 @@ NSArray *_sortedChannels;
                             }
                         }
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
-                        _menuBtn.tintColor = [UIColor unreadBlueColor];
-                        _menuBtn.accessibilityValue = @"Unread messages";
+                        self->_menuBtn.tintColor = [UIColor unreadBlueColor];
+                        self->_menuBtn.accessibilityValue = @"Unread messages";
                     }
                 }
             }
             if([[e.from lowercaseString] isEqualToString:[[[BuffersDataSource sharedInstance] getBuffer:e.bid].name lowercaseString]]) {
-                for(Event *ev in [_pendingEvents copy]) {
+                for(Event *ev in [self->_pendingEvents copy]) {
                     if(ev.bid == e.bid) {
                         if(ev.expirationTimer && [ev.expirationTimer isValid])
                             [ev.expirationTimer invalidate];
                         ev.expirationTimer = nil;
-                        [_pendingEvents removeObject:ev];
+                        [self->_pendingEvents removeObject:ev];
                         [[EventsDataSource sharedInstance] removeEvent:ev.eid buffer:ev.bid];
                     }
                 }
@@ -1538,19 +1538,19 @@ NSArray *_sortedChannels;
                             [e.expirationTimer invalidate];
                         e.expirationTimer = nil;
                         [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                        [_pendingEvents removeObject:e];
+                        [self->_pendingEvents removeObject:e];
                         break;
                     }
                 }
             }
             b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
-            if(b && !b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0 && [[EventsDataSource sharedInstance] sizeOfBuffer:b.bid] > 200 && [_eventsView.tableView numberOfRowsInSection:0] > 100) {
+            if(b && !b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0 && [[EventsDataSource sharedInstance] sizeOfBuffer:b.bid] > 200 && [self->_eventsView.tableView numberOfRowsInSection:0] > 100) {
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
-                if(b.bid == _buffer.bid) {
+                if(b.bid == self->_buffer.bid) {
                     if(b.last_seen_eid < e.eid)
                         b.last_seen_eid = e.eid;
                     [[ImageCache sharedInstance] clear];
-                    [_eventsView refresh];
+                    [self->_eventsView refresh];
                 }
             }
             break;
@@ -1562,7 +1562,7 @@ NSArray *_sortedChannels;
             for(NSNumber *cid in seenEids.allKeys) {
                 NSDictionary *eids = [seenEids objectForKey:cid];
                 for(NSNumber *bid in eids.allKeys) {
-                    if([bid intValue] != _buffer.bid) {
+                    if([bid intValue] != self->_buffer.bid) {
                         important = YES;
                         break;
                     }
@@ -1576,9 +1576,9 @@ NSArray *_sortedChannels;
         case kIRCEventDeleteBuffer:
         case kIRCEventBufferArchived:
             o = notification.object;
-            if(o.bid == _buffer.bid) {
-                if(_buffer && _buffer.lastBuffer && [[BuffersDataSource sharedInstance] getBuffer:_buffer.lastBuffer.bid])
-                    [self bufferSelected:_buffer.lastBuffer.bid];
+            if(o.bid == self->_buffer.bid) {
+                if(self->_buffer && _buffer.lastBuffer && [[BuffersDataSource sharedInstance] getBuffer:self->_buffer.lastBuffer.bid])
+                    [self bufferSelected:self->_buffer.lastBuffer.bid];
                 else if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                     [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
                 else
@@ -1588,9 +1588,9 @@ NSArray *_sortedChannels;
             break;
         case kIRCEventConnectionDeleted:
             o = notification.object;
-            if(o.cid == _buffer.cid) {
-                if(_buffer && _buffer.lastBuffer) {
-                    [self bufferSelected:_buffer.lastBuffer.bid];
+            if(o.cid == self->_buffer.cid) {
+                if(self->_buffer && _buffer.lastBuffer) {
+                    [self bufferSelected:self->_buffer.lastBuffer.bid];
                 } else if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]]) {
                     [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
                 } else if([[ServersDataSource sharedInstance] count]) {
@@ -1633,60 +1633,60 @@ NSArray *_sortedChannels;
 }
 
 -(void)_showConnectingView {
-    self.navigationItem.titleView = _connectingView;
+    self.navigationItem.titleView = self->_connectingView;
 }
 
 -(void)_hideConnectingView {
-    self.navigationItem.titleView = _titleView;
-    _connectingProgress.hidden = YES;
+    self.navigationItem.titleView = self->_titleView;
+    self->_connectingProgress.hidden = YES;
 }
 
 -(void)connectivityChanged:(NSNotification *)notification {
-    _connectingStatus.textColor = [UIColor navBarHeadingColor];
+    self->_connectingStatus.textColor = [UIColor navBarHeadingColor];
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
-    [_sendBtn setTitleColor:c forState:UIControlStateNormal];
-    [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
-    [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateNormal];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateDisabled];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
     
     switch([NetworkConnection sharedInstance].state) {
         case kIRCCloudStateConnecting:
             [self _showConnectingView];
-            _connectingStatus.text = @"Connecting";
-            _connectingProgress.progress = 0;
-            _connectingProgress.hidden = YES;
+            self->_connectingStatus.text = @"Connecting";
+            self->_connectingProgress.progress = 0;
+            self->_connectingProgress.hidden = YES;
             UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Connecting");
             break;
         case kIRCCloudStateDisconnected:
             [self _showConnectingView];
             if([NetworkConnection sharedInstance].reconnectTimestamp > 0) {
                 int seconds = (int)([NetworkConnection sharedInstance].reconnectTimestamp - [[NSDate date] timeIntervalSince1970]) + 1;
-                [_connectingStatus setText:[NSString stringWithFormat:@"Reconnecting in 0:%02i", seconds]];
-                _connectingProgress.progress = 0;
-                _connectingProgress.hidden = YES;
+                [self->_connectingStatus setText:[NSString stringWithFormat:@"Reconnecting in 0:%02i", seconds]];
+                self->_connectingProgress.progress = 0;
+                self->_connectingProgress.hidden = YES;
                 [self performSelector:@selector(connectivityChanged:) withObject:nil afterDelay:1];
             } else {
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Disconnected");
                 if([[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable) {
-                    _connectingStatus.text = @"Disconnected";
+                    self->_connectingStatus.text = @"Disconnected";
                     if([NetworkConnection sharedInstance].session.length && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
                         CLS_LOG(@"I'm disconnected but IRCCloud is reachable, reconnecting");
                         [[NetworkConnection sharedInstance] connect:NO];
                     }
                 } else {
-                    _connectingStatus.text = @"Offline";
+                    self->_connectingStatus.text = @"Offline";
                 }
-                _connectingProgress.progress = 0;
-                _connectingProgress.hidden = YES;
+                self->_connectingProgress.progress = 0;
+                self->_connectingProgress.hidden = YES;
             }
             break;
         case kIRCCloudStateConnected:
-            for(Event *e in [_pendingEvents copy]) {
+            for(Event *e in [self->_pendingEvents copy]) {
                 if(e.reqId == -1 && (([[NSDate date] timeIntervalSince1970] - (e.eid/1000000) - [NetworkConnection sharedInstance].clockOffset) < 60)) {
                     [e.expirationTimer invalidate];
                     e.expirationTimer = nil;
                     e.reqId = [[NetworkConnection sharedInstance] say:e.command to:e.to cid:e.cid handler:^(IRCCloudJSONObject *result) {
                         if(![[result objectForKey:@"success"] boolValue]) {
-                            [_pendingEvents removeObject:e];
+                            [self->_pendingEvents removeObject:e];
                             e.height = 0;
                             e.pending = NO;
                             e.rowType = ROW_FAILED;
@@ -1694,13 +1694,13 @@ NSArray *_sortedChannels;
                             e.bgColor = [UIColor errorBackgroundColor];
                             [e.expirationTimer invalidate];
                             e.expirationTimer = nil;
-                            [_eventsView reloadData];
+                            [self->_eventsView reloadData];
                         }
                     }];
                     if(e.reqId < 0)
                         e.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:e repeats:NO];
                 } else {
-                    [_pendingEvents removeObject:e];
+                    [self->_pendingEvents removeObject:e];
                     e.height = 0;
                     e.pending = NO;
                     e.rowType = ROW_FAILED;
@@ -1716,11 +1716,11 @@ NSArray *_sortedChannels;
 
 -(void)backlogStarted:(NSNotification *)notification {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if(!_connectingView.hidden) {
-                _connectingStatus.textColor = [UIColor navBarHeadingColor];
-                [_connectingStatus setText:@"Loading"];
-                _connectingProgress.progress = 0;
-                _connectingProgress.hidden = NO;
+            if(!self->_connectingView.hidden) {
+                self->_connectingStatus.textColor = [UIColor navBarHeadingColor];
+                [self->_connectingStatus setText:@"Loading"];
+                self->_connectingProgress.progress = 0;
+                self->_connectingProgress.hidden = NO;
             }
         }];
 }
@@ -1728,7 +1728,7 @@ NSArray *_sortedChannels;
 -(void)backlogProgress:(NSNotification *)notification {
     if(!_connectingView.hidden) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [_connectingProgress setProgress:[notification.object floatValue] animated:YES];
+            [self->_connectingProgress setProgress:[notification.object floatValue] animated:YES];
         }];
     }
 }
@@ -1743,41 +1743,41 @@ NSArray *_sortedChannels;
             }
         }
         [self _hideConnectingView];
-        if(_buffer && !_urlToOpen && _bidToOpen < 1 && _eidToOpen < 1 && _cidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
+        if(self->_buffer && !self->_urlToOpen && self->_bidToOpen < 1 && self->_eidToOpen < 1 && self->_cidToOpen < 1 && [[BuffersDataSource sharedInstance] getBuffer:self->_buffer.bid]) {
             [self _updateTitleArea];
             [self _updateServerStatus];
             [self _updateUserListVisibility];
             [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
             [self _updateGlobalMsg];
         } else {
-            [[NSNotificationCenter defaultCenter] removeObserver:_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
+            [[NSNotificationCenter defaultCenter] removeObserver:self->_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
             int bid = [BuffersDataSource sharedInstance].firstBid;
-            if(_buffer && _buffer.lastBuffer)
-                bid = _buffer.lastBuffer.bid;
+            if(self->_buffer && self->_buffer.lastBuffer)
+                bid = self->_buffer.lastBuffer.bid;
             
             if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
                 if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                     bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
             }
-            if(_bidToOpen > 0) {
-                CLS_LOG(@"backlog complete: BID to open: %i", _bidToOpen);
-                bid = _bidToOpen;
-                _bidToOpen = -1;
-            } else if(_eidToOpen > 0) {
-                bid = _buffer.bid;
-            } else if(_cidToOpen > 0 && _bufferToOpen) {
-                Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_bufferToOpen server:_cidToOpen];
+            if(self->_bidToOpen > 0) {
+                CLS_LOG(@"backlog complete: BID to open: %i", self->_bidToOpen);
+                bid = self->_bidToOpen;
+                self->_bidToOpen = -1;
+            } else if(self->_eidToOpen > 0) {
+                bid = self->_buffer.bid;
+            } else if(self->_cidToOpen > 0 && self->_bufferToOpen) {
+                Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:self->_bufferToOpen server:self->_cidToOpen];
                 if(b) {
                     bid = b.bid;
-                    _cidToOpen = -1;
-                    _bufferToOpen = nil;
+                    self->_cidToOpen = -1;
+                    self->_bufferToOpen = nil;
                 }
             }
             [self bufferSelected:bid];
-            _eidToOpen = -1;
-            if(_urlToOpen)
-                [self launchURL:_urlToOpen];
-            [[NSNotificationCenter defaultCenter] addObserver:_eventsView selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
+            self->_eidToOpen = -1;
+            if(self->_urlToOpen)
+                [self launchURL:self->_urlToOpen];
+            [[NSNotificationCenter defaultCenter] addObserver:self->_eventsView selector:@selector(backlogCompleted:) name:kIRCCloudBacklogCompletedNotification object:nil];
         }
     }];
 }
@@ -1793,9 +1793,9 @@ NSArray *_sortedChannels;
             height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
         }
     }
-    if(height != _kbSize.height) {
-        _kbSize = size;
-        _kbSize.height = height;
+    if(height != self->_kbSize.height) {
+        self->_kbSize = size;
+        self->_kbSize.height = height;
 
         [UIView beginAnimations:nil context:NULL];
         [UIView setAnimationBeginsFromCurrentState:YES];
@@ -1804,9 +1804,9 @@ NSArray *_sortedChannels;
 
         [self updateLayout];
         
-        [_buffersView scrollViewDidScroll:_buffersView.tableView];
+        [self->_buffersView scrollViewDidScroll:self->_buffersView.tableView];
         [UIView commitAnimations];
-        [self expandingTextViewDidChange:_message];
+        [self expandingTextViewDidChange:self->_message];
     }
 }
 
@@ -1817,7 +1817,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
-    _kbSize = CGSizeMake(0,0);
+    self->_kbSize = CGSizeMake(0,0);
     
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationBeginsFromCurrentState:YES];
@@ -1828,9 +1828,9 @@ NSArray *_sortedChannels;
     [self.slidingViewController updateUnderRightLayout];
     [self updateLayout];
 
-    [_buffersView scrollViewDidScroll:_buffersView.tableView];
-    _nickCompletionView.alpha = 0;
-    _updateSuggestionsTask.atMention = NO;
+    [self->_buffersView scrollViewDidScroll:self->_buffersView.tableView];
+    self->_nickCompletionView.alpha = 0;
+    self->_updateSuggestionsTask.atMention = NO;
     [UIView commitAnimations];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -1839,40 +1839,40 @@ NSArray *_sortedChannels;
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [_eventsView resumePlayback];
+        [self->_eventsView resumePlayback];
     }];
-    if(_ignoreVisibilityChanges)
+    if(self->_ignoreVisibilityChanges)
         return;
-    _isShowingPreview = NO;
-    [_eventsView viewWillAppear:animated];
+    self->_isShowingPreview = NO;
+    [self->_eventsView viewWillAppear:animated];
     [self applyTheme];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
-    for(Event *e in [_pendingEvents copy]) {
+    for(Event *e in [self->_pendingEvents copy]) {
         if(e.reqId != -1) {
-            [_pendingEvents removeObject:e];
+            [self->_pendingEvents removeObject:e];
             [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
         }
     }
     [[EventsDataSource sharedInstance] clearPendingAndFailed];
-    if(!_buffer || ![[BuffersDataSource sharedInstance] getBuffer:_buffer.bid]) {
+    if(!_buffer || ![[BuffersDataSource sharedInstance] getBuffer:self->_buffer.bid]) {
         int bid = [BuffersDataSource sharedInstance].firstBid;
-        if(_buffer && _buffer.lastBuffer)
-            bid = _buffer.lastBuffer.bid;
+        if(self->_buffer && _buffer.lastBuffer)
+            bid = self->_buffer.lastBuffer.bid;
         if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
             if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
         }
-        if(_bidToOpen > 0) {
+        if(self->_bidToOpen > 0) {
             CLS_LOG(@"viewwillappear: BID to open: %i", _bidToOpen);
-            bid = _bidToOpen;
+            bid = self->_bidToOpen;
         }
         [self bufferSelected:bid];
-        if(_urlToOpen) {
-            [self launchURL:_urlToOpen];
+        if(self->_urlToOpen) {
+            [self launchURL:self->_urlToOpen];
         }
     } else {
-        [self bufferSelected:_buffer.bid];
+        [self bufferSelected:self->_buffer.bid];
     }
     if(!self.presentedViewController) {
         self.navigationController.navigationBar.translucent = NO;
@@ -1959,50 +1959,50 @@ NSArray *_sortedChannels;
     }
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
-        _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+        self->_message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     } else {
-        _message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        self->_message.internalTextView.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
     
     self.slidingViewController.view.autoresizesSubviews = NO;
     [self updateLayout];
     
-    _buffersView.tableView.scrollsToTop = YES;
-    _usersView.tableView.scrollsToTop = YES;
-    if(_eventsView.topUnreadView.observationInfo) {
+    self->_buffersView.tableView.scrollsToTop = YES;
+    self->_usersView.tableView.scrollsToTop = YES;
+    if(self->_eventsView.topUnreadView.observationInfo) {
         @try {
-            [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
-            [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+            [self->_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+            [self->_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
         } @catch(id anException) {
             //Not registered yet
         }
     }
-    [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
-    [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+    [self->_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+    [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    if(_ignoreVisibilityChanges)
+    if(self->_ignoreVisibilityChanges)
         return;
-    [_eventsView viewWillDisappear:animated];
+    [self->_eventsView viewWillDisappear:animated];
     [UIApplication sharedApplication].idleTimerDisabled = NO;
     [self.navigationController.view removeGestureRecognizer:self.slidingViewController.panGesture];
-    [_doubleTapTimer invalidate];
-    _doubleTapTimer = nil;
-    _eidToOpen = -1;
-    _currentTheme = nil;
+    [self->_doubleTapTimer invalidate];
+    self->_doubleTapTimer = nil;
+    self->_eidToOpen = -1;
+    self->_currentTheme = nil;
     
     self.slidingViewController.view.autoresizesSubviews = YES;
     [self.slidingViewController resetTopView];
     
-    _buffersView.tableView.scrollsToTop = NO;
-    _usersView.tableView.scrollsToTop = NO;
+    self->_buffersView.tableView.scrollsToTop = NO;
+    self->_usersView.tableView.scrollsToTop = NO;
 
-    if(_eventsView.topUnreadView.observationInfo) {
+    if(self->_eventsView.topUnreadView.observationInfo) {
         @try {
-            [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
-            [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+            [self->_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+            [self->_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
         } @catch(id anException) {
             //Not registered yet
         }
@@ -2011,7 +2011,7 @@ NSArray *_sortedChannels;
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-    [_eventsView viewDidAppear:animated];
+    [self->_eventsView viewDidAppear:animated];
     [self updateLayout];
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
@@ -2029,23 +2029,23 @@ NSArray *_sortedChannels;
     [super didReceiveMemoryWarning];
     CLS_LOG(@"Received low memory warning, cleaning up backlog");
     for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
-        if(b != _buffer && !b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
+        if(b != self->_buffer && !b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
             [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:50];
     }
-    if(!_buffer.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:_buffer.bid lastSeenEid:_buffer.last_seen_eid type:_buffer.type] == 0) {
-        [[EventsDataSource sharedInstance] pruneEventsForBuffer:_buffer.bid maxSize:100];
-        [_eventsView setBuffer:_buffer];
+    if(!_buffer.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:self->_buffer.bid lastSeenEid:self->_buffer.last_seen_eid type:self->_buffer.type] == 0) {
+        [[EventsDataSource sharedInstance] pruneEventsForBuffer:self->_buffer.bid maxSize:100];
+        [self->_eventsView setBuffer:self->_buffer];
     }
     [[ImageCache sharedInstance] clear];
 }
 
 -(IBAction)serverStatusBarPressed:(id)sender {
-    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
     if(s) {
         if([s.status isEqualToString:@"disconnected"])
-            [[NetworkConnection sharedInstance] reconnect:_buffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] reconnect:self->_buffer.cid handler:nil];
         else if([s.away isKindOfClass:[NSString class]] && s.away.length) {
-            [[NetworkConnection sharedInstance] back:_buffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] back:self->_buffer.cid handler:nil];
             s.away = @"";
             [self _updateServerStatus];
         }
@@ -2053,21 +2053,21 @@ NSArray *_sortedChannels;
 }
 
 -(void)sendButtonPressed:(id)sender {
-    @synchronized(_message) {
-        if(_message.text && _message.text.length) {
+    @synchronized(self->_message) {
+        if(self->_message.text && _message.text.length) {
             id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
             SEL sel = NSSelectorFromString(@"acceptAutocorrection");
             if([k respondsToSelector:sel]) {
                 objc_msgSend(k, sel);
             }
             
-            NSAttributedString *messageText = _message.attributedText;
+            NSAttributedString *messageText = self->_message.attributedText;
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"]) {
                 [self resetColors:nil];
-                if(_defaultTextareaFont) {
-                    _message.internalTextView.font = _defaultTextareaFont;
-                    _message.internalTextView.textColor = [UIColor textareaTextColor];
-                    _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+                if(self->_defaultTextareaFont) {
+                    self->_message.internalTextView.font = self->_defaultTextareaFont;
+                    self->_message.internalTextView.textColor = [UIColor textareaTextColor];
+                    self->_message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:self->_defaultTextareaFont };
                 }
             }
             
@@ -2076,11 +2076,11 @@ NSArray *_sortedChannels;
 
             NSString *messageString = messageText.string;
             
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
             if(s) {
                 if([messageString isEqualToString:@"/ignore"]) {
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
                     itv.ignores = s.ignores;
                     itv.cid = s.cid;
@@ -2094,10 +2094,10 @@ NSArray *_sortedChannels;
                     [self presentViewController:nc animated:YES completion:nil];
                     return;
                 } else if([messageString isEqualToString:@"/clear"]) {
-                    [_message clearText];
-                    _buffer.draft = nil;
-                    [[EventsDataSource sharedInstance] removeEventsForBuffer:_buffer.bid];
-                    [_eventsView refresh];
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
+                    [[EventsDataSource sharedInstance] removeEventsForBuffer:self->_buffer.bid];
+                    [self->_eventsView refresh];
                     return;
 #ifndef APPSTORE
                 } else if([messageString isEqualToString:@"/crash"]) {
@@ -2110,8 +2110,8 @@ NSArray *_sortedChannels;
                     SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                     NSString *json = [writer stringWithObject:p];
                     [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     return;
                 } else if([messageString isEqualToString:@"/compact 0"]) {
                     NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
@@ -2119,8 +2119,8 @@ NSArray *_sortedChannels;
                     SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                     NSString *json = [writer stringWithObject:p];
                     [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     return;
                 } else if([messageString isEqualToString:@"/mono 1"]) {
                     CLS_LOG(@"Set monospace");
@@ -2129,8 +2129,8 @@ NSArray *_sortedChannels;
                     SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                     NSString *json = [writer stringWithObject:p];
                     [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     return;
                 } else if([messageString isEqualToString:@"/mono 0"]) {
                     NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;
@@ -2138,8 +2138,8 @@ NSArray *_sortedChannels;
                     SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                     NSString *json = [writer stringWithObject:p];
                     [[NetworkConnection sharedInstance] setPrefs:json handler:nil];
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     return;
                 } else if([messageString hasPrefix:@"/fontsize "]) {
                     [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInteger:
@@ -2155,14 +2155,14 @@ NSArray *_sortedChannels;
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventUserInfo]}];
                     }];
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     return;
                 } else if([messageString isEqualToString:@"/read"]) {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:_eventsView.YUNoHeartbeat delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:self->_eventsView.YUNoHeartbeat delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
                     [alert show];
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     return;
 #endif
                 } else if(messageString.length > 1080 || [messageString isEqualToString:@"/paste"] || [messageString hasPrefix:@"/paste "] || [messageString rangeOfString:@"\n"].location < messageString.length - 1) {
@@ -2175,11 +2175,11 @@ NSArray *_sortedChannels;
 
                     if(prompt || [messageString isEqualToString:@"/paste"] || [messageString hasPrefix:@"/paste "]) {
                         if([messageString isEqualToString:@"/paste"])
-                           [_message clearText];
+                           [self->_message clearText];
                         else if([messageString hasPrefix:@"/paste "])
                             messageString = [messageString substringFromIndex:7];
-                        _buffer.draft = messageString;
-                        PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+                        self->_buffer.draft = messageString;
+                        PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:self->_buffer];
                         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
                         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -2193,11 +2193,11 @@ NSArray *_sortedChannels;
                     }
 #ifndef APPSTORE
                 } else if([messageString isEqualToString:@"/buffers"]) {
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     NSMutableString *msg = [[NSMutableString alloc] init];
                     [msg appendString:@"=== Buffers ===\n"];
-                    NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_buffer.cid];
+                    NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:self->_buffer.cid];
                     for(Buffer *buffer in buffers) {
                         [msg appendFormat:@"CID: %i BID: %i Name: %@ lastSeenEID: %f unread: %i highlight: %i extra: %i\n", buffer.cid, buffer.bid, buffer.name, buffer.last_seen_eid, [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type], [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type], buffer.extraHighlights];
                         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:buffer.bid];
@@ -2212,7 +2212,7 @@ NSArray *_sortedChannels;
                     
                     Event *e = [[Event alloc] init];
                     e.cid = s.cid;
-                    e.bid = _buffer.bid;
+                    e.bid = self->_buffer.bid;
                     e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
                     if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
                         e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
@@ -2222,7 +2222,7 @@ NSArray *_sortedChannels;
                     e.msg = msg;
                     e.type = @"buffer_msg";
                     e.color = [UIColor timestampColor];
-                    if([_buffer.name isEqualToString:s.nick])
+                    if([self->_buffer.name isEqualToString:s.nick])
                         e.bgColor = [UIColor whiteColor];
                     else
                         e.bgColor = [UIColor selfBackgroundColor];
@@ -2235,14 +2235,14 @@ NSArray *_sortedChannels;
                     e.isHighlight = NO;
                     e.reqId = -1;
                     e.pending = YES;
-                    [_eventsView scrollToBottom];
+                    [self->_eventsView scrollToBottom];
                     [[EventsDataSource sharedInstance] addEvent:e];
-                    [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                    [self->_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                     return;
 #endif
                 } else if([messageString isEqualToString:@"/badge"]) {
-                    [_message clearText];
-                    _buffer.draft = nil;
+                    [self->_message clearText];
+                    self->_buffer.draft = nil;
                     if(@available(iOS 9, *)) {
                         [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
                             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -2266,7 +2266,7 @@ NSArray *_sortedChannels;
                                 
                                 Event *e = [[Event alloc] init];
                                 e.cid = s.cid;
-                                e.bid = _buffer.bid;
+                                e.bid = self->_buffer.bid;
                                 e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
                                 if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
                                     e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
@@ -2276,7 +2276,7 @@ NSArray *_sortedChannels;
                                 e.msg = msg;
                                 e.type = @"buffer_msg";
                                 e.color = [UIColor timestampColor];
-                                if([_buffer.name isEqualToString:s.nick])
+                                if([self->_buffer.name isEqualToString:s.nick])
                                     e.bgColor = [UIColor whiteColor];
                                 else
                                     e.bgColor = [UIColor selfBackgroundColor];
@@ -2289,16 +2289,16 @@ NSArray *_sortedChannels;
                                 e.isHighlight = NO;
                                 e.reqId = -1;
                                 e.pending = YES;
-                                [_eventsView scrollToBottom];
+                                [self->_eventsView scrollToBottom];
                                 [[EventsDataSource sharedInstance] addEvent:e];
-                                [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                                [self->_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                             }];
                         }];
                     }
                     return;
                 }
                 
-                User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:_buffer.bid];
+                User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:s.cid bid:self->_buffer.bid];
                 Event *e = [[Event alloc] init];
                 NSMutableString *msg = messageString.mutableCopy;
                 NSMutableString *formattedMsg = s.isSlack?messageString.mutableCopy:[ColorFormatter toIRC:messageText].mutableCopy;
@@ -2313,7 +2313,7 @@ NSArray *_sortedChannels;
                     msg = nil;
                 if(msg) {
                     e.cid = s.cid;
-                    e.bid = _buffer.bid;
+                    e.bid = self->_buffer.bid;
                     e.eid = ([[NSDate date] timeIntervalSince1970] + [NetworkConnection sharedInstance].clockOffset) * 1000000;
                     if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
                         e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
@@ -2350,26 +2350,26 @@ NSArray *_sortedChannels;
 #ifndef APPSTORE
                         CLS_LOG(@"Scrolling down after sending a message");
 #endif
-                        [_eventsView scrollToBottom];
-                        [_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
+                        [self->_eventsView scrollToBottom];
+                        [self->_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                     }];
                 }
-                e.to = _buffer.name;
+                e.to = self->_buffer.name;
                 e.command = formattedMsg;
                 if(e.msg)
-                    [_pendingEvents addObject:e];
-                [_message clearText];
-                _buffer.draft = nil;
+                    [self->_pendingEvents addObject:e];
+                [self->_message clearText];
+                self->_buffer.draft = nil;
                 msg = e.command.mutableCopy;
                 if(!disableConvert)
                     [ColorFormatter emojify:msg];
-                if(_msgid) {
+                if(self->_msgid) {
                     e.isReply = YES;
-                    e.entities = @{@"reply":_msgid};
-                    e.reqId = [[NetworkConnection sharedInstance] reply:msg to:_buffer.name cid:_buffer.cid msgid:_msgid handler:^(IRCCloudJSONObject *result) {
+                    e.entities = @{@"reply":self->_msgid};
+                    e.reqId = [[NetworkConnection sharedInstance] reply:msg to:self->_buffer.name cid:self->_buffer.cid msgid:self->_msgid handler:^(IRCCloudJSONObject *result) {
                         if(![[result objectForKey:@"success"] boolValue]) {
-                            [_pendingEvents removeObject:e];
-                            e.entities = @{@"reply":_msgid};
+                            [self->_pendingEvents removeObject:e];
+                            e.entities = @{@"reply":self->_msgid};
                             e.height = 0;
                             e.pending = NO;
                             e.rowType = ROW_FAILED;
@@ -2379,13 +2379,13 @@ NSArray *_sortedChannels;
                             e.height = 0;
                             [e.expirationTimer invalidate];
                             e.expirationTimer = nil;
-                            [_eventsView reloadData];
+                            [self->_eventsView reloadData];
                         }
                     }];
                 } else {
-                    e.reqId = [[NetworkConnection sharedInstance] say:msg to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
+                    e.reqId = [[NetworkConnection sharedInstance] say:msg to:self->_buffer.name cid:self->_buffer.cid handler:^(IRCCloudJSONObject *result) {
                         if(![[result objectForKey:@"success"] boolValue]) {
-                            [_pendingEvents removeObject:e];
+                            [self->_pendingEvents removeObject:e];
                             e.height = 0;
                             e.pending = NO;
                             e.rowType = ROW_FAILED;
@@ -2395,7 +2395,7 @@ NSArray *_sortedChannels;
                             e.height = 0;
                             [e.expirationTimer invalidate];
                             e.expirationTimer = nil;
-                            [_eventsView reloadData];
+                            [self->_eventsView reloadData];
                         }
                     }];
                 }
@@ -2410,8 +2410,8 @@ NSArray *_sortedChannels;
 -(void)_sendRequestDidExpire:(NSTimer *)timer {
     Event *e = timer.userInfo;
     e.expirationTimer = nil;
-    if([_pendingEvents containsObject:e]) {
-        [_pendingEvents removeObject:e];
+    if([self->_pendingEvents containsObject:e]) {
+        [self->_pendingEvents removeObject:e];
         e.height = 0;
         e.pending = NO;
         e.rowType = ROW_FAILED;
@@ -2419,13 +2419,13 @@ NSArray *_sortedChannels;
         e.bgColor = [UIColor errorBackgroundColor];
         e.formatted = nil;
         e.height = 0;
-        [_eventsView reloadData];
+        [self->_eventsView reloadData];
     }
 }
 
 -(void)nickSelected:(NSString *)nick {
-    _message.selectedRange = NSMakeRange(0, 0);
-    NSString *text = _message.text;
+    self->_message.selectedRange = NSMakeRange(0, 0);
+    NSString *text = self->_message.text;
     BOOL isChannel = NO;
     
     for(Channel *channel in _sortedChannels) {
@@ -2435,7 +2435,7 @@ NSArray *_sortedChannels;
         }
     }
     
-    if(_updateSuggestionsTask.atMention || (!_updateSuggestionsTask.isEmoji && _buffer.serverIsSlack))
+    if(self->_updateSuggestionsTask.atMention || (!_updateSuggestionsTask.isEmoji && _buffer.serverIsSlack))
         nick = [NSString stringWithFormat:@"@%@", nick];
 
     if(!isChannel && !_buffer.serverIsSlack && ![text hasPrefix:@":"] && [text rangeOfString:@" "].location == NSNotFound)
@@ -2444,125 +2444,125 @@ NSArray *_sortedChannels;
         nick = [nick stringByAppendingString:@" "];
     
     if(text.length == 0) {
-        _message.text = nick;
+        self->_message.text = nick;
     } else {
         while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
             text = [text substringToIndex:text.length - 1];
         }
         text = [text stringByAppendingString:nick];
-        _message.text = text;
+        self->_message.text = text;
     }
     
 }
 
 -(void)updateSuggestions:(BOOL)force {
-    if(_updateSuggestionsTask)
-        [_updateSuggestionsTask cancel];
+    if(self->_updateSuggestionsTask)
+        [self->_updateSuggestionsTask cancel];
     
-    _updateSuggestionsTask = [[UpdateSuggestionsTask alloc] init];
-    _updateSuggestionsTask.message = _message;
-    _updateSuggestionsTask.buffer = _buffer;
-    _updateSuggestionsTask.nickCompletionView = _nickCompletionView;
-    _updateSuggestionsTask.force = force;
+    self->_updateSuggestionsTask = [[UpdateSuggestionsTask alloc] init];
+    self->_updateSuggestionsTask.message = self->_message;
+    self->_updateSuggestionsTask.buffer = self->_buffer;
+    self->_updateSuggestionsTask.nickCompletionView = self->_nickCompletionView;
+    self->_updateSuggestionsTask.force = force;
     
-    [_updateSuggestionsTask performSelectorInBackground:@selector(run) withObject:nil];
+    [self->_updateSuggestionsTask performSelectorInBackground:@selector(run) withObject:nil];
 }
 
 -(void)_updateSuggestionsTimer {
-    _nickCompletionTimer = nil;
+    self->_nickCompletionTimer = nil;
     [self updateSuggestions:NO];
 }
 
 -(void)scheduleSuggestionsTimer {
-    if(_nickCompletionTimer)
-        [_nickCompletionTimer invalidate];
-    _nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
+    if(self->_nickCompletionTimer)
+        [self->_nickCompletionTimer invalidate];
+    self->_nickCompletionTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_updateSuggestionsTimer) userInfo:nil repeats:NO];
 }
 
 -(void)cancelSuggestionsTimer {
-    if(_nickCompletionTimer)
-        [_nickCompletionTimer invalidate];
-    _nickCompletionTimer = nil;
+    if(self->_nickCompletionTimer)
+        [self->_nickCompletionTimer invalidate];
+    self->_nickCompletionTimer = nil;
 }
 
 -(void)_updateMessageWidth {
-    _message.animateHeightChange = NO;
-    if(_message.text.length > 0) {
-        CGFloat c = _eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
+    self->_message.animateHeightChange = NO;
+    if(self->_message.text.length > 0) {
+        CGFloat c = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
         if(@available(iOS 11, *)) {
             c -= self.slidingViewController.view.safeAreaInsets.right;
         }
-        if(_messageWidthConstraint.constant != c)
-            _messageWidthConstraint.constant = c;
+        if(self->_messageWidthConstraint.constant != c)
+            self->_messageWidthConstraint.constant = c;
         [self.view layoutIfNeeded];
-        _sendBtn.enabled = YES;
-        _sendBtn.alpha = 1;
-        _settingsBtn.enabled = NO;
-        _settingsBtn.alpha = 0;
+        self->_sendBtn.enabled = YES;
+        self->_sendBtn.alpha = 1;
+        self->_settingsBtn.enabled = NO;
+        self->_settingsBtn.alpha = 0;
     } else {
-        _messageWidthConstraint.constant = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
+        self->_messageWidthConstraint.constant = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
         if(@available(iOS 11, *)) {
-            _messageWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
+            self->_messageWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
         }
         [self.view layoutIfNeeded];
-        _sendBtn.enabled = NO;
-        _sendBtn.alpha = 0;
-        _settingsBtn.enabled = YES;
-        _settingsBtn.alpha = 1;
-        _message.delegate = nil;
-        [_message clearText];
-        _message.delegate = self;
+        self->_sendBtn.enabled = NO;
+        self->_sendBtn.alpha = 0;
+        self->_settingsBtn.enabled = YES;
+        self->_settingsBtn.alpha = 1;
+        self->_message.delegate = nil;
+        [self->_message clearText];
+        self->_message.delegate = self;
     }
-    _message.animateHeightChange = YES;
-    _messageHeightConstraint.constant = _message.frame.size.height;
-    _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
+    self->_message.animateHeightChange = YES;
+    self->_messageHeightConstraint.constant = self->_message.frame.size.height;
+    self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
     if(@available(iOS 11, *)) {
-        CGRect frame = _settingsBtn.frame;
-        frame.origin.x = _eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
-        _settingsBtn.frame = frame;
-        frame = _sendBtn.frame;
-        frame.origin.x = _eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.safeAreaInsets.right;
-        _sendBtn.frame = frame;
+        CGRect frame = self->_settingsBtn.frame;
+        frame.origin.x = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
+        self->_settingsBtn.frame = frame;
+        frame = self->_sendBtn.frame;
+        frame.origin.x = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.safeAreaInsets.right;
+        self->_sendBtn.frame = frame;
     }
     [self _updateEventsInsets];
     [self.view layoutIfNeeded];
 }
 
 -(BOOL)expandingTextView:(UIExpandingTextView *)expandingTextView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    _textIsChanging = YES;
+    self->_textIsChanging = YES;
     if(range.location == expandingTextView.text.length) {
-        _currentMessageAttributes = expandingTextView.internalTextView.typingAttributes;
+        self->_currentMessageAttributes = expandingTextView.internalTextView.typingAttributes;
     } else {
-        _currentMessageAttributes = nil;
+        self->_currentMessageAttributes = nil;
     }
     return YES;
 }
 
 -(void)expandingTextViewDidChange:(UIExpandingTextView *)expandingTextView {
     if(!_textIsChanging)
-        _currentMessageAttributes = expandingTextView.internalTextView.typingAttributes;
+        self->_currentMessageAttributes = expandingTextView.internalTextView.typingAttributes;
     else
-        expandingTextView.internalTextView.typingAttributes = _currentMessageAttributes;
-    _textIsChanging = NO;
+        expandingTextView.internalTextView.typingAttributes = self->_currentMessageAttributes;
+    self->_textIsChanging = NO;
     [self.view layoutIfNeeded];
     [UIView beginAnimations:nil context:nil];
     [self _updateMessageWidth];
     [self.view layoutIfNeeded];
     [UIView commitAnimations];
-    if(_nickCompletionView.alpha == 1) {
+    if(self->_nickCompletionView.alpha == 1) {
         [self updateSuggestions:NO];
     } else {
         [self performSelectorOnMainThread:@selector(scheduleSuggestionsTimer) withObject:nil waitUntilDone:NO];
     }
     [[self userActivity] setNeedsSave:YES];
     [self userActivityWillSave:[self userActivity]];
-    if(_buffer) {
-        _buffer.draft = expandingTextView.text.length ? expandingTextView.text : nil;
+    if(self->_buffer) {
+        self->_buffer.draft = expandingTextView.text.length ? expandingTextView.text : nil;
     }
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
-    [_sendBtn setTitleColor:c forState:UIControlStateNormal];
-    [_sendBtn setTitleColor:c forState:UIControlStateDisabled];
-    [_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateNormal];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateDisabled];
+    [self->_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
@@ -2573,107 +2573,107 @@ NSArray *_sortedChannels;
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {
     if(expandingTextView.frame.size.height != height) {
         [self.view layoutIfNeeded];
-        _messageHeightConstraint.constant = height;
+        self->_messageHeightConstraint.constant = height;
         [self.view layoutIfNeeded];
         [self updateLayout];
     }
 }
 
 -(void)_updateTitleArea {
-    _lock.hidden = YES;
-    _titleLabel.textColor = [UIColor navBarHeadingColor];
-    _topicLabel.textColor = [UIColor navBarSubheadingColor];
-    if([_buffer.type isEqualToString:@"console"]) {
-        Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    self->_lock.hidden = YES;
+    self->_titleLabel.textColor = [UIColor navBarHeadingColor];
+    self->_topicLabel.textColor = [UIColor navBarSubheadingColor];
+    if([self->_buffer.type isEqualToString:@"console"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         if(s.name.length)
-            _titleLabel.text = s.name;
+            self->_titleLabel.text = s.name;
         else
-            _titleLabel.text = s.hostname;
-        _titleLabel.accessibilityLabel = @"Server";
-        _titleLabel.accessibilityValue = _titleLabel.text;
-        self.navigationItem.title = _titleLabel.text;
-        _topicLabel.hidden = NO;
-        _titleLabel.font = [UIFont boldSystemFontOfSize:18];
-        _topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
-        _lock.hidden = NO;
+            self->_titleLabel.text = s.hostname;
+        self->_titleLabel.accessibilityLabel = @"Server";
+        self->_titleLabel.accessibilityValue = self->_titleLabel.text;
+        self.navigationItem.title = self->_titleLabel.text;
+        self->_topicLabel.hidden = NO;
+        self->_titleLabel.font = [UIFont boldSystemFontOfSize:18];
+        self->_topicLabel.text = [NSString stringWithFormat:@"%@:%i", s.hostname, s.port];
+        self->_lock.hidden = NO;
         if(s.isSlack)
-            _lock.text = FA_SLACK;
+            self->_lock.text = FA_SLACK;
         else if(s.ssl > 0)
-            _lock.text = FA_SHIELD;
+            self->_lock.text = FA_SHIELD;
         else
-            _lock.text = FA_GLOBE;
-        _lock.textColor = [UIColor navBarHeadingColor];
+            self->_lock.text = FA_GLOBE;
+        self->_lock.textColor = [UIColor navBarHeadingColor];
     } else {
-        self.navigationItem.title = _titleLabel.text = _buffer.displayName;
-        _titleLabel.font = [UIFont boldSystemFontOfSize:20];
-        _titleLabel.accessibilityValue = _buffer.accessibilityValue;
-        _topicLabel.hidden = YES;
-        _lock.text = FA_LOCK;
-        _lock.textColor = [UIColor navBarHeadingColor];
-        if([_buffer.type isEqualToString:@"channel"]) {
-            _titleLabel.accessibilityLabel = _buffer.isMPDM ? @"Conversation with" : @"Channel";
+        self.navigationItem.title = self->_titleLabel.text = self->_buffer.displayName;
+        self->_titleLabel.font = [UIFont boldSystemFontOfSize:20];
+        self->_titleLabel.accessibilityValue = self->_buffer.accessibilityValue;
+        self->_topicLabel.hidden = YES;
+        self->_lock.text = FA_LOCK;
+        self->_lock.textColor = [UIColor navBarHeadingColor];
+        if([self->_buffer.type isEqualToString:@"channel"]) {
+            self->_titleLabel.accessibilityLabel = self->_buffer.isMPDM ? @"Conversation with" : @"Channel";
             BOOL lock = NO;
-            Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid];
+            Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid];
             if(channel) {
-                if(channel.key || (_buffer.serverIsSlack && !_buffer.isMPDM && [channel hasMode:@"s"]))
+                if(channel.key || (self->_buffer.serverIsSlack && !_buffer.isMPDM && [channel hasMode:@"s"]))
                     lock = YES;
                 if([channel.topic_text isKindOfClass:[NSString class]] && channel.topic_text.length) {
-                    _topicLabel.hidden = NO;
-                    _titleLabel.font = [UIFont boldSystemFontOfSize:18];
-                    _topicLabel.text = [channel.topic_text stripIRCFormatting];
-                    _topicLabel.accessibilityLabel = @"Topic";
-                    _topicLabel.accessibilityValue = _topicLabel.text;
+                    self->_topicLabel.hidden = NO;
+                    self->_titleLabel.font = [UIFont boldSystemFontOfSize:18];
+                    self->_topicLabel.text = [channel.topic_text stripIRCFormatting];
+                    self->_topicLabel.accessibilityLabel = @"Topic";
+                    self->_topicLabel.accessibilityValue = self->_topicLabel.text;
                 } else {
-                    _topicLabel.hidden = YES;
+                    self->_topicLabel.hidden = YES;
                 }
             }
             if(lock) {
-                _lock.hidden = NO;
+                self->_lock.hidden = NO;
             } else {
-                _lock.hidden = YES;
+                self->_lock.hidden = YES;
             }
-        } else if([_buffer.type isEqualToString:@"conversation"]) {
-            _titleLabel.accessibilityLabel = @"Conversation with";
-            self.navigationItem.title = _titleLabel.text = _buffer.name;
-            _topicLabel.hidden = NO;
-            _titleLabel.font = [UIFont boldSystemFontOfSize:18];
-            if(_buffer.away_msg.length) {
-                _topicLabel.text = [NSString stringWithFormat:@"Away: %@", _buffer.away_msg];
+        } else if([self->_buffer.type isEqualToString:@"conversation"]) {
+            self->_titleLabel.accessibilityLabel = @"Conversation with";
+            self.navigationItem.title = self->_titleLabel.text = self->_buffer.name;
+            self->_topicLabel.hidden = NO;
+            self->_titleLabel.font = [UIFont boldSystemFontOfSize:18];
+            if(self->_buffer.away_msg.length) {
+                self->_topicLabel.text = [NSString stringWithFormat:@"Away: %@", _buffer.away_msg];
             } else {
-                User *u = [[UsersDataSource sharedInstance] getUser:_buffer.name cid:_buffer.cid];
+                User *u = [[UsersDataSource sharedInstance] getUser:self->_buffer.name cid:self->_buffer.cid];
                 if(u && u.away) {
                     if(u.away_msg.length)
-                        _topicLabel.text = [NSString stringWithFormat:@"Away: %@", u.away_msg];
+                        self->_topicLabel.text = [NSString stringWithFormat:@"Away: %@", u.away_msg];
                     else
-                        _topicLabel.text = @"Away";
+                        self->_topicLabel.text = @"Away";
                 } else {
-                    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+                    Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
                     if(s.name.length)
-                        _topicLabel.text = s.name;
+                        self->_topicLabel.text = s.name;
                     else
-                        _topicLabel.text = s.hostname;
+                        self->_topicLabel.text = s.hostname;
                 }
             }
         }
     }
-    if(_msgid) {
-        _topicLabel.text = _titleLabel.text;
-        _topicLabel.hidden = NO;
-        _titleLabel.text = @"Thread";
-        _titleLabel.font = [UIFont boldSystemFontOfSize:18];
-        _lock.hidden = YES;
-        _titleLabel.accessibilityLabel = @"Thread from";
-        _titleLabel.accessibilityValue = _topicLabel.text;
+    if(self->_msgid) {
+        self->_topicLabel.text = self->_titleLabel.text;
+        self->_topicLabel.hidden = NO;
+        self->_titleLabel.text = @"Thread";
+        self->_titleLabel.font = [UIFont boldSystemFontOfSize:18];
+        self->_lock.hidden = YES;
+        self->_titleLabel.accessibilityLabel = @"Thread from";
+        self->_titleLabel.accessibilityValue = self->_topicLabel.text;
     }
-    if(_lock.hidden == NO && _lock.alpha == 1)
-        _titleOffsetXConstraint.constant = _lock.frame.size.width / 2;
+    if(self->_lock.hidden == NO && _lock.alpha == 1)
+        self->_titleOffsetXConstraint.constant = self->_lock.frame.size.width / 2;
     else
-        _titleOffsetXConstraint.constant = 0;
-    if(_topicLabel.hidden == NO && _topicLabel.alpha == 1)
-        _titleOffsetYConstraint.constant = -10;
+        self->_titleOffsetXConstraint.constant = 0;
+    if(self->_topicLabel.hidden == NO && _topicLabel.alpha == 1)
+        self->_titleOffsetYConstraint.constant = -10;
     else
-        _titleOffsetYConstraint.constant = 0;
-    [_titleView setNeedsUpdateConstraints];
+        self->_titleOffsetYConstraint.constant = 0;
+    [self->_titleView setNeedsUpdateConstraints];
 }
 
 -(void)launchURL:(NSURL *)url {
@@ -2684,8 +2684,8 @@ NSArray *_sortedChannels;
             lvc = (LogExportsTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController);
         } else {
             lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            lvc.buffer = _buffer;
-            lvc.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            lvc.buffer = self->_buffer;
+            lvc.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -2710,7 +2710,7 @@ NSArray *_sortedChannels;
     int port = [url.port intValue];
     int ssl = [url.scheme hasSuffix:@"s"]?1:0;
     BOOL match = NO;
-    _urlToOpen = nil;
+    self->_urlToOpen = nil;
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
     
     if([url.host intValue] > 0 && url.path && url.path.length > 1) {
@@ -2770,7 +2770,7 @@ NSArray *_sortedChannels;
             [evc setURL:url];
             [self.navigationController presentViewController:[[UINavigationController alloc] initWithRootViewController:evc] animated:YES completion:nil];
         } else {
-            _urlToOpen = url;
+            self->_urlToOpen = url;
         }
     }
 }
@@ -2779,23 +2779,23 @@ NSArray *_sortedChannels;
     [self performSelectorOnMainThread:@selector(cancelSuggestionsTimer) withObject:nil waitUntilDone:NO];
     _sortedChannels = nil;
     _sortedUsers = nil;
-    BOOL changed = (_buffer && _buffer.bid != bid) || !_buffer;
-    if(_buffer && _buffer.bid != bid && _bidToOpen != bid) {
-        _eidToOpen = -1;
+    BOOL changed = (self->_buffer && _buffer.bid != bid) || !_buffer;
+    if(self->_buffer && _buffer.bid != bid && _bidToOpen != bid) {
+        self->_eidToOpen = -1;
     }
 
     if(changed) {
         [self resetColors:nil];
-        _msgid = _eventsView.msgid = nil;
-        if(_defaultTextareaFont) {
-            _message.internalTextView.font = _defaultTextareaFont;
-            _message.internalTextView.textColor = [UIColor textareaTextColor];
-            _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_defaultTextareaFont };
+        self->_msgid = self->_eventsView.msgid = nil;
+        if(self->_defaultTextareaFont) {
+            self->_message.internalTextView.font = self->_defaultTextareaFont;
+            self->_message.internalTextView.textColor = [UIColor textareaTextColor];
+            self->_message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:self->_defaultTextareaFont };
         }
     }
     
-    Buffer *lastBuffer = _buffer;
-    _buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    Buffer *lastBuffer = self->_buffer;
+    self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     if(lastBuffer && changed) {
         if([NetworkConnection sharedInstance].prefs) {
             BOOL enabled = [[[[NetworkConnection sharedInstance].prefs objectForKey:[lastBuffer.type isEqualToString:@"channel"]?@"channel-enableReadOnSelect":@"buffer-enableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",lastBuffer.bid]] boolValue] || [[[NetworkConnection sharedInstance].prefs objectForKey:@"enableReadOnSelect"] intValue] == 1;
@@ -2815,33 +2815,33 @@ NSArray *_sortedChannels;
                     eid = last.eid;
                 }
                 if(eid >= 0 && eid >= lastBuffer.last_seen_eid) {
-                    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid handler:nil];
+                    [[NetworkConnection sharedInstance] heartbeat:self->_buffer.bid cid:lastBuffer.cid bid:lastBuffer.bid lastSeenEid:eid handler:nil];
                     lastBuffer.last_seen_eid = eid;
                 }
             }
         }
-        _buffer.lastBuffer = lastBuffer;
-        _buffer.nextBuffer = nil;
-        lastBuffer.draft = _message.text.length ? _message.text : nil;
+        self->_buffer.lastBuffer = lastBuffer;
+        self->_buffer.nextBuffer = nil;
+        lastBuffer.draft = self->_message.text.length ? _message.text : nil;
         [self showTwoSwipeTip];
     }
-    if(_buffer) {
-        if(_incomingDraft) {
+    if(self->_buffer) {
+        if(self->_incomingDraft) {
             if(changed) {
-                _buffer.draft = _incomingDraft;
+                self->_buffer.draft = self->_incomingDraft;
             } else {
-                [_message setText:_incomingDraft];
+                [self->_message setText:self->_incomingDraft];
             }
-            _incomingDraft = nil;
+            self->_incomingDraft = nil;
         }
-        if(_buffer.cid == _cidToOpen)
-            _cidToOpen = -1;
-        if(_buffer.bid == _bidToOpen)
-            _bidToOpen = -1;
-        _eidToOpen = -1;
-        _bufferToOpen = nil;
+        if(self->_buffer.cid == self->_cidToOpen)
+            self->_cidToOpen = -1;
+        if(self->_buffer.bid == self->_bidToOpen)
+            self->_bidToOpen = -1;
+        self->_eidToOpen = -1;
+        self->_bufferToOpen = nil;
         CLS_LOG(@"BID selected: cid%i bid%i", _buffer.cid, bid);
-        NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:_buffer.bid];
+        NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:self->_buffer.bid];
         for(Event *event in events) {
             if(event.isHighlight) {
                 User *u = [[UsersDataSource sharedInstance] getUser:event.from cid:event.cid bid:event.bid];
@@ -2870,92 +2870,92 @@ NSArray *_sortedChannels;
     }
     
     [self _updateTitleArea];
-    [_buffersView setBuffer:_buffer];
-    _eventsView.eidToOpen = _eidToOpen;
+    [self->_buffersView setBuffer:self->_buffer];
+    self->_eventsView.eidToOpen = self->_eidToOpen;
     [UIView animateWithDuration:0.1 animations:^{
-        _eventsView.stickyAvatar.alpha = 0;
-        _eventsView.tableView.alpha = 0;
-        _eventsView.topUnreadView.alpha = 0;
-        _eventsView.bottomUnreadView.alpha = 0;
-        _eventActivity.alpha = 1;
-        [_eventActivity startAnimating];
+        self->_eventsView.stickyAvatar.alpha = 0;
+        self->_eventsView.tableView.alpha = 0;
+        self->_eventsView.topUnreadView.alpha = 0;
+        self->_eventsView.bottomUnreadView.alpha = 0;
+        self->_eventActivity.alpha = 1;
+        [self->_eventActivity startAnimating];
         if(changed) {
-            NSString *draft = _buffer.draft.length ? _buffer.draft : nil;
-            _message.delegate = nil;
-            [_message clearText];
-            _message.delegate = self;
-            _buffer.draft = draft;
+            NSString *draft = self->_buffer.draft.length ? self->_buffer.draft : nil;
+            self->_message.delegate = nil;
+            [self->_message clearText];
+            self->_message.delegate = self;
+            self->_buffer.draft = draft;
         }
     } completion:^(BOOL finished){
-        [_eventsView setBuffer:_buffer];
+        [self->_eventsView setBuffer:self->_buffer];
         [UIView animateWithDuration:0.1 animations:^{
-            _eventsView.stickyAvatar.alpha = 1;
-            _eventsView.tableView.alpha = 1;
-            _eventActivity.alpha = 0;
+            self->_eventsView.stickyAvatar.alpha = 1;
+            self->_eventsView.tableView.alpha = 1;
+            self->_eventActivity.alpha = 0;
             if(changed) {
-                _message.delegate = nil;
-                _message.text = _buffer.draft;
-                _message.delegate = self;
+                self->_message.delegate = nil;
+                self->_message.text = self->_buffer.draft;
+                self->_message.delegate = self;
             }
         } completion:^(BOOL finished){
-            [_eventActivity stopAnimating];
+            [self->_eventActivity stopAnimating];
         }];
     }];
-    [_usersView setBuffer:_buffer];
+    [self->_usersView setBuffer:self->_buffer];
     [self _updateUserListVisibility];
     [self _updateServerStatus];
     [self.slidingViewController resetTopView];
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
     [self updateSuggestions:NO];
     
-    if([[ServersDataSource sharedInstance] getServer:_buffer.cid].isSlack) {
+    if([[ServersDataSource sharedInstance] getServer:self->_buffer.cid].isSlack) {
         [UIMenuController sharedMenuController].menuItems = @[];
         [self resetColors:nil];
-        _message.internalTextView.allowsEditingTextAttributes = NO;
+        self->_message.internalTextView.allowsEditingTextAttributes = NO;
     } else {
         [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Paste With Style" action:@selector(pasteRich:)],
                                                               [[UIMenuItem alloc] initWithTitle:@"Color" action:@selector(chooseFGColor:)],
                                                               [[UIMenuItem alloc] initWithTitle:@"Background" action:@selector(chooseBGColor:)],
                                                               [[UIMenuItem alloc] initWithTitle:@"Reset Colors" action:@selector(resetColors:)],
                                                               ];
-        _message.internalTextView.allowsEditingTextAttributes = YES;
+        self->_message.internalTextView.allowsEditingTextAttributes = YES;
     }
 }
 
 -(void)userActivityWasContinued:(NSUserActivity *)userActivity {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [_message clearText];
+        [self->_message clearText];
     }];
 }
 
 -(void)userActivityWillSave:(NSUserActivity *)activity {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
 #ifndef ENTERPRISE
-    CFStringRef draft_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)(_message.text?_message.text:@""), NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-    if([_buffer.type isEqualToString:@"console"]) {
-        if(_message.text.length)
+        CFStringRef draft_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)(self->_message.text?self->_message.text:@""), NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+    if([self->_buffer.type isEqualToString:@"console"]) {
+        if(self->_message.text.length)
             activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#?/text=%@&url=%@%@:%i", draft_escaped, s.ssl?@"ircs://":@"", s.hostname, s.port]];
         else
             activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/!%@%@:%i", s.ssl?@"ircs://":@"", s.hostname, s.port]];
         activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", s.hostname];
     } else {
-        if(_message.text.length)
-            activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#?/text=%@&url=%@%@:%i/%@", draft_escaped, s.ssl?@"ircs://":@"", s.hostname, s.port, [_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        if(self->_message.text.length)
+            activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#?/text=%@&url=%@%@:%i/%@", draft_escaped, s.ssl?@"ircs://":@"", s.hostname, s.port, [self->_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
         else
-            activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@%@:%i/%@", s.ssl?@"ircs://":@"", s.hostname, s.port, [_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
-        activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", _buffer.name];
+            activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@%@:%i/%@", s.ssl?@"ircs://":@"", s.hostname, s.port, [self->_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", self->_buffer.name];
     }
     CFRelease(draft_escaped);
 #endif
-    [activity addUserInfoEntriesFromDictionary:@{@"bid":@(_buffer.bid), @"cid":@(_buffer.cid), @"draft":(_message.text?_message.text:@"")}];
+        [activity addUserInfoEntriesFromDictionary:@{@"bid":@(self->_buffer.bid), @"cid":@(self->_buffer.cid), @"draft":(self->_message.text?self->_message.text:@"")}];
     }];
 }
 
 -(void)_updateGlobalMsg {
     if([NetworkConnection sharedInstance].globalMsg.length) {
-        _globalMsgContainer.hidden = NO;
-        _globalMsg.userInteractionEnabled = YES;
+        self->_globalMsgContainer.hidden = NO;
+        self->_globalMsg.userInteractionEnabled = YES;
         NSString *msg = [NetworkConnection sharedInstance].globalMsg;
         msg = [msg stringByReplacingOccurrencesOfString:@"<b>" withString:[NSString stringWithFormat:@"%c", BOLD]];
         msg = [msg stringByReplacingOccurrencesOfString:@"</b>" withString:[NSString stringWithFormat:@"%c", BOLD]];
@@ -2975,18 +2975,18 @@ NSArray *_sortedChannels;
         p.alignment = NSTextAlignmentCenter;
         [s addAttribute:NSParagraphStyleAttributeName value:p range:NSMakeRange(0, [s length])];
 
-        _globalMsg.textColor = [UIColor messageTextColor];
-        _globalMsg.attributedText = s;
+        self->_globalMsg.textColor = [UIColor messageTextColor];
+        self->_globalMsg.attributedText = s;
         for(NSTextCheckingResult *result in links) {
             if(result.resultType == NSTextCheckingTypeLink) {
-                [_globalMsg addLinkWithTextCheckingResult:result];
+                [self->_globalMsg addLinkWithTextCheckingResult:result];
             }
         }
-        _topUnreadBarYOffsetConstraint.constant = _globalMsg.intrinsicContentSize.height + 12;
+        self->_topUnreadBarYOffsetConstraint.constant = self->_globalMsg.intrinsicContentSize.height + 12;
         [self.view layoutIfNeeded];
     } else {
-        _globalMsgContainer.hidden = YES;
-        _topUnreadBarYOffsetConstraint.constant = 0;
+        self->_globalMsgContainer.hidden = YES;
+        self->_topUnreadBarYOffsetConstraint.constant = 0;
     }
     [self _updateEventsInsets];
 }
@@ -2997,61 +2997,61 @@ NSArray *_sortedChannels;
 }
 
 -(void)_updateServerStatus {
-    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
     if(s && (![s.status isEqualToString:@"connected_ready"] || ([s.away isKindOfClass:[NSString class]] && s.away.length))) {
-        if(_serverStatusBar.hidden) {
-            _serverStatusBar.hidden = NO;
+        if(self->_serverStatusBar.hidden) {
+            self->_serverStatusBar.hidden = NO;
         }
-        _serverStatusBar.backgroundColor = [UIColor connectionBarColor];
-        _serverStatus.textColor = [UIColor connectionBarTextColor];
-        _serverStatus.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_serverStatusBar.backgroundColor = [UIColor connectionBarColor];
+        self->_serverStatus.textColor = [UIColor connectionBarTextColor];
+        self->_serverStatus.font = [UIFont systemFontOfSize:FONT_SIZE];
         if([s.status isEqualToString:@"connected_ready"]) {
             if([s.away isKindOfClass:[NSString class]]) {
-                _serverStatusBar.backgroundColor = [UIColor awayBarColor];
-                _serverStatus.textColor = [UIColor awayBarTextColor];
+                self->_serverStatusBar.backgroundColor = [UIColor awayBarColor];
+                self->_serverStatus.textColor = [UIColor awayBarTextColor];
                 if(![[s.away lowercaseString] isEqualToString:@"away"]) {
-                    _serverStatus.text = [NSString stringWithFormat:@"Away (%@). Tap to come back.", s.away];
+                    self->_serverStatus.text = [NSString stringWithFormat:@"Away (%@). Tap to come back.", s.away];
                 } else {
-                    _serverStatus.text = @"Away. Tap to come back.";
+                    self->_serverStatus.text = @"Away. Tap to come back.";
                 }
             }
         } else if([s.status isEqualToString:@"quitting"]) {
-            _serverStatus.text = @"Disconnecting";
+            self->_serverStatus.text = @"Disconnecting";
         } else if([s.status isEqualToString:@"disconnected"]) {
             NSString *type = [s.fail_info objectForKey:@"type"];
             if([type isKindOfClass:[NSString class]] && [type length]) {
                 NSString *reason = [s.fail_info objectForKey:@"reason"];
                 if([type isEqualToString:@"killed"]) {
-                    _serverStatus.text = [NSString stringWithFormat:@"Disconnected - Killed: %@", reason];
+                    self->_serverStatus.text = [NSString stringWithFormat:@"Disconnected - Killed: %@", reason];
                 } else if([type isEqualToString:@"connecting_restricted"]) {
-                    _serverStatus.text = [EventsDataSource reason:reason];
-                    if([_serverStatus.text isEqualToString:reason])
-                        _serverStatus.text = @"You can’t connect to this server with a free account.";
+                    self->_serverStatus.text = [EventsDataSource reason:reason];
+                    if([self->_serverStatus.text isEqualToString:reason])
+                        self->_serverStatus.text = @"You can’t connect to this server with a free account.";
                 } else if([type isEqualToString:@"connection_blocked"]) {
-                    _serverStatus.text = @"Disconnected - Connections to this server have been blocked";
+                    self->_serverStatus.text = @"Disconnected - Connections to this server have been blocked";
                 } else {
                     if([reason isKindOfClass:[NSString class]] && [reason length] && [reason isEqualToString:@"ssl_verify_error"])
-                        _serverStatus.text = [NSString stringWithFormat:@"Strict transport security error: %@", [EventsDataSource SSLreason:[s.fail_info objectForKey:@"ssl_verify_error"]]];
+                        self->_serverStatus.text = [NSString stringWithFormat:@"Strict transport security error: %@", [EventsDataSource SSLreason:[s.fail_info objectForKey:@"ssl_verify_error"]]];
                     else
-                        _serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", [EventsDataSource reason:reason]];
+                        self->_serverStatus.text = [NSString stringWithFormat:@"Disconnected: %@", [EventsDataSource reason:reason]];
                 }
-                _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
-                _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
+                self->_serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+                self->_serverStatus.textColor = [UIColor connectionErrorBarTextColor];
             } else {
-                _serverStatus.text = @"Disconnected. Tap to reconnect.";
+                self->_serverStatus.text = @"Disconnected. Tap to reconnect.";
             }
         } else if([s.status isEqualToString:@"queued"]) {
-            _serverStatus.text = @"Connection Queued";
+            self->_serverStatus.text = @"Connection Queued";
         } else if([s.status isEqualToString:@"connecting"]) {
-            _serverStatus.text = @"Connecting";
+            self->_serverStatus.text = @"Connecting";
         } else if([s.status isEqualToString:@"connected"]) {
-            _serverStatus.text = @"Connected";
+            self->_serverStatus.text = @"Connected";
         } else if([s.status isEqualToString:@"connected_joining"]) {
-            _serverStatus.text = @"Connected: Joining Channels";
+            self->_serverStatus.text = @"Connected: Joining Channels";
         } else if([s.status isEqualToString:@"pool_unavailable"]) {
-            _serverStatus.text = @"Connection temporarily unavailable";
-            _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
-            _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
+            self->_serverStatus.text = @"Connection temporarily unavailable";
+            self->_serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+            self->_serverStatus.textColor = [UIColor connectionErrorBarTextColor];
         } else if([s.status isEqualToString:@"waiting_to_retry"]) {
             double seconds = ([[s.fail_info objectForKey:@"timestamp"] doubleValue] + [[s.fail_info objectForKey:@"retry_timeout"] intValue]) - [[NSDate date] timeIntervalSince1970];
             if(seconds > 0) {
@@ -3062,24 +3062,24 @@ NSArray *_sortedChannels;
                 else
                     text = [text stringByAppendingString:@"; "];
                 text = [text stringByAppendingFormat:@"Reconnecting in %i seconds.", (int)seconds];
-                _serverStatus.text = text;
-                _serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
-                _serverStatus.textColor = [UIColor connectionErrorBarTextColor];
+                self->_serverStatus.text = text;
+                self->_serverStatusBar.backgroundColor = [UIColor connectionErrorBarColor];
+                self->_serverStatus.textColor = [UIColor connectionErrorBarTextColor];
             } else {
-                _serverStatus.text = @"Ready to connect.  Waiting our turn…";
+                self->_serverStatus.text = @"Ready to connect.  Waiting our turn…";
             }
             [self performSelector:@selector(_updateServerStatus) withObject:nil afterDelay:0.5];
         } else if([s.status isEqualToString:@"ip_retry"]) {
-            _serverStatus.text = @"Trying another IP address";
+            self->_serverStatus.text = @"Trying another IP address";
         } else {
             CLS_LOG(@"Unhandled server status: %@", s.status);
         }
-        _bottomUnreadBarYOffsetConstraint.constant = _serverStatus.intrinsicContentSize.height + 12;
+        self->_bottomUnreadBarYOffsetConstraint.constant = self->_serverStatus.intrinsicContentSize.height + 12;
     } else {
         if(!_serverStatusBar.hidden) {
-            _serverStatusBar.hidden = YES;
+            self->_serverStatusBar.hidden = YES;
         }
-        _bottomUnreadBarYOffsetConstraint.constant = 0;
+        self->_bottomUnreadBarYOffsetConstraint.constant = 0;
     }
     [self _updateEventsInsets];
 }
@@ -3137,69 +3137,69 @@ NSArray *_sortedChannels;
     NSLog(@"Transitioning to size: %f, %f", size.width, size.height);
     CGPoint center = self.slidingViewController.view.center;
     if(self.slidingViewController.underLeftShowing)
-        center.x += _buffersView.tableView.frame.size.width;
+        center.x += self->_buffersView.tableView.frame.size.width;
     if(self.slidingViewController.underRightShowing)
-        center.x -= _buffersView.tableView.frame.size.width;
+        center.x -= self->_buffersView.tableView.frame.size.width;
     
     self.navigationController.view.frame = self.slidingViewController.view.bounds;
     self.navigationController.view.center = center;
     self.navigationController.view.layer.position = self.navigationController.view.center;
 
-    _bottomBarHeightConstraint.constant = _message.frame.size.height + 8;
+    self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height && size.width == [UIScreen mainScreen].bounds.size.width && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
-        _borders.hidden = NO;
-        _eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
-        _eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
+        self->_borders.hidden = NO;
+        self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
+        self->_eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
         if(@available(iOS 11, *)) {
-            _eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
-            _eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
+            self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
+            self->_eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
         }
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
-        if(_buffersView.view.superview != self.view) {
-            [self addChildViewController:_buffersView];
-            [_buffersView willMoveToParentViewController:self];
-            [_buffersView viewWillAppear:NO];
-            _buffersView.view.hidden = NO;
-            [self.view addSubview:_buffersView.view];
-            _buffersView.view.autoresizingMask = UIViewAutoresizingNone;
+        if(self->_buffersView.view.superview != self.view) {
+            [self addChildViewController:self->_buffersView];
+            [self->_buffersView willMoveToParentViewController:self];
+            [self->_buffersView viewWillAppear:NO];
+            self->_buffersView.view.hidden = NO;
+            [self.view addSubview:self->_buffersView.view];
+            self->_buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
-        _buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,self.view.frame.size.height);
+        self->_buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,self.view.frame.size.height);
         self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
-        _borders.hidden = YES;
+        self->_borders.hidden = YES;
         if(@available(iOS 11, *)) {
-            _eventsViewWidthConstraint.constant = size.width + self.slidingViewController.view.safeAreaInsets.left;
-            _eventsViewOffsetXConstraint.constant = self.slidingViewController.view.safeAreaInsets.left / 2;
+            self->_eventsViewWidthConstraint.constant = size.width + self.slidingViewController.view.safeAreaInsets.left;
+            self->_eventsViewOffsetXConstraint.constant = self.slidingViewController.view.safeAreaInsets.left / 2;
         } else {
-            _eventsViewWidthConstraint.constant = size.width;
-            _eventsViewOffsetXConstraint.constant = 0;
+            self->_eventsViewWidthConstraint.constant = size.width;
+            self->_eventsViewOffsetXConstraint.constant = 0;
         }
         if(!self.slidingViewController.underLeftViewController)
-            self.slidingViewController.underLeftViewController = _buffersView;
+            self.slidingViewController.underLeftViewController = self->_buffersView;
         if(!self.navigationItem.leftBarButtonItem)
-            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:_menuBtn];
+            self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_menuBtn];
         [self.slidingViewController updateUnderLeftLayout];
         [self.slidingViewController updateUnderRightLayout];
     }
-    _buffersView.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
-    CGRect frame = _titleView.frame;
+    self->_buffersView.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
+    CGRect frame = self->_titleView.frame;
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         frame.size.height = (size.width > size.height)?24:40;
-        _topicLabel.alpha = (size.width > size.height)?0:1;
+        self->_topicLabel.alpha = (size.width > size.height)?0:1;
     }
-    _topicWidthConstraint.constant = frame.size.width = size.width - 128;
+    self->_topicWidthConstraint.constant = frame.size.width = size.width - 128;
     if(@available(iOS 11, *)) {
         frame.size.width -= self.slidingViewController.view.safeAreaInsets.left;
         frame.size.width -= self.slidingViewController.view.safeAreaInsets.right;
-        _topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.left;
-        _topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
+        self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.left;
+        self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
     }
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && (size.width > size.height))
-        frame.size.width -= _buffersView.tableView.frame.size.width;
-    _connectingView.frame = _titleView.frame = frame;
+        frame.size.width -= self->_buffersView.tableView.frame.size.width;
+    self->_connectingView.frame = self->_titleView.frame = frame;
 
     [self.view layoutIfNeeded];
 
@@ -3218,55 +3218,55 @@ NSArray *_sortedChannels;
 }
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    if(_eventsView.topUnreadView.observationInfo) {
+    if(self->_eventsView.topUnreadView.observationInfo) {
         @try {
-            [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
-            [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+            [self->_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+            [self->_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
         } @catch(id anException) {
             //Not registered yet
         }
     }
-    _eventActivity.alpha = 1;
-    [_eventActivity startAnimating];
+    self->_eventActivity.alpha = 1;
+    [self->_eventActivity startAnimating];
     [self.slidingViewController resetTopView];
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
         [self transitionToSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        _eventActivity.alpha = 0;
-        [_eventActivity stopAnimating];
-        if(_eventsView.topUnreadView.observationInfo) {
+        self->_eventActivity.alpha = 0;
+        [self->_eventActivity stopAnimating];
+        if(self->_eventsView.topUnreadView.observationInfo) {
             @try {
-                [_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
-                [_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+                [self->_eventsView.topUnreadView removeObserver:self forKeyPath:@"alpha"];
+                [self->_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
             } @catch(id anException) {
                 //Not registered yet
             }
         }
         [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
         [self updateLayout];
-        [_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
-        [_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+        [self->_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+        [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
     }];
 }
 
 -(void)_updateEventsInsets {
-    _bottomBarOffsetConstraint.constant = _kbSize.height;
+    self->_bottomBarOffsetConstraint.constant = self->_kbSize.height;
     if(@available(iOS 11, *)) {
         if(self.slidingViewController.view.safeAreaInsets.bottom) {
             if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
-                _bottomBarOffsetConstraint.constant -= self.slidingViewController.view.safeAreaInsets.bottom/2;
+                self->_bottomBarOffsetConstraint.constant -= self.slidingViewController.view.safeAreaInsets.bottom/2;
         }
     }
-    CGFloat height = _bottomBarHeightConstraint.constant + _kbSize.height;
+    CGFloat height = self->_bottomBarHeightConstraint.constant + _kbSize.height;
     CGFloat top = 0;
     if(!_globalMsgContainer.hidden)
-        top += _globalMsgContainer.frame.size.height;
-    if(_eventsView.topUnreadView.alpha > 0)
-        top += _eventsView.topUnreadView.frame.size.height;
+        top += self->_globalMsgContainer.frame.size.height;
+    if(self->_eventsView.topUnreadView.alpha > 0)
+        top += self->_eventsView.topUnreadView.frame.size.height;
     if(!_serverStatusBar.hidden)
-        height += _serverStatusBar.bounds.size.height;
+        height += self->_serverStatusBar.bounds.size.height;
     if(@available(iOS 11, *)) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
             height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
@@ -3274,55 +3274,55 @@ NSArray *_sortedChannels;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if(@available(iOS 11, *)) {
-            CGFloat bottom = _kbSize.height ? (_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) ? self.slidingViewController.view.safeAreaInsets.bottom : self.slidingViewController.view.safeAreaInsets.bottom/2);
-            _buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
-            _usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
-            _buffersView.tableView.contentInset = UIEdgeInsetsZero;
-            if(_buffersView.tableView.adjustedContentInset.bottom > 0) { //Sometimes iOS 11 automatically adds the keyboard padding even though I told it not to
-                bottom -= _buffersView.tableView.adjustedContentInset.bottom;
+            CGFloat bottom = self->_kbSize.height ? (self->_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) ? self.slidingViewController.view.safeAreaInsets.bottom : self.slidingViewController.view.safeAreaInsets.bottom/2);
+            self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
+            self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
+            self->_buffersView.tableView.contentInset = UIEdgeInsetsZero;
+            if(self->_buffersView.tableView.adjustedContentInset.bottom > 0) { //Sometimes iOS 11 automatically adds the keyboard padding even though I told it not to
+                bottom -= self->_buffersView.tableView.adjustedContentInset.bottom;
             }
-            _buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
-            _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
+            self->_buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
+            self->_usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
         } else {
-            _buffersView.tableView.scrollIndicatorInsets = _buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
-            _usersView.tableView.scrollIndicatorInsets = _usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,_kbSize.height,0);
+            self->_buffersView.tableView.scrollIndicatorInsets = self->_buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,self->_kbSize.height,0);
+            self->_usersView.tableView.scrollIndicatorInsets = self->_usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,self->_kbSize.height,0);
         }
     }];
 
-    if(!_isShowingPreview && (_eventsView.tableView.contentInset.top != top || _eventsView.tableView.contentInset.bottom != height)) {
-        [_eventsView.tableView setContentInset:UIEdgeInsetsMake(top, 0, height, 0)];
-        [_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(top, 0, height, 0)];
+    if(!_isShowingPreview && (self->_eventsView.tableView.contentInset.top != top || _eventsView.tableView.contentInset.bottom != height)) {
+        [self->_eventsView.tableView setContentInset:UIEdgeInsetsMake(top, 0, height, 0)];
+        [self->_eventsView.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(top, 0, height, 0)];
 
-        if(_eventsView.tableView.contentSize.height > (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) {
+        if(self->_eventsView.tableView.contentSize.height > (self->_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) {
 #ifndef APPSTORE
             CLS_LOG(@"Adjusting content offset after changing insets");
 #endif
-            if(floorf(_eventsView.tableView.contentOffset.y + diff + (_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) > floorf(_eventsView.tableView.contentSize.height)) {
+            if(floorf(self->_eventsView.tableView.contentOffset.y + diff + (self->_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) > floorf(self->_eventsView.tableView.contentSize.height)) {
                 if(!_buffer.scrolledUp)
-                    [_eventsView _scrollToBottom];
+                    [self->_eventsView _scrollToBottom];
 #ifndef APPSTORE
                 else
                     CLS_LOG(@"Buffer was scrolled up, ignoring");
 #endif
             } else if(diff > 0 || _buffer.scrolledUp)
-                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
+                self->_eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
             else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
-                _eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));
+                self->_eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));
         }
     }
 }
 
 -(void)refresh {
-    [_buffersView refresh];
-    [_eventsView refresh];
-    [_usersView refresh];
+    [self->_buffersView refresh];
+    [self->_eventsView refresh];
+    [self->_usersView refresh];
     [self _updateTitleArea];
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
 }
 
 -(void)setMsgId:(NSString *)msgId {
-    _eventsView.msgid = _msgid = msgId;
-    [_eventsView refresh];
+    self->_eventsView.msgid = self->_msgid = msgId;
+    [self->_eventsView refresh];
     [self _updateTitleArea];
     [self _updateUserListVisibility];
 }
@@ -3337,63 +3337,63 @@ NSArray *_sortedChannels;
         return;
     }*/
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && ![[UIDevice currentDevice] isBigPhone]) {
-        if(_msgid) {
+        if(self->_msgid) {
             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_closeThread)];
             self.slidingViewController.underRightViewController = nil;
-        } else if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-            self.navigationItem.rightBarButtonItem = _usersButtonItem;
+        } else if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
+            self.navigationItem.rightBarButtonItem = self->_usersButtonItem;
             if(self.slidingViewController.underRightViewController == nil)
-                self.slidingViewController.underRightViewController = _usersView;
+                self.slidingViewController.underRightViewController = self->_usersView;
         } else {
             self.navigationItem.rightBarButtonItem = nil;
             self.slidingViewController.underRightViewController = nil;
         }
     } else {
         if(self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"]) {
-            if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
+            if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
                 if(self.slidingViewController.underRightViewController) {
                     self.slidingViewController.underRightViewController = nil;
-                    [self addChildViewController:_usersView];
-                    [_usersView willMoveToParentViewController:self];
-                    [_usersView viewWillAppear:NO];
-                    _usersView.view.autoresizingMask = UIViewAutoresizingNone;
+                    [self addChildViewController:self->_usersView];
+                    [self->_usersView willMoveToParentViewController:self];
+                    [self->_usersView viewWillAppear:NO];
+                    self->_usersView.view.autoresizingMask = UIViewAutoresizingNone;
                 }
-                _usersView.view.frame = CGRectMake(self.view.frame.size.width - 220,0,220,self.view.frame.size.height);
-                _usersView.view.hidden = NO;
-                if(_usersView.view.superview != self.view)
-                    [self.view insertSubview:_usersView.view atIndex:1];
-                _eventsViewWidthConstraint.constant = self.view.frame.size.width - 442;
-                _eventsViewOffsetXConstraint.constant = 0;
+                self->_usersView.view.frame = CGRectMake(self.view.frame.size.width - 220,0,220,self.view.frame.size.height);
+                self->_usersView.view.hidden = NO;
+                if(self->_usersView.view.superview != self.view)
+                    [self.view insertSubview:self->_usersView.view atIndex:1];
+                self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - 442;
+                self->_eventsViewOffsetXConstraint.constant = 0;
             } else {
-                if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-                    self.navigationItem.rightBarButtonItem = _usersButtonItem;
+                if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
+                    self.navigationItem.rightBarButtonItem = self->_usersButtonItem;
                     if(self.slidingViewController.underRightViewController == nil) {
-                        [_usersView.view removeFromSuperview];
-                        [_usersView removeFromParentViewController];
-                        CGRect frame = _usersView.view.frame;
+                        [self->_usersView.view removeFromSuperview];
+                        [self->_usersView removeFromParentViewController];
+                        CGRect frame = self->_usersView.view.frame;
                         frame.origin.x = 0;
                         frame.size.width = 220;
-                        _usersView.view.frame = frame;
-                        self.slidingViewController.underRightViewController = _usersView;
+                        self->_usersView.view.frame = frame;
+                        self.slidingViewController.underRightViewController = self->_usersView;
                     }
-                    _usersView.view.hidden = NO;
+                    self->_usersView.view.hidden = NO;
                 } else {
                     self.navigationItem.rightBarButtonItem = nil;
                     self.slidingViewController.underRightViewController = nil;
-                    _usersView.view.hidden = YES;
+                    self->_usersView.view.hidden = YES;
                 }
-                _eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
-                _eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
+                self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
+                self->_eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
                 if(@available(iOS 11, *)) {
-                    _eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
-                    _eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
+                    self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
+                    self->_eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
                 }
             }
         } else {
-            if([_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-                self.navigationItem.rightBarButtonItem = _usersButtonItem;
+            if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
+                self.navigationItem.rightBarButtonItem = self->_usersButtonItem;
                 if(self.slidingViewController.underRightViewController == nil)
-                    self.slidingViewController.underRightViewController = _usersView;
+                    self.slidingViewController.underRightViewController = self->_usersView;
             } else {
                 self.navigationItem.rightBarButtonItem = nil;
                 self.slidingViewController.underRightViewController = nil;
@@ -3401,17 +3401,17 @@ NSArray *_sortedChannels;
         }
     }
     [self _updateMessageWidth];
-    [_message updateConstraints];
+    [self->_message updateConstraints];
     [self.view layoutIfNeeded];
 }
 
 -(void)showMentionTip {
-    [_mentionTip.superview bringSubviewToFront:_mentionTip];
+    [self->_mentionTip.superview bringSubviewToFront:self->_mentionTip];
 
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"mentionTip"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"mentionTip"];
         [UIView animateWithDuration:0.5 animations:^{
-            _mentionTip.alpha = 1;
+            self->_mentionTip.alpha = 1;
         } completion:^(BOOL finished){
             [self performSelector:@selector(hideMentionTip) withObject:nil afterDelay:2];
         }];
@@ -3420,17 +3420,17 @@ NSArray *_sortedChannels;
 
 -(void)hideMentionTip {
     [UIView animateWithDuration:0.5 animations:^{
-        _mentionTip.alpha = 0;
+        self->_mentionTip.alpha = 0;
     } completion:nil];
 }
 
 -(void)didSwipe:(NSNotification *)n {
     [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"swipeTip"];
     if([n.name isEqualToString:ECSlidingViewUnderLeftWillAppear]) {
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [_buffersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [self->_buffersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
         self.view.accessibilityElementsHidden = YES;
     } else if([n.name isEqualToString:ECSlidingViewUnderRightWillAppear]) {
-        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [_usersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
+        UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [self->_usersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
         self.view.accessibilityElementsHidden = YES;
     } else {
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
@@ -3439,12 +3439,12 @@ NSArray *_sortedChannels;
 }
 
 -(void)showSwipeTip {
-    [_swipeTip.superview bringSubviewToFront:_swipeTip];
+    [self->_swipeTip.superview bringSubviewToFront:self->_swipeTip];
     
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"swipeTip"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"swipeTip"];
         [UIView animateWithDuration:0.5 animations:^{
-            _swipeTip.alpha = 1;
+            self->_swipeTip.alpha = 1;
         } completion:^(BOOL finished){
             [self performSelector:@selector(hideSwipeTip) withObject:nil afterDelay:2];
         }];
@@ -3453,17 +3453,17 @@ NSArray *_sortedChannels;
 
 -(void)hideSwipeTip {
     [UIView animateWithDuration:0.5 animations:^{
-        _swipeTip.alpha = 0;
+        self->_swipeTip.alpha = 0;
     } completion:nil];
 }
 
 -(void)showTwoSwipeTip {
-    [_2swipeTip.superview bringSubviewToFront:_2swipeTip];
+    [_2swipeTip.superview bringSubviewToFront:self->_2swipeTip];
     
     if(![[NSUserDefaults standardUserDefaults] boolForKey:@"twoSwipeTip"]) {
         [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"twoSwipeTip"];
         [UIView animateWithDuration:0.5 animations:^{
-            _2swipeTip.alpha = 1;
+            self->_2swipeTip.alpha = 1;
         } completion:^(BOOL finished){
             [self performSelector:@selector(hideTwoSwipeTip) withObject:nil afterDelay:2];
         }];
@@ -3472,7 +3472,7 @@ NSArray *_sortedChannels;
 
 -(void)hideTwoSwipeTip {
     [UIView animateWithDuration:0.5 animations:^{
-        _2swipeTip.alpha = 0;
+        self->_2swipeTip.alpha = 0;
     } completion:nil];
 }
 
@@ -3488,13 +3488,13 @@ NSArray *_sortedChannels;
 
 -(IBAction)settingsButtonPressed:(id)sender {
     [self dismissKeyboard];
-    _selectedBuffer = _buffer;
-    _selectedUser = nil;
-    _selectedEvent = nil;
-    User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
+    self->_selectedBuffer = self->_buffer;
+    self->_selectedUser = nil;
+    self->_selectedEvent = nil;
+    User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:self->_buffer.cid].nick cid:self->_buffer.cid bid:self->_buffer.bid];
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
-    if([_buffer.type isEqualToString:@"console"]) {
-        Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    if([self->_buffer.type isEqualToString:@"console"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
             [sheet addButtonWithTitle:@"Reconnect"];
             [sheet addButtonWithTitle:@"Delete"];
@@ -3503,8 +3503,8 @@ NSArray *_sortedChannels;
             [sheet addButtonWithTitle:@"Disconnect"];
         }
         [sheet addButtonWithTitle:@"Edit Connection"];
-    } else if([_buffer.type isEqualToString:@"channel"]) {
-        if([[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
+    } else if([self->_buffer.type isEqualToString:@"channel"]) {
+        if([[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
             [sheet addButtonWithTitle:@"Leave"];
             if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
                 [sheet addButtonWithTitle:@"Ban List"];
@@ -3512,13 +3512,13 @@ NSArray *_sortedChannels;
             [sheet addButtonWithTitle:@"Invite to Channel"];
         } else {
             [sheet addButtonWithTitle:@"Rejoin"];
-            [sheet addButtonWithTitle:(_buffer.archived)?@"Unarchive":@"Archive"];
+            [sheet addButtonWithTitle:(self->_buffer.archived)?@"Unarchive":@"Archive"];
             [sheet addButtonWithTitle:@"Rename"];
         }
         [sheet addButtonWithTitle:@"Delete"];
     } else {
         [sheet addButtonWithTitle:@"Whois"];
-        if(_buffer.archived) {
+        if(self->_buffer.archived) {
             [sheet addButtonWithTitle:@"Unarchive"];
         } else {
             [sheet addButtonWithTitle:@"Archive"];
@@ -3540,20 +3540,20 @@ NSArray *_sortedChannels;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
         [sheet showInView:self.view];
     } else {
-        [sheet showFromRect:CGRectMake(_bottomBar.frame.origin.x + _settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
+        [sheet showFromRect:CGRectMake(self->_bottomBar.frame.origin.x + _settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
     }
 }
 
 -(void)dismissKeyboard {
-    [_message resignFirstResponder];
+    [self->_message resignFirstResponder];
 }
 
 -(void)_eventTapped:(NSTimer *)timer {
-    _doubleTapTimer = nil;
-    [_message resignFirstResponder];
+    self->_doubleTapTimer = nil;
+    [self->_message resignFirstResponder];
     Event *e = timer.userInfo;
     if(e.rowType == ROW_FAILED) {
-        _selectedEvent = e;
+        self->_selectedEvent = e;
         Server *s = [[ServersDataSource sharedInstance] getServer:e.cid];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"This message could not be sent" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Try Again", nil];
         alert.tag = TAG_FAILEDMSG;
@@ -3561,30 +3561,30 @@ NSArray *_sortedChannels;
     } else if(e.rowType == ROW_REPLY_COUNT) {
         [self setMsgId:[[e.entities objectForKey:@"parent"] msgid]];
     } else {
-        [_eventsView clearLastSeenMarker];
+        [self->_eventsView clearLastSeenMarker];
     }
     [self closeColorPicker];
 }
 
 -(void)rowSelected:(Event *)event {
-    if(_doubleTapTimer) {
-        [_doubleTapTimer invalidate];
-        _doubleTapTimer = nil;
+    if(self->_doubleTapTimer) {
+        [self->_doubleTapTimer invalidate];
+        self->_doubleTapTimer = nil;
         NSString *from = event.from;
         if(!from.length)
             from = event.nick;
         if(from.length) {
-            _selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:event.cid bid:event.bid];
+            self->_selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:event.cid bid:event.bid];
             if(!_selectedUser) {
-                _selectedUser = [[User alloc] init];
-                _selectedUser.nick = event.fromNick;
-                _selectedUser.display_name = event.from;
-                _selectedUser.hostmask = event.hostmask;
+                self->_selectedUser = [[User alloc] init];
+                self->_selectedUser.nick = event.fromNick;
+                self->_selectedUser.display_name = event.from;
+                self->_selectedUser.hostmask = event.hostmask;
             }
             [self _mention];
         }
     } else {
-        _doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_eventTapped:) userInfo:event repeats:NO];
+        self->_doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_eventTapped:) userInfo:event repeats:NO];
     }
 }
 
@@ -3596,12 +3596,12 @@ NSArray *_sortedChannels;
     
     [self.slidingViewController resetTopView];
     
-    if(_message.text.length == 0) {
-        _message.text = _buffer.serverIsSlack ? [NSString stringWithFormat:@"@%@ ",_selectedUser.nick] : [NSString stringWithFormat:@"%@: ",_selectedUser.nick];
+    if(self->_message.text.length == 0) {
+        self->_message.text = self->_buffer.serverIsSlack ? [NSString stringWithFormat:@"@%@ ",_selectedUser.nick] : [NSString stringWithFormat:@"%@: ",_selectedUser.nick];
     } else {
-        NSString *from = _selectedUser.nick;
-        NSInteger oldPosition = _message.selectedRange.location;
-        NSString *text = _message.text;
+        NSString *from = self->_selectedUser.nick;
+        NSInteger oldPosition = self->_message.selectedRange.location;
+        NSString *text = self->_message.text;
         NSInteger start = oldPosition - 1;
         if(start > 0 && [text characterAtIndex:start] == ' ')
             start--;
@@ -3631,17 +3631,17 @@ NSArray *_sortedChannels;
                 newtext = (NSMutableString *)@"";
             if([newtext isEqualToString:@"@"])
                 newtext = (NSMutableString *)@"";
-            _message.text = newtext;
+            self->_message.text = newtext;
             if(match < newtext.length)
-                _message.selectedRange = NSMakeRange(match, 0);
+                self->_message.selectedRange = NSMakeRange(match, 0);
             else
-                _message.selectedRange = NSMakeRange(newtext.length, 0);
+                self->_message.selectedRange = NSMakeRange(newtext.length, 0);
         } else {
             if(oldPosition == text.length - 1) {
                 text = [NSString stringWithFormat:@" %@", from];
             } else {
                 NSMutableString *newtext = [[NSMutableString alloc] initWithString:[text substringWithRange:NSMakeRange(0, oldPosition)]];
-                if(_buffer.serverIsSlack && ![newtext hasSuffix:@"@"])
+                if(self->_buffer.serverIsSlack && ![newtext hasSuffix:@"@"])
                     from = [NSString stringWithFormat:@"@%@", from];
                 if(![newtext hasSuffix:@" "])
                     from = [NSString stringWithFormat:@" %@", from];
@@ -3653,53 +3653,53 @@ NSArray *_sortedChannels;
                     newtext = (NSMutableString *)[newtext substringWithRange:NSMakeRange(0, newtext.length - 1)];
                 text = newtext;
             }
-            _message.text = text;
+            self->_message.text = text;
             if(text.length > 0) {
                 if(oldPosition + from.length + 2 < text.length)
-                    _message.selectedRange = NSMakeRange(oldPosition + from.length, 0);
+                    self->_message.selectedRange = NSMakeRange(oldPosition + from.length, 0);
                 else
-                    _message.selectedRange = NSMakeRange(text.length, 0);
+                    self->_message.selectedRange = NSMakeRange(text.length, 0);
             }
         }
     }
-    [_message becomeFirstResponder];
+    [self->_message becomeFirstResponder];
 }
 
 -(void)_showUserPopupInRect:(CGRect)rect {
     [self dismissKeyboard];
     NSString *title = @"";;
-    Server *server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-    if(_selectedUser) {
-        if(!_buffer.serverIsSlack && ([_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)))
-            title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.display_name,[_selectedUser.hostmask stripIRCFormatting]];
+    Server *server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+    if(self->_selectedUser) {
+        if(!_buffer.serverIsSlack && ([self->_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)))
+            title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.display_name,[self->_selectedUser.hostmask stripIRCFormatting]];
         else
-            title = _selectedUser.nick;
+            title = self->_selectedUser.nick;
     }
     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
-    if(_selectedURL) {
+    if(self->_selectedURL) {
         [sheet addButtonWithTitle:@"Copy URL"];
         [sheet addButtonWithTitle:@"Share URL"];
     }
-    if(_selectedEvent) {
-        if([[_selectedEvent.entities objectForKey:@"own_file"] intValue]) {
+    if(self->_selectedEvent) {
+        if([[self->_selectedEvent.entities objectForKey:@"own_file"] intValue]) {
             [sheet addButtonWithTitle:@"Delete File"];
         }
-        if(_selectedEvent.rowType == ROW_THUMBNAIL || _selectedEvent.rowType == ROW_FILE)
+        if(self->_selectedEvent.rowType == ROW_THUMBNAIL || _selectedEvent.rowType == ROW_FILE)
             [sheet addButtonWithTitle:@"Close Preview"];
-        if(_selectedEvent.msg.length)
+        if(self->_selectedEvent.msg.length)
             [sheet addButtonWithTitle:@"Copy Message"];
-        if(!_msgid && _selectedEvent.msgid && ([_selectedEvent.type isEqualToString:@"buffer_msg"] || [_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [_selectedEvent.type isEqualToString:@"notice"])) {
+        if(!_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
             [sheet addButtonWithTitle:@"Reply"];
         }
-        if(_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
+        if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
             [sheet addButtonWithTitle:@"Edit Message"];
         }
-        if(_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
+        if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
             [sheet addButtonWithTitle:@"Delete Message"];
         }
     }
-    if(_selectedUser) {
-        if(_buffer.serverIsSlack)
+    if(self->_selectedUser) {
+        if(self->_buffer.serverIsSlack)
             [sheet addButtonWithTitle:@"Slack Profile"];
         if(!_buffer.serverIsSlack)
             [sheet addButtonWithTitle:@"Whois"];
@@ -3708,16 +3708,16 @@ NSArray *_sortedChannels;
         if(!_buffer.serverIsSlack)
             [sheet addButtonWithTitle:@"Invite to Channel"];
         [sheet addButtonWithTitle:@"Ignore"];
-        if(!_buffer.serverIsSlack && [_buffer.type isEqualToString:@"channel"]) {
-            User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:_buffer.cid].nick cid:_buffer.cid bid:_buffer.bid];
+        if(!_buffer.serverIsSlack && [self->_buffer.type isEqualToString:@"channel"]) {
+            User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:self->_buffer.cid].nick cid:self->_buffer.cid bid:self->_buffer.bid];
             if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
-                if([_selectedUser.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound)
+                if([self->_selectedUser.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound)
                     [sheet addButtonWithTitle:@"Deop"];
                 else
                     [sheet addButtonWithTitle:@"Op"];
             }
             if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
-                if([_selectedUser.mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound)
+                if([self->_selectedUser.mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound)
                     [sheet addButtonWithTitle:@"Devoice"];
                 else
                     [sheet addButtonWithTitle:@"Voice"];
@@ -3729,39 +3729,39 @@ NSArray *_sortedChannels;
             [sheet addButtonWithTitle:@"Copy Hostmask"];
     }
     
-    if(_selectedEvent)
+    if(self->_selectedEvent)
         [sheet addButtonWithTitle:@"Clear Backlog"];
 
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
         [sheet showInView:self.view];
     } else {
-        _selectedRect = rect;
-        if(_selectedEvent)
-            [sheet showFromRect:rect inView:_eventsView.tableView animated:NO];
+        self->_selectedRect = rect;
+        if(self->_selectedEvent)
+            [sheet showFromRect:rect inView:self->_eventsView.tableView animated:NO];
         else
-            [sheet showFromRect:rect inView:_usersView.tableView animated:NO];
+            [sheet showFromRect:rect inView:self->_usersView.tableView animated:NO];
     }
 }
 
 -(void)_userTapped {
-    [self _showUserPopupInRect:_selectedRect];
-    _doubleTapTimer = nil;
+    [self _showUserPopupInRect:self->_selectedRect];
+    self->_doubleTapTimer = nil;
 }
 
 -(void)userSelected:(NSString *)nick rect:(CGRect)rect {
-    _selectedRect = rect;
-    _selectedEvent = nil;
-    _selectedURL = nil;
-    _selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:_buffer.cid bid:_buffer.bid];
-    if(_doubleTapTimer) {
-        [_doubleTapTimer invalidate];
-        _doubleTapTimer = nil;
+    self->_selectedRect = rect;
+    self->_selectedEvent = nil;
+    self->_selectedURL = nil;
+    self->_selectedUser = [[UsersDataSource sharedInstance] getUser:nick cid:self->_buffer.cid bid:self->_buffer.bid];
+    if(self->_doubleTapTimer) {
+        [self->_doubleTapTimer invalidate];
+        self->_doubleTapTimer = nil;
         [self.slidingViewController resetTopViewWithAnimations:nil onComplete:^{
             [self _mention];
         }];
     } else {
-        _doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_userTapped) userInfo:nil repeats:NO];
+        self->_doubleTapTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_userTapped) userInfo:nil repeats:NO];
     }
 }
 
@@ -3778,12 +3778,12 @@ NSArray *_sortedChannels;
         }
     }
     
-    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cids:cids bids:bids lastSeenEids:eids handler:nil];
+    [[NetworkConnection sharedInstance] heartbeat:self->_buffer.bid cids:cids bids:bids lastSeenEids:eids handler:nil];
 }
 
 -(void)_editConnection {
     EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-    [ecv setServer:_selectedBuffer.cid];
+    [ecv setServer:self->_selectedBuffer.cid];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -3798,11 +3798,11 @@ NSArray *_sortedChannels;
 -(void)_deleteSelectedBuffer {
     [self dismissKeyboard];
     [self.view.window endEditing:YES];
-    NSString *title = [_selectedBuffer.type isEqualToString:@"console"]?@"Delete Connection":@"Clear History";
+    NSString *title = [self->_selectedBuffer.type isEqualToString:@"console"]?@"Delete Connection":@"Clear History";
     NSString *msg;
-    if([_selectedBuffer.type isEqualToString:@"console"]) {
+    if([self->_selectedBuffer.type isEqualToString:@"console"]) {
         msg = @"Are you sure you want to remove this connection?";
-    } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
+    } else if([self->_selectedBuffer.type isEqualToString:@"channel"]) {
         msg = [NSString stringWithFormat:@"Are you sure you want to clear your history in %@?", _selectedBuffer.name];
     } else {
         msg = [NSString stringWithFormat:@"Are you sure you want to clear your history with %@?", _selectedBuffer.name];
@@ -3812,15 +3812,15 @@ NSArray *_sortedChannels;
     
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-        if([_selectedBuffer.type isEqualToString:@"console"]) {
-            [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid handler:nil];
-        } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
+        if([self->_selectedBuffer.type isEqualToString:@"console"]) {
+            [[NetworkConnection sharedInstance] deleteServer:self->_selectedBuffer.cid handler:nil];
+        } else if(self->_selectedBuffer == nil || self->_selectedBuffer.bid == -1) {
             if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
             else
                 [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
         } else {
-            [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] deleteBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
         }
     }]];
     
@@ -3852,25 +3852,25 @@ NSArray *_sortedChannels;
 }
 
 -(void)_inviteToChannel {
-    Server *s = [[ServersDataSource sharedInstance] getServer:_selectedUser?_buffer.cid:_selectedBuffer.cid];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
-    _alertView.tag = TAG_INVITE;
-    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [_alertView textFieldAtIndex:0].delegate = self;
-    [_alertView textFieldAtIndex:0].placeholder = _selectedUser?@"#channel":@"nickname";
-    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [_alertView show];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedUser?_buffer.cid:self->_selectedBuffer.cid];
+    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
+    self->_alertView.tag = TAG_INVITE;
+    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [self->_alertView textFieldAtIndex:0].delegate = self;
+    [self->_alertView textFieldAtIndex:0].placeholder = self->_selectedUser?@"#channel":@"nickname";
+    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [self->_alertView show];
 }
 
 -(void)_joinAChannel {
-    Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Which channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-    _alertView.tag = TAG_JOIN;
-    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [_alertView textFieldAtIndex:0].delegate = self;
-    [_alertView textFieldAtIndex:0].placeholder = @"#channel";
-    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [_alertView show];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
+    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Which channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+    self->_alertView.tag = TAG_JOIN;
+    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [self->_alertView textFieldAtIndex:0].delegate = self;
+    [self->_alertView textFieldAtIndex:0].placeholder = @"#channel";
+    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [self->_alertView show];
 }
 
 -(void)_renameBuffer:(Buffer *)b msg:(NSString *)msg {
@@ -3893,78 +3893,78 @@ NSArray *_sortedChannels;
         }
         msg = [NSString stringWithFormat:@"Error renaming: %@. Please choose a new name for this %@", msg, b.type];
     }
-    Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
-    _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Rename", nil];
-    _alertView.tag = TAG_RENAME;
-    _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [_alertView textFieldAtIndex:0].delegate = self;
-    [_alertView textFieldAtIndex:0].text = b.name;
-    [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [_alertView show];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
+    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Rename", nil];
+    self->_alertView.tag = TAG_RENAME;
+    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [self->_alertView textFieldAtIndex:0].delegate = self;
+    [self->_alertView textFieldAtIndex:0].text = b.name;
+    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+    [self->_alertView show];
 }
 
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
-    _selectedUser = nil;
-    _selectedURL = nil;
-    _selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
+    self->_selectedUser = nil;
+    self->_selectedURL = nil;
+    self->_selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    if([_selectedBuffer.type isEqualToString:@"console"]) {
-        Server *s = [[ServersDataSource sharedInstance] getServer:_selectedBuffer.cid];
+    if([self->_selectedBuffer.type isEqualToString:@"console"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Reconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid handler:nil];
+                [[NetworkConnection sharedInstance] reconnect:self->_selectedBuffer.cid handler:nil];
             }]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
                 [self _deleteSelectedBuffer];
             }]];
         } else {
             [alert addAction:[UIAlertAction actionWithTitle:@"Disconnect" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil handler:nil];
+                [[NetworkConnection sharedInstance] disconnect:self->_selectedBuffer.cid msg:nil handler:nil];
             }]];
         }
         [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _editConnection];
         }]];
-    } else if([_selectedBuffer.type isEqualToString:@"channel"]) {
-        if([[ChannelsDataSource sharedInstance] channelForBuffer:_selectedBuffer.bid]) {
+    } else if([self->_selectedBuffer.type isEqualToString:@"channel"]) {
+        if([[ChannelsDataSource sharedInstance] channelForBuffer:self->_selectedBuffer.bid]) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid handler:nil];
+                [[NetworkConnection sharedInstance] part:self->_selectedBuffer.name msg:nil cid:self->_selectedBuffer.cid handler:nil];
             }]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Invite to Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 [self _inviteToChannel];
             }]];
         } else {
             [alert addAction:[UIAlertAction actionWithTitle:@"Rejoin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid handler:nil];
+                [[NetworkConnection sharedInstance] join:self->_selectedBuffer.name key:nil cid:self->_selectedBuffer.cid handler:nil];
             }]];
-            if(_selectedBuffer.archived) {
+            if(self->_selectedBuffer.archived) {
                 [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
+                    [[NetworkConnection sharedInstance] unarchiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
                 }]];
             } else {
                 [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                    [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
+                    [[NetworkConnection sharedInstance] archiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
                 }]];
             }
             [alert addAction:[UIAlertAction actionWithTitle:@"Rename" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [self _renameBuffer:_selectedBuffer msg:nil];
+                [self _renameBuffer:self->_selectedBuffer msg:nil];
             }]];
         }
         [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
             [self _deleteSelectedBuffer];
         }]];
     } else {
-        if(_selectedBuffer.archived) {
+        if(self->_selectedBuffer.archived) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
+                [[NetworkConnection sharedInstance] unarchiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
             }]];
         } else {
             [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
+                [[NetworkConnection sharedInstance] archiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
             }]];
         }
         [alert addAction:[UIAlertAction actionWithTitle:@"Rename" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _renameBuffer:_selectedBuffer msg:nil];
+            [self _renameBuffer:self->_selectedBuffer msg:nil];
         }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
             [self _deleteSelectedBuffer];
@@ -3981,7 +3981,7 @@ NSArray *_sortedChannels;
     }]];
     
     BOOL activeCount = NO;
-    NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:_selectedBuffer.cid];
+    NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:self->_selectedBuffer.cid];
     for(Buffer *b in buffers) {
         if([b.type isEqualToString:@"conversation"] && !b.archived) {
             activeCount = YES;
@@ -3991,7 +3991,7 @@ NSArray *_sortedChannels;
     
     if(activeCount) {
         [alert addAction:[UIAlertAction actionWithTitle:@"Delete Active Conversations" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *alert) {
-            [self spamSelected:_selectedBuffer.cid];
+            [self spamSelected:self->_selectedBuffer.cid];
         }]];
     }
     [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
@@ -4000,7 +4000,7 @@ NSArray *_sortedChannels;
 
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
     alert.popoverPresentationController.sourceRect = rect;
-    alert.popoverPresentationController.sourceView = _buffersView.tableView;
+    alert.popoverPresentationController.sourceView = self->_buffersView.tableView;
     [self presentViewController:alert animated:YES completion:nil];
 }
 
@@ -4024,23 +4024,23 @@ NSArray *_sortedChannels;
         if(!from.length)
             from = event.nick;
         if(from) {
-            _selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:_buffer.cid bid:_buffer.bid];
+            self->_selectedUser = [[UsersDataSource sharedInstance] getUser:from cid:self->_buffer.cid bid:self->_buffer.bid];
             if(!_selectedUser) {
-                _selectedUser = [[User alloc] init];
-                _selectedUser.cid = _selectedEvent.cid;
-                _selectedUser.bid = _selectedEvent.bid;
-                _selectedUser.nick = from;
-                _selectedUser.parted = YES;
+                self->_selectedUser = [[User alloc] init];
+                self->_selectedUser.cid = self->_selectedEvent.cid;
+                self->_selectedUser.bid = self->_selectedEvent.bid;
+                self->_selectedUser.nick = from;
+                self->_selectedUser.parted = YES;
             }
             if(event.hostmask.length)
-                _selectedUser.hostmask = event.hostmask;
+                self->_selectedUser.hostmask = event.hostmask;
         } else {
-            _selectedUser = nil;
+            self->_selectedUser = nil;
         }
-        _selectedEvent = event;
-        _selectedURL = url;
-        if([_selectedURL hasPrefix:@"irccloud-paste-"])
-            _selectedURL = [_selectedURL substringFromIndex:15];
+        self->_selectedEvent = event;
+        self->_selectedURL = url;
+        if([self->_selectedURL hasPrefix:@"irccloud-paste-"])
+            self->_selectedURL = [self->_selectedURL substringFromIndex:15];
         [self _showUserPopupInRect:rect];
     }
 }
@@ -4049,8 +4049,8 @@ NSArray *_sortedChannels;
     if([NetworkConnection sharedInstance].state == kIRCCloudStateDisconnected) {
         [[NetworkConnection sharedInstance] connect:NO];
     } else {
-        if(_buffer && !_buffer.isMPDM && [_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]) {
-            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithChannel:[[ChannelsDataSource sharedInstance] channelForBuffer:_buffer.bid]];
+        if(self->_buffer && !_buffer.isMPDM && [self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
+            ChannelInfoViewController *c = [[ChannelInfoViewController alloc] initWithChannel:[[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -4064,19 +4064,19 @@ NSArray *_sortedChannels;
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if(_alertView) {
-        [_alertView dismissWithClickedButtonIndex:1 animated:YES];
-        [self alertView:_alertView clickedButtonAtIndex:1];
+    if(self->_alertView) {
+        [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
+        [self alertView:self->_alertView clickedButtonAtIndex:1];
     }
     return NO;
 }
 
 -(void)_setSelectedBuffer:(Buffer *)b {
-    _selectedBuffer = b;
+    self->_selectedBuffer = b;
 }
 
 -(void)clearText {
-    [_message clearText];
+    [self->_message clearText];
 }
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
@@ -4086,54 +4086,54 @@ NSArray *_sortedChannels;
         case TAG_BAN:
             if([title isEqualToString:@"Ban"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:_buffer.name cid:_buffer.cid handler:nil];
+                    [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
             }
             break;
         case TAG_IGNORE:
             if([title isEqualToString:@"Ignore"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:_buffer.cid handler:nil];
+                    [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:self->_buffer.cid handler:nil];
             }
             break;
         case TAG_KICK:
             if([title isEqualToString:@"Kick"]) {
-               [[NetworkConnection sharedInstance] kick:_selectedUser.nick chan:_buffer.name msg:[alertView textFieldAtIndex:0].text cid:_buffer.cid handler:nil];
+               [[NetworkConnection sharedInstance] kick:self->_selectedUser.nick chan:self->_buffer.name msg:[alertView textFieldAtIndex:0].text cid:self->_buffer.cid handler:nil];
             }
             break;
         case TAG_INVITE:
             if([title isEqualToString:@"Invite"]) {
                 if([alertView textFieldAtIndex:0].text.length) {
-                    if(_selectedUser)
-                        [[NetworkConnection sharedInstance] invite:_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:_buffer.cid handler:nil];
+                    if(self->_selectedUser)
+                        [[NetworkConnection sharedInstance] invite:self->_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:self->_buffer.cid handler:nil];
                     else
-                        [[NetworkConnection sharedInstance] invite:[alertView textFieldAtIndex:0].text chan:_selectedBuffer.name cid:_selectedBuffer.cid handler:nil];
+                        [[NetworkConnection sharedInstance] invite:[alertView textFieldAtIndex:0].text chan:self->_selectedBuffer.name cid:self->_selectedBuffer.cid handler:nil];
                 }
             }
             break;
         case TAG_BADCHANNELKEY:
             if([title isEqualToString:@"Join"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] join:[_alertObject objectForKey:@"chan"] key:[alertView textFieldAtIndex:0].text cid:_alertObject.cid handler:nil];
+                    [[NetworkConnection sharedInstance] join:[self->_alertObject objectForKey:@"chan"] key:[alertView textFieldAtIndex:0].text cid:self->_alertObject.cid handler:nil];
             }
             break;
         case TAG_INVALIDNICK:
             if([title isEqualToString:@"Change"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",[alertView textFieldAtIndex:0].text] to:nil cid:_alertObject.cid handler:nil];
+                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",[alertView textFieldAtIndex:0].text] to:nil cid:self->_alertObject.cid handler:nil];
             }
             break;
         case TAG_FAILEDMSG:
             if([title isEqualToString:@"Try Again"]) {
-                _selectedEvent.height = 0;
-                _selectedEvent.rowType = ROW_MESSAGE;
-                _selectedEvent.bgColor = [UIColor selfBackgroundColor];
-                _selectedEvent.pending = YES;
-                _selectedEvent.reqId = [[NetworkConnection sharedInstance] say:_selectedEvent.command to:_buffer.name cid:_buffer.cid handler:nil];
-                if(_selectedEvent.msg)
-                    [_pendingEvents addObject:_selectedEvent];
-                [_eventsView reloadData];
-                if(_selectedEvent.reqId < 0)
-                    _selectedEvent.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:_selectedEvent repeats:NO];
+                self->_selectedEvent.height = 0;
+                self->_selectedEvent.rowType = ROW_MESSAGE;
+                self->_selectedEvent.bgColor = [UIColor selfBackgroundColor];
+                self->_selectedEvent.pending = YES;
+                self->_selectedEvent.reqId = [[NetworkConnection sharedInstance] say:self->_selectedEvent.command to:self->_buffer.name cid:self->_buffer.cid handler:nil];
+                if(self->_selectedEvent.msg)
+                    [self->_pendingEvents addObject:self->_selectedEvent];
+                [self->_eventsView reloadData];
+                if(self->_selectedEvent.reqId < 0)
+                    self->_selectedEvent.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:self->_selectedEvent repeats:NO];
             }
             break;
         case TAG_LOGOUT:
@@ -4145,49 +4145,49 @@ NSArray *_sortedChannels;
             break;
         case TAG_DELETE:
             if([title isEqualToString:@"Delete"]) {
-                if([_selectedBuffer.type isEqualToString:@"console"]) {
-                    [[NetworkConnection sharedInstance] deleteServer:_selectedBuffer.cid handler:nil];
-                } else if(_selectedBuffer == nil || _selectedBuffer.bid == -1) {
+                if([self->_selectedBuffer.type isEqualToString:@"console"]) {
+                    [[NetworkConnection sharedInstance] deleteServer:self->_selectedBuffer.cid handler:nil];
+                } else if(self->_selectedBuffer == nil || _selectedBuffer.bid == -1) {
                     if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                         [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
                     else
                         [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
                 } else {
-                    [[NetworkConnection sharedInstance] deleteBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
+                    [[NetworkConnection sharedInstance] deleteBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
                 }
             }
             break;
         case TAG_JOIN:
             if([title isEqualToString:@"Join"]) {
                 if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",[alertView textFieldAtIndex:0].text] to:nil cid:_selectedBuffer.cid handler:nil];
+                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",[alertView textFieldAtIndex:0].text] to:nil cid:self->_selectedBuffer.cid handler:nil];
             }
             break;
         case TAG_BUGREPORT:
             if([title isEqualToString:@"Copy to Clipboard"]) {
                 UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                [pb setValue:_bugReport forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                [pb setValue:self->_bugReport forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
             }
-            _bugReport = nil;
+            self->_bugReport = nil;
             break;
         case TAG_RENAME:
             if([title isEqualToString:@"Rename"]) {
                 id handler = ^(IRCCloudJSONObject *result) {
                     if([[result objectForKey:@"success"] intValue] == 0) {
                         CLS_LOG(@"Rename failed: %@", result);
-                        [self _renameBuffer:_selectedBuffer msg:[result objectForKey:@"message"]];
+                        [self _renameBuffer:self->_selectedBuffer msg:[result objectForKey:@"message"]];
                     }
                 };
                 if([alertView textFieldAtIndex:0].text.length) {
-                    if([_selectedBuffer.type isEqualToString:@"channel"])
-                        [[NetworkConnection sharedInstance] renameChannel:[alertView textFieldAtIndex:0].text cid:_selectedBuffer.cid bid:_selectedBuffer.bid handler:handler];
+                    if([self->_selectedBuffer.type isEqualToString:@"channel"])
+                        [[NetworkConnection sharedInstance] renameChannel:[alertView textFieldAtIndex:0].text cid:self->_selectedBuffer.cid bid:self->_selectedBuffer.bid handler:handler];
                     else
-                        [[NetworkConnection sharedInstance] renameConversation:[alertView textFieldAtIndex:0].text cid:_selectedBuffer.cid bid:_selectedBuffer.bid handler:handler];
+                        [[NetworkConnection sharedInstance] renameConversation:[alertView textFieldAtIndex:0].text cid:self->_selectedBuffer.cid bid:self->_selectedBuffer.bid handler:handler];
                 }
             }
             break;
     }
-    _alertView = nil;
+    self->_alertView = nil;
 }
 
 -(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
@@ -4213,9 +4213,9 @@ NSArray *_sortedChannels;
         picker.preferredContentSize = CGSizeMake(540, 576);
         [self presentViewController:picker animated:YES completion:nil];
     } else {
-        _popover = [[UIPopoverController alloc] initWithContentViewController:picker];
-        _popover.delegate = self;
-        [_popover presentPopoverFromRect:CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
+        self->_popover = [[UIPopoverController alloc] initWithContentViewController:picker];
+        self->_popover.delegate = self;
+        [self->_popover presentPopoverFromRect:CGRectMake(self->_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
     }
 }
 
@@ -4245,7 +4245,7 @@ NSArray *_sortedChannels;
     [self applyTheme];
     FileUploader *u = [[FileUploader alloc] init];
     u.delegate = self;
-    u.bid = _buffer.bid;
+    u.bid = self->_buffer.bid;
     [u uploadFile:url];
     FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
@@ -4262,7 +4262,7 @@ NSArray *_sortedChannels;
     [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
     [self applyTheme];
     [self _resetStatusBar];
-    _popover = nil;
+    self->_popover = nil;
 }
 
 - (void)_resetStatusBar {
@@ -4290,7 +4290,7 @@ NSArray *_sortedChannels;
         if((!img || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
-            u.bid = _buffer.bid;
+            u.bid = self->_buffer.bid;
             fvc = [[FileMetadataViewController alloc] initWithUploader:u];
             if(picker == nil || picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
                 [fvc showCancelButton];
@@ -4370,12 +4370,12 @@ NSArray *_sortedChannels;
             }
         } else {
             [self _showConnectingView];
-            _connectingStatus.text = @"Uploading";
-            _connectingProgress.progress = 0;
-            _connectingProgress.hidden = YES;
+            self->_connectingStatus.text = @"Uploading";
+            self->_connectingProgress.progress = 0;
+            self->_connectingProgress.hidden = YES;
             ImageUploader *u = [[ImageUploader alloc] init];
             u.delegate = self;
-            u.bid = _buffer.bid;
+            u.bid = self->_buffer.bid;
             [u upload:img];
         }
     }
@@ -4391,8 +4391,8 @@ NSArray *_sortedChannels;
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     }
     
-    if(_popover) {
-        [_popover dismissPopoverAnimated:YES];
+    if(self->_popover) {
+        [self->_popover dismissPopoverAnimated:YES];
         if(nc)
             [self presentViewController:nc animated:YES completion:nil];
     } else if(self.presentedViewController) {
@@ -4435,19 +4435,19 @@ NSArray *_sortedChannels;
     if(message.length)
         message = [message stringByAppendingString:@" "];
     message = [message stringByAppendingString:[file objectForKey:@"url"]];
-    [[NetworkConnection sharedInstance] say:message to:_buffer.name cid:_buffer.cid handler:nil];
+    [[NetworkConnection sharedInstance] say:message to:self->_buffer.name cid:self->_buffer.cid handler:nil];
 }
 
 -(void)fileUploadProgress:(float)progress {
     if(!self.presentedViewController) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if(self.navigationItem.titleView != _connectingView) {
+            if(self.navigationItem.titleView != self->_connectingView) {
                 [self _showConnectingView];
-                _connectingStatus.text = @"Uploading";
-                _connectingProgress.progress = progress;
+                self->_connectingStatus.text = @"Uploading";
+                self->_connectingProgress.progress = progress;
             }
-            _connectingProgress.hidden = NO;
-            [_connectingProgress setProgress:progress animated:YES];
+            self->_connectingProgress.hidden = NO;
+            [self->_connectingProgress setProgress:progress animated:YES];
         }];
     }
 }
@@ -4466,8 +4466,8 @@ NSArray *_sortedChannels;
             msg = @"Failed to upload file. Please try again shortly.";
         }
         [self dismissViewControllerAnimated:YES completion:nil];
-        _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [_alertView show];
+        self->_alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [self->_alertView show];
         [self _hideConnectingView];
     }];
 }
@@ -4476,8 +4476,8 @@ NSArray *_sortedChannels;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         CLS_LOG(@"File upload too large");
         [self dismissViewControllerAnimated:YES completion:nil];
-        _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [_alertView show];
+        self->_alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [self->_alertView show];
         [self _hideConnectingView];
     }];
 }
@@ -4498,15 +4498,15 @@ NSArray *_sortedChannels;
 
 -(void)imageUploadProgress:(float)progress {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _connectingProgress.hidden = NO;
-        [_connectingProgress setProgress:progress animated:YES];
+        self->_connectingProgress.hidden = NO;
+        [self->_connectingProgress setProgress:progress animated:YES];
     }];
 }
 
 -(void)imageUploadDidFail {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        _alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [_alertView show];
+        self->_alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+        [self->_alertView show];
         [self _hideConnectingView];
     }];
 }
@@ -4538,14 +4538,14 @@ NSArray *_sortedChannels;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([[d objectForKey:@"success"] intValue] == 1) {
             NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
-            Buffer *b = _buffer;
-            if(bid == _buffer.bid) {
-                if(_message.text.length == 0) {
-                    _message.text = link;
+            Buffer *b = self->_buffer;
+            if(bid == self->_buffer.bid) {
+                if(self->_message.text.length == 0) {
+                    self->_message.text = link;
                 } else {
-                    if(![_message.text hasSuffix:@" "])
-                        _message.text = [_message.text stringByAppendingString:@" "];
-                    _message.text = [_message.text stringByAppendingString:link];
+                    if(![self->_message.text hasSuffix:@" "])
+                        self->_message.text = [self->_message.text stringByAppendingString:@" "];
+                    self->_message.text = [self->_message.text stringByAppendingString:link];
                 }
             } else {
                 b = [[BuffersDataSource sharedInstance] getBuffer:bid];
@@ -4577,8 +4577,8 @@ NSArray *_sortedChannels;
 }
 
 -(void)_startPastebin {
-    if(_buffer) {
-        PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:_buffer];
+    if(self->_buffer) {
+        PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:self->_buffer];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -4652,11 +4652,11 @@ NSArray *_sortedChannels;
         }]];
     }
 #ifndef ENTERPRISE
-    BOOL avatars_supported = [[ServersDataSource sharedInstance] getServer:_buffer.cid].avatars_supported;
-    if([[ServersDataSource sharedInstance] getServer:_buffer.cid].isSlack)
+    BOOL avatars_supported = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid].avatars_supported;
+    if([[ServersDataSource sharedInstance] getServer:self->_buffer.cid].isSlack)
         avatars_supported = NO;
     [alert addAction:[UIAlertAction actionWithTitle:avatars_supported?@"Change Avatar":@"Change Public Avatar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:avatars_supported?_buffer.cid:-1];
+        AvatarsTableViewController *atv = [[AvatarsTableViewController alloc] initWithServer:avatars_supported?self->_buffer.cid:-1];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:atv];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -4667,20 +4667,20 @@ NSArray *_sortedChannels;
     }]];
 #endif
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
-    alert.popoverPresentationController.sourceRect = CGRectMake(_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
+    alert.popoverPresentationController.sourceRect = CGRectMake(self->_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
     alert.popoverPresentationController.sourceView = self.view;
     [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    [_message resignFirstResponder];
+    [self->_message resignFirstResponder];
     if(self.presentedViewController)
         [self dismissViewControllerAnimated:NO completion:nil];
     if(buttonIndex != -1) {
         NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
         
         if([action isEqualToString:@"Copy Message"]) {
-            Event *e = _selectedEvent;
+            Event *e = self->_selectedEvent;
             if(e.parent)
                 e = [[EventsDataSource sharedInstance] event:e.parent buffer:e.bid];
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
@@ -4696,17 +4696,17 @@ NSArray *_sortedChannels;
             NSAttributedString *msg = [ColorFormatter format:irc defaultColor:nil mono:NO linkify:NO server:nil links:nil];
             pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string,@"IRC formatting type":[irc dataUsingEncoding:NSUTF8StringEncoding]}];
         } else if([action isEqualToString:@"Clear Backlog"]) {
-            int bid = _selectedBuffer?_selectedBuffer.bid:_selectedEvent.bid;
+            int bid = self->_selectedBuffer?_selectedBuffer.bid:self->_selectedEvent.bid;
             [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
-            if(_buffer.bid == bid)
-                [_eventsView refresh];
+            if(self->_buffer.bid == bid)
+                [self->_eventsView refresh];
         } else if([action isEqualToString:@"Copy URL"]) {
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            [pb setValue:_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+            [pb setValue:self->_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Share URL"]) {
-            UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:_selectedURL]] type:@"URL"];
+            UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:self->_selectedURL]] type:@"URL"];
             activityController.popoverPresentationController.sourceView = self.slidingViewController.view;
-            activityController.popoverPresentationController.sourceRect = [_eventsView.tableView convertRect:_selectedRect toView:self.slidingViewController.view];
+            activityController.popoverPresentationController.sourceRect = [self->_eventsView.tableView convertRect:self->_selectedRect toView:self.slidingViewController.view];
             [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
         } else if([action isEqualToString:@"Delete Message"]) {
             [self dismissKeyboard];
@@ -4716,7 +4716,7 @@ NSArray *_sortedChannels;
             
             [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                [[NetworkConnection sharedInstance] deleteMessage:_selectedEvent.msgid cid:_selectedEvent.cid to:_selectedEvent.chan handler:^(IRCCloudJSONObject *result) {
+                [[NetworkConnection sharedInstance] deleteMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan handler:^(IRCCloudJSONObject *result) {
                     if(![[result objectForKey:@"success"] boolValue]) {
                         CLS_LOG(@"Error deleting message: %@", result);
                         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
@@ -4730,13 +4730,13 @@ NSArray *_sortedChannels;
             [self dismissKeyboard];
             [self.view.window endEditing:YES];
             
-            Server *s = [[ServersDataSource sharedInstance] getServer:_selectedEvent.cid];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedEvent.cid];
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Edit message" preferredStyle:UIAlertControllerStyleAlert];
             
             [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Edit" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
-                    [[NetworkConnection sharedInstance] editMessage:_selectedEvent.msgid cid:_selectedEvent.cid to:_selectedEvent.chan msg:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
+                    [[NetworkConnection sharedInstance] editMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan msg:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
                         if(![[result objectForKey:@"success"] boolValue]) {
                             CLS_LOG(@"Error editing message: %@", result);
                             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to edit message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
@@ -4750,7 +4750,7 @@ NSArray *_sortedChannels;
             }
             
             [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                textField.text = _selectedEvent.msg;
+                textField.text = self->_selectedEvent.msg;
                 textField.delegate = self;
                 [textField becomeFirstResponder];
             }];
@@ -4758,10 +4758,10 @@ NSArray *_sortedChannels;
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
                 [self presentViewController:alert animated:YES completion:nil];
         } else if([action isEqualToString:@"Delete File"]) {
-            [[NetworkConnection sharedInstance] deleteFile:[_selectedEvent.entities objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
+            [[NetworkConnection sharedInstance] deleteFile:[self->_selectedEvent.entities objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
                 if([[result objectForKey:@"success"] boolValue]) {
-                    [_eventsView uncacheFile:[_selectedEvent.entities objectForKey:@"id"]];
-                    [_eventsView refresh];
+                    [self->_eventsView uncacheFile:[self->_selectedEvent.entities objectForKey:@"id"]];
+                    [self->_eventsView refresh];
                 } else {
                     CLS_LOG(@"Error deleting file: %@", result);
                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
@@ -4769,25 +4769,25 @@ NSArray *_sortedChannels;
                 }
             }];
         } else if([action isEqualToString:@"Close Preview"]) {
-            [_eventsView closePreview:_selectedEvent];
+            [self->_eventsView closePreview:self->_selectedEvent];
         } else if([action isEqualToString:@"Archive"]) {
-            [[NetworkConnection sharedInstance] archiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] archiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Unarchive"]) {
-            [[NetworkConnection sharedInstance] unarchiveBuffer:_selectedBuffer.bid cid:_selectedBuffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] unarchiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Delete"]) {
             [self _deleteSelectedBuffer];
         } else if([action isEqualToString:@"Leave"]) {
-            [[NetworkConnection sharedInstance] part:_selectedBuffer.name msg:nil cid:_selectedBuffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] part:self->_selectedBuffer.name msg:nil cid:self->_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Rejoin"]) {
-            [[NetworkConnection sharedInstance] join:_selectedBuffer.name key:nil cid:_selectedBuffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] join:self->_selectedBuffer.name key:nil cid:self->_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Rename"]) {
-            [self _renameBuffer:_selectedBuffer msg:nil];
+            [self _renameBuffer:self->_selectedBuffer msg:nil];
         } else if([action isEqualToString:@"Ban List"]) {
-            [[NetworkConnection sharedInstance] mode:@"b" chan:_selectedBuffer.name cid:_selectedBuffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] mode:@"b" chan:self->_selectedBuffer.name cid:self->_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Disconnect"]) {
-            [[NetworkConnection sharedInstance] disconnect:_selectedBuffer.cid msg:nil handler:nil];
+            [[NetworkConnection sharedInstance] disconnect:self->_selectedBuffer.cid msg:nil handler:nil];
         } else if([action isEqualToString:@"Reconnect"]) {
-            [[NetworkConnection sharedInstance] reconnect:_selectedBuffer.cid handler:nil];
+            [[NetworkConnection sharedInstance] reconnect:self->_selectedBuffer.cid handler:nil];
         } else if([action isEqualToString:@"Logout"]) {
             [self dismissKeyboard];
             [self.view.window endEditing:YES];
@@ -4803,7 +4803,7 @@ NSArray *_sortedChannels;
             
             [self presentViewController:alert animated:YES completion:nil];
         } else if([action isEqualToString:@"Ignore List"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
             IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
             itv.ignores = s.ignores;
             itv.cid = s.cid;
@@ -4833,8 +4833,8 @@ NSArray *_sortedChannels;
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Display Options"]) {
             DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            dvc.buffer = _buffer;
-            dvc.navigationItem.title = _titleLabel.text;
+            dvc.buffer = self->_buffer;
+            dvc.navigationItem.title = self->_titleLabel.text;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -4844,8 +4844,8 @@ NSArray *_sortedChannels;
             [self presentViewController:nc animated:YES completion:nil];
         } else if([action isEqualToString:@"Download Logs"]) {
             LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            lvc.buffer = _buffer;
-            lvc.server = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            lvc.buffer = self->_buffer;
+            lvc.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -4891,13 +4891,13 @@ NSArray *_sortedChannels;
         } else if([action isEqualToString:@"Join a Channel"]) {
             [self _joinAChannel];
         } else if([action isEqualToString:@"Whois"]) {
-            if(_selectedUser && _selectedUser.nick.length > 0) {
-                if(_selectedUser.parted)
-                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:nil cid:_buffer.cid handler:nil];
+            if(self->_selectedUser && _selectedUser.nick.length > 0) {
+                if(self->_selectedUser.parted)
+                    [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:nil cid:self->_buffer.cid handler:nil];
                 else
-                    [[NetworkConnection sharedInstance] whois:_selectedUser.nick server:_selectedUser.ircserver.length?_selectedUser.ircserver:_selectedUser.nick cid:_buffer.cid handler:nil];
-            } else if([_buffer.type isEqualToString:@"conversation"]) {
-                [[NetworkConnection sharedInstance] whois:_buffer.name server:_buffer.name cid:_buffer.cid handler:nil];
+                    [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:self->_selectedUser.ircserver.length?_selectedUser.ircserver:self->_selectedUser.nick cid:self->_buffer.cid handler:nil];
+            } else if([self->_buffer.type isEqualToString:@"conversation"]) {
+                [[NetworkConnection sharedInstance] whois:self->_buffer.name server:self->_buffer.name cid:self->_buffer.cid handler:nil];
             }
         } else if([action isEqualToString:@"Send Feedback"]) {
             CLS_LOG(@"Feedback Requested");
@@ -4954,10 +4954,10 @@ Network type: %@\n",
                         [self _resetStatusBar];
                     }];
                 } else {
-                    _bugReport = report;
-                    _alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Copy to Clipboard", nil];
-                    _alertView.tag = TAG_BUGREPORT;
-                    [_alertView show];
+                    self->_bugReport = report;
+                    self->_alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Copy to Clipboard", nil];
+                    self->_alertView.tag = TAG_BUGREPORT;
+                    [self->_alertView show];
                 }
             }
         }
@@ -4970,64 +4970,64 @@ Network type: %@\n",
             NSString *plaintext = [NSString stringWithFormat:@"%@!%@", _selectedUser.nick, _selectedUser.hostmask];
             [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Send a Message"]) {
-            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:_selectedUser.nick server:_buffer.cid];
+            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:self->_selectedUser.nick server:self->_buffer.cid];
             if(b) {
                 [self bufferSelected:b.bid];
             } else {
-                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:_buffer.cid handler:nil];
+                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:self->_buffer.cid handler:nil];
             }
         } else if([action isEqualToString:@"Op"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Deop"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Voice"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Devoice"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:_buffer.name cid:_buffer.cid handler:nil];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
         } else if([action isEqualToString:@"Ban"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
-            _alertView.tag = TAG_BAN;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            if(_selectedUser.hostmask.length)
-                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+            self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
+            self->_alertView.tag = TAG_BAN;
+            self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            if(self->_selectedUser.hostmask.length)
+                [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
             else
-                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
-            [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
+                [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
+            [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+            [self->_alertView textFieldAtIndex:0].delegate = self;
+            [self->_alertView show];
         } else if([action isEqualToString:@"Ignore"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
-            _alertView.tag = TAG_IGNORE;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            if(_selectedUser.hostmask.length)
-                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+            self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
+            self->_alertView.tag = TAG_IGNORE;
+            self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            if(self->_selectedUser.hostmask.length)
+                [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
             else
-                [_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
-            [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView show];
+                [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
+            [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+            [self->_alertView textFieldAtIndex:0].delegate = self;
+            [self->_alertView show];
         } else if([action isEqualToString:@"Kick"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
-            _alertView.tag = TAG_KICK;
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-            [_alertView show];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+            self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
+            self->_alertView.tag = TAG_KICK;
+            self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            [self->_alertView textFieldAtIndex:0].delegate = self;
+            [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+            [self->_alertView show];
         } else if([action isEqualToString:@"Slack Profile"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
             NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];
             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
         } else if([action isEqualToString:@"Reply"]) {
-            NSString *msgid = _selectedEvent.reply;
+            NSString *msgid = self->_selectedEvent.reply;
             if(!msgid)
-                msgid = _selectedEvent.msgid;
+                msgid = self->_selectedEvent.msgid;
             [self setMsgId:msgid];
         }
     }
@@ -5052,61 +5052,61 @@ Network type: %@\n",
 }
 
 -(void)resetColors:(id)sender {
-    if(_message.selectedRange.length) {
-        NSRange selection = _message.selectedRange;
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        [msg removeAttribute:NSForegroundColorAttributeName range:_message.selectedRange];
-        [msg removeAttribute:NSBackgroundColorAttributeName range:_message.selectedRange];
-        _message.attributedText = msg;
-        _message.selectedRange = selection;
+    if(self->_message.selectedRange.length) {
+        NSRange selection = self->_message.selectedRange;
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        [msg removeAttribute:NSForegroundColorAttributeName range:self->_message.selectedRange];
+        [msg removeAttribute:NSBackgroundColorAttributeName range:self->_message.selectedRange];
+        self->_message.attributedText = msg;
+        self->_message.selectedRange = selection;
     } else {
         if([UIColor textareaTextColor] && _message.font)
-            _currentMessageAttributes = _message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_message.font };
+            self->_currentMessageAttributes = self->_message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:self->_message.font };
     }
 }
 
 -(void)chooseFGColor:(id)sender {
-    [_colorPickerView updateButtonColors:NO];
-    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 1; } completion:nil];
+    [self->_colorPickerView updateButtonColors:NO];
+    [UIView animateWithDuration:0.25 animations:^{ self->_colorPickerView.alpha = 1; } completion:nil];
 }
 
 -(void)chooseBGColor:(id)sender {
-    [_colorPickerView updateButtonColors:YES];
-    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 1; } completion:nil];
+    [self->_colorPickerView updateButtonColors:YES];
+    [UIView animateWithDuration:0.25 animations:^{ self->_colorPickerView.alpha = 1; } completion:nil];
 }
 
 -(void)foregroundColorPicked:(UIColor *)color {
-    if(_message.selectedRange.length) {
-        NSRange selection = _message.selectedRange;
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        [msg addAttribute:NSForegroundColorAttributeName value:color range:_message.selectedRange];
-        _message.attributedText = msg;
-        _message.selectedRange = selection;
+    if(self->_message.selectedRange.length) {
+        NSRange selection = self->_message.selectedRange;
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        [msg addAttribute:NSForegroundColorAttributeName value:color range:self->_message.selectedRange];
+        self->_message.attributedText = msg;
+        self->_message.selectedRange = selection;
     } else {
-        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:_message.internalTextView.typingAttributes];
+        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:self->_message.internalTextView.typingAttributes];
         [d setObject:color forKey:NSForegroundColorAttributeName];
-        _message.internalTextView.typingAttributes = d;
+        self->_message.internalTextView.typingAttributes = d;
     }
     [self closeColorPicker];
 }
 
 -(void)backgroundColorPicked:(UIColor *)color {
-    if(_message.selectedRange.length) {
-        NSRange selection = _message.selectedRange;
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        [msg addAttribute:NSBackgroundColorAttributeName value:color range:_message.selectedRange];
-        _message.attributedText = msg;
-        _message.selectedRange = selection;
+    if(self->_message.selectedRange.length) {
+        NSRange selection = self->_message.selectedRange;
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        [msg addAttribute:NSBackgroundColorAttributeName value:color range:self->_message.selectedRange];
+        self->_message.attributedText = msg;
+        self->_message.selectedRange = selection;
     } else {
-        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:_message.internalTextView.typingAttributes];
+        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:self->_message.internalTextView.typingAttributes];
         [d setObject:color forKey:NSBackgroundColorAttributeName];
-        _message.internalTextView.typingAttributes = d;
+        self->_message.internalTextView.typingAttributes = d;
     }
     [self closeColorPicker];
 }
 
 -(void)closeColorPicker {
-    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 0; } completion:nil];
+    [UIView animateWithDuration:0.25 animations:^{ self->_colorPickerView.alpha = 0; } completion:nil];
 }
 
 -(void)paste:(id)sender {
@@ -5119,54 +5119,54 @@ Network type: %@\n",
         }
         [self _imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
     } else if([UIPasteboard generalPasteboard].string) {
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        if(_message.selectedRange.length > 0)
-            [msg deleteCharactersInRange:_message.selectedRange];
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        if(self->_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:self->_message.selectedRange];
         
-        [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:_message.font,NSForegroundColorAttributeName:_message.textColor}] atIndex:_message.selectedRange.location];
+        [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:self->_message.font,NSForegroundColorAttributeName:self->_message.textColor}] atIndex:self->_message.selectedRange.location];
         
-        [_message setAttributedText:msg];
+        [self->_message setAttributedText:msg];
     }
 }
 
 -(void)pasteRich:(id)sender {
     if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        if(_message.selectedRange.length > 0)
-            [msg deleteCharactersInRange:_message.selectedRange];
-        [msg insertAttributedString:[ColorFormatter format:[[NSString alloc] initWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"] encoding:NSUTF8StringEncoding] defaultColor:_message.textColor mono:NO linkify:NO server:nil links:nil] atIndex:_message.internalTextView.selectedRange.location];
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        if(self->_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:self->_message.selectedRange];
+        [msg insertAttributedString:[ColorFormatter format:[[NSString alloc] initWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"] encoding:NSUTF8StringEncoding] defaultColor:self->_message.textColor mono:NO linkify:NO server:nil links:nil] atIndex:self->_message.internalTextView.selectedRange.location];
         
-        [_message setAttributedText:msg];
+        [self->_message setAttributedText:msg];
     } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        if(_message.selectedRange.length > 0)
-            [msg deleteCharactersInRange:_message.selectedRange];
-        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:_message.font.pointSize] atIndex:_message.internalTextView.selectedRange.location];
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        if(self->_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:self->_message.selectedRange];
+        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
         
-        [_message setAttributedText:msg];
+        [self->_message setAttributedText:msg];
     } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD]) {
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        if(_message.selectedRange.length > 0)
-            [msg deleteCharactersInRange:_message.selectedRange];
-        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:_message.font.pointSize] atIndex:_message.internalTextView.selectedRange.location];
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        if(self->_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:self->_message.selectedRange];
+        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
         
-        [_message setAttributedText:msg];
+        [self->_message setAttributedText:msg];
     } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"]) {
         NSDictionary *d = [NSPropertyListSerialization propertyListWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"] options:NSPropertyListImmutable format:NULL error:NULL];
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        if(_message.selectedRange.length > 0)
-            [msg deleteCharactersInRange:_message.selectedRange];
-        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil] fontSize:_message.font.pointSize] atIndex:_message.internalTextView.selectedRange.location];
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        if(self->_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:self->_message.selectedRange];
+        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
         
-        [_message setAttributedText:msg];
+        [self->_message setAttributedText:msg];
     } else if([UIPasteboard generalPasteboard].string) {
-        NSMutableAttributedString *msg = _message.attributedText.mutableCopy;
-        if(_message.selectedRange.length > 0)
-            [msg deleteCharactersInRange:_message.selectedRange];
+        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+        if(self->_message.selectedRange.length > 0)
+            [msg deleteCharactersInRange:self->_message.selectedRange];
         
-        [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:_message.font,NSForegroundColorAttributeName:_message.textColor}] atIndex:_message.selectedRange.location];
+        [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:self->_message.font,NSForegroundColorAttributeName:self->_message.textColor}] atIndex:self->_message.selectedRange.location];
         
-        [_message setAttributedText:msg];
+        [self->_message setAttributedText:msg];
     }
 }
 
@@ -5217,15 +5217,15 @@ Network type: %@\n",
 }
 
 -(void)getMessageAttributesBold:(BOOL *)bold italic:(BOOL *)italic underline:(BOOL *)underline {
-    UIFont *font = [_message.internalTextView.typingAttributes objectForKey:NSFontAttributeName];
+    UIFont *font = [self->_message.internalTextView.typingAttributes objectForKey:NSFontAttributeName];
     
     *bold = font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitBold;
     *italic = font.fontDescriptor.symbolicTraits & UIFontDescriptorTraitItalic;
-    *underline = [[_message.internalTextView.typingAttributes objectForKey:NSUnderlineStyleAttributeName] intValue] == NSUnderlineStyleSingle;
+    *underline = [[self->_message.internalTextView.typingAttributes objectForKey:NSUnderlineStyleAttributeName] intValue] == NSUnderlineStyleSingle;
 }
 
 -(void)setMessageAttributesBold:(BOOL)bold italic:(BOOL)italic underline:(BOOL)underline {
-    UIFont *font = [_message.internalTextView.typingAttributes objectForKey:NSFontAttributeName];
+    UIFont *font = [self->_message.internalTextView.typingAttributes objectForKey:NSFontAttributeName];
     UIFontDescriptorSymbolicTraits traits = 0;
     
     if(bold)
@@ -5236,10 +5236,10 @@ Network type: %@\n",
     
     font = [UIFont fontWithDescriptor:[font.fontDescriptor fontDescriptorWithSymbolicTraits:traits] size:font.pointSize];
     
-    NSMutableDictionary *attributes = _message.internalTextView.typingAttributes.mutableCopy;
+    NSMutableDictionary *attributes = self->_message.internalTextView.typingAttributes.mutableCopy;
     [attributes setObject:@(underline?NSUnderlineStyleSingle:NSUnderlineStyleNone) forKey:NSUnderlineStyleAttributeName];
     [attributes setObject:font forKey:NSFontAttributeName];
-    _message.internalTextView.typingAttributes = attributes;
+    self->_message.internalTextView.typingAttributes = attributes;
 }
 
 -(void)onCmdBPressed:(UIKeyCommand *)sender {
@@ -5264,72 +5264,72 @@ Network type: %@\n",
 }
 
 -(void)onPgUpPressed:(UIKeyCommand *)sender {
-    [_eventsView.tableView visibleCells];
-    NSIndexPath *first = [_eventsView.tableView indexPathsForVisibleRows].firstObject;
+    [self->_eventsView.tableView visibleCells];
+    NSIndexPath *first = [self->_eventsView.tableView indexPathsForVisibleRows].firstObject;
     if(first && first.row > 0) {
-        [_eventsView.tableView scrollToRowAtIndexPath:first atScrollPosition:UITableViewScrollPositionBottom animated:YES];
+        [self->_eventsView.tableView scrollToRowAtIndexPath:first atScrollPosition:UITableViewScrollPositionBottom animated:YES];
     }
 }
 
 -(void)onPgDownPressed:(UIKeyCommand *)sender {
-    [_eventsView.tableView visibleCells];
-    NSIndexPath *last = [_eventsView.tableView indexPathsForVisibleRows].lastObject;
+    [self->_eventsView.tableView visibleCells];
+    NSIndexPath *last = [self->_eventsView.tableView indexPathsForVisibleRows].lastObject;
     if(last && last.row > 0) {
-        [_eventsView.tableView scrollToRowAtIndexPath:last atScrollPosition:UITableViewScrollPositionTop animated:YES];
+        [self->_eventsView.tableView scrollToRowAtIndexPath:last atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
 }
 
 -(void)onAltUpPressed:(UIKeyCommand *)sender {
-    [_buffersView prev];
+    [self->_buffersView prev];
 }
 
 -(void)onAltDownPressed:(UIKeyCommand *)sender {
-    [_buffersView next];
+    [self->_buffersView next];
 }
 
 -(void)onShiftAltUpPressed:(UIKeyCommand *)sender {
-    [_buffersView prevUnread];
+    [self->_buffersView prevUnread];
 }
 
 -(void)onShiftAltDownPressed:(UIKeyCommand *)sender {
-    [_buffersView nextUnread];
+    [self->_buffersView nextUnread];
 }
 
 -(void)onTabPressed:(UIKeyCommand *)sender {
-    if(_nickCompletionView.count == 0)
+    if(self->_nickCompletionView.count == 0)
         [self updateSuggestions:YES];
-    if(_nickCompletionView.count > 0) {
-        NSInteger s = _nickCompletionView.selection;
-        if(s == -1 || s == _nickCompletionView.count - 1)
+    if(self->_nickCompletionView.count > 0) {
+        NSInteger s = self->_nickCompletionView.selection;
+        if(s == -1 || s == self->_nickCompletionView.count - 1)
             s = 0;
         else
             s++;
-        [_nickCompletionView setSelection:s];
-        NSString *text = _message.text;
-        _message.delegate = nil;
+        [self->_nickCompletionView setSelection:s];
+        NSString *text = self->_message.text;
+        self->_message.delegate = nil;
         if(text.length == 0) {
-            if(_buffer.serverIsSlack)
-                _message.text = [NSString stringWithFormat:@"@%@", [_nickCompletionView suggestion]];
+            if(self->_buffer.serverIsSlack)
+                self->_message.text = [NSString stringWithFormat:@"@%@", [self->_nickCompletionView suggestion]];
             else
-                _message.text = [_nickCompletionView suggestion];
+                self->_message.text = [self->_nickCompletionView suggestion];
         } else {
             while(text.length > 0 && [text characterAtIndex:text.length - 1] != ' ') {
                 text = [text substringToIndex:text.length - 1];
             }
-            if(_buffer.serverIsSlack)
+            if(self->_buffer.serverIsSlack)
                 text = [text stringByAppendingString:@"@"];
-            text = [text stringByAppendingString:[_nickCompletionView suggestion]];
-            _message.text = text;
+            text = [text stringByAppendingString:[self->_nickCompletionView suggestion]];
+            self->_message.text = text;
         }
         if([text rangeOfString:@" "].location == NSNotFound && !_buffer.serverIsSlack)
-            _message.text = [_message.text stringByAppendingString:@":"];
-        _message.delegate = self;
+            self->_message.text = [self->_message.text stringByAppendingString:@":"];
+        self->_message.delegate = self;
     }
 }
 
 -(void)onCmdRPressed:(UIKeyCommand *)sender {
-    [[NetworkConnection sharedInstance] heartbeat:_buffer.bid cid:_buffer.cid bid:_buffer.bid lastSeenEid:[[EventsDataSource sharedInstance] lastEidForBuffer:_buffer.bid] handler:nil];
-    _buffer.last_seen_eid = [[EventsDataSource sharedInstance] lastEidForBuffer:_buffer.bid];
+    [[NetworkConnection sharedInstance] heartbeat:self->_buffer.bid cid:self->_buffer.cid bid:self->_buffer.bid lastSeenEid:[[EventsDataSource sharedInstance] lastEidForBuffer:self->_buffer.bid] handler:nil];
+    self->_buffer.last_seen_eid = [[EventsDataSource sharedInstance] lastEidForBuffer:self->_buffer.bid];
 }
 
 -(void)onShiftCmdRPressed:(UIKeyCommand *)sender {

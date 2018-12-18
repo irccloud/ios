@@ -40,28 +40,28 @@
         if(buffer)
             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-        _buffer = buffer;
-        _sayreqid = -1;
+        self->_buffer = buffer;
+        self->_sayreqid = -1;
         
-        _type = [[UISegmentedControl alloc] initWithItems:@[@"Snippet", @"Messages"]];
-        _type.selectedSegmentIndex = 0;
-        [_type addTarget:self action:@selector(_typeToggled) forControlEvents:UIControlEventValueChanged];
-        self.navigationItem.titleView = _type;
+        self->_type = [[UISegmentedControl alloc] initWithItems:@[@"Snippet", @"Messages"]];
+        self->_type.selectedSegmentIndex = 0;
+        [self->_type addTarget:self action:@selector(_typeToggled) forControlEvents:UIControlEventValueChanged];
+        self.navigationItem.titleView = self->_type;
     }
     return self;
 }
 
 -(void)_typeToggled {
     [self.tableView reloadData];
-    [self textViewDidChange:_text];
+    [self textViewDidChange:self->_text];
 }
 
 -(id)initWithPasteID:(NSString *)pasteID {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.navigationItem.title = @"Text Snippet";
-        _pasteID = pasteID;
-        _sayreqid = -1;
+        self->_pasteID = pasteID;
+        self->_sayreqid = -1;
         UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
         [spinny startAnimating];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
@@ -70,7 +70,7 @@
 }
 
 -(void)_fetchPaste {
-    NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":_pasteID, @"type":@"json"} error:nil];
+    NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":self->_pasteID, @"type":@"json"} error:nil];
     
     NSURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
     [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -78,10 +78,10 @@
             NSLog(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
         } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-            _text.text = [dict objectForKey:@"body"];
-            _filename.text = [dict objectForKey:@"name"];
-            _text.editable = _filename.enabled = YES;
-            _extension = [dict objectForKey:@"extension"];
+            self->_text.text = [dict objectForKey:@"body"];
+            self->_filename.text = [dict objectForKey:@"name"];
+            self->_text.editable = self->_filename.enabled = YES;
+            self->_extension = [dict objectForKey:@"extension"];
         }
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
     }];
@@ -94,13 +94,13 @@
     [spinny startAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
 
-    if(_type.selectedSegmentIndex == 1) {
-        if(_message.text.length) {
-            _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, _text.text];
+    if(self->_type.selectedSegmentIndex == 1) {
+        if(self->_message.text.length) {
+            self->_buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, _text.text];
         } else {
-            _buffer.draft = _text.text;
+            self->_buffer.draft = self->_text.text;
         }
-        _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
+        self->_sayreqid = [[NetworkConnection sharedInstance] say:self->_buffer.draft to:self->_buffer.name cid:self->_buffer.cid handler:^(IRCCloudJSONObject *result) {
             if(![[result objectForKey:@"success"] boolValue]) {
                 UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Failed to send message: %@", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
                 [v show];
@@ -108,30 +108,30 @@
             }
         }];
     } else {
-        if([_filename.text rangeOfString:@"."].location != NSNotFound) {
-            NSString *extension = [_filename.text substringFromIndex:[_filename.text rangeOfString:@"." options:NSBackwardsSearch].location + 1];
+        if([self->_filename.text rangeOfString:@"."].location != NSNotFound) {
+            NSString *extension = [self->_filename.text substringFromIndex:[self->_filename.text rangeOfString:@"." options:NSBackwardsSearch].location + 1];
             if(extension.length)
-                _extension = extension;
+                self->_extension = extension;
             else if(!_extension.length)
-                _extension = @"txt";
+                self->_extension = @"txt";
                 
         } else {
             if(!_extension.length)
-                _extension = @"txt";
+                self->_extension = @"txt";
         }
         
         IRCCloudAPIResultHandler pasteHandler = ^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] boolValue]) {
-                if(_pasteID) {
+                if(self->_pasteID) {
                     [self.tableView endEditing:YES];
                     [self.navigationController popViewControllerAnimated:YES];
                 } else {
-                    if(_message.text.length) {
-                        _buffer.draft = [NSString stringWithFormat:@"%@ %@", _message.text, [result objectForKey:@"url"]];
+                    if(self->_message.text.length) {
+                        self->_buffer.draft = [NSString stringWithFormat:@"%@ %@", self->_message.text, [result objectForKey:@"url"]];
                     } else {
-                        _buffer.draft = [result objectForKey:@"url"];
+                        self->_buffer.draft = [result objectForKey:@"url"];
                     }
-                    _sayreqid = [[NetworkConnection sharedInstance] say:_buffer.draft to:_buffer.name cid:_buffer.cid handler:^(IRCCloudJSONObject *result) {
+                    self->_sayreqid = [[NetworkConnection sharedInstance] say:self->_buffer.draft to:self->_buffer.name cid:self->_buffer.cid handler:^(IRCCloudJSONObject *result) {
                         if(![result objectForKey:@"success"]) {
                             UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Failed to send message: %@", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
                             [v show];
@@ -141,14 +141,14 @@
             } else {
                 UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save snippet, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [alert show];
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:_pasteID?@"Save":@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:self->_pasteID?@"Save":@"Send" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
             }
         };
         
-        if(_pasteID)
-            [[NetworkConnection sharedInstance] editPaste:_pasteID name:_filename.text contents:_text.text extension:_extension handler:pasteHandler];
+        if(self->_pasteID)
+            [[NetworkConnection sharedInstance] editPaste:self->_pasteID name:self->_filename.text contents:self->_text.text extension:self->_extension handler:pasteHandler];
         else
-            [[NetworkConnection sharedInstance] paste:_filename.text contents:_text.text extension:_extension handler:pasteHandler];
+            [[NetworkConnection sharedInstance] paste:self->_filename.text contents:self->_text.text extension:self->_extension handler:pasteHandler];
     }
 }
 
@@ -179,12 +179,12 @@
     switch(event) {
         case kIRCEventBufferMsg:
             e = notification.object;
-            if(_sayreqid > 0 && e.bid == _buffer.bid && (e.reqId == _sayreqid || (e.isSelf && [e.from isEqualToString:_buffer.name]))) {
-                _buffer.draft = @"";
+            if(self->_sayreqid > 0 && e.bid == self->_buffer.bid && (e.reqId == self->_sayreqid || (e.isSelf && [e.from isEqualToString:self->_buffer.name]))) {
+                self->_buffer.draft = @"";
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.tableView endEditing:YES];
                     [self dismissViewControllerAnimated:YES completion:nil];
-                    _buffer.draft = @"";
+                    self->_buffer.draft = @"";
                     [((AppDelegate *)[UIApplication sharedApplication].delegate).mainViewController clearText];
                 }];
             }
@@ -199,67 +199,67 @@
     
     self.navigationController.navigationBar.clipsToBounds = YES;
 
-    _filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - 32, 22)];
-    _filename.text = @"";
-    _filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
-    _filename.autocorrectionType = UITextAutocorrectionTypeNo;
-    _filename.adjustsFontSizeToFitWidth = YES;
-    _filename.returnKeyType = UIReturnKeyDone;
-    _filename.delegate = self;
-    _filename.enabled = !_pasteID;
-    _filename.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - 32, 22)];
+    self->_filename.text = @"";
+    self->_filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_filename.autocorrectionType = UITextAutocorrectionTypeNo;
+    self->_filename.adjustsFontSizeToFitWidth = YES;
+    self->_filename.returnKeyType = UIReturnKeyDone;
+    self->_filename.delegate = self;
+    self->_filename.enabled = !_pasteID;
+    self->_filename.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     
-    _message = [[UITextView alloc] initWithFrame:CGRectZero];
-    _message.text = @"";
-    _message.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _message.backgroundColor = [UIColor clearColor];
-    _message.returnKeyType = UIReturnKeyDone;
-    _message.delegate = self;
-    _message.font = _filename.font;
-    _message.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_message = [[UITextView alloc] initWithFrame:CGRectZero];
+    self->_message.text = @"";
+    self->_message.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_message.backgroundColor = [UIColor clearColor];
+    self->_message.returnKeyType = UIReturnKeyDone;
+    self->_message.delegate = self;
+    self->_message.font = self->_filename.font;
+    self->_message.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
-        _message.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+        self->_message.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     } else {
-        _message.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        self->_message.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
 
-    _messageFooter = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 32)];
-    _messageFooter.backgroundColor = [UIColor clearColor];
-    _messageFooter.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
-    _messageFooter.textAlignment = NSTextAlignmentCenter;
-    _messageFooter.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _messageFooter.numberOfLines = 0;
-    _messageFooter.adjustsFontSizeToFitWidth = YES;
+    self->_messageFooter = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 32)];
+    self->_messageFooter.backgroundColor = [UIColor clearColor];
+    self->_messageFooter.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    self->_messageFooter.textAlignment = NSTextAlignmentCenter;
+    self->_messageFooter.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_messageFooter.numberOfLines = 0;
+    self->_messageFooter.adjustsFontSizeToFitWidth = YES;
     
-    _text = [[UITextView alloc] initWithFrame:CGRectZero];
-    _text.backgroundColor = [UIColor clearColor];
-    _text.font = _filename.font;
-    _text.textColor = [UITableViewCell appearance].detailTextLabelColor;
-    _text.delegate = self;
-    _text.editable = !_pasteID;
-    _text.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-    _text.text = _buffer.draft;
-    _text.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_text = [[UITextView alloc] initWithFrame:CGRectZero];
+    self->_text.backgroundColor = [UIColor clearColor];
+    self->_text.font = self->_filename.font;
+    self->_text.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_text.delegate = self;
+    self->_text.editable = !_pasteID;
+    self->_text.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_text.text = self->_buffer.draft;
+    self->_text.keyboardAppearance = [UITextField appearance].keyboardAppearance;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"autoCaps"]) {
-        _text.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+        self->_text.autocapitalizationType = UITextAutocapitalizationTypeSentences;
     } else {
-        _text.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        self->_text.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
-    [self textViewDidChange:_text];
+    [self textViewDidChange:self->_text];
     
-    if(_pasteID)
+    if(self->_pasteID)
         [self _fetchPaste];
 }
 
 - (void)textViewDidBeginEditing:(UITextView *)textView {
-    if(textView == _message)
+    if(textView == self->_message)
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:1] atScrollPosition:UITableViewScrollPositionTop animated:YES];
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    if(textView != _text && [text isEqualToString:@"\n"]) {
+    if(textView != self->_text && [text isEqualToString:@"\n"]) {
         [self.tableView endEditing:YES];
         return NO;
     }
@@ -267,17 +267,17 @@
 }
 
 -(void)textViewDidChange:(UITextView *)textView {
-    self.navigationItem.rightBarButtonItem.enabled = (_text.text.length > 0);
-    if(textView == _text) {
+    self.navigationItem.rightBarButtonItem.enabled = (self->_text.text.length > 0);
+    if(textView == self->_text) {
         int count = 0;
-        NSArray *lines = [_text.text componentsSeparatedByString:@"\n"];
+        NSArray *lines = [self->_text.text componentsSeparatedByString:@"\n"];
         for (NSString *line in lines) {
             count += ceil((float)line.length / 1080.0f);
         }
-        if(_type.selectedSegmentIndex == 1)
-            _messageFooter.text = [NSString stringWithFormat:@"Text will be sent as %i message%@", count, (count == 1)?@"":@"s"];
+        if(self->_type.selectedSegmentIndex == 1)
+            self->_messageFooter.text = [NSString stringWithFormat:@"Text will be sent as %i message%@", count, (count == 1)?@"":@"s"];
         else
-            _messageFooter.text = @"Text snippets are visible to anyone with the URL but are not publicly listed or indexed.";
+            self->_messageFooter.text = @"Text snippets are visible to anyone with the URL but are not publicly listed or indexed.";
     }
 }
 
@@ -298,9 +298,9 @@
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if(_pasteID)
+    if(self->_pasteID)
         return 2;
-    else if(_type.selectedSegmentIndex == 0)
+    else if(self->_type.selectedSegmentIndex == 0)
         return 3;
     else
         return 1;
@@ -345,9 +345,9 @@
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     if(section == 0) {
         if(@available(iOS 11, *)) {
-            CGRect frame = _messageFooter.frame;
+            CGRect frame = self->_messageFooter.frame;
             frame.origin.x = self.view.safeAreaInsets.left;
-            _messageFooter.frame = frame;
+            self->_messageFooter.frame = frame;
         }
         return _messageFooter;
     }
@@ -377,18 +377,18 @@
     switch(indexPath.section) {
         case 0:
             cell.textLabel.text = nil;
-            [_text removeFromSuperview];
-            _text.frame = CGRectInset(cell.contentView.bounds, 4, 4);
-            [cell.contentView addSubview:_text];
+            [self->_text removeFromSuperview];
+            self->_text.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:self->_text];
             break;
         case 1:
-            cell.accessoryView = _filename;
+            cell.accessoryView = self->_filename;
             break;
         case 2:
             cell.textLabel.text = nil;
-            [_message removeFromSuperview];
-            _message.frame = CGRectInset(cell.contentView.bounds, 4, 4);
-            [cell.contentView addSubview:_message];
+            [self->_message removeFromSuperview];
+            self->_message.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:self->_message];
             break;
     }
     return cell;

@@ -28,11 +28,11 @@
 -(id)initWithChannel:(Channel *)channel {
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
-        _channel = channel;
-        _modeHints = [[NSMutableArray alloc] init];
-        _topicChanged = NO;
+        self->_channel = channel;
+        self->_modeHints = [[NSMutableArray alloc] init];
+        self->_topicChanged = NO;
         Server *s = [[ServersDataSource sharedInstance] getServer:channel.cid];
-        _topiclen = [[s.isupport objectForKey:@"TOPICLEN"] longValue];
+        self->_topiclen = [[s.isupport objectForKey:@"TOPICLEN"] longValue];
     }
     return self;
 }
@@ -52,42 +52,42 @@
     }
     self.navigationItem.title = [NSString stringWithFormat:@"%@ Info", _channel.name];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
-    _topicLabel = [[LinkTextView alloc] initWithFrame:CGRectZero];
-    _topicLabel.editable = NO;
-    _topicLabel.scrollEnabled = NO;
-    _topicLabel.textContainerInset = UIEdgeInsetsZero;
-    _topicLabel.dataDetectorTypes = UIDataDetectorTypeNone;
-    _topicLabel.linkDelegate = self;
-    _topicLabel.backgroundColor = [UIColor clearColor];
-    _topicLabel.textColor = [UIColor messageTextColor];
-    _topicLabel.textContainer.lineFragmentPadding = 0;
+    self->_topicLabel = [[LinkTextView alloc] initWithFrame:CGRectZero];
+    self->_topicLabel.editable = NO;
+    self->_topicLabel.scrollEnabled = NO;
+    self->_topicLabel.textContainerInset = UIEdgeInsetsZero;
+    self->_topicLabel.dataDetectorTypes = UIDataDetectorTypeNone;
+    self->_topicLabel.linkDelegate = self;
+    self->_topicLabel.backgroundColor = [UIColor clearColor];
+    self->_topicLabel.textColor = [UIColor messageTextColor];
+    self->_topicLabel.textContainer.lineFragmentPadding = 0;
 
-    _url = [[LinkTextView alloc] initWithFrame:CGRectZero];
-    _url.editable = NO;
-    _url.scrollEnabled = NO;
-    _url.textContainerInset = UIEdgeInsetsZero;
-    _url.dataDetectorTypes = UIDataDetectorTypeNone;
-    _url.linkDelegate = self;
-    _url.backgroundColor = [UIColor clearColor];
-    _url.textColor = [UIColor messageTextColor];
-    _url.textContainer.lineFragmentPadding = 0;
+    self->_url = [[LinkTextView alloc] initWithFrame:CGRectZero];
+    self->_url.editable = NO;
+    self->_url.scrollEnabled = NO;
+    self->_url.textContainerInset = UIEdgeInsetsZero;
+    self->_url.dataDetectorTypes = UIDataDetectorTypeNone;
+    self->_url.linkDelegate = self;
+    self->_url.backgroundColor = [UIColor clearColor];
+    self->_url.textColor = [UIColor messageTextColor];
+    self->_url.textContainer.lineFragmentPadding = 0;
     
-    _topicEdit = [[UITextView alloc] initWithFrame:CGRectZero];
-    _topicEdit.font = [UIFont systemFontOfSize:14];
-    _topicEdit.returnKeyType = UIReturnKeyDone;
-    _topicEdit.delegate = self;
-    _topicEdit.textStorage.delegate = self;
-    _topicEdit.backgroundColor = [UIColor clearColor];
-    _topicEdit.textColor = [UIColor textareaTextColor];
-    _topicEdit.keyboardAppearance = [UITextField appearance].keyboardAppearance;
-    _topicEdit.allowsEditingTextAttributes = YES;
+    self->_topicEdit = [[UITextView alloc] initWithFrame:CGRectZero];
+    self->_topicEdit.font = [UIFont systemFontOfSize:14];
+    self->_topicEdit.returnKeyType = UIReturnKeyDone;
+    self->_topicEdit.delegate = self;
+    self->_topicEdit.textStorage.delegate = self;
+    self->_topicEdit.backgroundColor = [UIColor clearColor];
+    self->_topicEdit.textColor = [UIColor textareaTextColor];
+    self->_topicEdit.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_topicEdit.allowsEditingTextAttributes = YES;
     
-    _colorPickerView = [[IRCColorPickerView alloc] initWithFrame:CGRectZero];
-    _colorPickerView.frame = CGRectMake(self.view.bounds.size.width / 2 - _colorPickerView.intrinsicContentSize.width / 2,20,_colorPickerView.intrinsicContentSize.width,_colorPickerView.intrinsicContentSize.height);
-    _colorPickerView.delegate = self;
-    _colorPickerView.alpha = 0;
-    [_colorPickerView updateButtonColors:YES];
-    [self.navigationController.view addSubview:_colorPickerView];
+    self->_colorPickerView = [[IRCColorPickerView alloc] initWithFrame:CGRectZero];
+    self->_colorPickerView.frame = CGRectMake(self.view.bounds.size.width / 2 - _colorPickerView.intrinsicContentSize.width / 2,20,_colorPickerView.intrinsicContentSize.width,_colorPickerView.intrinsicContentSize.height);
+    self->_colorPickerView.delegate = self;
+    self->_colorPickerView.alpha = 0;
+    [self->_colorPickerView updateButtonColors:YES];
+    [self.navigationController.view addSubview:self->_colorPickerView];
 
     [self refresh];
 }
@@ -123,7 +123,7 @@
         case kIRCEventChannelMode:
         case kIRCEventUserChannelMode:
             o = notification.object;
-            if(o.bid == _channel.bid && !self.tableView.editing)
+            if(o.bid == self->_channel.bid && !self.tableView.editing)
                 [self refresh];
             break;
         default:
@@ -132,7 +132,7 @@
 }
 
 -(void)textStorage:(NSTextStorage *)textStorage didProcessEditing:(NSTextStorageEditActions)editedMask range:(NSRange)editedRange changeInLength:(NSInteger)delta {
-    _topicChanged = YES;
+    self->_topicChanged = YES;
 }
 
 -(BOOL)canPerformAction:(SEL)action withSender:(id)sender {
@@ -144,60 +144,60 @@
 }
 
 -(void)resetColors:(id)sender {
-    if(_topicEdit.selectedRange.length) {
-        NSRange selection = _topicEdit.selectedRange;
-        NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
-        [msg removeAttribute:NSForegroundColorAttributeName range:_topicEdit.selectedRange];
-        [msg removeAttribute:NSBackgroundColorAttributeName range:_topicEdit.selectedRange];
-        _topicEdit.attributedText = msg;
-        _topicEdit.selectedRange = selection;
+    if(self->_topicEdit.selectedRange.length) {
+        NSRange selection = self->_topicEdit.selectedRange;
+        NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
+        [msg removeAttribute:NSForegroundColorAttributeName range:self->_topicEdit.selectedRange];
+        [msg removeAttribute:NSBackgroundColorAttributeName range:self->_topicEdit.selectedRange];
+        self->_topicEdit.attributedText = msg;
+        self->_topicEdit.selectedRange = selection;
     } else {
-        _currentMessageAttributes = _topicEdit.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:_topicEdit.font };
+        self->_currentMessageAttributes = self->_topicEdit.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:self->_topicEdit.font };
     }
 }
 
 -(void)chooseFGColor:(id)sender {
-    [_colorPickerView updateButtonColors:NO];
-    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 1; } completion:nil];
+    [self->_colorPickerView updateButtonColors:NO];
+    [UIView animateWithDuration:0.25 animations:^{ self->_colorPickerView.alpha = 1; } completion:nil];
 }
 
 -(void)chooseBGColor:(id)sender {
-    [_colorPickerView updateButtonColors:YES];
-    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 1; } completion:nil];
+    [self->_colorPickerView updateButtonColors:YES];
+    [UIView animateWithDuration:0.25 animations:^{ self->_colorPickerView.alpha = 1; } completion:nil];
 }
 
 -(void)foregroundColorPicked:(UIColor *)color {
-    if(_topicEdit.selectedRange.length) {
-        NSRange selection = _topicEdit.selectedRange;
-        NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
-        [msg addAttribute:NSForegroundColorAttributeName value:color range:_topicEdit.selectedRange];
-        _topicEdit.attributedText = msg;
-        _topicEdit.selectedRange = selection;
+    if(self->_topicEdit.selectedRange.length) {
+        NSRange selection = self->_topicEdit.selectedRange;
+        NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
+        [msg addAttribute:NSForegroundColorAttributeName value:color range:self->_topicEdit.selectedRange];
+        self->_topicEdit.attributedText = msg;
+        self->_topicEdit.selectedRange = selection;
     } else {
-        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:_topicEdit.typingAttributes];
+        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:self->_topicEdit.typingAttributes];
         [d setObject:color forKey:NSForegroundColorAttributeName];
-        _topicEdit.typingAttributes = d;
+        self->_topicEdit.typingAttributes = d;
     }
     [self closeColorPicker];
 }
 
 -(void)backgroundColorPicked:(UIColor *)color {
-    if(_topicEdit.selectedRange.length) {
-        NSRange selection = _topicEdit.selectedRange;
-        NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
-        [msg addAttribute:NSBackgroundColorAttributeName value:color range:_topicEdit.selectedRange];
-        _topicEdit.attributedText = msg;
-        _topicEdit.selectedRange = selection;
+    if(self->_topicEdit.selectedRange.length) {
+        NSRange selection = self->_topicEdit.selectedRange;
+        NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
+        [msg addAttribute:NSBackgroundColorAttributeName value:color range:self->_topicEdit.selectedRange];
+        self->_topicEdit.attributedText = msg;
+        self->_topicEdit.selectedRange = selection;
     } else {
-        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:_topicEdit.typingAttributes];
+        NSMutableDictionary *d = [[NSMutableDictionary alloc] initWithDictionary:self->_topicEdit.typingAttributes];
         [d setObject:color forKey:NSBackgroundColorAttributeName];
-        _topicEdit.typingAttributes = d;
+        self->_topicEdit.typingAttributes = d;
     }
     [self closeColorPicker];
 }
 
 -(void)closeColorPicker {
-    [UIView animateWithDuration:0.25 animations:^{ _colorPickerView.alpha = 0; } completion:nil];
+    [UIView animateWithDuration:0.25 animations:^{ self->_colorPickerView.alpha = 0; } completion:nil];
 }
 
 -(void)textViewDidChangeSelection:(UITextView *)textView {
@@ -205,83 +205,83 @@
 }
 
 -(void)textViewDidChange:(UITextView *)textView {
-    if(_currentMessageAttributes)
-        textView.typingAttributes = _currentMessageAttributes;
+    if(self->_currentMessageAttributes)
+        textView.typingAttributes = self->_currentMessageAttributes;
     else
-        _currentMessageAttributes = textView.typingAttributes;
+        self->_currentMessageAttributes = textView.typingAttributes;
     topicHeader.text = [self tableView:self.tableView titleForHeaderInSection:0];
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
     if(range.location == textView.text.length)
-        _currentMessageAttributes = textView.typingAttributes;
+        self->_currentMessageAttributes = textView.typingAttributes;
     else
-        _currentMessageAttributes = nil;
+        self->_currentMessageAttributes = nil;
 
     if(text.length && [text isEqualToString:[UIPasteboard generalPasteboard].string]) {
         if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
-            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
-            if(_topicEdit.selectedRange.length > 0)
-                [msg deleteCharactersInRange:_topicEdit.selectedRange];
-            [msg insertAttributedString:[ColorFormatter format:[[NSString alloc] initWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"] encoding:NSUTF8StringEncoding] defaultColor:_topicEdit.textColor mono:NO linkify:NO server:nil links:nil] atIndex:_topicEdit.selectedRange.location];
+            NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
+            if(self->_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:self->_topicEdit.selectedRange];
+            [msg insertAttributedString:[ColorFormatter format:[[NSString alloc] initWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"] encoding:NSUTF8StringEncoding] defaultColor:self->_topicEdit.textColor mono:NO linkify:NO server:nil links:nil] atIndex:self->_topicEdit.selectedRange.location];
             
-            [_topicEdit setAttributedText:msg];
+            [self->_topicEdit setAttributedText:msg];
         } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
-            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
-            if(_topicEdit.selectedRange.length > 0)
-                [msg deleteCharactersInRange:_topicEdit.selectedRange];
-            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:_topicEdit.font.pointSize] atIndex:_topicEdit.selectedRange.location];
+            NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
+            if(self->_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:self->_topicEdit.selectedRange];
+            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_topicEdit.font.pointSize] atIndex:self->_topicEdit.selectedRange.location];
             
-            [_topicEdit setAttributedText:msg];
+            [self->_topicEdit setAttributedText:msg];
         } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD]) {
-            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
-            if(_topicEdit.selectedRange.length > 0)
-                [msg deleteCharactersInRange:_topicEdit.selectedRange];
-            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:_topicEdit.font.pointSize] atIndex:_topicEdit.selectedRange.location];
+            NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
+            if(self->_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:self->_topicEdit.selectedRange];
+            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_topicEdit.font.pointSize] atIndex:self->_topicEdit.selectedRange.location];
             
-            [_topicEdit setAttributedText:msg];
+            [self->_topicEdit setAttributedText:msg];
         } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"]) {
             NSDictionary *d = [NSPropertyListSerialization propertyListWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"] options:NSPropertyListImmutable format:NULL error:NULL];
-            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
-            if(_topicEdit.selectedRange.length > 0)
-                [msg deleteCharactersInRange:_topicEdit.selectedRange];
-            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil] fontSize:_topicEdit.font.pointSize] atIndex:_topicEdit.selectedRange.location];
+            NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
+            if(self->_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:self->_topicEdit.selectedRange];
+            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_topicEdit.font.pointSize] atIndex:self->_topicEdit.selectedRange.location];
             
-            [_topicEdit setAttributedText:msg];
+            [self->_topicEdit setAttributedText:msg];
         } else if([UIPasteboard generalPasteboard].string) {
-            NSMutableAttributedString *msg = _topicEdit.attributedText.mutableCopy;
-            if(_topicEdit.selectedRange.length > 0)
-                [msg deleteCharactersInRange:_topicEdit.selectedRange];
+            NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
+            if(self->_topicEdit.selectedRange.length > 0)
+                [msg deleteCharactersInRange:self->_topicEdit.selectedRange];
             
-            [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:_topicEdit.font,NSForegroundColorAttributeName:_topicEdit.textColor}] atIndex:_topicEdit.selectedRange.location];
+            [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:self->_topicEdit.font,NSForegroundColorAttributeName:self->_topicEdit.textColor}] atIndex:self->_topicEdit.selectedRange.location];
             
-            [_topicEdit setAttributedText:msg];
+            [self->_topicEdit setAttributedText:msg];
         }
         return NO;
     } else if([text isEqualToString:@"\n"]) {
         [self setEditing:NO animated:YES];
         return NO;
     }
-    _topicChanged = YES;
+    self->_topicChanged = YES;
     return YES;
 }
 
 -(void)refresh {
     self.navigationItem.rightBarButtonItem = self.editButtonItem;
-    [_modeHints removeAllObjects];
-    _topicChanged = NO;
-    Server *server = [[ServersDataSource sharedInstance] getServer:_channel.cid];
-    if([_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
+    [self->_modeHints removeAllObjects];
+    self->_topicChanged = NO;
+    Server *server = [[ServersDataSource sharedInstance] getServer:self->_channel.cid];
+    if([self->_channel.topic_text isKindOfClass:[NSString class]] && _channel.topic_text.length) {
         NSArray *links;
-        _topic = [ColorFormatter format:_channel.topic_text defaultColor:[UIColor textareaTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
-        _topicLabel.attributedText = _topic;
-        _topicLabel.linkAttributes = [UIColor linkAttributes];
+        self->_topic = [ColorFormatter format:self->_channel.topic_text defaultColor:[UIColor textareaTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:self->_channel.cid] links:&links];
+        self->_topicLabel.attributedText = self->_topic;
+        self->_topicLabel.linkAttributes = [UIColor linkAttributes];
         
         for(NSTextCheckingResult *result in links) {
             if(result.resultType == NSTextCheckingTypeLink) {
-                [_topicLabel addLinkWithTextCheckingResult:result];
+                [self->_topicLabel addLinkWithTextCheckingResult:result];
             } else {
-                NSString *url = [[_topic attributedSubstringFromRange:result.range] string];
+                NSString *url = [[self->_topic attributedSubstringFromRange:result.range] string];
                 if(![url hasPrefix:@"irc"]) {
                     CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
                     if(url_escaped != NULL) {
@@ -289,40 +289,40 @@
                         CFRelease(url_escaped);
                     }
                 }
-                [_topicLabel addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
+                [self->_topicLabel addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
             }
         }
-        _topicEdit.attributedText = _topic;
+        self->_topicEdit.attributedText = self->_topic;
         
-        if(_channel.topic_author) {
-            _topicSetBy = [NSString stringWithFormat:@"Set by %@", _channel.topic_author];
-            if(_channel.topic_time > 0) {
+        if(self->_channel.topic_author) {
+            self->_topicSetBy = [NSString stringWithFormat:@"Set by %@", _channel.topic_author];
+            if(self->_channel.topic_time > 0) {
                 NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
                 [dateFormatter setDateStyle:NSDateFormatterMediumStyle];
                 [dateFormatter setTimeStyle:NSDateFormatterShortStyle];
                 
-                _topicSetBy = [_topicSetBy stringByAppendingFormat:@" on %@", [dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:_channel.topic_time]]];
+                self->_topicSetBy = [self->_topicSetBy stringByAppendingFormat:@" on %@", [dateFormatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:self->_channel.topic_time]]];
             }
         } else {
-            _topicSetBy = nil;
+            self->_topicSetBy = nil;
         }
     } else {
-        _topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor textareaTextColor] mono:NO linkify:NO server:nil links:nil];
-        _topicLabel.attributedText = _topic;
-        _topicEdit.text = @"";
-        _topicSetBy = nil;
+        self->_topic = [ColorFormatter format:@"(No topic set)" defaultColor:[UIColor textareaTextColor] mono:NO linkify:NO server:nil links:nil];
+        self->_topicLabel.attributedText = self->_topic;
+        self->_topicEdit.text = @"";
+        self->_topicSetBy = nil;
     }
-    if(([_channel.url isKindOfClass:[NSString class]] && _channel.url.length) || server.isSlack) {
-        NSString *url = server.isSlack ? [NSString stringWithFormat:@"%@/messages/%@/details", server.slackBaseURL, [[BuffersDataSource sharedInstance] getBuffer:_channel.bid].normalizedName] : _channel.url;
+    if(([self->_channel.url isKindOfClass:[NSString class]] && _channel.url.length) || server.isSlack) {
+        NSString *url = server.isSlack ? [NSString stringWithFormat:@"%@/messages/%@/details", server.slackBaseURL, [[BuffersDataSource sharedInstance] getBuffer:self->_channel.bid].normalizedName] : _channel.url;
         NSArray *links;
-        _url.attributedText = [ColorFormatter format:url defaultColor:[UIColor textareaTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:_channel.cid] links:&links];
-        _url.linkAttributes = [UIColor linkAttributes];
+        self->_url.attributedText = [ColorFormatter format:url defaultColor:[UIColor textareaTextColor] mono:NO linkify:YES server:[[ServersDataSource sharedInstance] getServer:self->_channel.cid] links:&links];
+        self->_url.linkAttributes = [UIColor linkAttributes];
         
         for(NSTextCheckingResult *result in links) {
             if(result.resultType == NSTextCheckingTypeLink) {
-                [_url addLinkWithTextCheckingResult:result];
+                [self->_url addLinkWithTextCheckingResult:result];
             } else {
-                NSString *url = [[_topic attributedSubstringFromRange:result.range] string];
+                NSString *url = [[self->_topic attributedSubstringFromRange:result.range] string];
                 if(![url hasPrefix:@"irc"]) {
                     CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
                     if(url_escaped != NULL) {
@@ -330,44 +330,44 @@
                         CFRelease(url_escaped);
                     }
                 }
-                [_url addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
+                [self->_url addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
             }
         }
     } else {
-        _url.attributedText = nil;
+        self->_url.attributedText = nil;
     }
-    if(_channel.mode.length) {
+    if(self->_channel.mode.length) {
         for(NSDictionary *mode in _channel.modes) {
             unichar m = [[mode objectForKey:@"mode"] characterAtIndex:0];
             switch(m) {
                 case 'i':
-                    [_modeHints addObject:@{@"mode":@"Invite Only (+i)", @"hint":@"Members must be invited to join this channel."}];
+                    [self->_modeHints addObject:@{@"mode":@"Invite Only (+i)", @"hint":@"Members must be invited to join this channel."}];
                     break;
                 case 'k':
-                    [_modeHints addObject:@{@"mode":@"Password (+k)", @"hint":[mode objectForKey:@"param"]}];
+                    [self->_modeHints addObject:@{@"mode":@"Password (+k)", @"hint":[mode objectForKey:@"param"]}];
                     break;
                 case 'm':
-                    [_modeHints addObject:@{@"mode":@"Moderated (+m)", @"hint":@"Only ops and voiced members may talk."}];
+                    [self->_modeHints addObject:@{@"mode":@"Moderated (+m)", @"hint":@"Only ops and voiced members may talk."}];
                     break;
                 case 'n':
-                    [_modeHints addObject:@{@"mode":@"No External Messages (+n)", @"hint":@"No messages allowed from outside the channel."}];
+                    [self->_modeHints addObject:@{@"mode":@"No External Messages (+n)", @"hint":@"No messages allowed from outside the channel."}];
                     break;
                 case 'p':
-                    [_modeHints addObject:@{@"mode":@"Private (+p)", @"hint":@"Membership is only visible to other members."}];
+                    [self->_modeHints addObject:@{@"mode":@"Private (+p)", @"hint":@"Membership is only visible to other members."}];
                     break;
                 case 's':
-                    [_modeHints addObject:@{@"mode":@"Secret (+s)", @"hint":@"This channel is unlisted and membership is only visible to other members."}];
+                    [self->_modeHints addObject:@{@"mode":@"Secret (+s)", @"hint":@"This channel is unlisted and membership is only visible to other members."}];
                     break;
                 case 't':
-                    [_modeHints addObject:@{@"mode":@"Topic Control (+t)", @"hint":@"Only ops can set the topic."}];
-                    User *u = [[UsersDataSource sharedInstance] getUser:server.nick cid:_channel.cid bid:_channel.bid];
+                    [self->_modeHints addObject:@{@"mode":@"Topic Control (+t)", @"hint":@"Only ops can set the topic."}];
+                    User *u = [[UsersDataSource sharedInstance] getUser:server.nick cid:self->_channel.cid bid:self->_channel.bid];
                     if(u && [u.mode rangeOfCharacterFromSet:[NSCharacterSet characterSetWithCharactersInString:server?[NSString stringWithFormat:@"%@%@%@%@%@",server.MODE_OPER, server.MODE_OWNER, server.MODE_ADMIN, server.MODE_OP, server.MODE_HALFOP]:@"Yqaoh"]].location == NSNotFound)
                         self.navigationItem.rightBarButtonItem = nil;
                     break;
             }
         }
     }
-    if(_channel.bid == -1)
+    if(self->_channel.bid == -1)
         self.navigationItem.rightBarButtonItem = nil;
     [self.tableView reloadData];
 }
@@ -450,10 +450,10 @@
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    if([_channel.mode isKindOfClass:[NSString class]] && _channel.mode.length)
-        return 2 + (_url.attributedText.length ? 1 : 0);
+    if([self->_channel.mode isKindOfClass:[NSString class]] && _channel.mode.length)
+        return 2 + (self->_url.attributedText.length ? 1 : 0);
     else
-        return 1 + (_url.attributedText.length ? 1 : 0);
+        return 1 + (self->_url.attributedText.length ? 1 : 0);
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -462,7 +462,7 @@
 
     switch(section) {
         case 2:
-            if(_modeHints.count)
+            if(self->_modeHints.count)
                 return _modeHints.count;
         default:
             return 1;
@@ -471,15 +471,15 @@
 
 - (void)setEditing:(BOOL)editing animated:(BOOL)animated {
     if(self.tableView.editing && !editing && _topicChanged) {
-        [[NetworkConnection sharedInstance] topic:[ColorFormatter toIRC:_topicEdit.attributedText] chan:_channel.name cid:_channel.cid handler:nil];
+        [[NetworkConnection sharedInstance] topic:[ColorFormatter toIRC:self->_topicEdit.attributedText] chan:self->_channel.name cid:self->_channel.cid handler:nil];
     }
     [super setEditing:editing animated:animated];
     [self.tableView reloadData];
     if(editing) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [_topicEdit becomeFirstResponder];
+            [self->_topicEdit becomeFirstResponder];
         }];
-        _topicChanged = NO;
+        self->_topicChanged = NO;
     }
 }
 
@@ -487,19 +487,19 @@
     if(indexPath.section == 0) {
         if(tableView.isEditing)
             return 148;
-        CGFloat height = [LinkTextView heightOfString:_topic constrainedToWidth:self.tableView.bounds.size.width - offset];
-        _topicLabel.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
-        _topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
+        CGFloat height = [LinkTextView heightOfString:self->_topic constrainedToWidth:self.tableView.bounds.size.width - offset];
+        self->_topicLabel.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
+        self->_topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
         return height + 20;
     } else if(indexPath.section == 1 && _url.attributedText.length) {
-        CGFloat height = [LinkTextView heightOfString:_url.attributedText constrainedToWidth:self.tableView.bounds.size.width - offset];
-        _url.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
+        CGFloat height = [LinkTextView heightOfString:self->_url.attributedText constrainedToWidth:self.tableView.bounds.size.width - offset];
+        self->_url.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
         return height + 20;
     } else {
         if(indexPath.row == 0 && _modeHints.count == 0) {
             return 48;
         } else {
-            NSString *hint = [[_modeHints objectAtIndex:indexPath.row] objectForKey:@"hint"];
+            NSString *hint = [[self->_modeHints objectAtIndex:indexPath.row] objectForKey:@"hint"];
             return ceil([hint boundingRectWithSize:CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]} context:nil].size.height) + 32;
         }
     }
@@ -517,14 +517,14 @@
     switch(section) {
         case 0:
             if(tableView.isEditing && _topiclen) {
-                return [NSString stringWithFormat:@"TOPIC (%li CHARS)", (_topiclen - [ColorFormatter toIRC:_topicEdit.attributedText].length)];
+                return [NSString stringWithFormat:@"TOPIC (%li CHARS)", (self->_topiclen - [ColorFormatter toIRC:self->_topicEdit.attributedText].length)];
             } else {
                 return @"TOPIC";
             }
         case 1:
             return @"CHANNEL URL";
         case 2:
-            if(_modeHints.count)
+            if(self->_modeHints.count)
                 return [NSString stringWithFormat:@"MODE: +%@", _channel.mode];
             else
                 return @"MODE";
@@ -548,18 +548,18 @@
     switch(section) {
         case 0:
             if(tableView.isEditing) {
-                [cell.contentView addSubview:_topicEdit];
+                [cell.contentView addSubview:self->_topicEdit];
             } else {
-                [cell.contentView addSubview:_topicLabel];
+                [cell.contentView addSubview:self->_topicLabel];
             }
             break;
         case 1:
-            [cell.contentView addSubview:_url];
+            [cell.contentView addSubview:self->_url];
             break;
         case 2:
-            if(_modeHints.count) {
-                cell.textLabel.text = [[_modeHints objectAtIndex:indexPath.row] objectForKey:@"mode"];
-                cell.detailTextLabel.text = [[_modeHints objectAtIndex:indexPath.row] objectForKey:@"hint"];
+            if(self->_modeHints.count) {
+                cell.textLabel.text = [[self->_modeHints objectAtIndex:indexPath.row] objectForKey:@"mode"];
+                cell.detailTextLabel.text = [[self->_modeHints objectAtIndex:indexPath.row] objectForKey:@"hint"];
                 cell.detailTextLabel.numberOfLines = 0;
             } else {
                 cell.textLabel.text = [NSString stringWithFormat:@"+%@", _channel.mode];

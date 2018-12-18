@@ -32,17 +32,17 @@
     if (self) {
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _label = [[LinkTextView alloc] init];
-        _label.font = [UIFont systemFontOfSize:FONT_SIZE];
-        _label.backgroundColor = [UIColor clearColor];
-        _label.textColor = [UIColor messageTextColor];
-        _label.selectable = YES;
-        _label.editable = NO;
-        _label.scrollEnabled = NO;
-        _label.textContainerInset = UIEdgeInsetsZero;
-        _label.dataDetectorTypes = UIDataDetectorTypeNone;
-        _label.textContainer.lineFragmentPadding = 0;
-        [self.contentView addSubview:_label];
+        self->_label = [[LinkTextView alloc] init];
+        self->_label.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_label.backgroundColor = [UIColor clearColor];
+        self->_label.textColor = [UIColor messageTextColor];
+        self->_label.selectable = YES;
+        self->_label.editable = NO;
+        self->_label.scrollEnabled = NO;
+        self->_label.textContainerInset = UIEdgeInsetsZero;
+        self->_label.dataDetectorTypes = UIDataDetectorTypeNone;
+        self->_label.textContainer.lineFragmentPadding = 0;
+        [self.contentView addSubview:self->_label];
     }
     return self;
 }
@@ -56,7 +56,7 @@
     frame.size.width -= 12;
     frame.size.height -= 8;
     
-    _label.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+    self->_label.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
 }
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -76,20 +76,20 @@
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
 
-    _placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
-    _placeholder.backgroundColor = [UIColor clearColor];
-    _placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
-    _placeholder.numberOfLines = 0;
-    _placeholder.textAlignment = NSTextAlignmentCenter;
-    _placeholder.textColor = [UIColor messageTextColor];
+    self->_placeholder = [[UILabel alloc] initWithFrame:CGRectZero];
+    self->_placeholder.backgroundColor = [UIColor clearColor];
+    self->_placeholder.font = [UIFont systemFontOfSize:FONT_SIZE];
+    self->_placeholder.numberOfLines = 0;
+    self->_placeholder.textAlignment = NSTextAlignmentCenter;
+    self->_placeholder.textColor = [UIColor messageTextColor];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     CGRect frame = self.tableView.frame;
-    frame.size.height = _placeholder.font.pointSize * 2;
-    _placeholder.frame = frame;
-    [self.tableView.superview addSubview:_placeholder];
+    frame.size.height = self->_placeholder.font.pointSize * 2;
+    self->_placeholder.frame = frame;
+    [self.tableView.superview addSubview:self->_placeholder];
     [self refresh];
 }
 
@@ -101,13 +101,13 @@
 -(void)refresh {
     NSMutableArray *data = [[NSMutableArray alloc] init];
     
-    if([[_event objectForKey:@"lines"] count] == 1 && [[[_event objectForKey:@"lines"] objectAtIndex:0] objectForKey:@"no_such_nick"]) {
-        _data = nil;
-        _placeholder.text = @"There was no such nickname";
+    if([[self->_event objectForKey:@"lines"] count] == 1 && [[[self->_event objectForKey:@"lines"] objectAtIndex:0] objectForKey:@"no_such_nick"]) {
+        self->_data = nil;
+        self->_placeholder.text = @"There was no such nickname";
     } else {
-        _placeholder.text = nil;
+        self->_placeholder.text = nil;
         
-        for(NSDictionary *line in [_event objectForKey:@"lines"]) {
+        for(NSDictionary *line in [self->_event objectForKey:@"lines"]) {
             NSMutableDictionary *c = [[NSMutableDictionary alloc] init];
             NSMutableString *text = [[NSMutableString alloc] init];
             [text appendFormat:@"%c%c%@Nick%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"nick"]];
@@ -125,11 +125,11 @@
             [data addObject:c];
         }
         
-        _data = data;
+        self->_data = data;
     }
     [self.tableView reloadData];
     
-    self.navigationItem.title = [NSString stringWithFormat:@"WHOWAS response for %@", [_event objectForKey:@"nick"]];
+    self.navigationItem.title = [NSString stringWithFormat:@"WHOWAS response for %@", [self->_event objectForKey:@"nick"]];
 }
 
 -(void)doneButtonPressed {
@@ -143,12 +143,12 @@
 #pragma mark - Table view data source
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
     return [[row objectForKey:@"height"] floatValue];
 }
 
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return [_data count];
+    return [self->_data count];
 }
 
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
@@ -159,7 +159,7 @@
     ThenWhoWasTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"whowascell"];
     if(!cell)
         cell = [[ThenWhoWasTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"whowascell"];
-    NSDictionary *row = [_data objectAtIndex:[indexPath section]];
+    NSDictionary *row = [self->_data objectAtIndex:[indexPath section]];
     cell.label.attributedText = [row objectForKey:@"text"];
     return cell;
 }

@@ -36,9 +36,9 @@
 - (id)initWithURL:(NSURL *)url {
     self = [super initWithNibName:@"ImageViewController" bundle:nil];
     if (self) {
-        _url = url;
-        _chrome = [[OpenInChromeController alloc] init];
-        _urlHandler = [[URLHandler alloc] init];
+        self->_url = url;
+        self->_chrome = [[OpenInChromeController alloc] init];
+        self->_urlHandler = [[URLHandler alloc] init];
     }
     return self;
 }
@@ -51,21 +51,21 @@
     return @[
              [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                 [pb setValue:_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                 [pb setValue:self->_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
              }],
              [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIApplication *app = [UIApplication sharedApplication];
                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                  MainViewController *mainViewController = [appDelegate mainViewController];
                  
-                 UIActivityViewController *activityController = [URLHandler activityControllerForItems:_imageView.image?@[_url,_imageView.image]:@[_url] type:_movieController?@"Animation":@"Image"];
+                 UIActivityViewController *activityController = [URLHandler activityControllerForItems:self->_imageView.image?@[self->_url,self->_imageView.image]:@[self->_url] type:self->_movieController?@"Animation":@"Image"];
 
                  activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
                  
                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
              }],
              [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
-                 if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:_url
+                 if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:self->_url
                                                                                                                                                          withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
                                                                                                                                                                           @"irccloud-enterprise://"
@@ -75,10 +75,10 @@
                                                                                                                                                                           ]
                                                                                                                                                             createNewTab:NO])
                      return;
-                 else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_url])
+                 else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_url])
                      return;
                  else
-                     [[UIApplication sharedApplication] openURL:_url];
+                     [[UIApplication sharedApplication] openURL:self->_url];
              }]
              ];
 }
@@ -92,21 +92,21 @@
 }
 
 -(void)transitionToSize:(CGSize)size {
-    _scrollView.frame = CGRectMake(0,0,size.width,size.height);
-    if(_imageView.image) {
-        [_imageView sizeToFit];
-        CGRect frame = _imageView.frame;
+    self->_scrollView.frame = CGRectMake(0,0,size.width,size.height);
+    if(self->_imageView.image) {
+        [self->_imageView sizeToFit];
+        CGRect frame = self->_imageView.frame;
         frame.origin.x = 0;
         frame.origin.y = 0;
-        _imageView.frame = frame;
-        _scrollView.contentSize = _imageView.frame.size;
+        self->_imageView.frame = frame;
+        self->_scrollView.contentSize = self->_imageView.frame.size;
     }
-    [self scrollViewDidZoom:_scrollView];
+    [self scrollViewDidZoom:self->_scrollView];
     
-    _progressView.center = CGPointMake(self.view.bounds.size.width / 2.0,self.view.bounds.size.height/2.0);
+    self->_progressView.center = CGPointMake(self.view.bounds.size.width / 2.0,self.view.bounds.size.height/2.0);
     
-    if(_movieController)
-        _movieController.view.frame = _scrollView.bounds;
+    if(self->_movieController)
+        self->_movieController.view.frame = self->_scrollView.bounds;
 }
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -119,12 +119,12 @@
 
 //Some centering magic from: http://stackoverflow.com/a/2189336/1406639
 -(void)scrollViewDidZoom:(UIScrollView *)pScrollView {
-    CGRect innerFrame = _imageView.frame;
+    CGRect innerFrame = self->_imageView.frame;
     CGRect scrollerBounds = pScrollView.bounds;
     
     if ((innerFrame.size.width < scrollerBounds.size.width) || (innerFrame.size.height < scrollerBounds.size.height)) {
-        CGFloat tempx = _imageView.center.x - (scrollerBounds.size.width / 2);
-        CGFloat tempy = _imageView.center.y - (scrollerBounds.size.height / 2);
+        CGFloat tempx = self->_imageView.center.x - (scrollerBounds.size.width / 2);
+        CGFloat tempy = self->_imageView.center.y - (scrollerBounds.size.height / 2);
         CGPoint myScrollViewOffset = CGPointMake(tempx, tempy);
         
         pScrollView.contentOffset = myScrollViewOffset;
@@ -142,32 +142,32 @@
     }
     pScrollView.contentInset = anEdgeInset;
     
-    if(_toolbar.hidden && !_previewing)
+    if(self->_toolbar.hidden && !_previewing)
         [self _showToolbar];
-    [_hideTimer invalidate];
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    [self->_hideTimer invalidate];
+    self->_hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
     
     pScrollView.alwaysBounceHorizontal = (pScrollView.zoomScale > pScrollView.minimumZoomScale);
     pScrollView.alwaysBounceVertical = (pScrollView.zoomScale > pScrollView.minimumZoomScale);
 }
 
 -(void)_showToolbar {
-    [_hideTimer invalidate];
-    _hideTimer = nil;
+    [self->_hideTimer invalidate];
+    self->_hideTimer = nil;
     [UIView animateWithDuration:0.5 animations:^{
-        _toolbar.hidden = NO;
-        _toolbar.alpha = 1;
+        self->_toolbar.hidden = NO;
+        self->_toolbar.alpha = 1;
     } completion:nil];
 }
 
 -(void)_hideToolbar {
-    [_hideTimer invalidate];
-    _hideTimer = nil;
-    if(_imageView.image != nil || _movieController != nil) {
+    [self->_hideTimer invalidate];
+    self->_hideTimer = nil;
+    if(self->_imageView.image != nil || _movieController != nil) {
         [UIView animateWithDuration:0.5 animations:^{
-            _toolbar.alpha = 0;
+            self->_toolbar.alpha = 0;
         } completion:^(BOOL finished){
-            _toolbar.hidden = YES;
+            self->_toolbar.hidden = YES;
         }];
     }
 }
@@ -178,13 +178,13 @@
 }
 
 -(void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    self->_hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
 -(void)fail:(NSString *)error {
-    [_progressView removeFromSuperview];
+    [self->_progressView removeFromSuperview];
 
-    if(_previewing || self.view.window.rootViewController != self) {
+    if(self->_previewing || self.view.window.rootViewController != self) {
         NSLog(@"Not launching fallback URL as we're not the root view controller");
         return;
     }
@@ -207,7 +207,7 @@
 
 -(void)_openInBrowser {
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] isChromeInstalled]) {
-        if([[OpenInChromeController sharedInstance] openInChrome:_url withCallbackURL:[NSURL URLWithString:
+        if([[OpenInChromeController sharedInstance] openInChrome:self->_url withCallbackURL:[NSURL URLWithString:
 #ifdef ENTERPRISE
                                                                                        @"irccloud-enterprise://"
 #else
@@ -217,10 +217,10 @@
             return;
     }
     if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] isFirefoxInstalled]) {
-        if([[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:_url])
+        if([[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_url])
             return;
     }
-    if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Safari"] && [SFSafariViewController class] && [_url.scheme hasPrefix:@"http"]) {
+    if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Safari"] && [SFSafariViewController class] && [self->_url.scheme hasPrefix:@"http"]) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             UIApplication *app = [UIApplication sharedApplication];
             AppDelegate *appDelegate = (AppDelegate *)app.delegate;
@@ -232,30 +232,30 @@
                 [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
                 [UIApplication sharedApplication].statusBarHidden = NO;
                 
-                [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:_url] animated:YES completion:nil];
+                [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:self->_url] animated:YES completion:nil];
             }];
         }];
     } else {
-        [[UIApplication sharedApplication] openURL:_url];
+        [[UIApplication sharedApplication] openURL:self->_url];
     }
 }
 
 -(void)_fetchVideo:(NSURL *)url {
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
-    _movieController = [[MPMoviePlayerController alloc] initWithContentURL:url];
-    _movieController.controlStyle = MPMovieControlStyleNone;
-    _movieController.view.userInteractionEnabled = NO;
-    _movieController.view.frame = _scrollView.bounds;
-    [_scrollView addSubview:_movieController.view];
-    _scrollView.userInteractionEnabled = NO;
-    [_scrollView removeGestureRecognizer:_panGesture];
-    [self.view addGestureRecognizer:_panGesture];
-    [_progressView removeFromSuperview];
-    [_movieController play];
+    self->_movieController = [[MPMoviePlayerController alloc] initWithContentURL:url];
+    self->_movieController.controlStyle = MPMovieControlStyleNone;
+    self->_movieController.view.userInteractionEnabled = NO;
+    self->_movieController.view.frame = self->_scrollView.bounds;
+    [self->_scrollView addSubview:self->_movieController.view];
+    self->_scrollView.userInteractionEnabled = NO;
+    [self->_scrollView removeGestureRecognizer:self->_panGesture];
+    [self.view addGestureRecognizer:self->_panGesture];
+    [self->_progressView removeFromSuperview];
+    [self->_movieController play];
     if([UIApplication sharedApplication].delegate.window.rootViewController == self)
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
-    [self scrollViewDidZoom:_scrollView];
+    [self scrollViewDidZoom:self->_scrollView];
 }
 
 -(void)load {
@@ -263,11 +263,11 @@
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
 #endif
     
-    NSDictionary *d = [_urlHandler MediaURLs:_url];
+    NSDictionary *d = [self->_urlHandler MediaURLs:self->_url];
     if(d) {
         if([d objectForKey:@"mp4_loop"]) {
             [self _fetchVideo:[d objectForKey:@"mp4_loop"]];
-            _movieController.repeatMode = MPMovieRepeatModeOne;
+            self->_movieController.repeatMode = MPMovieRepeatModeOne;
         } else if([d objectForKey:@"mp4"]) {
             [self _fetchVideo:[d objectForKey:@"mp4"]];
         } else if([d objectForKey:@"image"]) {
@@ -276,7 +276,7 @@
             [self fail:@"Unsupported media type"];
         }
     } else {
-        [_urlHandler fetchMediaURLs:_url result:^(BOOL success, NSString *error) {
+        [self->_urlHandler fetchMediaURLs:self->_url result:^(BOOL success, NSString *error) {
             if(success)
                 [self load];
             else
@@ -289,13 +289,13 @@
     CLS_LOG(@"Fetching image: %@", url);
     NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:url].path;
     if([[NSFileManager defaultManager] fileExistsAtPath:cacheFile]) {
-        _imageData = [[NSData alloc] initWithContentsOfFile:cacheFile].mutableCopy;
-        [self _parseImageData:_imageData];
+        self->_imageData = [[NSData alloc] initWithContentsOfFile:cacheFile].mutableCopy;
+        [self _parseImageData:self->_imageData];
     } else {
         NSURLRequest *request = [NSURLRequest requestWithURL:url];
-        _connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+        self->_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
         
-        [_connection start];
+        [self->_connection start];
     }
 }
 
@@ -304,8 +304,8 @@
 }
 
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
-    _bytesExpected = [response expectedContentLength];
-    _imageData = [[NSMutableData alloc] initWithCapacity:(NSUInteger)(_bytesExpected + 32)]; // Just in case? Unsure if the extra 32 bytes are necessary
+    self->_bytesExpected = [response expectedContentLength];
+    self->_imageData = [[NSMutableData alloc] initWithCapacity:(NSUInteger)(self->_bytesExpected + 32)]; // Just in case? Unsure if the extra 32 bytes are necessary
     if(response.statusCode != 200) {
         [self fail:[NSString stringWithFormat:@"HTTP error %ld: %@", (long)response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]];
         return;
@@ -318,34 +318,34 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     NSInteger receivedDataLength = [data length];
-    _totalBytesReceived += receivedDataLength;
-    [_imageData appendData:data];
+    self->_totalBytesReceived += receivedDataLength;
+    [self->_imageData appendData:data];
 
-    if(_bytesExpected != NSURLResponseUnknownLength) {
-        float progress = (((_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f);
-        if(_progressView.progress < progress)
-            _progressView.progress = progress;
+    if(self->_bytesExpected != NSURLResponseUnknownLength) {
+        float progress = (((self->_totalBytesReceived/(float)_bytesExpected) * 100.f) / 100.f);
+        if(self->_progressView.progress < progress)
+            self->_progressView.progress = progress;
     }
 }
 
 - (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    if(connection == _connection) {
+    if(connection == self->_connection) {
         NSLog(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
         [self fail:error.localizedDescription];
-        _connection = nil;
+        self->_connection = nil;
     }
 }
 
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if(connection == _connection) {
-        if(_imageData) {
+    if(connection == self->_connection) {
+        if(self->_imageData) {
             NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:connection.originalRequest.URL].path;
-            [_imageData writeToFile:cacheFile atomically:YES];
-            [self performSelectorInBackground:@selector(_parseImageData:) withObject:_imageData];
+            [self->_imageData writeToFile:cacheFile atomically:YES];
+            [self performSelectorInBackground:@selector(_parseImageData:) withObject:self->_imageData];
         } else {
             [self fail:@"No image data recieved"];
         }
-        _connection = nil;
+        self->_connection = nil;
     }
 }
 
@@ -353,15 +353,15 @@
     YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];
     if(img) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            _progressView.progress = 1.f;
-            [_scrollView removeGestureRecognizer:_panGesture];
-            [self.view addGestureRecognizer:_panGesture];
+            self->_progressView.progress = 1.f;
+            [self->_scrollView removeGestureRecognizer:self->_panGesture];
+            [self.view addGestureRecognizer:self->_panGesture];
             CGSize size;
             size = img.size;
-            _imageView.image = img;
-            _imageView.frame = CGRectMake(0,0,size.width,size.height);
-            CGFloat xScale = _scrollView.bounds.size.width / _imageView.frame.size.width;
-            CGFloat yScale = _scrollView.bounds.size.height / _imageView.frame.size.height;
+            self->_imageView.image = img;
+            self->_imageView.frame = CGRectMake(0,0,size.width,size.height);
+            CGFloat xScale = self->_scrollView.bounds.size.width / self->_imageView.frame.size.width;
+            CGFloat yScale = self->_scrollView.bounds.size.height / self->_imageView.frame.size.height;
             CGFloat minScale = MIN(xScale, yScale);
             
             CGFloat maxScale = 4;
@@ -370,16 +370,16 @@
                 minScale = maxScale;
             }
             
-            _scrollView.minimumZoomScale = minScale;
-            _scrollView.maximumZoomScale = maxScale;
-            _scrollView.contentSize = _imageView.frame.size;
-            _scrollView.zoomScale = minScale;
-            [self scrollViewDidZoom:_scrollView];
+            self->_scrollView.minimumZoomScale = minScale;
+            self->_scrollView.maximumZoomScale = maxScale;
+            self->_scrollView.contentSize = self->_imageView.frame.size;
+            self->_scrollView.zoomScale = minScale;
+            [self scrollViewDidZoom:self->_scrollView];
             
-            [_progressView removeFromSuperview];
+            [self->_progressView removeFromSuperview];
             [UIView beginAnimations:nil context:nil];
             [UIView setAnimationDuration:0.25];
-            _imageView.alpha = 1;
+            self->_imageView.alpha = 1;
             [UIView commitAnimations];
             if([UIApplication sharedApplication].delegate.window.rootViewController == self)
                 [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
@@ -394,51 +394,51 @@
     [super viewDidLoad];
     
     if(@available(iOS 11, *))
-        _imageView.accessibilityIgnoresInvertColors = YES;
+        self->_imageView.accessibilityIgnoresInvertColors = YES;
 
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
     [doubleTap setNumberOfTapsRequired:2];
-    [_scrollView addGestureRecognizer:doubleTap];
+    [self->_scrollView addGestureRecognizer:doubleTap];
     
-    _panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panned:)];
-    [_scrollView addGestureRecognizer:_panGesture];
+    self->_panGesture = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panned:)];
+    [self->_scrollView addGestureRecognizer:self->_panGesture];
     
     [self transitionToSize:self.view.bounds.size];
     [self performSelector:@selector(load) withObject:nil afterDelay:0.5]; //Let the fade animation finish
     
-    if(_previewing)
-        _toolbar.hidden = YES;
+    if(self->_previewing)
+        self->_toolbar.hidden = YES;
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
-    _previewing = NO;
-    _toolbar.hidden = NO;
+    self->_previewing = NO;
+    self->_toolbar.hidden = NO;
     [self _showToolbar];
 }
 
 //From: http://stackoverflow.com/a/19146512
 - (void)doubleTap:(UITapGestureRecognizer*)recognizer {
-    if (_scrollView.zoomScale > _scrollView.minimumZoomScale) {
-        [_scrollView setZoomScale:_scrollView.minimumZoomScale animated:YES];
+    if (self->_scrollView.zoomScale > _scrollView.minimumZoomScale) {
+        [self->_scrollView setZoomScale:self->_scrollView.minimumZoomScale animated:YES];
     } else {
-        CGPoint touch = [recognizer locationInView:_imageView];
+        CGPoint touch = [recognizer locationInView:self->_imageView];
         
-        CGFloat w = _imageView.bounds.size.width / _scrollView.maximumZoomScale;
-        CGFloat h = _imageView.bounds.size.height / _scrollView.maximumZoomScale;
+        CGFloat w = self->_imageView.bounds.size.width / _scrollView.maximumZoomScale;
+        CGFloat h = self->_imageView.bounds.size.height / _scrollView.maximumZoomScale;
         CGFloat x = touch.x-(w/2.0);
         CGFloat y = touch.y-(h/2.0);
         
         CGRect rectTozoom=CGRectMake(x, y, w, h);
-        [_scrollView zoomToRect:rectTozoom animated:YES];
+        [self->_scrollView zoomToRect:rectTozoom animated:YES];
     }
 }
 
 - (void)panned:(UIPanGestureRecognizer *)recognizer {
-    if(_previewing)
+    if(self->_previewing)
         return;
     
-    if (_scrollView.zoomScale <= _scrollView.minimumZoomScale || _movieController || !_imageView.image) {
-        CGRect frame = _scrollView.frame;
+    if (self->_scrollView.zoomScale <= self->_scrollView.minimumZoomScale || _movieController || !_imageView.image) {
+        CGRect frame = self->_scrollView.frame;
         
         switch(recognizer.state) {
             case UIGestureRecognizerStateBegan:
@@ -449,31 +449,31 @@
             case UIGestureRecognizerStateCancelled: {
                 frame.origin.y = 0;
                 [UIView animateWithDuration:0.25 animations:^{
-                    _scrollView.frame = frame;
-                    _progressView.center = _scrollView.center;
+                    self->_scrollView.frame = frame;
+                    self->_progressView.center = self->_scrollView.center;
                     self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
                 }];
                 [self _showToolbar];
-                _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+                self->_hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
                 break;
             }
             case UIGestureRecognizerStateChanged:
                 frame.origin.y = [recognizer translationInView:self.view].y;
-                _scrollView.frame = frame;
-                _progressView.center = _scrollView.center;
+                self->_scrollView.frame = frame;
+                self->_progressView.center = self->_scrollView.center;
                 self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1-(fabs([recognizer translationInView:self.view].y) / self.view.frame.size.height / 2)];
                 break;
             case UIGestureRecognizerStateEnded:
             {
                 if(fabs([recognizer translationInView:self.view].y) > 100 || fabs([recognizer velocityInView:self.view].y) > 1000) {
                     frame.origin.y = ([recognizer translationInView:self.view].y > 0)?frame.size.height:-frame.size.height;
-                    [_hideTimer invalidate];
-                    _hideTimer = nil;
-                    [_connection cancel];
-                    _connection = nil;
+                    [self->_hideTimer invalidate];
+                    self->_hideTimer = nil;
+                    [self->_connection cancel];
+                    self->_connection = nil;
                     [UIView animateWithDuration:0.25 animations:^{
-                        _scrollView.frame = frame;
-                        _progressView.center = _scrollView.center;
+                        self->_scrollView.frame = frame;
+                        self->_progressView.center = self->_scrollView.center;
                         self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:0];
                     } completion:^(BOOL finished) {
                         [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
@@ -481,10 +481,10 @@
                 } else {
                     frame.origin.y = 0;
                     [self _showToolbar];
-                    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+                    self->_hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
                     [UIView animateWithDuration:0.25 animations:^{
-                        _scrollView.frame = frame;
-                        _progressView.center = _scrollView.center;
+                        self->_scrollView.frame = frame;
+                        self->_progressView.center = self->_scrollView.center;
                         self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1];
                     }];
                 }
@@ -499,27 +499,27 @@
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
     [self transitionToSize:self.view.bounds.size];
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    self->_hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
     NSUserActivity *activity = [self userActivity];
     [activity invalidate];
     activity = [[NSUserActivity alloc] initWithActivityType:NSUserActivityTypeBrowsingWeb];
-    activity.webpageURL = [NSURL URLWithString:[_url.absoluteString stringByReplacingCharactersInRange:NSMakeRange(0, _url.scheme.length) withString:_url.scheme.lowercaseString]];
+    activity.webpageURL = [NSURL URLWithString:[self->_url.absoluteString stringByReplacingCharactersInRange:NSMakeRange(0, _url.scheme.length) withString:self->_url.scheme.lowercaseString]];
     [self setUserActivity:activity];
     [activity becomeCurrent];
-    if(_movieController)
-        [_movieController play];
+    if(self->_movieController)
+        [self->_movieController play];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
-    if(_movieController)
-        [_movieController pause];
-    [_hideTimer invalidate];
-    _hideTimer = nil;
+    if(self->_movieController)
+        [self->_movieController pause];
+    [self->_hideTimer invalidate];
+    self->_hideTimer = nil;
 }
 
 -(IBAction)viewTapped:(id)sender {
-    if(_toolbar.hidden && !_previewing) {
+    if(self->_toolbar.hidden && !_previewing) {
         [self _showToolbar];
     } else {
         [self _hideToolbar];
@@ -527,29 +527,29 @@
 }
 
 -(void)popoverPresentationControllerDidDismissPopover:(UIPopoverPresentationController *)popoverPresentationController {
-    _hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
+    self->_hideTimer = [NSTimer scheduledTimerWithTimeInterval:HIDE_DURATION target:self selector:@selector(_hideToolbar) userInfo:nil repeats:NO];
 }
 
 -(IBAction)shareButtonPressed:(id)sender {
-    UIActivityViewController *activityController = [URLHandler activityControllerForItems:_imageView.image?@[_url,_imageView.image]:@[_url] type:_movieController?@"Animation":@"Image"];
+    UIActivityViewController *activityController = [URLHandler activityControllerForItems:self->_imageView.image?@[self->_url,_imageView.image]:@[self->_url] type:self->_movieController?@"Animation":@"Image"];
 
     activityController.popoverPresentationController.delegate = self;
     activityController.popoverPresentationController.barButtonItem = sender;
     [self presentViewController:activityController animated:YES completion:nil];
-    [_hideTimer invalidate];
-    _hideTimer = nil;
+    [self->_hideTimer invalidate];
+    self->_hideTimer = nil;
 }
 
 -(IBAction)doneButtonPressed:(id)sender {
-    [_hideTimer invalidate];
-    _hideTimer = nil;
-    [_connection cancel];
-    _connection = nil;
+    [self->_hideTimer invalidate];
+    self->_hideTimer = nil;
+    [self->_connection cancel];
+    self->_connection = nil;
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
 }
 
 -(BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch {
-    if(!_toolbar.hidden && CGRectContainsPoint(_toolbar.frame, [touch locationInView:self.view]))
+    if(!_toolbar.hidden && CGRectContainsPoint(self->_toolbar.frame, [touch locationInView:self.view]))
         return NO;
     return YES;
 }

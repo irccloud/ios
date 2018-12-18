@@ -64,42 +64,42 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        _type = 0;
+        self->_type = 0;
         
         self.selectionStyle = UITableViewCellSelectionStyleNone;
         
-        _bg = [[UIView alloc] init];
-        [self.contentView addSubview:_bg];
+        self->_bg = [[UIView alloc] init];
+        [self.contentView addSubview:self->_bg];
         
-        _border = [[UIView alloc] init];
-        [self.contentView addSubview:_border];
+        self->_border = [[UIView alloc] init];
+        [self.contentView addSubview:self->_border];
         
-        _unreadIndicator = [[UIView alloc] init];
-        _unreadIndicator.backgroundColor = [UIColor unreadBlueColor];
-        [self.contentView addSubview:_unreadIndicator];
+        self->_unreadIndicator = [[UIView alloc] init];
+        self->_unreadIndicator.backgroundColor = [UIColor unreadBlueColor];
+        [self.contentView addSubview:self->_unreadIndicator];
         
-        _icon = [[UILabel alloc] init];
-        _icon.backgroundColor = [UIColor clearColor];
-        _icon.textColor = [UIColor bufferTextColor];
-        _icon.textAlignment = NSTextAlignmentCenter;
-        [self.contentView addSubview:_icon];
+        self->_icon = [[UILabel alloc] init];
+        self->_icon.backgroundColor = [UIColor clearColor];
+        self->_icon.textColor = [UIColor bufferTextColor];
+        self->_icon.textAlignment = NSTextAlignmentCenter;
+        [self.contentView addSubview:self->_icon];
 
-        _label = [[UILabel alloc] init];
-        _label.backgroundColor = [UIColor clearColor];
-        _label.textColor = [UIColor bufferTextColor];
-        [self.contentView addSubview:_label];
+        self->_label = [[UILabel alloc] init];
+        self->_label.backgroundColor = [UIColor clearColor];
+        self->_label.textColor = [UIColor bufferTextColor];
+        [self.contentView addSubview:self->_label];
         
-        _highlights = [[HighlightsCountView alloc] initWithFrame:CGRectZero];
-        [self.contentView addSubview:_highlights];
+        self->_highlights = [[HighlightsCountView alloc] initWithFrame:CGRectZero];
+        [self.contentView addSubview:self->_highlights];
         
-        _activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-        _activity.hidden = YES;
-        [self.contentView addSubview:_activity];
+        self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+        self->_activity.hidden = YES;
+        [self.contentView addSubview:self->_activity];
         
-        _spamHint = [[UILabel alloc] init];
-        _spamHint.text = @"Tap here to choose conversations to delete";
-        _spamHint.numberOfLines = 0;
-        [self.contentView addSubview:_spamHint];
+        self->_spamHint = [[UILabel alloc] init];
+        self->_spamHint.text = @"Tap here to choose conversations to delete";
+        self->_spamHint.numberOfLines = 0;
+        [self.contentView addSubview:self->_spamHint];
     }
     return self;
 }
@@ -108,49 +108,49 @@
 	[super layoutSubviews];
 	
     CGRect frame = [self.contentView bounds];
-    frame.origin.x += _borderInset;
-    frame.size.width -= _borderInset;
-    _border.frame = CGRectMake(frame.origin.x - _borderInset, frame.origin.y, 6 + _borderInset, frame.size.height);
+    frame.origin.x += self->_borderInset;
+    frame.size.width -= self->_borderInset;
+    self->_border.frame = CGRectMake(frame.origin.x - _borderInset, frame.origin.y, 6 + _borderInset, frame.size.height);
     frame.size.width -= 8;
-    if(_type == TYPE_SERVER) {
+    if(self->_type == TYPE_SERVER) {
         frame.origin.y += 6;
         frame.size.height -= 6;
     }
-    _bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
-    _unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
-    _icon.frame = CGRectMake(frame.origin.x + 12, frame.origin.y + 10, 16, 18);
+    self->_bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
+    self->_unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
+    self->_icon.frame = CGRectMake(frame.origin.x + 12, frame.origin.y + 10, 16, 18);
     if(!_activity.hidden) {
-        frame.size.width -= _activity.frame.size.width + 12;
-        _activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
+        frame.size.width -= self->_activity.frame.size.width + 12;
+        self->_activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
     }
     if(!_highlights.hidden) {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-        CGSize size = [_highlights.count sizeWithFont:_highlights.font];
+        CGSize size = [self->_highlights.count sizeWithFont:self->_highlights.font];
 #pragma GCC diagnostic pop
         size.width += 0;
         size.height = frame.size.height - 16;
         if(size.width < size.height)
             size.width = size.height;
         frame.size.width -= size.width + 12;
-        _highlights.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 6, size.width, size.height);
+        self->_highlights.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 6, size.width, size.height);
     }
-    _label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, (_type == TYPE_SPAM)?_icon.frame.origin.y-1:frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 16, (_type == TYPE_SPAM)?_icon.frame.size.height:frame.size.height);
+    self->_label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, (self->_type == TYPE_SPAM)?_icon.frame.origin.y-1:frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 16, (self->_type == TYPE_SPAM)?_icon.frame.size.height:frame.size.height);
     
-    if(_type == TYPE_SPAM) {
-        _spamHint.textColor = _label.textColor;
-        _spamHint.font = [_label.font fontWithSize:_label.font.pointSize - 2];
-        _spamHint.frame = CGRectMake(_label.frame.origin.x, _label.frame.origin.y + _label.frame.size.height, _label.frame.size.width, frame.size.height - _label.frame.size.height - _label.frame.origin.y);
-        _spamHint.hidden = NO;
+    if(self->_type == TYPE_SPAM) {
+        self->_spamHint.textColor = self->_label.textColor;
+        self->_spamHint.font = [self->_label.font fontWithSize:self->_label.font.pointSize - 2];
+        self->_spamHint.frame = CGRectMake(self->_label.frame.origin.x, _label.frame.origin.y + _label.frame.size.height, _label.frame.size.width, frame.size.height - _label.frame.size.height - _label.frame.origin.y);
+        self->_spamHint.hidden = NO;
     } else {
-        _spamHint.hidden = YES;
+        self->_spamHint.hidden = YES;
     }
 }
 
 -(void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
     [super setHighlighted:highlighted animated:animated];
     if(!self.selected)
-        _bg.backgroundColor = highlighted?_highlightColor:_bgColor;
+        self->_bg.backgroundColor = highlighted?_highlightColor:self->_bgColor;
 }
 
 @end
@@ -160,15 +160,15 @@
 - (id)initWithStyle:(UITableViewStyle)style {
     self = [super initWithStyle:style];
     if (self) {
-        _data = nil;
-        _selectedRow = -1;
-        _expandedArchives = [[NSMutableDictionary alloc] init];
-        _firstHighlightPosition = -1;
-        _firstUnreadPosition = -1;
-        _lastHighlightPosition = -1;
-        _lastUnreadPosition = -1;
-        _servers = [ServersDataSource sharedInstance];
-        _buffers = [BuffersDataSource sharedInstance];
+        self->_data = nil;
+        self->_selectedRow = -1;
+        self->_expandedArchives = [[NSMutableDictionary alloc] init];
+        self->_firstHighlightPosition = -1;
+        self->_firstUnreadPosition = -1;
+        self->_lastHighlightPosition = -1;
+        self->_lastUnreadPosition = -1;
+        self->_servers = [ServersDataSource sharedInstance];
+        self->_buffers = [BuffersDataSource sharedInstance];
     }
     return self;
 }
@@ -176,15 +176,15 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        _data = nil;
-        _selectedRow = -1;
-        _expandedArchives = [[NSMutableDictionary alloc] init];
-        _firstHighlightPosition = -1;
-        _firstUnreadPosition = -1;
-        _lastHighlightPosition = -1;
-        _lastUnreadPosition = -1;
-        _servers = [ServersDataSource sharedInstance];
-        _buffers = [BuffersDataSource sharedInstance];
+        self->_data = nil;
+        self->_selectedRow = -1;
+        self->_expandedArchives = [[NSMutableDictionary alloc] init];
+        self->_firstHighlightPosition = -1;
+        self->_firstUnreadPosition = -1;
+        self->_lastHighlightPosition = -1;
+        self->_lastUnreadPosition = -1;
+        self->_servers = [ServersDataSource sharedInstance];
+        self->_buffers = [BuffersDataSource sharedInstance];
     }
     return self;
 }
@@ -208,7 +208,7 @@
 }
 
 - (void)refresh {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSMutableArray *data = [[NSMutableArray alloc] init];
         NSInteger archiveCount = 0;
         NSInteger firstHighlightPosition = -1;
@@ -221,12 +221,12 @@
         
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
-        for(Server *server in [_servers getServers]) {
+        for(Server *server in [self->_servers getServers]) {
 #ifndef EXTENSION
             int spamCount = 0;
 #endif
             archiveCount = server.deferred_archives;
-            NSArray *buffers = [_buffers getBuffersForServer:server.cid];
+            NSArray *buffers = [self->_buffers getBuffersForServer:server.cid];
             for(Buffer *buffer in buffers) {
                 if([buffer.type isEqualToString:@"console"]) {
                     int unread = 0;
@@ -267,7 +267,7 @@
                     if(server.fail_info.count > 0 && (lastFailurePosition == -1 || lastFailurePosition < data.count - 1))
                         lastFailurePosition = data.count - 1;
 
-                    if(buffer.bid == _selectedBuffer.bid)
+                    if(buffer.bid == self->_selectedBuffer.bid)
                         selectedRow = data.count - 1;
                     break;
                 }
@@ -334,7 +334,7 @@
                     if(type == TYPE_CONVERSATION && unread == 1 && [[EventsDataSource sharedInstance] sizeOfBuffer:buffer.bid] == 1)
                         spamCount++;
 #endif
-                    if(buffer.bid == _selectedBuffer.bid)
+                    if(buffer.bid == self->_selectedBuffer.bid)
                         selectedRow = data.count - 1;
                 }
                 if(type > 0 && buffer.archived > 0)
@@ -353,7 +353,7 @@
 #endif
             if(archiveCount > 0) {
                 [data addObject:@{@"type":@(TYPE_ARCHIVES_HEADER), @"name":@"Archives", @"cid":@(server.cid)}];
-                if([_expandedArchives objectForKey:@(server.cid)]) {
+                if([self->_expandedArchives objectForKey:@(server.cid)]) {
                     for(Buffer *buffer in buffers) {
                         int type = -1;
                         if(buffer.archived && ![buffer.type isEqualToString:@"console"]) {
@@ -373,7 +373,7 @@
                              @"hint":buffer.accessibilityValue?buffer.accessibilityValue:@"",
                              @"key":@0,
                              }];
-                            if(buffer.bid == _selectedBuffer.bid)
+                            if(buffer.bid == self->_selectedBuffer.bid)
                                 selectedRow = data.count - 1;
                         }
                     }
@@ -392,21 +392,21 @@
             }
         }
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            _boldFont = [UIFont boldSystemFontOfSize:FONT_SIZE];
-           _normalFont = [UIFont systemFontOfSize:FONT_SIZE];
+            self->_boldFont = [UIFont boldSystemFontOfSize:FONT_SIZE];
+           self->_normalFont = [UIFont systemFontOfSize:FONT_SIZE];
 
             if(data.count <= 1) {
                 CLS_LOG(@"The buffer list doesn't have any buffers: %@", data);
-                CLS_LOG(@"I should have %lu servers with %lu buffers", (unsigned long)[_servers count], (unsigned long)[_buffers count]);
+                CLS_LOG(@"I should have %lu servers with %lu buffers", (unsigned long)[self->_servers count], (unsigned long)[self->_buffers count]);
             }
-            _data = data;
-            _selectedRow = selectedRow;
-            _firstUnreadPosition = firstUnreadPosition;
-            _firstHighlightPosition = firstHighlightPosition;
-            _firstFailurePosition = firstFailurePosition;
-            _lastUnreadPosition = lastUnreadPosition;
-            _lastHighlightPosition = lastHighlightPosition;
-            _lastFailurePosition = lastFailurePosition;
+            self->_data = data;
+            self->_selectedRow = selectedRow;
+            self->_firstUnreadPosition = firstUnreadPosition;
+            self->_firstHighlightPosition = firstHighlightPosition;
+            self->_firstFailurePosition = firstFailurePosition;
+            self->_lastUnreadPosition = lastUnreadPosition;
+            self->_lastHighlightPosition = lastHighlightPosition;
+            self->_lastFailurePosition = lastFailurePosition;
             self.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
             [self.tableView reloadData];
             [self _updateUnreadIndicators];
@@ -422,7 +422,7 @@
         NSInteger first = [[rows objectAtIndex:0] row];
         NSInteger last = [[rows lastObject] row];
         
-        if(_firstFailurePosition != -1 && first > _firstFailurePosition) {
+        if(self->_firstFailurePosition != -1 && first > _firstFailurePosition) {
             topUnreadIndicator.hidden = NO;
             topUnreadIndicator.alpha = 1;
             topUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
@@ -431,14 +431,14 @@
             topUnreadIndicator.hidden = YES;
             topUnreadIndicator.alpha = 0;
         }
-        if(_firstUnreadPosition != -1 && first > _firstUnreadPosition) {
+        if(self->_firstUnreadPosition != -1 && first > _firstUnreadPosition) {
             topUnreadIndicator.hidden = NO;
             topUnreadIndicator.alpha = 1;
             topUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
             topUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
         }
-        if((_lastHighlightPosition != -1 && first > _lastHighlightPosition) ||
-           (_firstHighlightPosition != -1 && first > _firstHighlightPosition)) {
+        if((self->_lastHighlightPosition != -1 && first > _lastHighlightPosition) ||
+           (self->_firstHighlightPosition != -1 && first > _firstHighlightPosition)) {
             topUnreadIndicator.hidden = NO;
             topUnreadIndicator.alpha = 1;
             topUnreadIndicatorColor.backgroundColor = [UIColor redColor];
@@ -446,7 +446,7 @@
         }
         
         if(last < _data.count) {
-            if(_lastFailurePosition != -1 && last < _lastFailurePosition) {
+            if(self->_lastFailurePosition != -1 && last < _lastFailurePosition) {
                 bottomUnreadIndicator.hidden = NO;
                 bottomUnreadIndicator.alpha = 1;
                 bottomUnreadIndicatorColor.backgroundColor = [UIColor networkErrorBackgroundColor];
@@ -455,14 +455,14 @@
                 bottomUnreadIndicator.hidden = YES;
                 bottomUnreadIndicator.alpha = 0;
             }
-            if(_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
+            if(self->_lastUnreadPosition != -1 && last < _lastUnreadPosition) {
                 bottomUnreadIndicator.hidden = NO;
                 bottomUnreadIndicator.alpha = 1;
                 bottomUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
                 bottomUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
             }
-            if((_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
-               (_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
+            if((self->_firstHighlightPosition != -1 && last < _firstHighlightPosition) ||
+               (self->_lastHighlightPosition != -1 && last < _lastHighlightPosition)) {
                 bottomUnreadIndicator.hidden = NO;
                 bottomUnreadIndicator.alpha = 1;
                 bottomUnreadIndicatorColor.backgroundColor = [UIColor redColor];
@@ -479,14 +479,14 @@
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [_alertView dismissWithClickedButtonIndex:1 animated:YES];
-    [self alertView:_alertView clickedButtonAtIndex:1];
+    [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
+    [self alertView:self->_alertView clickedButtonAtIndex:1];
     return NO;
 }
 
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    [_delegate dismissKeyboard];
-    [_alertView endEditing:YES];
+    [self->_delegate dismissKeyboard];
+    [self->_alertView endEditing:YES];
     NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
     
     if([title isEqualToString:@"Join"]) {
@@ -504,7 +504,7 @@
         }
     }
     
-    _alertView = nil;
+    self->_alertView = nil;
 }
 
 - (void)viewDidLoad {
@@ -518,11 +518,11 @@
     }
 
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
-    _boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+    self->_boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
     d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-    _normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
-    _awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
+    self->_normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+    self->_awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
 
     lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
@@ -531,7 +531,7 @@
     
 #ifndef EXTENSION
     if(!_delegate) {
-        _delegate = (UIViewController<BuffersTableViewDelegate> *)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
+        self->_delegate = (UIViewController<BuffersTableViewDelegate> *)[(UINavigationController *)(self.slidingViewController.topViewController) topViewController];
     }
     
     if(!topUnreadIndicatorColor) {
@@ -602,7 +602,7 @@
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
 #ifndef EXTENSION
-    NSDictionary *d = [_data objectAtIndex:[self.tableView indexPathForRowAtPoint:location].row];
+    NSDictionary *d = [self->_data objectAtIndex:[self.tableView indexPathForRowAtPoint:location].row];
 
     if(d) {
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectForKey:@"bid"] intValue]];
@@ -615,7 +615,7 @@
             e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
             lp.enabled = NO;
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                lp.enabled = YES;
+                self->lp.enabled = YES;
             }];
             return e;
         }
@@ -626,21 +626,21 @@
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
     [viewControllerToCommit viewWillDisappear:NO];
-    [_delegate bufferSelected:((EventsTableView *)viewControllerToCommit).buffer.bid];
+    [self->_delegate bufferSelected:((EventsTableView *)viewControllerToCommit).buffer.bid];
 }
 
 - (void)backlogCompleted:(NSNotification *)notification {
     if(notification.object == nil || [notification.object bid] < 1) {
         [self performSelectorInBackground:@selector(refresh) withObject:nil];
     } else {
-        [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[_buffers getBuffer:[notification.object bid]]];
+        [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[self->_buffers getBuffer:[notification.object bid]]];
     }
 }
 
 - (void)refreshBuffer:(Buffer *)b {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
-        NSMutableArray *data = _data;
+        NSMutableArray *data = self->_data;
         for(int i = 0; i < data.count; i++) {
             NSDictionary *d = [data objectAtIndex:i];
             if(b.bid == [[d objectForKey:@"bid"] intValue]) {
@@ -684,50 +684,50 @@
                     [m setObject:s.fail_info forKey:@"fail_info"];
                 [data setObject:[NSDictionary dictionaryWithDictionary:m] atIndexedSubscript:i];
                 if(unread) {
-                    if(_firstUnreadPosition == -1 || _firstUnreadPosition > i)
-                        _firstUnreadPosition = i;
-                    if(_lastUnreadPosition == -1 || _lastUnreadPosition < i)
-                        _lastUnreadPosition = i;
+                    if(self->_firstUnreadPosition == -1 || _firstUnreadPosition > i)
+                        self->_firstUnreadPosition = i;
+                    if(self->_lastUnreadPosition == -1 || _lastUnreadPosition < i)
+                        self->_lastUnreadPosition = i;
                 } else {
-                    if(_firstUnreadPosition == i) {
-                        _firstUnreadPosition = -1;
+                    if(self->_firstUnreadPosition == i) {
+                        self->_firstUnreadPosition = -1;
                         for(int j = i; j < _data.count; j++) {
-                            if([[[_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
-                                _firstUnreadPosition = j;
+                            if([[[self->_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
+                                self->_firstUnreadPosition = j;
                                 break;
                             }
                         }
                     }
-                    if(_lastUnreadPosition == i) {
-                        _lastUnreadPosition = -1;
+                    if(self->_lastUnreadPosition == i) {
+                        self->_lastUnreadPosition = -1;
                         for(int j = i; j >= 0; j--) {
-                            if([[[_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
-                                _lastUnreadPosition = j;
+                            if([[[self->_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
+                                self->_lastUnreadPosition = j;
                                 break;
                             }
                         }
                     }
                 }
                 if(highlights) {
-                    if(_firstHighlightPosition == -1 || _firstHighlightPosition > i)
-                        _firstHighlightPosition = i;
-                    if(_lastHighlightPosition == -1 || _lastHighlightPosition < i)
-                        _lastHighlightPosition = i;
+                    if(self->_firstHighlightPosition == -1 || _firstHighlightPosition > i)
+                        self->_firstHighlightPosition = i;
+                    if(self->_lastHighlightPosition == -1 || _lastHighlightPosition < i)
+                        self->_lastHighlightPosition = i;
                 } else {
-                    if(_firstHighlightPosition == i) {
-                        _firstHighlightPosition = -1;
+                    if(self->_firstHighlightPosition == i) {
+                        self->_firstHighlightPosition = -1;
                         for(int j = i; j < _data.count; j++) {
-                            if([[[_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
-                                _firstHighlightPosition = j;
+                            if([[[self->_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
+                                self->_firstHighlightPosition = j;
                                 break;
                             }
                         }
                     }
-                    if(_lastHighlightPosition == i) {
-                        _lastHighlightPosition = -1;
+                    if(self->_lastHighlightPosition == i) {
+                        self->_lastHighlightPosition = -1;
                         for(int j = i; j >= 0; j--) {
-                            if([[[_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
-                                _lastHighlightPosition = j;
+                            if([[[self->_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
+                                self->_lastHighlightPosition = j;
                                 break;
                             }
                         }
@@ -735,25 +735,25 @@
                 }
                 if([[m objectForKey:@"type"] intValue] == TYPE_SERVER) {
                     if(s.fail_info.count) {
-                        if(_firstFailurePosition == -1 || _firstFailurePosition > i)
-                            _firstFailurePosition = i;
-                        if(_lastFailurePosition == -1 || _lastFailurePosition < i)
-                            _lastFailurePosition = i;
+                        if(self->_firstFailurePosition == -1 || _firstFailurePosition > i)
+                            self->_firstFailurePosition = i;
+                        if(self->_lastFailurePosition == -1 || _lastFailurePosition < i)
+                            self->_lastFailurePosition = i;
                     } else {
-                        if(_firstFailurePosition == i) {
-                            _firstFailurePosition = -1;
+                        if(self->_firstFailurePosition == i) {
+                            self->_firstFailurePosition = -1;
                             for(int j = i; j < _data.count; j++) {
-                                if([[[_data objectAtIndex:j] objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[[_data objectAtIndex:j] objectForKey:@"fail_info"] count]) {
-                                    _firstFailurePosition = j;
+                                if([[[self->_data objectAtIndex:j] objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[[self->_data objectAtIndex:j] objectForKey:@"fail_info"] count]) {
+                                    self->_firstFailurePosition = j;
                                     break;
                                 }
                             }
                         }
-                        if(_lastFailurePosition == i) {
-                            _lastFailurePosition = -1;
+                        if(self->_lastFailurePosition == i) {
+                            self->_lastFailurePosition = -1;
                             for(int j = i; j >= 0; j--) {
-                                if([[[_data objectAtIndex:j] objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[[_data objectAtIndex:j] objectForKey:@"fail_info"] count]) {
-                                    _lastFailurePosition = j;
+                                if([[[self->_data objectAtIndex:j] objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[[self->_data objectAtIndex:j] objectForKey:@"fail_info"] count]) {
+                                    self->_lastFailurePosition = j;
                                     break;
                                 }
                             }
@@ -829,14 +829,14 @@
             for(NSNumber *cid in seenEids.allKeys) {
                 NSDictionary *eids = [seenEids objectForKey:cid];
                 for(NSNumber *bid in eids.allKeys) {
-                    [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[_buffers getBuffer:[bid intValue]]];
+                    [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[self->_buffers getBuffer:[bid intValue]]];
                 }
             }
         }
             break;
         case kIRCEventBufferMsg:
             if(e) {
-                Buffer *b = [_buffers getBuffer:e.bid];
+                Buffer *b = [self->_buffers getBuffer:e.bid];
                 if([e isImportant:b.type]) {
                     [self refreshBuffer:b];
                 }
@@ -844,7 +844,7 @@
             break;
         case kIRCEventStatusChanged:
             if(o) {
-                NSArray *buffers = [_buffers getBuffersForServer:o.cid];
+                NSArray *buffers = [self->_buffers getBuffersForServer:o.cid];
                 for(Buffer *b in buffers) {
                     [self refreshBuffer:b];
                 }
@@ -852,7 +852,7 @@
             break;
         case kIRCEventChannelMode:
             if(o) {
-                Buffer *b = [_buffers getBuffer:o.bid];
+                Buffer *b = [self->_buffers getBuffer:o.bid];
                 if(b)
                     [self refreshBuffer:b];
             }
@@ -894,16 +894,16 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         return _data.count;
     }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_data) {
-       if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
+    @synchronized(self->_data) {
+       if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
            return 46;
-       } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
+       } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
            return 64;
        } else {
            return 40;
@@ -912,13 +912,13 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_data) {
-        BOOL selected = (indexPath.row == _selectedRow);
+    @synchronized(self->_data) {
+        BOOL selected = (indexPath.row == self->_selectedRow);
         BuffersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bufferscell"];
         if(!cell) {
             cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bufferscell"];
         }
-        NSDictionary *row = [_data objectAtIndex:[indexPath row]];
+        NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
         NSString *status = [row objectForKey:@"status"];
         cell.type = [[row objectForKey:@"type"] intValue];
         cell.label.text = [row objectForKey:@"name"];
@@ -928,7 +928,7 @@
         cell.highlightColor = [UIColor bufferHighlightColor];
         cell.border.backgroundColor = [UIColor bufferBorderColor];
         cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
-        cell.icon.font = _awesomeFont;
+        cell.icon.font = self->_awesomeFont;
 #ifndef EXTENSION
         if(@available(iOS 11, *))
             cell.borderInset = self.slidingViewController.view.safeAreaInsets.left;
@@ -939,7 +939,7 @@
             else
                 cell.unreadIndicator.backgroundColor = selected?[UIColor selectedBufferBorderColor]:[UIColor unreadBlueColor];
             cell.unreadIndicator.hidden = NO;
-            cell.label.font = _boldFont;
+            cell.label.font = self->_boldFont;
             cell.accessibilityValue = [cell.accessibilityValue stringByAppendingString:@", unread"];
         } else {
             if(cell.type == TYPE_SERVER) {
@@ -951,7 +951,7 @@
             } else {
                 cell.unreadIndicator.hidden = YES;
             }
-            cell.label.font = _normalFont;
+            cell.label.font = self->_normalFont;
         }
         if([[row objectForKey:@"highlights"] intValue]) {
             cell.highlights.hidden = NO;
@@ -1057,7 +1057,7 @@
             case TYPE_ARCHIVES_HEADER:
                 cell.icon.text = nil;
                 cell.icon.hidden = YES;
-                if([_expandedArchives objectForKey:[row objectForKey:@"cid"]]) {
+                if([self->_expandedArchives objectForKey:[row objectForKey:@"cid"]]) {
                     cell.label.textColor = [UIColor blackColor];
                     cell.bgColor = [UIColor timestampColor];
                     cell.accessibilityHint = @"Hides archive list";
@@ -1136,80 +1136,80 @@
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     if([UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad)
-        [_delegate dismissKeyboard];
+        [self->_delegate dismissKeyboard];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
-        if(indexPath.row >= _data.count)
+        if(indexPath.row >= self->_data.count)
             return;
         
-        if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER) {
-            int cid = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
-            if([_expandedArchives objectForKey:@(cid)])
-                [_expandedArchives removeObjectForKey:@(cid)];
+        if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER) {
+            int cid = [[[self->_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
+            if([self->_expandedArchives objectForKey:@(cid)])
+                [self->_expandedArchives removeObjectForKey:@(cid)];
             else
-                [_expandedArchives setObject:@YES forKey:@(cid)];
+                [self->_expandedArchives setObject:@YES forKey:@(cid)];
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
             if([[ServersDataSource sharedInstance] getServer:cid].deferred_archives) {
                 [[NetworkConnection sharedInstance] requestArchives:cid];
             }
     #ifndef EXTENSION
-        } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
-            if(_delegate)
-                [_delegate spamSelected:[[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
-        } else if([[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
-            [_delegate dismissKeyboard];
-            Server *s = [_servers getServer:[[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
-            _alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-            _alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            _alertView.tag = [[[_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
-            [_alertView textFieldAtIndex:0].placeholder = @"#example";
-            [_alertView textFieldAtIndex:0].text = @"#";
-            [_alertView textFieldAtIndex:0].delegate = self;
-            [_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-            [_alertView show];
+        } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
+            if(self->_delegate)
+                [self->_delegate spamSelected:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
+        } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
+            [self->_delegate dismissKeyboard];
+            Server *s = [self->_servers getServer:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
+            self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
+            self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+            self->_alertView.tag = [[[self->_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
+            [self->_alertView textFieldAtIndex:0].placeholder = @"#example";
+            [self->_alertView textFieldAtIndex:0].text = @"#";
+            [self->_alertView textFieldAtIndex:0].delegate = self;
+            [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+            [self->_alertView show];
     #endif
         } else {
     #ifndef EXTENSION
-            _selectedRow = indexPath.row;
+            self->_selectedRow = indexPath.row;
     #endif
             [self.tableView reloadData];
             [self _updateUnreadIndicators];
-            if(_delegate)
-                [_delegate bufferSelected:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
+            if(self->_delegate)
+                [self->_delegate bufferSelected:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
         }
     }
 }
 
 -(void)setBuffer:(Buffer *)buffer {
-    if(_selectedBuffer.bid != buffer.bid)
-        _selectedRow = -1;
-    _selectedBuffer = buffer;
-    if(_selectedBuffer.archived && ![_selectedBuffer.type isEqualToString:@"console"]) {
-        if(![_expandedArchives objectForKey:@(_selectedBuffer.cid)]) {
-            [_expandedArchives setObject:@YES forKey:@(_selectedBuffer.cid)];
+    if(self->_selectedBuffer.bid != buffer.bid)
+        self->_selectedRow = -1;
+    self->_selectedBuffer = buffer;
+    if(self->_selectedBuffer.archived && ![self->_selectedBuffer.type isEqualToString:@"console"]) {
+        if(![self->_expandedArchives objectForKey:@(self->_selectedBuffer.cid)]) {
+            [self->_expandedArchives setObject:@YES forKey:@(self->_selectedBuffer.cid)];
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
             return;
         }
     }
-    @synchronized(_data) {
-        if(_data.count) {
+    @synchronized(self->_data) {
+        if(self->_data.count) {
             for(int i = 0; i < _data.count; i++) {
-                if([[[_data objectAtIndex:i] objectForKey:@"bid"] intValue] == _selectedBuffer.bid) {
-                    _selectedRow = i;
+                if([[[self->_data objectAtIndex:i] objectForKey:@"bid"] intValue] == self->_selectedBuffer.bid) {
+                    self->_selectedRow = i;
                     break;
                 }
             }
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.tableView reloadData];
                 [self _updateUnreadIndicators];
-                if(_selectedRow != -1) {
+                if(self->_selectedRow != -1) {
                     NSArray *a = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
                     if(a.count) {
-                        if([[a objectAtIndex:0] row] > _selectedRow || [[a lastObject] row] < _selectedRow)
-                            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+                        if([[a objectAtIndex:0] row] > self->_selectedRow || [[a lastObject] row] < self->_selectedRow)
+                            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
                     }
                 }
             }];
@@ -1224,14 +1224,14 @@
 }
 
 -(IBAction)topUnreadIndicatorClicked:(id)sender {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
         if(rows.count) {
             NSInteger first = [[rows objectAtIndex:0] row] - 1;
             NSInteger pos = 0;
             
             for(NSInteger i = first; i >= 0; i--) {
-                NSDictionary *d = [_data objectAtIndex:i];
+                NSDictionary *d = [self->_data objectAtIndex:i];
                 if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
                     pos = i - 1;
                     break;
@@ -1247,14 +1247,14 @@
 }
 
 -(IBAction)bottomUnreadIndicatorClicked:(id)sender {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.contentInset)];
         if(rows.count) {
             NSInteger last = [[rows lastObject] row] + 1;
-            NSInteger pos = _data.count - 1;
+            NSInteger pos = self->_data.count - 1;
             
             for(NSInteger i = last; i  < _data.count; i++) {
-                NSDictionary *d = [_data objectAtIndex:i];
+                NSDictionary *d = [self->_data objectAtIndex:i];
                 if([[d objectForKey:@"unread"] intValue] || [[d objectForKey:@"highlights"] intValue] || ([[d objectForKey:@"type"] intValue] == TYPE_SERVER && [(NSDictionary *)[d objectForKey:@"fail_info"] count])) {
                     pos = i + 1;
                     break;
@@ -1262,7 +1262,7 @@
             }
 
             if(pos > _data.count - 1)
-                pos = _data.count - 1;
+                pos = self->_data.count - 1;
             
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:pos inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         }
@@ -1270,14 +1270,14 @@
 }
 
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
             NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
             if(indexPath) {
                 if(indexPath.row < _data.count) {
-                    int type = [[[_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue];
+                    int type = [[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue];
                     if(type == TYPE_SERVER || type == TYPE_CHANNEL || type == TYPE_CONVERSATION)
-                        [_delegate bufferLongPressed:[[[_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+                        [self->_delegate bufferLongPressed:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
                 }
             }
         }
@@ -1285,77 +1285,77 @@
 }
 
 -(void)next {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSDictionary *d;
-        NSInteger row = _selectedRow + 1;
+        NSInteger row = self->_selectedRow + 1;
         
         do {
             if(row < _data.count)
-                d = [_data objectAtIndex:row];
+                d = [self->_data objectAtIndex:row];
             else
                 d = nil;
             row++;
         } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
         
         if(d) {
-            [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+            [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
         }
     }
 }
 
 -(void)prev {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSDictionary *d;
-        NSInteger row = _selectedRow - 1;
+        NSInteger row = self->_selectedRow - 1;
         
         do {
             if(row >= 0)
-                d = [_data objectAtIndex:row];
+                d = [self->_data objectAtIndex:row];
             else
                 d = nil;
             row--;
         } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
         
         if(d) {
-            [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+            [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
         }
     }
 }
 
 -(void)nextUnread {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSDictionary *d;
-        NSInteger row = _selectedRow + 1;
+        NSInteger row = self->_selectedRow + 1;
         
         do {
             if(row < _data.count)
-                d = [_data objectAtIndex:row];
+                d = [self->_data objectAtIndex:row];
             else
                 d = nil;
             row++;
         } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
         
         if(d) {
-            [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+            [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
         }
     }
 }
 
 -(void)prevUnread {
-    @synchronized(_data) {
+    @synchronized(self->_data) {
         NSDictionary *d;
-        NSInteger row = _selectedRow - 1;
+        NSInteger row = self->_selectedRow - 1;
         
         do {
             if(row >= 0)
-                d = [_data objectAtIndex:row];
+                d = [self->_data objectAtIndex:row];
             else
                 d = nil;
             row--;
         } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
         
         if(d) {
-            [_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
+            [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
         }
     }
 }

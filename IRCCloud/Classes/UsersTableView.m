@@ -45,26 +45,26 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
     self = [super initWithStyle:style reuseIdentifier:reuseIdentifier];
     if (self) {
-        _type = 0;
+        self->_type = 0;
         
         self.backgroundColor = [UIColor membersGroupColor];
         
-        _label = self.textLabel;
-        _label.backgroundColor = [UIColor clearColor];
-        _label.textColor = [UIColor blackColor];
-        _label.font = [UIFont systemFontOfSize:16];
+        self->_label = self.textLabel;
+        self->_label.backgroundColor = [UIColor clearColor];
+        self->_label.textColor = [UIColor blackColor];
+        self->_label.font = [UIFont systemFontOfSize:16];
 
-        _count = [[UILabel alloc] init];
-        _count.backgroundColor = [UIColor clearColor];
-        _count.textColor = [UIColor grayColor];
-        _count.font = [UIFont systemFontOfSize:14];
-        [self.contentView addSubview:_count];
+        self->_count = [[UILabel alloc] init];
+        self->_count.backgroundColor = [UIColor clearColor];
+        self->_count.textColor = [UIColor grayColor];
+        self->_count.font = [UIFont systemFontOfSize:14];
+        [self.contentView addSubview:self->_count];
         
-        _border1 = [[UIView alloc] init];
-        [self.contentView addSubview:_border1];
+        self->_border1 = [[UIView alloc] init];
+        [self.contentView addSubview:self->_border1];
         
-        _border2 = [[UIView alloc] init];
-        [self.contentView addSubview:_border2];
+        self->_border2 = [[UIView alloc] init];
+        [self.contentView addSubview:self->_border2];
     }
     return self;
 }
@@ -73,20 +73,20 @@
 	[super layoutSubviews];
 	
 	CGRect frame = [self.contentView bounds];
-    _border1.frame = CGRectMake(0,frame.size.height - 1,frame.size.width,1);
-    _border2.frame = CGRectMake(0,0,3,frame.size.height);
+    self->_border1.frame = CGRectMake(0,frame.size.height - 1,frame.size.width,1);
+    self->_border2.frame = CGRectMake(0,0,3,frame.size.height);
 
     frame.origin.x = 12;
     frame.size.width -= 24;
     
-    if(_type == TYPE_HEADING) {
-        float countWidth = [_count.text sizeWithAttributes:@{NSFontAttributeName:_count.font}].width;
-        _count.frame = CGRectMake(frame.origin.x + frame.size.width - countWidth, frame.origin.y, countWidth, frame.size.height);
-        _count.hidden = NO;
-        _label.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - countWidth - 6, frame.size.height);
+    if(self->_type == TYPE_HEADING) {
+        float countWidth = [self->_count.text sizeWithAttributes:@{NSFontAttributeName:self->_count.font}].width;
+        self->_count.frame = CGRectMake(frame.origin.x + frame.size.width - countWidth, frame.origin.y, countWidth, frame.size.height);
+        self->_count.hidden = NO;
+        self->_label.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.width - countWidth - 6, frame.size.height);
     } else {
-        _count.hidden = YES;
-        _label.frame = frame;
+        self->_count.hidden = YES;
+        self->_label.frame = frame;
     }
 }
 
@@ -94,8 +94,8 @@
     [super setHighlighted:highlighted animated:animated];
     if(self.selected || _type == TYPE_HEADING)
         highlighted = NO;
-    self.contentView.backgroundColor = highlighted?_border1.backgroundColor:_bgColor;
-    _label.textColor = highlighted?[UIColor whiteColor]:_fgColor;
+    self.contentView.backgroundColor = highlighted?_border1.backgroundColor:self->_bgColor;
+    self->_label.textColor = highlighted?[UIColor whiteColor]:self->_fgColor;
 }
 @end
 
@@ -115,7 +115,7 @@
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     switch(event) {
         case kIRCEventAway:
-            if(o.cid == _buffer.cid)
+            if(o.cid == self->_buffer.cid)
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.tableView reloadData];
             }];
@@ -131,7 +131,7 @@
         case kIRCEventKick:
         case kIRCEventWhoList:
             if(!_refreshTimer) {
-                _refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_refreshTimer) userInfo:nil repeats:NO];
+                self->_refreshTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_refreshTimer) userInfo:nil repeats:NO];
             }
             break;
         default:
@@ -140,7 +140,7 @@
 }
 
 - (void)_refreshTimer {
-    _refreshTimer = nil;
+    self->_refreshTimer = nil;
     [self refresh];
 }
 
@@ -185,16 +185,16 @@
 }
 
 - (void)setBuffer:(Buffer *)buffer {
-    _buffer = buffer;
-    _refreshTimer = nil;
+    self->_buffer = buffer;
+    self->_refreshTimer = nil;
     [self refresh];
-    if(_data.count)
+    if(self->_data.count)
         [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
 }
 
 - (void)refresh {
     NSDictionary *PREFIX;
-    Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
     if(s) {
         PREFIX = s.PREFIX;
     }
@@ -220,7 +220,7 @@
     
     NSString *opersGroupMode = @"Y";
     
-    NSArray *users = [[UsersDataSource sharedInstance] usersForBuffer:_buffer.bid];
+    NSArray *users = [[UsersDataSource sharedInstance] usersForBuffer:self->_buffer.bid];
     if(users.count > 1000) {
         NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
         if(![disableNickSuggestions objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]]) {
@@ -277,19 +277,19 @@
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"]) {
-            _headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-            _countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-            _userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+            self->_headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+            self->_countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+            self->_userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
         } else {
             UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-            _headingFont = _countFont = _userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+            self->_headingFont = self->_countFont = self->_userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
         }
         
-        _refreshTimer = nil;
-        _data = data;
-        _sectionTitles = sectionTitles;
-        _sectionIndexes = sectionIndexes;
-        _sectionSizes = sectionSizes;
+        self->_refreshTimer = nil;
+        self->_data = data;
+        self->_sectionTitles = sectionTitles;
+        self->_sectionIndexes = sectionIndexes;
+        self->_sectionSizes = sectionSizes;
         [self.tableView reloadData];
         self.tableView.backgroundColor = [UIColor usersDrawerBackgroundColor];
     }];
@@ -316,15 +316,15 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(refresh) name:kIRCCloudBacklogCompletedNotification object:nil];
     
-    _refreshTimer = nil;
+    self->_refreshTimer = nil;
 
     if([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"]) {
-        _headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-        _countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-        _userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        self->_headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        self->_countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        self->_userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
     } else {
         UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-        _headingFont = _countFont = _userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+        self->_headingFont = self->_countFont = self->_userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
     }
 }
 
@@ -335,19 +335,19 @@
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     if([[[NetworkConnection sharedInstance].prefs objectForKey:@"font"] isEqualToString:@"mono"]) {
-        _headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-        _countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
-        _userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        self->_headingFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        self->_countFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
+        self->_userFont = [UIFont fontWithName:@"Courier" size:FONT_SIZE];
     } else {
         UIFontDescriptor *d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-        _headingFont = _countFont = _userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
+        self->_headingFont = self->_countFont = self->_userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
     }
     [self.tableView reloadData];
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [self refresh];
-    _refreshTimer = nil;
+    self->_refreshTimer = nil;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -358,15 +358,15 @@
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-/*    if(_data.count > 20)
+/*    if(self->_data.count > 20)
         return _sectionIndexes.count;
     else*/
         return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-/*    if(_data.count > 20)
-        return [[_sectionSizes objectAtIndex:section] intValue];
+/*    if(self->_data.count > 20)
+        return [[self->_sectionSizes objectAtIndex:section] intValue];
     else*/
         return _data.count;
 }
@@ -376,7 +376,7 @@
 }
 
 /*-(NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView {
-    if(_data.count > 20)
+    if(self->_data.count > 20)
         return _sectionTitles;
     else
         return nil;
@@ -386,15 +386,15 @@
     if(section == 0)
         return nil;
     else
-        return [_sectionTitles objectAtIndex:section - 1];
+        return [self->_sectionTitles objectAtIndex:section - 1];
 }*/
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UsersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"userscell"];
     if(!cell)
         cell = [[UsersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"userscell"];
-    NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
-    NSDictionary *row = [_data objectAtIndex:idx];
+    NSUInteger idx = [[self->_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+    NSDictionary *row = [self->_data objectAtIndex:idx];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     cell.type = [[row objectForKey:@"type"] intValue];
     cell.bgColor = [row objectForKey:@"bgColor"];
@@ -409,14 +409,14 @@
         cell.count.text = [NSString stringWithFormat:@"%@", [row objectForKey:@"count"]];
     cell.count.textColor = [row objectForKey:@"countColor"];
     if(cell.type == TYPE_HEADING) {
-        if(_headingFont)
-            cell.label.font = _headingFont;
+        if(self->_headingFont)
+            cell.label.font = self->_headingFont;
         
-        if(_countFont)
-            cell.count.font = _countFont;
+        if(self->_countFont)
+            cell.count.font = self->_countFont;
     } else {
-        if(_userFont)
-            cell.label.font = _userFont;
+        if(self->_userFont)
+            cell.label.font = self->_userFont;
     }
     if(cell.type == TYPE_HEADING || ![[row objectForKey:@"last"] intValue]) {
         cell.border1.hidden = YES;
@@ -472,14 +472,14 @@
 
 -(void)scrollViewWillBeginDragging:(UIScrollView *)scrollView {
     if([UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad)
-        [_delegate dismissKeyboard];
+        [self->_delegate dismissKeyboard];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-    NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
-    if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
-        [_delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+    NSUInteger idx = [[self->_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+    if([[[self->_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
+        [self->_delegate userSelected:[[self->_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
 }
 
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
@@ -487,9 +487,9 @@
         NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
         if(indexPath) {
             if(indexPath.row < _data.count) {
-                NSUInteger idx = [[_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
-                if([[[_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
-                    [_delegate userSelected:[[_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+                NSUInteger idx = [[self->_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+                if([[[self->_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
+                    [self->_delegate userSelected:[[self->_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
             }
         }
     }
