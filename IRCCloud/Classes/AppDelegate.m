@@ -134,21 +134,15 @@
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"browser":[SFSafariViewController class]?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES), @"backgroundUploads":@(YES)}];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
-    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"www.irccloud.com"]) {
-        CLS_LOG(@"Migrating host");
-        [[NSUserDefaults standardUserDefaults] setObject:@"api.irccloud.com" forKey:@"host"];
-    }
+
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"path"]) {
         IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
         IRCCLOUD_PATH = [[NSUserDefaults standardUserDefaults] objectForKey:@"path"];
-    } else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"host"] isEqualToString:@"api.irccloud.com"]) {
-        NSString *session = [NetworkConnection sharedInstance].session;
-        if(session.length) {
-            CLS_LOG(@"Migrating path from session cookie");
-            IRCCLOUD_PATH = [NSString stringWithFormat:@"/websocket/%c", [session characterAtIndex:0]];
-            [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-        }
+    } else if([NetworkConnection sharedInstance].session.length) {
+        CLS_LOG(@"Session cookie found without websocket path");
+        [NetworkConnection sharedInstance].session = nil;
     }
+
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"useChrome"]) {
         CLS_LOG(@"Migrating browser setting");
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"useChrome"])
