@@ -237,10 +237,9 @@ volatile BOOL __socketPaused = NO;
                                                 kTSKSwizzleNetworkDelegates: @YES,
                                                 kTSKPinnedDomains : @{
                                                         @"irccloud.com" : @{
-                                                                kTSKExpirationDate: @"2019-03-21",
                                                                 kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
                                                                 kTSKPublicKeyHashes : @[
-                                                                        @"hPUhE79j0hDUJDg/Zy+yqkLt/lJKEa9PWb0vrnp2oyQ=",
+                                                                        @"5kJvNEMw0KjrCAu7eXY5HZdvyCS13BbA0VJG1RSP91w=",
                                                                         @"A0us4Wg8ZwLOrXMWm8W4BsECg+dz98ntmZZAmm8if9c=",
                                                                         ],
                                                                 kTSKIncludeSubdomains : @YES
