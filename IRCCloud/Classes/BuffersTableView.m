@@ -788,7 +788,6 @@
         case kIRCEventSetIgnores:
         case kIRCEventBadChannelKey:
         case kIRCEventOpenBuffer:
-        case kIRCEventInvalidNick:
         case kIRCEventBanList:
         case kIRCEventWhoList:
         case kIRCEventWhois:

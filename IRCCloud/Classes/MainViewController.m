@@ -65,7 +65,6 @@
 #define TAG_KICK 3
 #define TAG_INVITE 4
 #define TAG_BADCHANNELKEY 5
-#define TAG_INVALIDNICK 6
 #define TAG_FAILEDMSG 7
 #define TAG_LOGOUT 8
 #define TAG_DELETE 9
@@ -889,35 +888,6 @@ NSArray *_sortedChannels;
                     [self presentViewController:alert animated:YES completion:nil];
             }];}
             break;
-        case kIRCEventInvalidNick: {
-            self->_alertObject = notification.object;
-            s = [[ServersDataSource sharedInstance] getServer:self->_alertObject.cid];
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self dismissKeyboard];
-                [self.view.window endEditing:YES];
-                
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:s?[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port]:@"Invalid Nick" message:@"Invalid nickname, try again." preferredStyle:UIAlertControllerStyleAlert];
-                
-                [alert addAction:[UIAlertAction actionWithTitle:s?@"Cancel":@"Close" style:UIAlertActionStyleCancel handler:nil]];
-                if(s) {
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Change" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                        if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
-                            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:self->_alertObject.cid handler:nil];
-                    }]];
-                }
-                
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9)
-                    [self presentViewController:alert animated:YES completion:nil];
-                
-                [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                    textField.delegate = self;
-                    [textField becomeFirstResponder];
-                }];
-                
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-                    [self presentViewController:alert animated:YES completion:nil];
-            }];}
-            break;
         case kIRCEventAlert:
             o = notification.object;
             type = o.type;
@@ -1084,11 +1054,16 @@ NSArray *_sortedChannels;
                     msg = [NSString stringWithFormat:@"%@: %@ for target %@", [o objectForKey:@"msg"], [o objectForKey:@"key"], [o objectForKey:@"target"]];
                 else if([type isEqualToString:@"metadata_toomanysubs"])
                     msg = [NSString stringWithFormat:@"Metadata key subscription limit reached, keys after and including '%@' are not subscribed", [o objectForKey:@"key"]];
+                else if([[o objectForKey:@"message"] isEqualToString:@"invalid_nick"])
+                    msg = @"Invalid nickname";
                 else
                     msg = [o objectForKey:@"msg"];
 
                 s = [[ServersDataSource sharedInstance] getServer:o.cid];
-                self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                if (s)
+                    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                else
+                    self->_alertView = [[UIAlertView alloc] initWithTitle:msg message:nil delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                 [self->_alertView show];
             }
             break;
@@ -4114,12 +4089,6 @@ NSArray *_sortedChannels;
             if([title isEqualToString:@"Join"]) {
                 if([alertView textFieldAtIndex:0].text.length)
                     [[NetworkConnection sharedInstance] join:[self->_alertObject objectForKey:@"chan"] key:[alertView textFieldAtIndex:0].text cid:self->_alertObject.cid handler:nil];
-            }
-            break;
-        case TAG_INVALIDNICK:
-            if([title isEqualToString:@"Change"]) {
-                if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/nick %@",[alertView textFieldAtIndex:0].text] to:nil cid:self->_alertObject.cid handler:nil];
             }
             break;
         case TAG_FAILEDMSG:

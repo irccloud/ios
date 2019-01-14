@@ -69,7 +69,6 @@ typedef enum {
     kIRCEventSetIgnores,
     kIRCEventBadChannelKey,
     kIRCEventOpenBuffer,
-    kIRCEventInvalidNick,
     kIRCEventBanList,
     kIRCEventWhoList,
     kIRCEventWhois,

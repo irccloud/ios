@@ -1011,14 +1011,13 @@ volatile BOOL __socketPaused = NO;
                                 @"chan_open",@"knock_on_chan",@"knock_disabled",@"cannotknock",@"ownmode",
                                 @"nossl",@"redirect_error",@"invalid_flood",@"join_flood",@"metadata_limit",
                                 @"metadata_targetinvalid",@"metadata_nomatchingkey",@"metadata_keyinvalid",
-                                @"metadata_keynotset",@"metadata_keynopermission",@"metadata_toomanysubs"]) {
+                                @"metadata_keynotset",@"metadata_keynopermission",@"metadata_toomanysubs",@"invalid_nick"]) {
             [parserMap setObject:alert forKey:type];
         }
         
         NSDictionary *broadcastMap = @{    @"bad_channel_key":@(kIRCEventBadChannelKey),
                                            @"channel_query":@(kIRCEventChannelQuery),
                                            @"open_buffer":@(kIRCEventOpenBuffer),
-                                           @"invalid_nick":@(kIRCEventInvalidNick),
                                            @"ban_list":@(kIRCEventBanList),
                                            @"accept_list":@(kIRCEventAcceptList),
                                            @"quiet_list":@(kIRCEventQuietList),
@@ -2062,7 +2061,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             if([object objectForKey:@"success"] && ![[object objectForKey:@"success"] boolValue] && [object objectForKey:@"message"]) {
                 CLS_LOG(@"Failure: %@", object);
                 if([[object objectForKey:@"message"] isEqualToString:@"invalid_nick"]) {
-                    [self postObject:object forEvent:kIRCEventInvalidNick];
+                    [self postObject:object forEvent:kIRCEventAlert];
                 } else if([[object objectForKey:@"message"] isEqualToString:@"auth"]) {
                     [self postObject:object forEvent:kIRCEventAuthFailure];
                 } else if([[object objectForKey:@"message"] isEqualToString:@"set_shard"]) {
