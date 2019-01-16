@@ -1551,7 +1551,7 @@ NSArray *_sortedChannels;
         case kIRCEventDeleteBuffer:
         case kIRCEventBufferArchived:
             o = notification.object;
-            if(o.bid == self->_buffer.bid) {
+            if(o.bid == self->_buffer.bid && ![self->_buffer.type isEqualToString:@"console"]) {
                 if(self->_buffer && _buffer.lastBuffer && [[BuffersDataSource sharedInstance] getBuffer:self->_buffer.lastBuffer.bid])
                     [self bufferSelected:self->_buffer.lastBuffer.bid];
                 else if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
@@ -3900,6 +3900,16 @@ NSArray *_sortedChannels;
         [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _editConnection];
         }]];
+        Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:@"*" server:s.cid];
+        if(b.archived) {
+            [alert addAction:[UIAlertAction actionWithTitle:@"Expand" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NetworkConnection sharedInstance] unarchiveBuffer:b.bid cid:b.cid handler:nil];
+            }]];
+        } else {
+            [alert addAction:[UIAlertAction actionWithTitle:@"Collapse" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [[NetworkConnection sharedInstance] archiveBuffer:b.bid cid:b.cid handler:nil];
+            }]];
+        }
     } else if([self->_selectedBuffer.type isEqualToString:@"channel"]) {
         if([[ChannelsDataSource sharedInstance] channelForBuffer:self->_selectedBuffer.bid]) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {

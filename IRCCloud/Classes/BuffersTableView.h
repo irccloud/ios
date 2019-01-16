@@ -28,6 +28,7 @@
 
 @interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIAlertViewDelegate, UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate> {
     NSMutableArray *_data;
+    NSMutableDictionary *_expandedCids;
     NSInteger _selectedRow;
     UIViewController<BuffersTableViewDelegate> *_delegate;
     NSMutableDictionary *_expandedArchives;
@@ -54,6 +55,7 @@
     UIFont *_boldFont;
     UIFont *_normalFont;
     UIFont *_awesomeFont;
+    UIFont *_smallFont;
     id<UIViewControllerPreviewing> __previewer;
     UILongPressGestureRecognizer *lp;
 }

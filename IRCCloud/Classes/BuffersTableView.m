@@ -35,6 +35,7 @@
 #define TYPE_ARCHIVES_HEADER 3
 #define TYPE_JOIN_CHANNEL 4
 #define TYPE_SPAM 5
+#define TYPE_COLLAPSED 6
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -118,7 +119,7 @@
     }
     self->_bg.frame = CGRectMake(frame.origin.x + 6, frame.origin.y, frame.size.width - 6, frame.size.height);
     self->_unreadIndicator.frame = CGRectMake(frame.origin.x, frame.origin.y, 6, frame.size.height);
-    self->_icon.frame = CGRectMake(frame.origin.x + 12, frame.origin.y + 10, 16, 18);
+    self->_icon.frame = CGRectMake(frame.origin.x + 12, frame.origin.y + ((self->_type == TYPE_COLLAPSED)?8:10), 16, 18);
     if(!_activity.hidden) {
         frame.size.width -= self->_activity.frame.size.width + 12;
         self->_activity.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 10, _activity.frame.size.width, _activity.frame.size.height);
@@ -161,6 +162,7 @@
     self = [super initWithStyle:style];
     if (self) {
         self->_data = nil;
+        self->_expandedCids = [[NSMutableDictionary alloc] init];
         self->_selectedRow = -1;
         self->_expandedArchives = [[NSMutableDictionary alloc] init];
         self->_firstHighlightPosition = -1;
@@ -177,6 +179,7 @@
     self = [super initWithCoder:aDecoder];
     if (self) {
         self->_data = nil;
+        self->_expandedCids = [[NSMutableDictionary alloc] init];
         self->_selectedRow = -1;
         self->_expandedArchives = [[NSMutableDictionary alloc] init];
         self->_firstHighlightPosition = -1;
@@ -222,7 +225,11 @@
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
         for(Server *server in [self->_servers getServers]) {
+            NSMutableDictionary *collapsed;
+            int collapsed_unread = 0;
+            int collapsed_highlights = 0;
 #ifndef EXTENSION
+            NSUInteger collapsed_row = data.count;
             int spamCount = 0;
 #endif
             archiveCount = server.deferred_archives;
@@ -269,9 +276,21 @@
 
                     if(buffer.bid == self->_selectedBuffer.bid)
                         selectedRow = data.count - 1;
+                    
+#ifndef EXTENSION
+                    if(buffer.archived || [self->_expandedCids objectForKey:@(buffer.cid)]) {
+                        collapsed = [[NSMutableDictionary alloc] init];
+                        [collapsed setObject:@TYPE_COLLAPSED forKey:@"type"];
+                        [collapsed setObject:@(buffer.cid) forKey:@"cid"];
+                        [collapsed setObject:@(buffer.bid) forKey:@"bid"];
+                        [collapsed setObject:@(buffer.archived) forKey:@"archived"];
+                    }
+#endif
                     break;
                 }
             }
+            if(collapsed)
+                [data addObject:collapsed];
             for(Buffer *buffer in buffers) {
                 int type = -1;
                 int key = 0;
@@ -308,20 +327,23 @@
                                 unread = 0;
                         }
                     }
-                    [data addObject:@{
-                     @"type":@(type),
-                     @"cid":@(buffer.cid),
-                     @"bid":@(buffer.bid),
-                     @"name":buffer.displayName?buffer.displayName:buffer.name,
-                     @"unread":@(unread),
-                     @"highlights":@(highlights),
-                     @"archived":@0,
-                     @"joined":@(joined),
-                     @"key":@(key),
-                     @"timeout":@(buffer.timeout),
-                     @"hint":buffer.accessibilityValue?buffer.accessibilityValue:@"",
-                     @"status":server.status
-                     }];
+                    
+                    if(buffer.bid == self->_selectedBuffer.bid || !collapsed || [self->_expandedCids objectForKey:@(buffer.cid)]) {
+                        [data addObject:@{
+                         @"type":@(type),
+                         @"cid":@(buffer.cid),
+                         @"bid":@(buffer.bid),
+                         @"name":buffer.displayName?buffer.displayName:buffer.name,
+                         @"unread":@(unread),
+                         @"highlights":@(highlights),
+                         @"archived":@0,
+                         @"joined":@(joined),
+                         @"key":@(key),
+                         @"timeout":@(buffer.timeout),
+                         @"hint":buffer.accessibilityValue?buffer.accessibilityValue:@"",
+                         @"status":server.status
+                         }];
+                    }
                     if(unread > 0 && firstUnreadPosition == -1)
                         firstUnreadPosition = data.count - 1;
                     if(unread > 0 && (lastUnreadPosition == -1 || lastUnreadPosition < data.count - 1))
@@ -334,14 +356,18 @@
                     if(type == TYPE_CONVERSATION && unread == 1 && [[EventsDataSource sharedInstance] sizeOfBuffer:buffer.bid] == 1)
                         spamCount++;
 #endif
+                    collapsed_unread += unread;
+                    collapsed_highlights += highlights;
+
                     if(buffer.bid == self->_selectedBuffer.bid)
                         selectedRow = data.count - 1;
+                    
                 }
                 if(type > 0 && buffer.archived > 0)
                     archiveCount++;
             }
 #ifndef EXTENSION
-            if(spamCount > 3) {
+            if(spamCount > 3 && (!collapsed || [self->_expandedCids objectForKey:@(server.cid)])) {
                 for(int i = 0; i < data.count; i++) {
                     NSDictionary *d = [data objectAtIndex:i];
                     if([[d objectForKey:@"cid"] intValue] == server.cid && [[d objectForKey:@"type"] intValue] == TYPE_CONVERSATION) {
@@ -350,8 +376,31 @@
                     }
                 }
             }
+            
+            if(collapsed) {
+                if([self->_expandedCids objectForKey:@(server.cid)]) {
+                    [collapsed setObject:@"Collapse" forKey:@"name"];
+                    [collapsed setObject:FA_MINUS_SQUARE_O forKey:@"icon"];
+                } else {
+                    [collapsed setObject:@"Expand" forKey:@"name"];
+                    [collapsed setObject:FA_PLUS_SQUARE_O forKey:@"icon"];
+                    [collapsed setObject:@(collapsed_unread) forKey:@"unread"];
+                    [collapsed setObject:@(collapsed_highlights) forKey:@"highlights"];
+                }
+
+                if(collapsed_unread > 0 && firstUnreadPosition == -1)
+                    firstUnreadPosition = collapsed_row;
+                if(collapsed_unread > 0 && (lastUnreadPosition == -1 || lastUnreadPosition < collapsed_row))
+                    lastUnreadPosition = collapsed_row;
+                if(collapsed_highlights > 0 && firstHighlightPosition == -1)
+                    firstHighlightPosition = collapsed_row;
+                if(collapsed_highlights > 0 && (lastHighlightPosition == -1 || lastHighlightPosition < collapsed_row))
+                    lastHighlightPosition = collapsed_row;
+
+            }
+            collapsed_unread = 0;
 #endif
-            if(archiveCount > 0) {
+            if((!collapsed || [self->_expandedCids objectForKey:@(server.cid)]) && archiveCount > 0) {
                 [data addObject:@{@"type":@(TYPE_ARCHIVES_HEADER), @"name":@"Archives", @"cid":@(server.cid)}];
                 if([self->_expandedArchives objectForKey:@(server.cid)]) {
                     for(Buffer *buffer in buffers) {
@@ -393,7 +442,8 @@
         }
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             self->_boldFont = [UIFont boldSystemFontOfSize:FONT_SIZE];
-           self->_normalFont = [UIFont systemFontOfSize:FONT_SIZE];
+            self->_normalFont = [UIFont systemFontOfSize:FONT_SIZE];
+            self->_smallFont = [UIFont systemFontOfSize:FONT_SIZE - 2];
 
             if(data.count <= 1) {
                 CLS_LOG(@"The buffer list doesn't have any buffers: %@", data);
@@ -522,6 +572,7 @@
     
     d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
     self->_normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
+    self->_normalFont = [UIFont fontWithDescriptor:d size:d.pointSize - 2];
     self->_awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
 
     lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
@@ -826,9 +877,15 @@
         {
             NSDictionary *seenEids = [o objectForKey:@"seenEids"];
             for(NSNumber *cid in seenEids.allKeys) {
-                NSDictionary *eids = [seenEids objectForKey:cid];
-                for(NSNumber *bid in eids.allKeys) {
-                    [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[self->_buffers getBuffer:[bid intValue]]];
+                Buffer *b = [self->_buffers getBufferWithName:@"*" server:cid.intValue];
+                if(b.archived) {
+                    [self performSelectorInBackground:@selector(refresh) withObject:nil];
+                    break;
+                } else {
+                    NSDictionary *eids = [seenEids objectForKey:cid];
+                    for(NSNumber *bid in eids.allKeys) {
+                        [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[self->_buffers getBuffer:[bid intValue]]];
+                    }
                 }
             }
         }
@@ -837,7 +894,12 @@
             if(e) {
                 Buffer *b = [self->_buffers getBuffer:e.bid];
                 if([e isImportant:b.type]) {
-                    [self refreshBuffer:b];
+                    Buffer *c = [self->_buffers getBufferWithName:@"*" server:e.cid];
+                    if(c.archived) {
+                        [self performSelectorInBackground:@selector(refresh) withObject:nil];
+                    } else {
+                        [self refreshBuffer:b];
+                    }
                 }
             }
             break;
@@ -904,6 +966,8 @@
            return 46;
        } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
            return 64;
+       } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_COLLAPSED) {
+           return 32;
        } else {
            return 40;
        }
@@ -1087,6 +1151,13 @@
                 cell.icon.hidden = NO;
                 cell.accessibilityLabel = @"Spam detected. Double tap to choose conversations to delete";
                 break;
+            case TYPE_COLLAPSED:
+                cell.icon.textColor = cell.label.textColor = [UIColor archivesHeadingTextColor];
+                cell.icon.text = [row objectForKey:@"icon"];
+                cell.icon.hidden = NO;
+                cell.label.font = self->_smallFont;
+                cell.accessibilityLabel = [row objectForKey:@"name"];
+                break;
         }
         return cell;
     }
@@ -1169,6 +1240,16 @@
             [self->_alertView textFieldAtIndex:0].delegate = self;
             [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
             [self->_alertView show];
+        } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_COLLAPSED) {
+            NSDictionary *d = [self->_data objectAtIndex:indexPath.row];
+            if([[d objectForKey:@"archived"] intValue]) {
+                [[NetworkConnection sharedInstance] unarchiveBuffer:[[d objectForKey:@"bid"] intValue] cid:[[d objectForKey:@"cid"] intValue] handler:nil];
+                [self->_expandedCids setObject:@(1) forKey:[d objectForKey:@"cid"]];
+            } else {
+                [[NetworkConnection sharedInstance] archiveBuffer:[[d objectForKey:@"bid"] intValue] cid:[[d objectForKey:@"cid"] intValue] handler:nil];
+                [self->_expandedCids removeObjectForKey:[d objectForKey:@"cid"]];
+            }
+            return;
     #endif
         } else {
     #ifndef EXTENSION
