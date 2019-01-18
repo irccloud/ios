@@ -118,6 +118,7 @@ UIColor *__socketClosedBarColor;
 UIColor *__codeSpanForegroundColor;
 UIColor *__codeSpanBackgroundColor;
 UIColor *__quoteBorderColor;
+UIColor *__unreadCollapsedColor;
 
 UIColor *__mIRCColors_BG[IRC_COLOR_COUNT];
 UIColor *__mIRCColors_FG[IRC_COLOR_COUNT];
@@ -446,6 +447,7 @@ BOOL __compact = NO;
         
         __selfNickColor = [UIColor colorWithRed:0.08 green:0.17 blue:0.26 alpha:1.0];
         __socketClosedBarColor = __timestampColor;
+        __unreadCollapsedColor = [UIColor colorWithRed:0.34 green:0.64 blue:0.97 alpha:1.0];
 
         [[UITableView appearance] setBackgroundColor:[UIColor colorWithRed:0.937 green:0.937 blue:0.957 alpha:1]];
         [[UITableView appearance] setSeparatorColor:nil];
@@ -659,6 +661,7 @@ BOOL __compact = NO;
         __socketClosedBarColor = color_border5;
         __codeSpanForegroundColor = color_text3;
         __codeSpanBackgroundColor = color_background1;
+        __unreadCollapsedColor = color_background2;
 
         __opersBorderColor = [UIColor colorWithHue:30.0/360.0 saturation:0.85 lightness:0.25 alpha:1.0];
         __ownersBorderColor = [UIColor colorWithHue:47.0/360.0 saturation:0.68 lightness:0.25 alpha:1.0];
@@ -1290,6 +1293,9 @@ BOOL __compact = NO;
 }
 +(UIColor *)selfNickColor {
     return __selfNickColor;
+}
++(UIColor *)unreadCollapsedColor {
+    return __unreadCollapsedColor;
 }
 -(NSString *)toHexString {
     CGFloat r,g,b;

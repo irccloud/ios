@@ -284,6 +284,8 @@
                         [collapsed setObject:@(buffer.cid) forKey:@"cid"];
                         [collapsed setObject:@(buffer.bid) forKey:@"bid"];
                         [collapsed setObject:@(buffer.archived) forKey:@"archived"];
+                        [collapsed setObject:@(collapsed_row) forKey:@"row"];
+                        server.collapsed = collapsed;
                     }
 #endif
                     break;
@@ -398,7 +400,7 @@
                     lastHighlightPosition = collapsed_row;
 
             }
-            collapsed_unread = 0;
+            collapsed_unread = collapsed_highlights = 0;
 #endif
             if((!collapsed || [self->_expandedCids objectForKey:@(server.cid)]) && archiveCount > 0) {
                 [data addObject:@{@"type":@(TYPE_ARCHIVES_HEADER), @"name":@"Archives", @"cid":@(server.cid)}];
@@ -821,6 +823,94 @@
     }
 }
 
+- (void)refreshCollapsed:(Server *)s {
+    @synchronized(self->_data) {
+        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+        
+        int unread = 0, highlights = 0;
+        for(Buffer *b in [self->_buffers getBuffersForServer:s.cid]) {
+            int u = [[EventsDataSource sharedInstance] unreadStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+            int h = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+            if([b.type isEqualToString:@"channel"]) {
+                if([[[prefs objectForKey:@"channel-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                    u = 0;
+            } else {
+                if([[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                    u = 0;
+                if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                    h = 0;
+            }
+            if([[prefs objectForKey:@"disableTrackUnread"] intValue] == 1) {
+                if([b.type isEqualToString:@"channel"]) {
+                    if([[[prefs objectForKey:@"channel-enableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] != 1)
+                        u = 0;
+                }
+            }
+            unread += u;
+            highlights += h;
+        }
+        
+        [s.collapsed setObject:@(unread) forKey:@"unread"];
+        [s.collapsed setObject:@(highlights) forKey:@"highlights"];
+        
+        int row = [[s.collapsed objectForKey:@"row"] intValue];
+        if(unread) {
+            if(self->_firstUnreadPosition == -1 || _firstUnreadPosition > row)
+                self->_firstUnreadPosition = row;
+            if(self->_lastUnreadPosition == -1 || _lastUnreadPosition < row)
+                self->_lastUnreadPosition = row;
+        } else {
+            if(self->_firstUnreadPosition == row) {
+                self->_firstUnreadPosition = -1;
+                for(int j = row; j < _data.count; j++) {
+                    if([[[self->_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
+                        self->_firstUnreadPosition = j;
+                        break;
+                    }
+                }
+            }
+            if(self->_lastUnreadPosition == row) {
+                self->_lastUnreadPosition = -1;
+                for(int j = row; j >= 0; j--) {
+                    if([[[self->_data objectAtIndex:j] objectForKey:@"unread"] intValue]) {
+                        self->_lastUnreadPosition = j;
+                        break;
+                    }
+                }
+            }
+        }
+        if(highlights) {
+            if(self->_firstHighlightPosition == -1 || _firstHighlightPosition > row)
+                self->_firstHighlightPosition = row;
+            if(self->_lastHighlightPosition == -1 || _lastHighlightPosition < row)
+                self->_lastHighlightPosition = row;
+        } else {
+            if(self->_firstHighlightPosition == row) {
+                self->_firstHighlightPosition = -1;
+                for(int j = row; j < _data.count; j++) {
+                    if([[[self->_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
+                        self->_firstHighlightPosition = j;
+                        break;
+                    }
+                }
+            }
+            if(self->_lastHighlightPosition == row) {
+                self->_lastHighlightPosition = -1;
+                for(int j = row; j >= 0; j--) {
+                    if([[[self->_data objectAtIndex:j] objectForKey:@"highlights"] intValue]) {
+                        self->_lastHighlightPosition = j;
+                        break;
+                    }
+                }
+            }
+        }
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self.tableView reloadData];
+            [self _updateUnreadIndicators];
+        }];
+    }
+}
+
 - (void)handleEvent:(NSNotification *)notification {
     kIRCEvent event = [[notification.userInfo objectForKey:kIRCCloudEventKey] intValue];
     IRCCloudJSONObject *o = notification.object;
@@ -879,7 +969,7 @@
             for(NSNumber *cid in seenEids.allKeys) {
                 Buffer *b = [self->_buffers getBufferWithName:@"*" server:cid.intValue];
                 if(b.archived) {
-                    [self performSelectorInBackground:@selector(refresh) withObject:nil];
+                    [self performSelectorInBackground:@selector(refreshCollapsed:) withObject:[self->_servers getServer:[cid intValue]]];
                     break;
                 } else {
                     NSDictionary *eids = [seenEids objectForKey:cid];
@@ -896,7 +986,7 @@
                 if([e isImportant:b.type]) {
                     Buffer *c = [self->_buffers getBufferWithName:@"*" server:e.cid];
                     if(c.archived) {
-                        [self performSelectorInBackground:@selector(refresh) withObject:nil];
+                        [self performSelectorInBackground:@selector(refreshCollapsed:) withObject:[self->_servers getServer:e.cid]];
                     } else {
                         [self refreshBuffer:b];
                     }
@@ -1152,11 +1242,14 @@
                 cell.accessibilityLabel = @"Spam detected. Double tap to choose conversations to delete";
                 break;
             case TYPE_COLLAPSED:
+                cell.bgColor = cell.highlightColor = [UIColor bufferBackgroundColor];
                 cell.icon.textColor = cell.label.textColor = [UIColor archivesHeadingTextColor];
                 cell.icon.text = [row objectForKey:@"icon"];
                 cell.icon.hidden = NO;
                 cell.label.font = self->_smallFont;
                 cell.accessibilityLabel = [row objectForKey:@"name"];
+                cell.unreadIndicator.backgroundColor = [UIColor unreadCollapsedColor];
+                cell.unreadIndicator.hidden = ([[row objectForKey:@"unread"] intValue] == 0);
                 break;
         }
         return cell;

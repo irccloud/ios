@@ -131,4 +131,5 @@
 +(UIColor *)codeSpanForegroundColor;
 +(UIColor *)codeSpanBackgroundColor;
 +(UIColor *)quoteBorderColor;
++(UIColor *)unreadCollapsedColor;
 @end
