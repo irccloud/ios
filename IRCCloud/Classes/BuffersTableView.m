@@ -277,6 +277,7 @@
                     if(buffer.bid == self->_selectedBuffer.bid)
                         selectedRow = data.count - 1;
                     
+#ifndef ENTERPRISE
 #ifndef EXTENSION
                     if(buffer.archived || [self->_expandedCids objectForKey:@(buffer.cid)]) {
                         collapsed = [[NSMutableDictionary alloc] init];
@@ -287,6 +288,7 @@
                         [collapsed setObject:@(collapsed_row) forKey:@"row"];
                         server.collapsed = collapsed;
                     }
+#endif
 #endif
                     break;
                 }
@@ -967,16 +969,20 @@
         {
             NSDictionary *seenEids = [o objectForKey:@"seenEids"];
             for(NSNumber *cid in seenEids.allKeys) {
+#ifndef ENTERPRISE
                 Buffer *b = [self->_buffers getBufferWithName:@"*" server:cid.intValue];
                 if(b.archived) {
                     [self performSelectorInBackground:@selector(refreshCollapsed:) withObject:[self->_servers getServer:[cid intValue]]];
                     break;
                 } else {
+#endif
                     NSDictionary *eids = [seenEids objectForKey:cid];
                     for(NSNumber *bid in eids.allKeys) {
                         [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[self->_buffers getBuffer:[bid intValue]]];
                     }
+#ifndef ENTERPRISE
                 }
+#endif
             }
         }
             break;
@@ -984,12 +990,16 @@
             if(e) {
                 Buffer *b = [self->_buffers getBuffer:e.bid];
                 if([e isImportant:b.type]) {
+#ifndef ENTERPRISE
                     Buffer *c = [self->_buffers getBufferWithName:@"*" server:e.cid];
                     if(c.archived) {
                         [self performSelectorInBackground:@selector(refreshCollapsed:) withObject:[self->_servers getServer:e.cid]];
                     } else {
+#endif
                         [self refreshBuffer:b];
+#ifndef ENTERPRISE
                     }
+#endif
                 }
             }
             break;
@@ -1360,6 +1370,7 @@
     if(self->_selectedBuffer.bid != buffer.bid)
         self->_selectedRow = -1;
     self->_selectedBuffer = buffer;
+#ifndef ENTERPRISE
     if(self->_selectedBuffer.archived && ![self->_selectedBuffer.type isEqualToString:@"console"]) {
         if(![self->_expandedArchives objectForKey:@(self->_selectedBuffer.cid)]) {
             [self->_expandedArchives setObject:@YES forKey:@(self->_selectedBuffer.cid)];
@@ -1367,6 +1378,7 @@
             return;
         }
     }
+#endif
     @synchronized(self->_data) {
         if(self->_data.count) {
             for(int i = 0; i < _data.count; i++) {

@@ -3900,6 +3900,7 @@ NSArray *_sortedChannels;
         [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self _editConnection];
         }]];
+#ifndef ENTERPRISE
         Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:@"*" server:s.cid];
         if(b.archived) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Expand" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
@@ -3910,6 +3911,7 @@ NSArray *_sortedChannels;
                 [[NetworkConnection sharedInstance] archiveBuffer:b.bid cid:b.cid handler:nil];
             }]];
         }
+#endif
     } else if([self->_selectedBuffer.type isEqualToString:@"channel"]) {
         if([[ChannelsDataSource sharedInstance] channelForBuffer:self->_selectedBuffer.bid]) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
