@@ -71,6 +71,7 @@
 #define TAG_JOIN 10
 #define TAG_BUGREPORT 11
 #define TAG_RENAME 12
+#define TAG_MESSAGE 13
 
 extern NSDictionary *emojiMap;
 
@@ -3990,7 +3991,17 @@ NSArray *_sortedChannels;
     [alert addAction:[UIAlertAction actionWithTitle:@"Join a Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         [self _joinAChannel];
     }]];
-    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Send a Message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
+        self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Which nick do you want to message?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Message", nil];
+        self->_alertView.tag = TAG_MESSAGE;
+        self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+        [self->_alertView textFieldAtIndex:0].delegate = self;
+        [self->_alertView textFieldAtIndex:0].placeholder = @"nickname";
+        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+        [self->_alertView show];
+    }]];
+
     BOOL activeCount = NO;
     NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffersForServer:self->_selectedBuffer.cid];
     for(Buffer *b in buffers) {
@@ -4166,6 +4177,12 @@ NSArray *_sortedChannels;
             if([title isEqualToString:@"Join"]) {
                 if([alertView textFieldAtIndex:0].text.length)
                     [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",[alertView textFieldAtIndex:0].text] to:nil cid:self->_selectedBuffer.cid handler:nil];
+            }
+            break;
+        case TAG_MESSAGE:
+            if([title isEqualToString:@"Message"]) {
+                if([alertView textFieldAtIndex:0].text.length)
+                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@",[alertView textFieldAtIndex:0].text] to:nil cid:self->_selectedBuffer.cid handler:nil];
             }
             break;
         case TAG_BUGREPORT:
