@@ -1325,6 +1325,30 @@ NSArray *_sortedChannels;
                 }
             }
             break;
+        case kIRCEventTextList:
+            o = notification.object;
+            if(o.cid == self->_buffer.cid) {
+                if([self.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[TextTableViewController class]] && [((TextTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController)).type isEqualToString:@"text"]) {
+                    TextTableViewController *tv = ((TextTableViewController *)(((UINavigationController *)self.presentedViewController).topViewController));
+                    [tv appendText:@"\n"];
+                    [tv appendText:[o objectForKey:@"msg"]];
+                } else {
+                    TextTableViewController *tv = [[TextTableViewController alloc] initWithText:[o objectForKey:@"msg"]];
+                    tv.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+                    tv.type = @"text";
+                    tv.navigationItem.title = [o objectForKey:@"server"];
+                    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
+                    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    else
+                        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                    if(self.presentedViewController)
+                        [self dismissViewControllerAnimated:NO completion:nil];
+                    [self presentViewController:nc animated:YES completion:nil];
+                }
+            }
+            break;
         case kIRCEventNamesList:
             o = notification.object;
             if(o.cid == self->_buffer.cid) {

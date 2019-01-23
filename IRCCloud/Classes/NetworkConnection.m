@@ -1036,7 +1036,8 @@ volatile BOOL __socketPaused = NO;
                                            @"trace_response":@(kIRCEventTraceResponse),
                                            @"export_finished":@(kIRCEventLogExportFinished),
                                            @"avatar_change":@(kIRCEventAvatarChange),
-                                           @"chanfilter_list":@(kIRCEventChanFilterList)
+                                           @"chanfilter_list":@(kIRCEventChanFilterList),
+                                           @"text":@(kIRCEventTextList)
                                            };
         void (^broadcast)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
             if(!backlog && !self->_resuming)
