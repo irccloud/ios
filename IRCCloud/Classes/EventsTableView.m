@@ -2164,11 +2164,11 @@ extern UIImage *__socketClosedBackgroundImage;
         e.links = links;
         
         if(e.from.length && e.msg.length) {
-            e.accessibilityLabel = [NSString stringWithFormat:@"Message from %@: at %@", e.from, e.timestamp];
-            e.accessibilityValue = [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
+            e.accessibilityLabel = [NSString stringWithFormat:@"Message from %@: ", e.from];
+            e.accessibilityValue = [[[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] stringByAppendingFormat:@", at %@", e.timestamp];
         } else if([e.type isEqualToString:@"buffer_me_msg"]) {
-            e.accessibilityLabel = [NSString stringWithFormat:@"Action: at %@", e.timestamp];
-            e.accessibilityValue = [NSString stringWithFormat:@"%@ %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string]];
+            e.accessibilityLabel = @"Action: ";
+            e.accessibilityValue = [NSString stringWithFormat:@"%@ %@, at: %@", e.nick, [[ColorFormatter format:e.msg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string], e.timestamp];
         } else if(e.rowType == ROW_MESSAGE || e.rowType == ROW_ME_MESSAGE) {
             NSMutableString *s = [[[ColorFormatter format:e.formattedMsg defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string] mutableCopy];
             if(s.length > 1) {
@@ -2181,7 +2181,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 if([e.type hasSuffix:@"nickchange"])
                     [s replaceOccurrencesOfString:@"→" withString:@"changed their nickname to" options:0 range:NSMakeRange(0, s.length)];
             }
-            e.accessibilityLabel = [NSString stringWithFormat:@"Status message: at %@", e.timestamp];
+            [s appendFormat:@", at: %@", e.timestamp];
+            e.accessibilityLabel = @"Status message:";
             e.accessibilityValue = s;
         }
         
