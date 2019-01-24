@@ -1025,11 +1025,14 @@
                 }
                 break;
             }
+        case kIRCEventBufferArchived:
+            [self->_expandedCids removeObjectForKey:@(o.cid)];
+            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+            break;
         case kIRCEventMakeServer:
         case kIRCEventMakeBuffer:
         case kIRCEventDeleteBuffer:
         case kIRCEventChannelInit:
-        case kIRCEventBufferArchived:
         case kIRCEventBufferUnarchived:
         case kIRCEventRenameConversation:
         case kIRCEventConnectionDeleted:
