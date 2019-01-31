@@ -778,7 +778,7 @@ extern UIImage *__socketClosedBackgroundImage;
         
         if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
             self->_collapsedEvents.showChan = ![self->_buffer.type isEqualToString:@"channel"];
-            if(__hideJoinPartPref && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) {
+            if(__hideJoinPartPref && !event.isSelf && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) {
                 [self->_lock lock];
                 for(Event *e in _data) {
                     if(e.eid == event.eid) {
