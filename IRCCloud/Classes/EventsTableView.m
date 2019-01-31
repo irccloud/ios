@@ -2715,7 +2715,7 @@ extern UIImage *__socketClosedBackgroundImage;
     if(e.rowType == ROW_SOCKETCLOSED) {
         cell.socketClosedBar.backgroundColor = [UIColor socketClosedBackgroundColor];
         cell.socketClosedBar.hidden = NO;
-        if(!e.msg.length) {
+        if(!e.msg.length && !e.groupMsg.length) {
             cell.message.text = nil;
             cell.timestampLeft.text = nil;
             cell.timestampRight.text = nil;
