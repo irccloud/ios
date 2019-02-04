@@ -1129,7 +1129,8 @@ extern UIImage *__socketClosedBackgroundImage;
             parent.replyCount = parent.replyCount + 1;
             if(!parent.replyNicks)
                 parent.replyNicks = [[NSMutableSet alloc] init];
-            [parent.replyNicks addObject:event.from];
+            if(event.from)
+                [parent.replyNicks addObject:event.from];
         }
         event.isReply = event.reply != nil;
         if(event.isReply && __replyCollapsePref) {
