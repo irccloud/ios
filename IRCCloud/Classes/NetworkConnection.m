@@ -1455,6 +1455,25 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self heartbeat:selectedBuffer cids:@[@(cid)] bids:@[@(bid)] lastSeenEids:@[@(lastSeenEid)] handler:resultHandler];
 }
 
+-(NSDictionary *)POSTheartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids {
+    @synchronized(self->_writer) {
+        NSMutableDictionary *heartbeat = [[NSMutableDictionary alloc] init];
+        for(int i = 0; i < cids.count; i++) {
+            NSMutableDictionary *d = [heartbeat objectForKey:[NSString stringWithFormat:@"%@",[cids objectAtIndex:i]]];
+            if(!d) {
+                d = [[NSMutableDictionary alloc] init];
+                [heartbeat setObject:d forKey:[NSString stringWithFormat:@"%@",[cids objectAtIndex:i]]];
+            }
+            [d setObject:[lastSeenEids objectAtIndex:i] forKey:[NSString stringWithFormat:@"%@",[bids objectAtIndex:i]]];
+        }
+        NSString *seenEids = [self->_writer stringWithObject:heartbeat];
+        return [self _postRequest:@"/chat/heartbeat" args:@{@"selectedBuffer":[@(selectedBuffer) stringValue], @"seenEids":seenEids}];
+    }
+}
+-(NSDictionary *)POSTheartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid {
+    return [self POSTheartbeat:selectedBuffer cids:@[@(cid)] bids:@[@(bid)] lastSeenEids:@[@(lastSeenEid)]];
+}
+
 -(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     if(key.length) {
         return [self _sendRequest:@"join" args:@{@"cid":@(cid), @"channel":channel, @"key":key} handler:resultHandler];

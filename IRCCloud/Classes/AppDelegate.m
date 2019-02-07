@@ -109,10 +109,11 @@
         UNNotificationAction *joinAction = [UNNotificationAction actionWithIdentifier:@"join" title:@"Join" options:UNNotificationActionOptionForeground];
         UNNotificationAction *acceptAction = [UNNotificationAction actionWithIdentifier:@"accept" title:@"Accept" options:UNNotificationActionOptionNone];
         UNNotificationAction *retryAction = [UNNotificationAction actionWithIdentifier:@"retry" title:@"Retry" options:UNNotificationActionOptionNone];
+        UNNotificationAction *readAction = [UNNotificationAction actionWithIdentifier:@"read" title:@"Mark As Read" options:UNNotificationActionOptionNone];
 
         [center setNotificationCategories:[NSSet setWithObjects:
-                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
-                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
+                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction,readAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
+                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction,readAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
                                            [UNNotificationCategory categoryWithIdentifier:@"channel_invite" actions:@[joinAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
                                            [UNNotificationCategory categoryWithIdentifier:@"callerid" actions:@[acceptAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
                                            [UNNotificationCategory categoryWithIdentifier:@"retry" actions:@[retryAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
@@ -704,6 +705,8 @@
         result = [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"/accept %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]]
                                                   to:@""
                                                  cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+    } else if([identifier isEqualToString:@"read"]) {
+        result = [[NetworkConnection sharedInstance] POSTheartbeat:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue] bid:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] lastSeenEid:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue]];
     }
 
     if([[result objectForKey:@"success"] intValue] == 1) {
