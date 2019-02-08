@@ -712,6 +712,10 @@
     if([[result objectForKey:@"success"] intValue] == 1) {
         if([identifier isEqualToString:@"reply"]) {
             AudioServicesPlaySystemSound(1001);
+        } else if([identifier isEqualToString:@"read"]) {
+            [[BuffersDataSource sharedInstance] updateLastSeenEID:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue] buffer:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+            [[NotificationsDataSource sharedInstance] removeNotificationsForBID:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] olderThan:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue]];
+            [[NotificationsDataSource sharedInstance] updateBadgeCount];
         } else if([identifier isEqualToString:@"join"]) {
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
             if(b) {
