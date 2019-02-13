@@ -3285,7 +3285,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "$SRCROOT/build-scripts/crashlytics.sh";
+			shellScript = "$SRCROOT/build-scripts/crashlytics.sh\n";
 		};
 		2200DB4E18BCF97B00343583 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

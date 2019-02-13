@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 VERSION=`cat $PROJECT_DIR/build-scripts/VERSION`
 echo -n "#define VERSION_STRING " > $PROJECT_DIR/IRCCloud/InfoPlist.h
 echo $VERSION >> $PROJECT_DIR/IRCCloud/InfoPlist.h
