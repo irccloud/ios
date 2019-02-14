@@ -109,11 +109,11 @@
         UNNotificationAction *joinAction = [UNNotificationAction actionWithIdentifier:@"join" title:@"Join" options:UNNotificationActionOptionForeground];
         UNNotificationAction *acceptAction = [UNNotificationAction actionWithIdentifier:@"accept" title:@"Accept" options:UNNotificationActionOptionNone];
         UNNotificationAction *retryAction = [UNNotificationAction actionWithIdentifier:@"retry" title:@"Retry" options:UNNotificationActionOptionNone];
-        UNNotificationAction *readAction = [UNNotificationAction actionWithIdentifier:@"read" title:@"Mark As Read" options:UNNotificationActionOptionNone];
+        //UNNotificationAction *readAction = [UNNotificationAction actionWithIdentifier:@"read" title:@"Mark As Read" options:UNNotificationActionOptionNone];
 
         [center setNotificationCategories:[NSSet setWithObjects:
-                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction,readAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
-                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction,readAction] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
+                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
+                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
                                            [UNNotificationCategory categoryWithIdentifier:@"channel_invite" actions:@[joinAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
                                            [UNNotificationCategory categoryWithIdentifier:@"callerid" actions:@[acceptAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
                                            [UNNotificationCategory categoryWithIdentifier:@"retry" actions:@[retryAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
@@ -713,7 +713,9 @@
         if([identifier isEqualToString:@"reply"]) {
             AudioServicesPlaySystemSound(1001);
         } else if([identifier isEqualToString:@"read"]) {
-            [[BuffersDataSource sharedInstance] updateLastSeenEID:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue] buffer:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+            if(b && b.last_seen_eid < [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue])
+                b.last_seen_eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
             [[NotificationsDataSource sharedInstance] removeNotificationsForBID:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] olderThan:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue]];
             [[NotificationsDataSource sharedInstance] updateBadgeCount];
         } else if([identifier isEqualToString:@"join"]) {
