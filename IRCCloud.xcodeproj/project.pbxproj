@@ -3325,7 +3325,7 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
+			shellPath = /bin/bash;
 			shellScript = "$SRCROOT/build-scripts/git-revision.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
