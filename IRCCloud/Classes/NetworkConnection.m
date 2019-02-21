@@ -237,10 +237,10 @@ volatile BOOL __socketPaused = NO;
                                                 kTSKSwizzleNetworkDelegates: @YES,
                                                 kTSKPinnedDomains : @{
                                                         @"irccloud.com" : @{
-                                                                kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048],
+                                                                kTSKPublicKeyAlgorithms : @[kTSKAlgorithmRsa2048,kTSKAlgorithmEcDsaSecp256r1],
                                                                 kTSKPublicKeyHashes : @[
                                                                         @"5kJvNEMw0KjrCAu7eXY5HZdvyCS13BbA0VJG1RSP91w=",
-                                                                        @"A0us4Wg8ZwLOrXMWm8W4BsECg+dz98ntmZZAmm8if9c=",
+                                                                        @"Y9mvm0exBk1JoQ57f9Vm28jKo5lFm/woKcVxrYxu80o=",
                                                                         ],
                                                                 kTSKIncludeSubdomains : @YES
                                                                 }
