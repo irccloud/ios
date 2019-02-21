@@ -1704,6 +1704,9 @@ extern BOOL __compact;
                      @"secret":@"㊙️",
                      
                      @"like":@"👍",
+                     @"thumbs_up":@"👍",
+                     @"dislike":@"👎",
+                     @"thumbs_down":@"👎",
                      @"doge":@"🐕",
                      @"aubergine":@"🍆",
                      @"gust_of_wind":@"💨",
@@ -1711,7 +1714,6 @@ extern BOOL __compact;
                      @"shock":@"😱",
                      @"atom":@"⚛️",
                      @"<3":@"❤️",
-                     @"</3":@"💔",
                      @"</3":@"💔",
                      @"simple_smile":@"🙂",
                      @":)":@"🙂",
@@ -1725,7 +1727,7 @@ extern BOOL __compact;
                      @"(":@"😞",
                      @":'(":@"😢",
                      @"'(":@"😢",
-                     @":self->_(":@"😭",
+                     @":_(":@"😭",
                      @"_(":@"😭",
                      @"loudly_crying_face":@"😭",
                      @"sad_tears":@"😭",
@@ -1788,7 +1790,13 @@ extern BOOL __compact;
                      @"being_sick":@"🤮",
                      @"mind_blown":@"🤯",
                      @"lightning_bolt":@"⚡",
-                     };
+                     @"confetti":@"🎊",
+                     @"rubbish":@"🗑️",
+                     @"trash":@"🗑️",
+                     @"garbage":@"🗑️",
+                     @"bin":@"🗑️",
+                     @"wastepaper_basket":@"🗑️",
+     };
     
     static NSRegularExpression *_pattern;
     if(!_pattern) {
