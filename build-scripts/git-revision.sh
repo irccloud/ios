@@ -7,7 +7,8 @@ git rev-parse 2> /dev/null > /dev/null
 IS_GIT=$?
 
 if [ $CONFIGURATION == "AppStore" ] || [ $IS_GIT -ne 0 ]; then
-    bN=$VERSION
+    bN=$((`cat $PROJECT_DIR/build-scripts/BUILD`+1))
+    echo -n $bN > $PROJECT_DIR/build-scripts/BUILD
 else
     bN=$(/usr/bin/git rev-parse --short HEAD)
 fi
