@@ -415,17 +415,21 @@ static NSString * const ServerHasSSLKey = @"ssl";
     [self refresh];
 }
 
+-(void)updateWidth:(float)width view:(UIView *)v {
+    v.frame = CGRectMake(v.frame.origin.x, v.frame.origin.y, width, 22);
+}
+
 -(void)refresh {
-    CGRect frame = CGRectMake(0, 0, self.tableView.frame.size.width / 2, 22);
-    self->_server.frame = frame;
-    self->_port.frame = frame;
-    self->_nickname.frame = frame;
-    self->_realname.frame = frame;
-    self->_nspass.frame = frame;
-    self->_serverpass.frame = frame;
-    self->_network.frame = frame;
-    self->_commands.frame = frame;
-    self->_channels.frame = frame;
+    float width = self.tableView.frame.size.width / 2;
+    [self updateWidth:width view:_server];
+    [self updateWidth:width view:_port];
+    [self updateWidth:width view:_nickname];
+    [self updateWidth:width view:_realname];
+    [self updateWidth:width view:_nspass];
+    [self updateWidth:width view:_serverpass];
+    [self updateWidth:width view:_network];
+    [self updateWidth:width view:_commands];
+    [self updateWidth:width view:_channels];
 
     if(self->_url) {
         int port = [self->_url.port intValue];
