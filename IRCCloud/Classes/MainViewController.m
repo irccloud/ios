@@ -5318,6 +5318,8 @@ Network type: %@\n",
 }
 
 -(void)onTabPressed:(UIKeyCommand *)sender {
+    if(!self->_message.internalTextView.isFirstResponder)
+        [self->_message.internalTextView becomeFirstResponder];
     if(self->_nickCompletionView.count == 0)
         [self updateSuggestions:YES];
     if(self->_nickCompletionView.count > 0) {
