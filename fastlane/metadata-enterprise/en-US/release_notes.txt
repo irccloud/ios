@@ -1,7 +1,7 @@
-• Fixed login issues on iOS 12
-• Fixed missing navigation bar after previewing channel information via 3D touch
-• Prevented bold text from unexpectedly being sent in messages when the "bold text" system accessibility option is enabled
-• The "unread messages" bar no longer prevents channels from scrolling when receiving new messages
-• Disabled Instagram previews, since they weren't showing videos or multi-part posts properly.
-• Improved iPhone X layout
+• Added the ability to start a new private conversation with any nickname when you press and hold in the network list
+• Improved the VoiceOver description for chat messages
+• Improved the text input font
+• Fixed an issue that could cause the "add a connection" screen to appear unexpectedly when resuming the app
+• Fixed missing text on parts and quits
+• The text input field can now be focused by pressing the tab key on Bluetooth keyboards
 • Stability improvements and minor fixes
