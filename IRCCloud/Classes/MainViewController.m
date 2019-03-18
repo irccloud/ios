@@ -2018,11 +2018,6 @@ NSArray *_sortedChannels;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
-#ifdef DEBUG
-    if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"] && [[NSProcessInfo processInfo].arguments containsObject:@"-memberlist"]) {
-        [self.slidingViewController anchorTopViewTo:ECLeft];
-    }
-#endif
 }
 
 - (void)didReceiveMemoryWarning {
@@ -2920,6 +2915,11 @@ NSArray *_sortedChannels;
                                                               ];
         self->_message.internalTextView.allowsEditingTextAttributes = YES;
     }
+#ifdef DEBUG
+    if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"] && [[NSProcessInfo processInfo].arguments containsObject:@"-memberlist"]) {
+        [self performSelector:@selector(usersButtonPressed:) withObject:nil afterDelay:1];
+    }
+#endif
 }
 
 -(void)userActivityWasContinued:(NSUserActivity *)userActivity {

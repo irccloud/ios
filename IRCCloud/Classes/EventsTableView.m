@@ -1178,6 +1178,14 @@ extern UIImage *__socketClosedBackgroundImage;
                 
                 @synchronized (self->_filePropsCache) {
                     NSDictionary *properties = [self->_filePropsCache objectForKey:[entity objectForKey:@"id"]];
+#ifdef DEBUG
+                    if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+                        NSMutableDictionary *d = entity.mutableCopy;
+                        [d removeObjectForKey:@"id"];
+                        [d setObject:[NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/static/test/%@", [d objectForKey:@"filename"]]] forKey:@"thumb"];
+                        properties = d;
+                    }
+#endif
                     if(properties) {
                         Event *e1 = [self entity:event eid:entity_eid properties:properties];
                         [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
@@ -1832,6 +1840,30 @@ extern UIImage *__socketClosedBackgroundImage;
                 __replyCollapsePref = NO;
 
         }
+#ifdef DEBUG
+        if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+            __24hrPref = NO;
+            __secondsPref = NO;
+            __timeLeftPref = NO;
+            __nickColorsPref = YES;
+            __colorizeMentionsPref = YES;
+            __hideJoinPartPref = NO;
+            __expandJoinPartPref = NO;
+            __avatarsOffPref = NO;
+            __chatOneLinePref = NO;
+            __norealnamePref = NO;
+            __monospacePref = [[NSProcessInfo processInfo].arguments containsObject:@"-mono"];
+            __disableInlineFilesPref = NO;
+            __compact = NO;
+            __disableBigEmojiPref = NO;
+            __disableCodeSpanPref = NO;
+            __disableCodeBlockPref = NO;
+            __disableQuotePref = NO;
+            __inlineMediaPref = YES;
+            __avatarImages = YES;
+            __replyCollapsePref = NO;
+        }
+#endif
         __largeAvatarHeight = MIN(32, roundf(FONT_SIZE * 2) + (__compact ? 1 : 6));
         if(__monospacePref)
             self->_groupIndent = @"  ";

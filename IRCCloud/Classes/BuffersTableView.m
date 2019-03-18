@@ -254,8 +254,8 @@
                      @"unread":@(unread),
                      @"highlights":@(highlights),
                      @"archived":@0,
-                     @"status":server.status,
-                     @"fail_info":server.fail_info,
+                     @"status":server.status ? server.status : @"",
+                     @"fail_info":server.fail_info ? server.fail_info : @{},
                      @"ssl":@(server.ssl),
                      @"slack":@(server.isSlack),
                      @"count":@(buffers.count)

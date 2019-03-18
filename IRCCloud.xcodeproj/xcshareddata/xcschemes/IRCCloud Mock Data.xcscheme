@@ -88,11 +88,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-memberlist"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-theme midnight"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-mono"
