@@ -2917,7 +2917,7 @@ NSArray *_sortedChannels;
     }
 #ifdef DEBUG
     if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"] && [[NSProcessInfo processInfo].arguments containsObject:@"-memberlist"]) {
-        [self performSelector:@selector(usersButtonPressed:) withObject:nil afterDelay:1];
+        [self.slidingViewController performSelector:@selector(anchorTopViewTo:) withObject:nil afterDelay:0.5];
     }
 #endif
 }
