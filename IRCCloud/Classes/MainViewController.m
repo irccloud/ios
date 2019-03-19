@@ -1804,9 +1804,11 @@ NSArray *_sortedChannels;
 
         [self updateLayout];
         
-        [self->_buffersView scrollViewDidScroll:self->_buffersView.tableView];
         [UIView commitAnimations];
         [self expandingTextViewDidChange:self->_message];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self->_buffersView scrollViewDidScroll:self->_buffersView.tableView];
+        }];
     }
 }
 
