@@ -31,6 +31,7 @@
     UISwitch *_disableNickSuggestions;
     UISwitch *_inlineImages;
     UISwitch *_replyCollapse;
+    UISwitch *_muted;
 }
 @property (strong, nonatomic) Buffer *buffer;
 @end

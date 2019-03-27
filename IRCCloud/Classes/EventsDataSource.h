@@ -126,6 +126,7 @@
 -(Event *)copy;
 -(NSURL *)avatar:(int)size;
 -(NSString *)reply;
+-(BOOL)isMuted;
 @end
 
 @interface EventsDataSource : NSObject {

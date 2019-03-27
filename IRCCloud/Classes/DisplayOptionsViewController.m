@@ -54,6 +54,8 @@
     NSMutableDictionary *disableInlineImages = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hiddenMembers = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *replyCollapse = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *muted = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *disableMuted = [[NSMutableDictionary alloc] init];
 
     if([self->_buffer.type isEqualToString:@"channel"]) {
         NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
@@ -222,7 +224,29 @@
             [prefs setObject:replyCollapse forKey:@"channel-reply-collapse"];
         else
             [prefs removeObjectForKey:@"channel-reply-collapse"];
-} else {
+        
+        if([[prefs objectForKey:@"channel-notifications-mute"] isKindOfClass:[NSDictionary class]])
+            [muted addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-mute"]];
+        if(self->_muted.on)
+            [muted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [muted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(muted.count)
+            [prefs setObject:muted forKey:@"channel-notifications-mute"];
+        else
+            [prefs removeObjectForKey:@"channel-notifications-mute"];
+        
+        if([[prefs objectForKey:@"channel-notifications-mute-disable"] isKindOfClass:[NSDictionary class]])
+            [disableMuted addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-mute-disable"]];
+        if(self->_muted.on)
+            [disableMuted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [disableMuted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(disableMuted.count)
+            [prefs setObject:disableMuted forKey:@"channel-notifications-mute-disable"];
+        else
+            [prefs removeObjectForKey:@"channel-notifications-mute-disable"];
+    } else {
         if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableReadOnSelect"]];
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
@@ -268,6 +292,28 @@
             else
                 [prefs removeObjectForKey:@"buffer-disableTrackUnread"];
         }
+        
+        if([[prefs objectForKey:@"buffer-notifications-mute"] isKindOfClass:[NSDictionary class]])
+            [muted addEntriesFromDictionary:[prefs objectForKey:@"buffer-notifications-mute"]];
+        if(self->_muted.on)
+            [muted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [muted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(muted.count)
+            [prefs setObject:muted forKey:@"buffer-notifications-mute"];
+        else
+            [prefs removeObjectForKey:@"buffer-notifications-mute"];
+        
+        if([[prefs objectForKey:@"buffer-notifications-mute-disable"] isKindOfClass:[NSDictionary class]])
+            [disableMuted addEntriesFromDictionary:[prefs objectForKey:@"buffer-notifications-mute-disable"]];
+        if(self->_muted.on)
+            [disableMuted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        else
+            [disableMuted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+        if(disableMuted.count)
+            [prefs setObject:disableMuted forKey:@"buffer-notifications-mute-disable"];
+        else
+            [prefs removeObjectForKey:@"buffer-notifications-mute-disable"];
         
         if([self->_buffer.type isEqualToString:@"conversation"]) {
             if([[prefs objectForKey:@"buffer-hideJoinPart"] isKindOfClass:[NSDictionary class]])
@@ -463,6 +509,19 @@
             self->_replyCollapse.on = YES;
         else
             self->_replyCollapse.on = NO;
+
+        self->_muted.on = [[prefs objectForKey:@"notifications-mute"] boolValue];
+        if(self->_muted.on) {
+            NSDictionary *disableMap = [prefs objectForKey:@"channel-notifications-mute-disable"];
+            
+            if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                self->_muted.on = NO;
+        } else {
+            NSDictionary *enableMap = [prefs objectForKey:@"channel-notifications-mute"];
+            
+            if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                self->_muted.on = YES;
+        }
     } else {
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
             if([[[prefs objectForKey:@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
@@ -532,6 +591,19 @@
             self->_replyCollapse.on = YES;
         else
             self->_replyCollapse.on = NO;
+        
+        self->_muted.on = [[prefs objectForKey:@"notifications-mute"] boolValue];
+        if(self->_muted.on) {
+            NSDictionary *disableMap = [prefs objectForKey:@"buffer-notifications-mute-disable"];
+            
+            if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                self->_muted.on = NO;
+        } else {
+            NSDictionary *enableMap = [prefs objectForKey:@"buffer-notifications-mute"];
+            
+            if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                self->_muted.on = YES;
+        }
     }
     self->_collapseJoinPart.enabled = self->_showJoinPart.on;
     self->_disableNickSuggestions.on = !([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]);
@@ -554,6 +626,7 @@
     self->_replyCollapse = [[UISwitch alloc] init];
     self->_inlineImages = [[UISwitch alloc] init];
     [self->_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
+    self->_muted = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -596,11 +669,11 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     if([self->_buffer.type isEqualToString:@"channel"])
-        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?9:10;
+        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?10:11;
     else if([self->_buffer.type isEqualToString:@"console"])
-        return 3;
+        return 4;
     else
-        return 7;
+        return 8;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -639,6 +712,10 @@
             cell.accessoryView = self->_disableNickSuggestions;
             break;
         case 5:
+            cell.textLabel.text = @"Mute notifications";
+            cell.accessoryView = self->_muted;
+            break;
+        case 6:
             if([self->_buffer.type isEqualToString:@"console"]) {
                 cell.textLabel.text = @"Group repeated disconnects";
                 cell.accessoryView = self->_expandDisco;
@@ -647,19 +724,19 @@
                 cell.accessoryView = self->_showJoinPart;
             }
             break;
-        case 6:
+        case 7:
             cell.textLabel.text = @"Collapse joins/parts";
             cell.accessoryView = self->_collapseJoinPart;
             break;
-        case 7:
+        case 8:
             cell.textLabel.text = @"Collapse reply threads";
             cell.accessoryView = self->_replyCollapse;
             break;
-        case 8:
+        case 9:
             cell.textLabel.text = @"Embed uploaded files";
             cell.accessoryView = self->_disableInlineFiles;
             break;
-        case 9:
+        case 10:
             cell.textLabel.text = @"Embed external media";
             cell.accessoryView = self->_inlineImages;
             break;

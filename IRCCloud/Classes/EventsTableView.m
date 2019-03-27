@@ -52,6 +52,7 @@ BOOL __disableQuotePref = NO;
 BOOL __avatarImages = YES;
 BOOL __replyCollapsePref = NO;
 BOOL __colorizeMentionsPref = NO;
+BOOL __notificationsMuted = NO;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
 
@@ -1162,7 +1163,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     [self sendHeartbeat];
             } else if(!event.isSelf && [event isImportant:self->_buffer.type]) {
                 self->_newMsgs++;
-                if(event.isHighlight)
+                if(event.isHighlight && !__notificationsMuted)
                     self->_newHighlights++;
                 [self updateUnread];
                 [self scrollViewDidScroll:self->_tableView];
@@ -1517,7 +1518,7 @@ extern UIImage *__socketClosedBackgroundImage;
             return;
         }
         
-        if(eid > _buffer.last_seen_eid && e.isHighlight) {
+        if(eid > _buffer.last_seen_eid && e.isHighlight && !__notificationsMuted) {
             [self->_unseenHighlightPositions addObject:@(insertPos)];
             [self->_unseenHighlightPositions sortUsingSelector:@selector(compare:)];
         }
@@ -1725,6 +1726,7 @@ extern UIImage *__socketClosedBackgroundImage;
         __inlineMediaPref = NO;
         __avatarImages = YES;
         __replyCollapsePref = NO;
+        __notificationsMuted = NO;
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         if(prefs) {
             __monospacePref = [[prefs objectForKey:@"font"] isEqualToString:@"mono"];
@@ -1838,7 +1840,31 @@ extern UIImage *__socketClosedBackgroundImage;
             
             if(self->_msgid)
                 __replyCollapsePref = NO;
-
+            
+            __notificationsMuted = [[prefs objectForKey:@"notifications-mute"] boolValue];
+            if(__notificationsMuted) {
+                NSDictionary *disableMap;
+                
+                if([self->_buffer.type isEqualToString:@"channel"]) {
+                    disableMap = [prefs objectForKey:@"channel-notifications-mute-disable"];
+                } else {
+                    disableMap = [prefs objectForKey:@"buffer-notifications-mute-disable"];
+                }
+                
+                if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                    __notificationsMuted = NO;
+            } else {
+                NSDictionary *enableMap;
+                
+                if([self->_buffer.type isEqualToString:@"channel"]) {
+                    enableMap = [prefs objectForKey:@"channel-notifications-mute"];
+                } else {
+                    enableMap = [prefs objectForKey:@"buffer-notifications-mute"];
+                }
+                
+                if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                    __notificationsMuted = YES;
+            }
         }
 #ifdef DEBUG
         if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
@@ -2079,7 +2105,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     for(Event *e in self->_data) {
                         if(self->_buffer.last_seen_eid > 0 && e.eid > self->_buffer.last_seen_eid && !e.isSelf && e.rowType != ROW_LASTSEENEID && [e isImportant:self->_buffer.type]) {
                             self->_newMsgs++;
-                            if(e.isHighlight)
+                            if(e.isHighlight && !__notificationsMuted)
                                 self->_newHighlights++;
                         }
                     }

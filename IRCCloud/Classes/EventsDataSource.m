@@ -1226,6 +1226,7 @@
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = s.ignore;
+
     NSArray *copy;
     @synchronized(self->_events) {
         copy = [self eventsForBuffer:bid];
@@ -1249,6 +1250,34 @@
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = s.ignore;
+    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+    BOOL muted = [[prefs objectForKey:@"notifications-mute"] boolValue];
+    if(muted) {
+        NSDictionary *disableMap;
+        
+        if([b.type isEqualToString:@"channel"]) {
+            disableMap = [prefs objectForKey:@"channel-notifications-mute-disable"];
+        } else {
+            disableMap = [prefs objectForKey:@"buffer-notifications-mute-disable"];
+        }
+        
+        if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",b.bid]] boolValue])
+            muted = NO;
+    } else {
+        NSDictionary *enableMap;
+        
+        if([b.type isEqualToString:@"channel"]) {
+            enableMap = [prefs objectForKey:@"channel-notifications-mute"];
+        } else {
+            enableMap = [prefs objectForKey:@"buffer-notifications-mute"];
+        }
+        
+        if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",b.bid]] boolValue])
+            muted = YES;
+    }
+    if(muted)
+        return 0;
+
     NSArray *copy;
     @synchronized(self->_events) {
         copy = [self eventsForBuffer:bid];
@@ -1271,6 +1300,34 @@
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = s.ignore;
+    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+    BOOL muted = [[prefs objectForKey:@"notifications-mute"] boolValue];
+    if(muted) {
+        NSDictionary *disableMap;
+        
+        if([b.type isEqualToString:@"channel"]) {
+            disableMap = [prefs objectForKey:@"channel-notifications-mute-disable"];
+        } else {
+            disableMap = [prefs objectForKey:@"buffer-notifications-mute-disable"];
+        }
+        
+        if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",b.bid]] boolValue])
+            muted = NO;
+    } else {
+        NSDictionary *enableMap;
+        
+        if([b.type isEqualToString:@"channel"]) {
+            enableMap = [prefs objectForKey:@"channel-notifications-mute"];
+        } else {
+            enableMap = [prefs objectForKey:@"buffer-notifications-mute"];
+        }
+        
+        if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",b.bid]] boolValue])
+            muted = YES;
+    }
+    if(muted)
+        return 0;
+
     NSArray *copy;
     @synchronized(self->_events) {
         copy = [self eventsForBuffer:bid];
