@@ -149,7 +149,7 @@
 -(void)addButtonPressed {
     [self.view endEditing:YES];
     Server *s = [[ServersDataSource sharedInstance] getServer:self->_event.cid];
-    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Add", nil];
+    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[_event.type isEqualToString:@"chanfilter_list"]?@"Add this pattern":@"Add this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Add", nil];
     self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
     [self->_alertView textFieldAtIndex:0].delegate = self;
     [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
