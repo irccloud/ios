@@ -668,12 +668,17 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
+    int count;
     if([self->_buffer.type isEqualToString:@"channel"])
-        return ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?10:11;
+        count = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?10:11;
     else if([self->_buffer.type isEqualToString:@"console"])
-        return 4;
+        count = 4;
     else
-        return 8;
+        count = 8;
+#ifdef ENTERPRISE
+    count--;
+#endif
+    return count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -689,6 +694,11 @@
         row+=3;
     else if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone && row > 1)
         row++;
+    
+#ifdef ENTERPRISE
+    if(row >= 5)
+        row++;
+#endif
     
     switch(row) {
         case 0:
