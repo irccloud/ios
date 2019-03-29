@@ -1,7 +1,4 @@
-• Added the ability to start a new private conversation with any nickname when you press and hold in the network list
-• Improved the VoiceOver description for chat messages
-• Improved the text input font
-• Fixed an issue that could cause the "add a connection" screen to appear unexpectedly when resuming the app
-• Fixed missing text on parts and quits
-• The text input field can now be focused by pressing the tab key on Bluetooth keyboards
+• Add an option to mute notifications for individual channels and conversations
+• Fixed image thumbnails not responding to taps if the filename contained an invalid URL character
+• Fixed bottom unread bar appearing in the wrong position after the keyboard appears/disappears
 • Stability improvements and minor fixes
