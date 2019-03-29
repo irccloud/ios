@@ -1,4 +1,3 @@
-• Add an option to mute notifications for individual channels and conversations
 • Fixed image thumbnails not responding to taps if the filename contained an invalid URL character
 • Fixed bottom unread bar appearing in the wrong position after the keyboard appears/disappears
 • Stability improvements and minor fixes
