@@ -106,27 +106,29 @@ platform :ios do
   desc "Take screenshots"
   lane :screenshots do
     snapshot(
-        clear_previous_screenshots: true,
-        skip_open_summary: true,
-        devices: []
+      clear_previous_screenshots: true,
+      skip_open_summary: true,
+      clean: true,
+      derived_data_path: "./build",
+      devices: ["iPhone X", "iPhone 6 Plus"],
+      ios_version: "12.2",
+      launch_arguments: ["-bigphone YES"]
     )
-    for device in [
-      "iPhone 6",
-      "iPhone 5",
-      "iPhone 4s",
-      "iPad Retina",
-      "iPad Pro",
-      "iPhone X"
-    ] do
-      snapshot(
-        clear_previous_screenshots: false,
-        skip_open_summary: true,
-        devices: [device],
-        launch_arguments: ["-FASTLANE_SNAPSHOT_DEVICE \"#{device}\""],
-        ios_version: "11.0.1"
-      )
-      frameit()
-    end
+    snapshot(
+      clear_previous_screenshots: false,
+      skip_open_summary: true,
+      derived_data_path: "./build",
+      test_without_building: true,
+      devices: [
+      "iPhone SE",
+      "iPhone 5s",
+      "iPhone 6s",
+      "iPad Pro (9.7-inch)",
+      "iPad Pro (12.9-inch) (2nd generation)"
+      ],
+      ios_version: "12.2"
+    )
+    frameit()
     notification(
       subtitle: "screenshots",
       message: "iOS screenshots complete",

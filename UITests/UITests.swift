@@ -32,12 +32,8 @@ override func setUp() {
     
     let isPhone = UIDevice().userInterfaceIdiom == .phone
     let isPad = UIDevice().userInterfaceIdiom == .pad
-    let args = app.launchArguments
     var isBigPhone = false
-    if (
-        args[args.endIndex-2] == "-FASTLANE_SNAPSHOT_DEVICE" &&
-        args[args.endIndex-1] == "\"iPhone 6 Plus\""
-    ) {
+    if UserDefaults.standard.bool(forKey: "bigphone") {
         isBigPhone = true
     }
     let isDawn = theme == "dawn"
