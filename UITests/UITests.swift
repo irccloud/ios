@@ -33,7 +33,7 @@ override func setUp() {
     let isPhone = UIDevice().userInterfaceIdiom == .phone
     let isPad = UIDevice().userInterfaceIdiom == .pad
     var isBigPhone = false
-    if UserDefaults.standard.bool(forKey: "bigphone") {
+    if (app.launchArguments.contains("-bigphone")) {
         isBigPhone = true
     }
     let isDawn = theme == "dawn"

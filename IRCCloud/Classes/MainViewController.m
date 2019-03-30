@@ -1886,6 +1886,9 @@ NSArray *_sortedChannels;
     [self.slidingViewController resetTopView];
     
     NSString *session = [NetworkConnection sharedInstance].session;
+#ifdef DEBUG
+    if(![[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+#endif
     if(session.length) {
         if(@available(iOS 10, *)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
@@ -1956,6 +1959,9 @@ NSArray *_sortedChannels;
         [[UIApplication sharedApplication] registerForRemoteNotifications];
 #endif
     }
+#ifdef DEBUG
+    }
+#endif
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
         [[NetworkConnection sharedInstance] connect:NO];
     }

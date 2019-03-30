@@ -547,6 +547,9 @@ volatile BOOL __socketPaused = NO;
 
                        self->_prefs = nil;
 #ifndef EXTENSION
+#ifdef DEBUG
+                       if(![[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+#endif
                        NSDictionary *p = [self prefs];
                        if([p objectForKey:@"theme"] && ![[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]) {
                            dispatch_sync(dispatch_get_main_queue(), ^{
@@ -586,6 +589,9 @@ volatile BOOL __socketPaused = NO;
                            [[NSUserDefaults standardUserDefaults] setObject:[object objectForKey:@"id"] forKey:@"last_uid"];
                        }
                        [[NSUserDefaults standardUserDefaults] synchronize];
+#ifdef DEBUG
+                       }
+#endif
                        [self->_events reformat];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
