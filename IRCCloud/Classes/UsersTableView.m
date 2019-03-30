@@ -239,24 +239,28 @@
                     s.from = user.nick;
             }
             NSString *mode = user.mode.lowercaseString;
-            if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"])) {
-                [opers addObject:user];
-                if([user.mode rangeOfString:s?s.MODE_OPER:@"Y"].location != NSNotFound)
-                    opersGroupMode = s.MODE_OPER;
+            if(mode) {
+                if([mode rangeOfString:s?s.MODE_OPER.lowercaseString:@"y"].location != NSNotFound && ([PREFIX objectForKey:s?s.MODE_OPER:@"Y"] || [PREFIX objectForKey:s?s.MODE_OPER.lowercaseString:@"y"])) {
+                    [opers addObject:user];
+                    if([user.mode rangeOfString:s?s.MODE_OPER:@"Y"].location != NSNotFound)
+                        opersGroupMode = s.MODE_OPER;
+                    else
+                        opersGroupMode = s.MODE_OPER.lowercaseString;
+                } else if([mode rangeOfString:s?s.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
+                    [owners addObject:user];
+                else if([mode rangeOfString:s?s.MODE_ADMIN.lowercaseString:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
+                    [admins addObject:user];
+                else if([mode rangeOfString:s?s.MODE_OP.lowercaseString:@"o"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OP:@"o"])
+                    [ops addObject:user];
+                else if([mode rangeOfString:s?s.MODE_HALFOP.lowercaseString:@"h"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_HALFOP:@"h"])
+                    [halfops addObject:user];
+                else if([mode rangeOfString:s?s.MODE_VOICED.lowercaseString:@"v"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_VOICED:@"v"])
+                    [voiced addObject:user];
                 else
-                    opersGroupMode = s.MODE_OPER.lowercaseString;
-            } else if([mode rangeOfString:s?s.MODE_OWNER.lowercaseString:@"q"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OWNER:@"q"])
-                [owners addObject:user];
-            else if([mode rangeOfString:s?s.MODE_ADMIN.lowercaseString:@"a"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_ADMIN:@"a"])
-                [admins addObject:user];
-            else if([mode rangeOfString:s?s.MODE_OP.lowercaseString:@"o"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_OP:@"o"])
-                [ops addObject:user];
-            else if([mode rangeOfString:s?s.MODE_HALFOP.lowercaseString:@"h"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_HALFOP:@"h"])
-                [halfops addObject:user];
-            else if([mode rangeOfString:s?s.MODE_VOICED.lowercaseString:@"v"].location != NSNotFound && [PREFIX objectForKey:s?s.MODE_VOICED:@"v"])
-                [voiced addObject:user];
-            else
+                    [members addObject:user];
+            } else {
                 [members addObject:user];
+            }
         }
     }
     
