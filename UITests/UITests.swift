@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 
-let SCREENSHOT_DELAY:UInt32 = 2;
+let SCREENSHOT_DELAY:UInt32 = 5;
 
 class UITests: XCTestCase {
 
