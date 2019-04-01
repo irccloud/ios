@@ -53,7 +53,7 @@
     NSString *actualHost = @"";
     if([object objectForKey:@"actual_host"])
         actualHost = [NSString stringWithFormat:@"/%@", [object objectForKey:@"actual_host"]];
-    [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@%c (%@%@%c)", [object objectForKey:@"user_realname"], CLEAR, [object objectForKey:@"user_mask"], actualHost, CLEAR] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
+    [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@%c (%@%c%@%c)", [object objectForKey:@"user_realname"], CLEAR, [object objectForKey:@"user_mask"], CLEAR, actualHost, CLEAR] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
     
     if([[object objectForKey:@"user_logged_in_as"] length]) {
         [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@" is authed as %@", [object objectForKey:@"user_logged_in_as"]] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
