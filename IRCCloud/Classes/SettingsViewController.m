@@ -528,6 +528,7 @@
         [prefs setObject:[NSNumber numberWithBool:!_disableCodeSpan.isOn] forKey:@"chat-nocodespan"];
         [prefs setObject:[NSNumber numberWithBool:!_disableCodeBlock.isOn] forKey:@"chat-nocodeblock"];
         [prefs setObject:[NSNumber numberWithBool:!_disableQuote.isOn] forKey:@"chat-noquote"];
+        [prefs setObject:[NSNumber numberWithBool:!_muteNotifications.isOn] forKey:@"notifications-mute"];
 
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -827,7 +828,8 @@
     [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":self->_notifyAll}];
     [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":self->_showUnread}];
     [notifications addObject:@{@"title":@"Mark As Read Automatically", @"accessory":self->_markAsRead}];
-    
+    [notifications addObject:@{@"title":@"Mute Notifications", @"accessory":self->_muteNotifications}];
+
     self->_data = @[
               @{@"title":@"Account", @"items":account},
               @{@"title":@"Highlight Words", @"items":@[
@@ -966,6 +968,7 @@
     self->_backgroundUploads = [[UISwitch alloc] init];
     self->_colorizeMentions = [[UISwitch alloc] init];
     self->_hiddenMembers = [[UISwitch alloc] init];
+    self->_muteNotifications = [[UISwitch alloc] init];
 
     self->_highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     self->_highlights.text = @"";
@@ -1197,6 +1200,12 @@
         self->_disableQuote.on = ![[prefs objectForKey:@"chat-noquote"] boolValue];
     } else {
         self->_disableQuote.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"notifications-mute"] isKindOfClass:[NSNumber class]]) {
+        self->_muteNotifications.on = [[prefs objectForKey:@"notifications-mute"] boolValue];
+    } else {
+        self->_muteNotifications.on = NO;
     }
     
     self->_screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];
