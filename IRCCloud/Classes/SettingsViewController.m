@@ -528,7 +528,7 @@
         [prefs setObject:[NSNumber numberWithBool:!_disableCodeSpan.isOn] forKey:@"chat-nocodespan"];
         [prefs setObject:[NSNumber numberWithBool:!_disableCodeBlock.isOn] forKey:@"chat-nocodeblock"];
         [prefs setObject:[NSNumber numberWithBool:!_disableQuote.isOn] forKey:@"chat-noquote"];
-        [prefs setObject:[NSNumber numberWithBool:!_muteNotifications.isOn] forKey:@"notifications-mute"];
+        [prefs setObject:[NSNumber numberWithBool:_muteNotifications.isOn] forKey:@"notifications-mute"];
 
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];

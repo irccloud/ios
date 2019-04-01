@@ -225,27 +225,29 @@
         else
             [prefs removeObjectForKey:@"channel-reply-collapse"];
         
-        if([[prefs objectForKey:@"channel-notifications-mute"] isKindOfClass:[NSDictionary class]])
-            [muted addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-mute"]];
-        if(self->_muted.on)
-            [muted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [muted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(muted.count)
-            [prefs setObject:muted forKey:@"channel-notifications-mute"];
-        else
-            [prefs removeObjectForKey:@"channel-notifications-mute"];
-        
-        if([[prefs objectForKey:@"channel-notifications-mute-disable"] isKindOfClass:[NSDictionary class]])
-            [disableMuted addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-mute-disable"]];
-        if(self->_muted.on)
-            [disableMuted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [disableMuted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(disableMuted.count)
-            [prefs setObject:disableMuted forKey:@"channel-notifications-mute-disable"];
-        else
-            [prefs removeObjectForKey:@"channel-notifications-mute-disable"];
+        if([[prefs objectForKey:@"notifications-mute"] intValue] == 1) {
+            if([[prefs objectForKey:@"channel-notifications-mute-disable"] isKindOfClass:[NSDictionary class]])
+                [disableMuted addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-mute-disable"]];
+            if(self->_muted.on)
+                [disableMuted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableMuted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableMuted.count)
+                [prefs setObject:disableMuted forKey:@"channel-notifications-mute-disable"];
+            else
+                [prefs removeObjectForKey:@"channel-notifications-mute-disable"];
+        } else {
+            if([[prefs objectForKey:@"channel-notifications-mute"] isKindOfClass:[NSDictionary class]])
+                [muted addEntriesFromDictionary:[prefs objectForKey:@"channel-notifications-mute"]];
+            if(self->_muted.on)
+                [muted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [muted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(muted.count)
+                [prefs setObject:muted forKey:@"channel-notifications-mute"];
+            else
+                [prefs removeObjectForKey:@"channel-notifications-mute"];
+        }
     } else {
         if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableReadOnSelect"]];
@@ -293,27 +295,29 @@
                 [prefs removeObjectForKey:@"buffer-disableTrackUnread"];
         }
         
-        if([[prefs objectForKey:@"buffer-notifications-mute"] isKindOfClass:[NSDictionary class]])
-            [muted addEntriesFromDictionary:[prefs objectForKey:@"buffer-notifications-mute"]];
-        if(self->_muted.on)
-            [muted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [muted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(muted.count)
-            [prefs setObject:muted forKey:@"buffer-notifications-mute"];
-        else
-            [prefs removeObjectForKey:@"buffer-notifications-mute"];
-        
-        if([[prefs objectForKey:@"buffer-notifications-mute-disable"] isKindOfClass:[NSDictionary class]])
-            [disableMuted addEntriesFromDictionary:[prefs objectForKey:@"buffer-notifications-mute-disable"]];
-        if(self->_muted.on)
-            [disableMuted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [disableMuted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(disableMuted.count)
-            [prefs setObject:disableMuted forKey:@"buffer-notifications-mute-disable"];
-        else
-            [prefs removeObjectForKey:@"buffer-notifications-mute-disable"];
+        if([[prefs objectForKey:@"notifications-mute"] intValue] == 1) {
+            if([[prefs objectForKey:@"buffer-notifications-mute-disable"] isKindOfClass:[NSDictionary class]])
+                [disableMuted addEntriesFromDictionary:[prefs objectForKey:@"buffer-notifications-mute-disable"]];
+            if(self->_muted.on)
+                [disableMuted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableMuted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableMuted.count)
+                [prefs setObject:disableMuted forKey:@"buffer-notifications-mute-disable"];
+            else
+                [prefs removeObjectForKey:@"buffer-notifications-mute-disable"];
+        } else {
+            if([[prefs objectForKey:@"buffer-notifications-mute"] isKindOfClass:[NSDictionary class]])
+                [muted addEntriesFromDictionary:[prefs objectForKey:@"buffer-notifications-mute"]];
+            if(self->_muted.on)
+                [muted setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [muted removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(muted.count)
+                [prefs setObject:muted forKey:@"buffer-notifications-mute"];
+            else
+                [prefs removeObjectForKey:@"buffer-notifications-mute"];
+        }
         
         if([self->_buffer.type isEqualToString:@"conversation"]) {
             if([[prefs objectForKey:@"buffer-hideJoinPart"] isKindOfClass:[NSDictionary class]])

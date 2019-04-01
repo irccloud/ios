@@ -1486,7 +1486,32 @@ NSArray *_sortedChannels;
                     Ignore *ignore = s.ignore;
                     if(e.ignoreMask && [ignore match:e.ignoreMask])
                         break;
-                    if(e.isHighlight || [b.type isEqualToString:@"conversation"]) {
+                    NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+                    BOOL muted = [[prefs objectForKey:@"notifications-mute"] boolValue];
+                    if(muted) {
+                        NSDictionary *disableMap;
+                        
+                        if([b.type isEqualToString:@"channel"]) {
+                            disableMap = [prefs objectForKey:@"channel-notifications-mute-disable"];
+                        } else {
+                            disableMap = [prefs objectForKey:@"buffer-notifications-mute-disable"];
+                        }
+                        
+                        if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",b.bid]] boolValue])
+                            muted = NO;
+                    } else {
+                        NSDictionary *enableMap;
+                        
+                        if([b.type isEqualToString:@"channel"]) {
+                            enableMap = [prefs objectForKey:@"channel-notifications-mute"];
+                        } else {
+                            enableMap = [prefs objectForKey:@"buffer-notifications-mute"];
+                        }
+                        
+                        if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",b.bid]] boolValue])
+                            muted = YES;
+                    }
+                    if((e.isHighlight || [b.type isEqualToString:@"conversation"]) && !muted) {
                         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10 && [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
                             self->_lastNotificationTime = [NSDate date].timeIntervalSince1970;
                             AudioServicesPlaySystemSound(alertSound);
