@@ -1760,7 +1760,7 @@ NSArray *_sortedChannels;
 
 -(void)backlogCompleted:(NSNotification *)notification {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if([notification.object bid] == 0) {
+        if([notification.object bid] == -1) {
           [self _themeChanged];
             if(!((AppDelegate *)([UIApplication sharedApplication].delegate)).movedToBackground && [NetworkConnection sharedInstance].ready && ![NetworkConnection sharedInstance].notifier && [ServersDataSource sharedInstance].count < 1) {
                 [(AppDelegate *)([UIApplication sharedApplication].delegate) showConnectionView];
