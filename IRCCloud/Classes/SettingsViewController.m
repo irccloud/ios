@@ -828,8 +828,10 @@
     [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":self->_notifyAll}];
     [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":self->_showUnread}];
     [notifications addObject:@{@"title":@"Mark As Read Automatically", @"accessory":self->_markAsRead}];
+#ifndef ENTERPRISE
     [notifications addObject:@{@"title":@"Mute Notifications", @"accessory":self->_muteNotifications}];
-
+#endif
+    
     self->_data = @[
               @{@"title":@"Account", @"items":account},
               @{@"title":@"Highlight Words", @"items":@[
