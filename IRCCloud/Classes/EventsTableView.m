@@ -1977,9 +1977,13 @@ extern UIImage *__socketClosedBackgroundImage;
             self->_tableView.tableHeaderView = nil;
         }
         
+        int row = 0;
         for(Event *e in _data) {
-            if(e.formattedMsg && !e.formatted)
+            if(e.formattedMsg && !e.formatted) {
                 [self _format:e];
+                [self tableView:self.tableView heightForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+            }
+            row++;
         }
         
         if(backlogEid > 0) {
