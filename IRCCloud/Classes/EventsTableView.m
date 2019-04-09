@@ -835,8 +835,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 c.showChan = self->_collapsedEvents.showChan;
                 c.server = self->_server;
                 [c addEvent:event];
-                msg = [c collapse];
                 if(!nextIsGrouped) {
+                    msg = [c collapse];
                     NSString *groupMsg = [self->_collapsedEvents collapse];
                     if(groupMsg == nil && [type isEqualToString:@"nickchange"])
                         groupMsg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [self->_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO displayName:nil], BOLD];
@@ -867,6 +867,8 @@ extern UIImage *__socketClosedBackgroundImage;
                         }
                         event.rowType = ROW_SOCKETCLOSED;
                     }
+                } else {
+                    msg = @"";
                 }
                 event.timestamp = nil;
             } else {
@@ -1150,7 +1152,7 @@ extern UIImage *__socketClosedBackgroundImage;
             return;
         }
         [self _addItem:event eid:eid];
-        if(!event.formatted && event.formattedMsg.length > 0) {
+        if(!event.formatted && event.formattedMsg.length > 0 && !backlog) {
             [self _format:event];
         }
         
@@ -1950,15 +1952,22 @@ extern UIImage *__socketClosedBackgroundImage;
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:self->_buffer.bid];
         if(events.count) {
             NSMutableDictionary *uuids = [[NSMutableDictionary alloc] init];
-            for(Event *e in events) {
+            for(int i = 0; i < events.count; i++) {
+                Event *e = [events objectAtIndex:i];
+                Event *next = (i < events.count - 1)?[events objectAtIndex:i+1]:nil;
                 if(e.childEventCount) {
                     e.formatted = nil;
                     e.formattedMsg = nil;
                 }
                 e.replyCount = 0;
-                [self insertEvent:e backlog:true nextIsGrouped:false];
-                if(e.formattedMsg && !e.formatted)
-                    [self _format:e];
+                NSString *type = next.type;
+                if(next && _currentCollapsedEid != -1 && ![_expandedSectionEids objectForKey:@(_currentCollapsedEid)] &&
+                   ([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"])) {
+                    NSDate *date = [NSDate dateWithTimeIntervalSince1970:next.time];
+                    [self insertEvent:e backlog:YES nextIsGrouped:[_lastCollpasedDay isEqualToString:[self->_formatter stringFromDate:date]]];
+                } else {
+                    [self insertEvent:e backlog:YES nextIsGrouped:NO];
+                }
                 [uuids setObject:@(YES) forKey:e.UUID];
             }
             for(NSString *uuid in _rowCache.allKeys) {
@@ -1966,6 +1975,11 @@ extern UIImage *__socketClosedBackgroundImage;
                     [self->_rowCache removeObjectForKey:uuid];
             }
             self->_tableView.tableHeaderView = nil;
+        }
+        
+        for(Event *e in _data) {
+            if(e.formattedMsg && !e.formatted)
+                [self _format:e];
         }
         
         if(backlogEid > 0) {

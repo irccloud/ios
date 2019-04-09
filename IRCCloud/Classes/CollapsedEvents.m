@@ -717,7 +717,8 @@
         self->_server?_server.MODE_VOICED.lowercaseString:@"v":@"25B100"
     };
     
-    NSMutableString *output = [[NSMutableString alloc] initWithFormat:@"%c", BOLD];
+    NSMutableString *output = [[NSMutableString alloc] initWithCapacity:100];
+    [output appendFormat:@"%c", BOLD];
     BOOL showSymbol = [[NetworkConnection sharedInstance] prefs] && [[[[NetworkConnection sharedInstance] prefs] objectForKey:@"mode-showsymbol"] boolValue];
     
     if(colorize && nick) {
