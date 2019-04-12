@@ -1932,10 +1932,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             self->_streamId = nil;
             self->_highestEID = 0;
         }
-        if([self reachable] == kIRCCloudReachable && _reconnectTimestamp != 0) {
+        if(_reconnectTimestamp != 0) {
             [self fail];
         } else {
-            CLS_LOG(@"IRCCloud is unreacahable or reconnecting is disabled");
+            CLS_LOG(@"reconnecting is disabled");
             [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
             [self serialize];
         }
