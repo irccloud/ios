@@ -770,7 +770,7 @@
         self->_conn.reconnectTimestamp = -1;
     self->_conn.failCount = 0;
     self->_conn.reachabilityValid = NO;
-    if(self->_conn.session.length && _conn.state != kIRCCloudStateConnected && _conn.state != kIRCCloudStateConnecting)
+    if(self->_conn.session.length && self->_conn.state != kIRCCloudStateConnected && self->_conn.state != kIRCCloudStateConnecting)
         [self->_conn connect:NO];
     else if(self->_conn.notifier)
         self->_conn.notifier = NO;
@@ -784,6 +784,8 @@
             [ColorFormatter loadFonts];
         }
         self->_conn.reconnectTimestamp = -1;
+        if(_conn.state == kIRCCloudStateConnected)
+            [self->_conn scheduleIdleTimer];
         if([self.window.rootViewController isKindOfClass:[ECSlidingViewController class]]) {
             ECSlidingViewController *evc = (ECSlidingViewController *)self.window.rootViewController;
             [evc.topViewController viewWillAppear:NO];

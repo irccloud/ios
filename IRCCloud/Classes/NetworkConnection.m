@@ -2156,6 +2156,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
         CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
         [self connect:self->_notifier];
+    } else {
+        CLS_LOG(@"Websocket idle time exceeded in the background...");
     }
 #endif
 }
