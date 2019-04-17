@@ -234,6 +234,41 @@
     [self _upload:file];
 }
 
+-(void)uploadPNG:(UIImage *)img {
+    CLS_LOG(@"Uploading UIImage");
+    self->_mimeType = @"image/png";
+    if(self->_originalFilename) {
+        if([self->_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location != NSNotFound) {
+            self->_originalFilename = [NSString stringWithFormat:@"%@.PNG", [self->_originalFilename substringToIndex:[self->_originalFilename rangeOfString:@"." options:NSBackwardsSearch].location]];
+        } else {
+            self->_originalFilename = [self->_originalFilename stringByAppendingString:@".PNG"];
+        }
+    } else {
+        self->_originalFilename = [NSString stringWithFormat:@"%li.PNG", time(NULL)];
+    }
+    [self performSelectorInBackground:@selector(_uploadPNG:) withObject:img];
+}
+
+-(void)_uploadPNG:(UIImage *)img {
+    NSUserDefaults *d;
+#ifdef ENTERPRISE
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+#else
+    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+#endif
+    int size = [[d objectForKey:@"photoSize"] intValue];
+    if(size == -1 && (img.size.width * img.size.height > 15000000)) {
+        CLS_LOG(@"Image dimensions too large, scaling down to 3872x3872");
+        size = 3872;
+    }
+    if(size > 0) {
+        img = [FileUploader image:img scaledCopyOfSize:CGSizeMake(size,size)];
+    }
+    
+    NSData *file = UIImagePNGRepresentation(img);
+    [self _upload:file];
+}
+
 //http://stackoverflow.com/a/19697172
 + (UIImage *)image:(UIImage *)image scaledCopyOfSize:(CGSize)newSize {
     if(image.size.width <= newSize.width && image.size.height <= newSize.height)

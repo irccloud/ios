@@ -57,6 +57,7 @@
 -(void)uploadFile:(NSURL *)file;
 -(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data;
 -(void)uploadImage:(UIImage *)image;
+-(void)uploadPNG:(UIImage *)image;
 -(void)setFilename:(NSString *)filename message:(NSString *)message;
 -(void)cancel;
 +(UIImage *)image:(UIImage *)image scaledCopyOfSize:(CGSize)newSize;

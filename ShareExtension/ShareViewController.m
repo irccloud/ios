@@ -59,7 +59,10 @@
                     if([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
                         NSLog(@"Uploading image to IRCCloud");
                         self->_item = item;
-                        [self->_fileUploader uploadImage:item];
+                        if([i hasItemConformingToTypeIdentifier:@"public.png"])
+                            [self->_fileUploader uploadPNG:item];
+                        else
+                            [self->_fileUploader uploadImage:item];
                         if(!self->_filename)
                             self->_filename = self->_fileUploader.originalFilename;
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
