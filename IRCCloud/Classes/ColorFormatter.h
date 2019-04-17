@@ -54,6 +54,7 @@
 
 @interface NSString (ColorFormatter)
 -(NSString *)stripIRCFormatting;
+-(NSString *)stripIRCColors;
 -(NSString *)insertCodeSpans;
 -(BOOL)isBlockQuote;
 -(BOOL)isEmojiOnly;

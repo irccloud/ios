@@ -2720,6 +2720,68 @@ extern BOOL __compact;
 -(NSString *)stripIRCFormatting {
     return [[ColorFormatter format:self defaultColor:[UIColor blackColor] mono:NO linkify:NO server:nil links:nil] string];
 }
+-(NSString *)stripIRCColors {
+    NSMutableString *text = self.mutableCopy;
+    BOOL rgb;
+    int fg_color, bg_color;
+    
+    for(int i = 0; i < text.length; i++) {
+        switch([text characterAtIndex:i]) {
+            case COLOR_MIRC:
+            case COLOR_RGB:
+                rgb = [text characterAtIndex:i] == COLOR_RGB;
+                int count = 0;
+                [text deleteCharactersInRange:NSMakeRange(i,1)];
+                if(i < text.length) {
+                    while(i+count < text.length && (([text characterAtIndex:i+count] >= '0' && [text characterAtIndex:i+count] <= '9') ||
+                                                    (rgb && (([text characterAtIndex:i+count] >= 'a' && [text characterAtIndex:i+count] <= 'f')||
+                                                             ([text characterAtIndex:i+count] >= 'A' && [text characterAtIndex:i+count] <= 'F'))))) {
+                        if((++count == 2 && !rgb) || (count == 6))
+                            break;
+                    }
+                    if(count > 0) {
+                        if(count < 3 && !rgb) {
+                            fg_color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
+                            if(fg_color > IRC_COLOR_COUNT) {
+                                count--;
+                                fg_color /= 10;
+                            } else if(fg_color == 99) {
+                                fg_color = -1;
+                            }
+                        } else {
+                            fg_color = -1;
+                        }
+                        [text deleteCharactersInRange:NSMakeRange(i,count)];
+                    }
+                }
+                if(i < text.length && [text characterAtIndex:i] == ',') {
+                    [text deleteCharactersInRange:NSMakeRange(i,1)];
+                    count = 0;
+                    while(i+count < text.length && (([text characterAtIndex:i+count] >= '0' && [text characterAtIndex:i+count] <= '9') ||
+                                                    (rgb && (([text characterAtIndex:i+count] >= 'a' && [text characterAtIndex:i+count] <= 'f')||
+                                                             ([text characterAtIndex:i+count] >= 'A' && [text characterAtIndex:i+count] <= 'F'))))) {
+                        if(++count == 2 && !rgb)
+                            break;
+                    }
+                    if(count > 0) {
+                        if(count < 3 && !rgb) {
+                            int color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
+                            if(color > IRC_COLOR_COUNT) {
+                                count--;
+                                color /= 10;
+                            }
+                        }
+                        [text deleteCharactersInRange:NSMakeRange(i,count)];
+                    } else {
+                        [text insertString:@"," atIndex:i];
+                    }
+                }
+                i--;
+                continue;
+        }
+    }
+    return text;
+}
 -(BOOL)isEmojiOnly {
     if(!self || !self.length)
         return NO;

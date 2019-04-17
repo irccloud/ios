@@ -512,7 +512,7 @@
                     else
                         output = [NSString stringWithFormat:@"%c%@→\U0000FE0E\u00a0%@%c%@ joined", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
                     if(!_server.isSlack)
-                        output = [output stringByAppendingFormat:@" (%@)", self->_noColor ? e.hostname.stripIRCFormatting : e.hostname];
+                        output = [output stringByAppendingFormat:@" (%@)", self->_noColor ? e.hostname.stripIRCColors : e.hostname];
                     break;
                 case kCollapsedEventPart:
                     if(self->_showChan)
@@ -520,16 +520,16 @@
                     else
                         output = [NSString stringWithFormat:@"%c%@←\U0000FE0E\u00a0%@%c%@ left", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
                     if(!_server.isSlack)
-                        output = [output stringByAppendingFormat:@" (%@)", self->_noColor ? e.hostname.stripIRCFormatting : e.hostname];
+                        output = [output stringByAppendingFormat:@" (%@)", self->_noColor ? e.hostname.stripIRCColors : e.hostname];
                     if(e.msg.length > 0)
-                        output = [output stringByAppendingFormat:@": %@", self->_noColor ? e.msg.stripIRCFormatting : e.msg];
+                        output = [output stringByAppendingFormat:@": %@", self->_noColor ? e.msg.stripIRCColors : e.msg];
                     break;
                 case kCollapsedEventQuit:
                     output = [NSString stringWithFormat:@"%c%@⇐\U0000FE0E\u00a0%@%c%@ quit", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR, [self was:e]];
                     if(!_server.isSlack && e.hostname.length > 0)
-                        output = [output stringByAppendingFormat:@" (%@)", self->_noColor ? e.hostname.stripIRCFormatting : e.hostname];
+                        output = [output stringByAppendingFormat:@" (%@)", self->_noColor ? e.hostname.stripIRCColors : e.hostname];
                     if(e.msg.length > 0)
-                        output = [output stringByAppendingFormat:@": %@", self->_noColor ? e.msg.stripIRCFormatting : e.msg];
+                        output = [output stringByAppendingFormat:@": %@", self->_noColor ? e.msg.stripIRCColors : e.msg];
                     break;
                 case kCollapsedEventNickChange:
                     output = [NSString stringWithFormat:@"%@ %c%@→\U0000FE0E\u00a0%@%c", e.oldNick, COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, [self formatNick:e.nick mode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil], CLEAR];

@@ -777,7 +777,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if([type hasPrefix:@"you_"]) {
             type = [type substringFromIndex:4];
         }
-        NSString *eventmsg = __noColor ? event.msg.stripIRCFormatting : event.msg;
+        NSString *eventmsg = __noColor ? event.msg.stripIRCColors : event.msg;
 
         if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
             self->_collapsedEvents.showChan = ![self->_buffer.type isEqualToString:@"channel"];
@@ -2223,7 +2223,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if(e.from.length)
             e.formattedNick = [ColorFormatter format:[self->_collapsedEvents formatNick:e.fromNick mode:e.fromMode colorize:(__nickColorsPref && !e.isSelf) defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43" displayName:e.from] defaultColor:e.color mono:__monospacePref linkify:NO server:nil links:nil];
         if([e.realname isKindOfClass:[NSString class]] && e.realname.length) {
-            e.formattedRealname = [ColorFormatter format:[e.realname stripIRCFormatting] defaultColor:[UIColor collapsedRowTextColor] mono:__monospacePref linkify:YES server:self->_server links:&links];
+            e.formattedRealname = [ColorFormatter format:e.realname.stripIRCColors defaultColor:[UIColor collapsedRowTextColor] mono:__monospacePref linkify:YES server:self->_server links:&links];
             e.realnameLinks = links;
             links = nil;
         }
