@@ -682,6 +682,7 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+    CLS_LOG(@"App entering background");
 #ifndef DEBUG
 #ifdef ENTERPRISE
     NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];

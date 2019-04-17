@@ -80,8 +80,9 @@ typedef enum {
     Server *_server;
     NSArray *_mode_modes;
     BOOL _showChan;
+    BOOL _noColor;
 }
-@property BOOL showChan;
+@property BOOL showChan, noColor;
 -(void)clear;
 -(BOOL)addEvent:(Event *)event;
 -(NSString *)collapse;

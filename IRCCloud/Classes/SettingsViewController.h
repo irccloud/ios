@@ -73,6 +73,7 @@
     UISwitch *_colorizeMentions;
     UISwitch *_hiddenMembers;
     UISwitch *_muteNotifications;
+    UISwitch *_noColor;
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;

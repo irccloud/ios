@@ -32,6 +32,7 @@
     UISwitch *_inlineImages;
     UISwitch *_replyCollapse;
     UISwitch *_muted;
+    UISwitch *_nocolors;
 }
 @property (strong, nonatomic) Buffer *buffer;
 @end

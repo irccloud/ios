@@ -56,6 +56,8 @@
     NSMutableDictionary *replyCollapse = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *muted = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *disableMuted = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *colors = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *nocolors = [[NSMutableDictionary alloc] init];
 
     if([self->_buffer.type isEqualToString:@"channel"]) {
         NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
@@ -247,6 +249,30 @@
                 [prefs setObject:muted forKey:@"channel-notifications-mute"];
             else
                 [prefs removeObjectForKey:@"channel-notifications-mute"];
+        }
+        
+        if([[prefs objectForKey:@"chat-nocolor"] intValue] == 1) {
+            if([[prefs objectForKey:@"channel-chat-color"] isKindOfClass:[NSDictionary class]])
+                [colors addEntriesFromDictionary:[prefs objectForKey:@"channel-chat-color"]];
+            if(self->_nocolors.on)
+                [colors setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [colors removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(colors.count)
+                [prefs setObject:colors forKey:@"channel-chat-color"];
+            else
+                [prefs removeObjectForKey:@"channel-chat-color"];
+        } else {
+            if([[prefs objectForKey:@"channel-chat-nocolor"] isKindOfClass:[NSDictionary class]])
+                [nocolors addEntriesFromDictionary:[prefs objectForKey:@"channel-chat-nocolor"]];
+            if(self->_nocolors.on)
+                [nocolors removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [nocolors setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(nocolors.count)
+                [prefs setObject:nocolors forKey:@"channel-chat-nocolor"];
+            else
+                [prefs removeObjectForKey:@"channel-chat-nocolor"];
         }
     } else {
         if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
@@ -526,6 +552,19 @@
             if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
                 self->_muted.on = YES;
         }
+
+        self->_nocolors.on = ![[prefs objectForKey:@"chat-nocolor"] boolValue];
+        if(self->_nocolors.on) {
+            NSDictionary *disableMap = [prefs objectForKey:@"channel-chat-nocolor"];
+            
+            if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                self->_nocolors.on = NO;
+        } else {
+            NSDictionary *enableMap = [prefs objectForKey:@"channel-chat-color"];
+            
+            if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                self->_nocolors.on = YES;
+        }
     } else {
         if([[prefs objectForKey:@"enableReadOnSelect"] intValue] == 1) {
             if([[[prefs objectForKey:@"buffer-disableReadOnSelect"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
@@ -608,6 +647,19 @@
             if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
                 self->_muted.on = YES;
         }
+        
+        self->_nocolors.on = ![[prefs objectForKey:@"buffer-nocolor"] boolValue];
+        if(self->_nocolors.on) {
+            NSDictionary *disableMap = [prefs objectForKey:@"buffer-chat-nocolor"];
+            
+            if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                self->_nocolors.on = NO;
+        } else {
+            NSDictionary *enableMap = [prefs objectForKey:@"buffer-chat-color"];
+            
+            if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                self->_nocolors.on = YES;
+        }
     }
     self->_collapseJoinPart.enabled = self->_showJoinPart.on;
     self->_disableNickSuggestions.on = !([[[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]);
@@ -631,6 +683,7 @@
     self->_inlineImages = [[UISwitch alloc] init];
     [self->_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     self->_muted = [[UISwitch alloc] init];
+    self->_nocolors = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -674,11 +727,11 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     int count;
     if([self->_buffer.type isEqualToString:@"channel"])
-        count = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?10:11;
+        count = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?11:12;
     else if([self->_buffer.type isEqualToString:@"console"])
-        count = 4;
+        count = 5;
     else
-        count = 8;
+        count = 9;
 #ifdef ENTERPRISE
     count--;
 #endif
@@ -726,10 +779,14 @@
             cell.accessoryView = self->_disableNickSuggestions;
             break;
         case 5:
+            cell.textLabel.text = @"Format colors";
+            cell.accessoryView = self->_nocolors;
+            break;
+        case 6:
             cell.textLabel.text = @"Mute notifications";
             cell.accessoryView = self->_muted;
             break;
-        case 6:
+        case 7:
             if([self->_buffer.type isEqualToString:@"console"]) {
                 cell.textLabel.text = @"Group repeated disconnects";
                 cell.accessoryView = self->_expandDisco;
@@ -738,19 +795,19 @@
                 cell.accessoryView = self->_showJoinPart;
             }
             break;
-        case 7:
+        case 8:
             cell.textLabel.text = @"Collapse joins/parts";
             cell.accessoryView = self->_collapseJoinPart;
             break;
-        case 8:
+        case 9:
             cell.textLabel.text = @"Collapse reply threads";
             cell.accessoryView = self->_replyCollapse;
             break;
-        case 9:
+        case 10:
             cell.textLabel.text = @"Embed uploaded files";
             cell.accessoryView = self->_disableInlineFiles;
             break;
-        case 10:
+        case 11:
             cell.textLabel.text = @"Embed external media";
             cell.accessoryView = self->_inlineImages;
             break;
