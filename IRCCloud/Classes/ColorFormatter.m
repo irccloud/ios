@@ -2723,7 +2723,7 @@ extern BOOL __compact;
 -(NSString *)stripIRCColors {
     NSMutableString *text = self.mutableCopy;
     BOOL rgb;
-    int fg_color, bg_color;
+    int fg_color;
     
     for(int i = 0; i < text.length; i++) {
         switch([text characterAtIndex:i]) {
