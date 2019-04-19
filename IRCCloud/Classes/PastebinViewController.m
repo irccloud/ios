@@ -38,8 +38,6 @@
             
             if([[pair objectAtIndex:0] isEqualToString:@"id"])
                 self->_pasteID = [pair objectAtIndex:1];
-            else if([[pair objectAtIndex:0] isEqualToString:@"own_paste"])
-                self->_ownPaste = [[pair objectAtIndex:1] isEqualToString:@"1"];
         }
         
         self->_url = [self->_url substringToIndex:[self->_url rangeOfString:@"?"].location];
@@ -105,24 +103,6 @@
     self->_lineNumbers.on = YES;
     [self->_lineNumbers addTarget:self action:@selector(_toggleLineNumbers) forControlEvents:UIControlEventValueChanged];
     
-    if(self->_ownPaste) {
-        [self->_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
-                             [[UIBarButtonItem alloc] initWithCustomView:self->_lineNumbers],
-                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(_editPaste)],
-                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(_removePaste)],
-                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
-                             ]];
-    } else {
-        [self->_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
-                             [[UIBarButtonItem alloc] initWithCustomView:self->_lineNumbers],
-                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
-                             [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
-                             ]];
-        
-    }
     self->_lineNumbers.enabled = NO;
     [self->_lineNumbers sizeToFit];
     
@@ -159,10 +139,44 @@
     if([self->_url hasPrefix:[NSString stringWithFormat:@"https://%@/pastebin/", IRCCLOUD_HOST]] || [self->_url hasPrefix:@"https://www.irccloud.com/pastebin/"]) {
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         [[NSURLCache sharedURLCache] removeAllCachedResponses];
-        NSURL *url = [NSURL URLWithString:[self->_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]]];
-        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+        NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":self->_pasteID, @"type":@"json"} error:nil];
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         [request setHTTPShouldHandleCookies:NO];
-        [self->_webView loadRequest:request];
+        [request setValue:[NSString stringWithFormat:@"session=%@",NetworkConnection.sharedInstance.session] forHTTPHeaderField:@"Cookie"];
+
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            if (error) {
+                NSLog(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
+            } else {
+                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                self->_ownPaste = [[dict objectForKey:@"own_paste"] intValue] == 1;
+            }
+            NSURL *url = [NSURL URLWithString:[self->_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@&own_paste=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"], self->_ownPaste ? @"1" : @"0"]];
+            NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+            [request setHTTPShouldHandleCookies:NO];
+            [self->_webView loadRequest:request];
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                if(self->_ownPaste) {
+                    [self->_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+                                               [[UIBarButtonItem alloc] initWithCustomView:self->_lineNumbers],
+                                               [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                                               [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCompose target:self action:@selector(_editPaste)],
+                                               [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                                               [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemTrash target:self action:@selector(_removePaste)],
+                                               [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                                               [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
+                                               ]];
+                } else {
+                    [self->_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
+                                               [[UIBarButtonItem alloc] initWithCustomView:self->_lineNumbers],
+                                               [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil],
+                                               [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(shareButtonPressed:)]
+                                               ]];
+                    
+                }
+            }];
+        }];
     }
 }
 

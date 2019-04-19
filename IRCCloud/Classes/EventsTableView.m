@@ -2258,7 +2258,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
                         NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":[paste objectForKey:@"id"]} error:nil];
                         if(url && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
-                            r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@&own_paste=%@", url, [paste objectForKey:@"id"], [paste objectForKey:@"own_paste"]]]];
+                            r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-%@?id=%@", url, [paste objectForKey:@"id"]]]];
                             [mutableLinks setObject:r atIndexedSubscript:i];
                         }
                     }

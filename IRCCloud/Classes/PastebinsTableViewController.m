@@ -450,7 +450,7 @@
     self->_selectedPaste = [self->_pastes objectAtIndex:indexPath.row];
     if(self->_selectedPaste) {
         NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:self->_selectedPaste error:nil];
-        url = [url stringByAppendingFormat:@"?id=%@&own_paste=%@", [self->_selectedPaste objectForKey:@"id"], [self->_selectedPaste objectForKey:@"own_paste"]];
+        url = [url stringByAppendingFormat:@"?id=%@", [self->_selectedPaste objectForKey:@"id"]];
         PastebinViewController *c = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"PastebinViewController"];
         [c setUrl:[NSURL URLWithString:url]];
         [self.navigationController pushViewController:c animated:YES];
