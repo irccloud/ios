@@ -21,6 +21,7 @@ typedef void (^mediaURLResult)(BOOL, NSString *);
 @interface URLHandler : NSObject <UIAlertViewDelegate> {
     NSMutableDictionary *_tasks;
     NSMutableDictionary *_mediaURLs;
+    NSMutableDictionary *_fileIDs;
 }
 
 @property (nonatomic, copy) NSURL *appCallbackURL;
@@ -32,4 +33,6 @@ typedef void (^mediaURLResult)(BOOL, NSString *);
 + (int)URLtoBID:(NSURL *)url;
 - (NSDictionary *)MediaURLs:(NSURL *)url;
 - (void)fetchMediaURLs:(NSURL *)url result:(mediaURLResult)callback;
+- (void)addFileID:(NSString *)fileID URL:(NSURL *)url;
+- (void)clearFileIDs;
 @end

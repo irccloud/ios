@@ -125,6 +125,7 @@
     if(self) {
         self->_tasks = [[NSMutableDictionary alloc] init];
         self->_mediaURLs = [[NSMutableDictionary alloc] init];
+        self->_fileIDs = [[NSMutableDictionary alloc] init];
     }
     
     return self;
@@ -455,15 +456,54 @@
     return IS_YOUTUBE(url);
 }
 
+- (void)addFileID:(NSString *)fileID URL:(NSURL *)url {
+    [_fileIDs setObject:fileID forKey:url];
+}
+
+- (void)clearFileIDs {
+    [_fileIDs removeAllObjects];
+}
+
 - (void)launchURL:(NSURL *)url
 {
 #ifndef EXTENSION
-    if([[UIApplication sharedApplication] respondsToSelector:NSSelectorFromString(@"_deactivateReachability")])
-        objc_msgSend([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
     NSLog(@"Launch: %@", url);
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
     MainViewController *mainViewController = [appDelegate mainViewController];
+
+    if([_fileIDs objectForKey:url]) {
+        NSURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, [_fileIDs objectForKey:url]]]];
+        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            NSURL *result = url;
+            if (error) {
+                NSLog(@"Error fetching file metadata. Error %li : %@", (long)error.code, error.userInfo);
+            } else {
+                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                
+                NSString *mime_type = [dict objectForKey:@"mime_type"];
+                NSString *extension = [dict objectForKey:@"extension"];
+                NSString *name = [dict objectForKey:@"name"];
+
+                if(extension.length == 0)
+                    extension = [NSString stringWithFormat:@".%@", [mime_type substringFromIndex:[mime_type rangeOfString:@"/"].location + 1]];
+
+                if(![name.lowercaseString hasSuffix:extension.lowercaseString])
+                    name = [[dict objectForKey:@"id"] stringByAppendingString:extension];
+                
+                result = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[dict objectForKey:@"id"], @"name":name} error:nil]];
+            }
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [appDelegate launchURL:result];
+            }];
+        }];
+
+        return;
+    }
+    
+    if([[UIApplication sharedApplication] respondsToSelector:NSSelectorFromString(@"_deactivateReachability")])
+        objc_msgSend([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
     
     if(mainViewController.slidingViewController.presentedViewController) {
         [mainViewController.slidingViewController dismissViewControllerAnimated:NO completion:^{

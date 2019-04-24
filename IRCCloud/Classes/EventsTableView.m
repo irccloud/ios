@@ -151,6 +151,11 @@ extern UIImage *__socketClosedBackgroundImage;
         self->_buffer = nil;
         self->_eidToOpen = -1;
         self->_urlHandler = [[URLHandler alloc] init];
+#ifdef ENTERPRISE
+        self->_urlHandler.appCallbackURL = [NSURL URLWithString:@"irccloud-enterprise://"];
+#else
+        self->_urlHandler.appCallbackURL = [NSURL URLWithString:@"irccloud://"];
+#endif
     }
     return self;
 }
@@ -249,7 +254,7 @@ extern UIImage *__socketClosedBackgroundImage;
     NSURL *url;
     if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
         if([e.entities objectForKey:@"id"]) {
-        NSString *extension = [e.entities objectForKey:@"extension"];
+            NSString *extension = [e.entities objectForKey:@"extension"];
             if(!extension.length)
                 extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
             url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"mime_type"] substringToIndex:5], extension]];
@@ -1633,6 +1638,7 @@ extern UIImage *__socketClosedBackgroundImage;
         self->_server = nil;
     self->_earliestEid = 0;
     [self->_expandedSectionEids removeAllObjects];
+    [self->_urlHandler clearFileIDs];
     [self refresh];
 }
 
@@ -2247,12 +2253,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 if(r.resultType == NSTextCheckingTypeLink) {
                     for(NSDictionary *file in [e.entities objectForKey:@"files"]) {
                         NSString *url = [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[file objectForKey:@"id"]} error:nil];
-                        if(url && ([[file objectForKey:@"mime_type"] hasPrefix:@"image/"] || [[file objectForKey:@"mime_type"] hasPrefix:@"video/"]) && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
-                            NSString *extension = [file objectForKey:@"extension"];
-                            if(!extension.length)
-                                extension = [@"." stringByAppendingString:[[file objectForKey:@"mime_type"] substringFromIndex:[[file objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
-                            r = [NSTextCheckingResult linkCheckingResultWithRange:r.range URL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", url, [[file objectForKey:@"mime_type"] substringToIndex:5], extension]]];
-                            [mutableLinks setObject:r atIndexedSubscript:i];
+                        if(url && ([r.URL.absoluteString isEqualToString:url] || [r.URL.absoluteString hasPrefix:[url stringByAppendingString:@"/"]])) {
+                            [_urlHandler addFileID:[file objectForKey:@"id"] URL:r.URL];
                         }
                     }
                     for(NSDictionary *paste in [e.entities objectForKey:@"pastes"]) {
@@ -2883,7 +2885,7 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)LinkLabel:(LinkLabel *)label didSelectLinkWithTextCheckingResult:(NSTextCheckingResult *)result {
-    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:result.URL];
+    [_urlHandler launchURL:result.URL];
 }
 
 -(IBAction)dismissButtonPressed:(id)sender {
