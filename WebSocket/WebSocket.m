@@ -488,19 +488,23 @@ WebSocketWaitingState waitingState;
 }
 
 - (void)handleClose:(WebSocketFragment *)aFragment {
+    NSData *payloadData = aFragment.payloadData;
+    if(&deflate && aFragment.isRSV1)
+        payloadData = [self inflate:aFragment.payloadData];
+    
     //close status & message
     BOOL invalidUTF8 = NO;
-    if (aFragment.payloadData) {
-        NSUInteger length = aFragment.payloadData.length;
+    if (payloadData) {
+        NSUInteger length = payloadData.length;
         if (length >= 2) {
             //get status code
             unsigned char buffer[2];
-            [aFragment.payloadData getBytes:&buffer length:2];
+            [payloadData getBytes:&buffer length:2];
             closeStatusCode = buffer[0] << 8 | buffer[1];
 
             //get message
             if (length > 2) {
-                closeMessage = [[NSString alloc] initWithData:[aFragment.payloadData subdataWithRange:NSMakeRange(2, length - 2)] encoding:NSUTF8StringEncoding];
+                closeMessage = [[NSString alloc] initWithData:[payloadData subdataWithRange:NSMakeRange(2, length - 2)] encoding:NSUTF8StringEncoding];
                 if (!closeMessage) {
                     invalidUTF8 = YES;
                 }
