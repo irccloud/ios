@@ -666,6 +666,7 @@ NSArray *_sortedChannels;
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
     if([viewControllerToCommit isKindOfClass:[UINavigationController class]]) {
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:((UINavigationController *)viewControllerToCommit).topViewController];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
             nc.modalPresentationStyle = UIModalPresentationFormSheet;
         else
