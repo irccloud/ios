@@ -3049,7 +3049,7 @@
 			};
 			buildConfigurationList = 228A056716D3DABA0029769C /* Build configuration list for PBXProject "IRCCloud" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
