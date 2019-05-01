@@ -779,7 +779,7 @@
             cell.accessoryView = self->_disableNickSuggestions;
             break;
         case 5:
-            cell.textLabel.text = @"Format colors";
+            cell.textLabel.text = @"Format colours";
             cell.accessoryView = self->_nocolors;
             break;
         case 6:
