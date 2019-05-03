@@ -1,4 +1,4 @@
-• Add an option to mute notifications for individual channels and conversations
-• Fixed image thumbnails not responding to taps if the filename contained an invalid URL character
-• Fixed bottom unread bar appearing in the wrong position after the keyboard appears/disappears
+• Add an option to disable displaying IRC colors per-channel and globally
+• PNGs uploaded through the Share Extension no longer get converted to JPEGs
+• Improved performance while scrolling and displaying channels with a large number of collapsed joins/parts/quits
 • Stability improvements and minor fixes
