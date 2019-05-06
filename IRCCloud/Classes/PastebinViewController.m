@@ -31,17 +31,14 @@
     self->_url = url.absoluteString;
     
     if([self->_url rangeOfString:@"?"].location != NSNotFound) {
-        NSString *query = [self->_url substringFromIndex:[self->_url rangeOfString:@"?"].location + 1];
-        NSArray *args = [query componentsSeparatedByString:@"&"];
-        for(NSString *arg in args) {
-            NSArray *pair = [arg componentsSeparatedByString:@"="];
-            
-            if([[pair objectAtIndex:0] isEqualToString:@"id"])
-                self->_pasteID = [pair objectAtIndex:1];
-        }
-        
         self->_url = [self->_url substringToIndex:[self->_url rangeOfString:@"?"].location];
     }
+
+    NSRegularExpression *regexExpression = [NSRegularExpression regularExpressionWithPattern:@"/pastebin/([^/.&?]+)" options:0 error:NULL];
+    NSRange range = NSMakeRange(0, self->_url.length);
+    NSTextCheckingResult *r = [regexExpression firstMatchInString:self->_url options:0 range:range];
+    if(r.numberOfRanges == 2)
+        self->_pasteID = [self->_url substringWithRange:[r rangeAtIndex:1]];
 }
 
 
