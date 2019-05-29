@@ -142,14 +142,14 @@
 -(void)_loadMore {
     @synchronized (self) {
         NSDictionary *d = [[NetworkConnection sharedInstance] getFiles:++_pages];
-        if([[d objectForKey:@"success"] boolValue]) {
-            CLS_LOG(@"Loaded file list for page %i", _pages);
-            if(self->_files)
-                self->_files = [self->_files arrayByAddingObjectsFromArray:[d objectForKey:@"files"]];
-            else
-                self->_files = [d objectForKey:@"files"];
-            self->_canLoadMore = self->_files.count < [[d objectForKey:@"total"] intValue];
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if([[d objectForKey:@"success"] boolValue]) {
+                CLS_LOG(@"Loaded file list for page %i", self->_pages);
+                if(self->_files)
+                    self->_files = [self->_files arrayByAddingObjectsFromArray:[d objectForKey:@"files"]];
+                else
+                    self->_files = [d objectForKey:@"files"];
+                self->_canLoadMore = self->_files.count < [[d objectForKey:@"total"] intValue];
                 self.tableView.tableFooterView = self->_canLoadMore?self->_footerView:nil;
                 if(!self->_files.count) {
                     CLS_LOG(@"File list is empty");
@@ -161,11 +161,9 @@
                     [fail sizeToFit];
                     self.tableView.tableFooterView = fail;
                 }
-            }];
-        } else {
-            CLS_LOG(@"Failed to load file list for page %i: %@", _pages, d);
-            self->_canLoadMore = NO;
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            } else {
+                CLS_LOG(@"Failed to load file list for page %i: %@", self->_pages, d);
+                self->_canLoadMore = NO;
                 UILabel *fail = [[UILabel alloc] init];
                 fail.text = @"\nUnable to load files.\nPlease try again later.\n";
                 fail.numberOfLines = 4;
@@ -173,10 +171,10 @@
                 fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
                 [fail sizeToFit];
                 self.tableView.tableFooterView = fail;
-            }];
-            return;
-        }
-        [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+                return;
+            }
+            [self.tableView reloadData];
+        }];
     }
 }
 
