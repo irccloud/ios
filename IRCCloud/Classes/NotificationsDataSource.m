@@ -109,6 +109,7 @@
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
         content.userInfo = @{@"d": @[@(cid), @(bid), @(eid)], @"aps":@{@"alert":@{@"loc-args":@[b.name, b.name, b.name, b.name]}}};
         content.categoryIdentifier = category;
+        content.threadIdentifier = [NSString stringWithFormat:@"%i-%i", cid, bid];
         
         UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:[@(eid) stringValue] content:content trigger:nil];
         [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
