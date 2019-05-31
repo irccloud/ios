@@ -112,13 +112,31 @@
         UNNotificationAction *retryAction = [UNNotificationAction actionWithIdentifier:@"retry" title:@"Retry" options:UNNotificationActionOptionNone];
         //UNNotificationAction *readAction = [UNNotificationAction actionWithIdentifier:@"read" title:@"Mark As Read" options:UNNotificationActionOptionNone];
 
-        [center setNotificationCategories:[NSSet setWithObjects:
-                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
-                                           [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
-                                           [UNNotificationCategory categoryWithIdentifier:@"channel_invite" actions:@[joinAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
-                                           [UNNotificationCategory categoryWithIdentifier:@"callerid" actions:@[acceptAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
-                                           [UNNotificationCategory categoryWithIdentifier:@"retry" actions:@[retryAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
-                                           nil]];
+        if (@available(iOS 12, *)) {
+            [center setNotificationCategories:[NSSet setWithObjects:
+                                               [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] hiddenPreviewsBodyPlaceholder:@"New message" categorySummaryFormat:@"%u more messages" options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] hiddenPreviewsBodyPlaceholder:@"New message" categorySummaryFormat:@"%u more messages" options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"channel_invite" actions:@[joinAction] intentIdentifiers:@[] hiddenPreviewsBodyPlaceholder:@"Channel invite" categorySummaryFormat:@"%u more channel invites" options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"callerid" actions:@[acceptAction] intentIdentifiers:@[] hiddenPreviewsBodyPlaceholder:@"Caller ID" categorySummaryFormat:@"%u more notifications" options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"retry" actions:@[retryAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
+                                               nil]];
+        } else if (@available(iOS 11, *)) {
+            [center setNotificationCategories:[NSSet setWithObjects:
+                                               [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] hiddenPreviewsBodyPlaceholder:@"New message" options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] hiddenPreviewsBodyPlaceholder:@"New message" options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"channel_invite" actions:@[joinAction] intentIdentifiers:@[] hiddenPreviewsBodyPlaceholder:@"Channel invite" options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"callerid" actions:@[acceptAction] intentIdentifiers:@[] hiddenPreviewsBodyPlaceholder:@"Caller ID" options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"retry" actions:@[retryAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
+                                               nil]];
+        } else {
+            [center setNotificationCategories:[NSSet setWithObjects:
+                                               [UNNotificationCategory categoryWithIdentifier:@"buffer_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"buffer_me_msg" actions:@[replyAction/*,readAction*/] intentIdentifiers:@[INSendMessageIntentIdentifier] options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"channel_invite" actions:@[joinAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"callerid" actions:@[acceptAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
+                                               [UNNotificationCategory categoryWithIdentifier:@"retry" actions:@[retryAction] intentIdentifiers:@[] options:UNNotificationCategoryOptionNone],
+                                               nil]];
+        }
     }
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     NSURL *caches = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:[[NSBundle mainBundle] bundleIdentifier]];
