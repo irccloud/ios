@@ -81,4 +81,5 @@
     NSArray *_data;
     FontSizeCell *_fontSizeCell;
 }
+@property BOOL scrollToNotifications;
 @end

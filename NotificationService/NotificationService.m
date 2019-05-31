@@ -45,6 +45,8 @@
     if([d boolForKey:@"defaultSound"])
         self.bestAttemptContent.sound = [UNNotificationSound defaultSound];
     
+    self.bestAttemptContent.threadIdentifier = [NSString stringWithFormat:@"%@-%@", [[request.content.userInfo objectForKey:@"d"] objectAtIndex:0], [[request.content.userInfo objectForKey:@"d"] objectAtIndex:1]];
+    
     if(![d boolForKey:@"disableNotificationPreviews"]) {
         [NetworkConnection sync];
         

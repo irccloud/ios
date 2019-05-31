@@ -897,6 +897,10 @@
               ];
     
     [self.tableView reloadData];
+    if(self.scrollToNotifications) {
+        self.scrollToNotifications = NO;
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:device.count - 1 inSection:4] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+    }
 }
 
 - (void)viewDidLoad {
