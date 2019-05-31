@@ -1916,7 +1916,14 @@ NSArray *_sortedChannels;
     if(![[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 #endif
     if(session.length) {
-        if(@available(iOS 10, *)) {
+        if(@available(iOS 12, *)) {
+            UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+            
+            [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge + UNAuthorizationOptionProvidesAppNotificationSettings) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                if(!granted)
+                    CLS_LOG(@"Notification permission denied: %@", error);
+            }];
+        } else if(@available(iOS 10, *)) {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             
             [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {

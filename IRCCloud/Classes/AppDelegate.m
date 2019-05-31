@@ -30,6 +30,7 @@
 #import "ImageCache.h"
 #import "LogExportsTableViewController.h"
 #import "ImageViewController.h"
+#import "SettingsViewController.h"
 #if DEBUG
 #import "FLEXManager.h"
 #endif
@@ -540,6 +541,23 @@
     } else {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:nil completionHandler:completionHandler];
     }
+}
+
+-(void)userNotificationCenter:(UNUserNotificationCenter *)center openSettingsForNotification:(UNNotification *)notification {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+        [self.mainViewController applyTheme];
+        [self showMainView:NO];
+        SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        svc.scrollToNotifications = YES;
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self.mainViewController presentViewController:nc animated:NO completion:nil];
+    }];
 }
 
 -(void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
