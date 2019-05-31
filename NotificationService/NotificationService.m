@@ -47,6 +47,12 @@
     
     if([self.bestAttemptContent.categoryIdentifier isEqualToString:@"buffer_me_msg"])
         self.bestAttemptContent.categoryIdentifier = @"buffer_msg";
+    
+    if (@available(iOS 12, *)) {
+        self.bestAttemptContent.threadIdentifier = [NSString stringWithFormat:@"%@-%@", [[request.content.userInfo objectForKey:@"d"] objectAtIndex:0], [[request.content.userInfo objectForKey:@"d"] objectAtIndex:1]];
+
+        self.bestAttemptContent.summaryArgumentCount = 1;
+    }
 
     if(![d boolForKey:@"disableNotificationPreviews"]) {
         [NetworkConnection sync];
