@@ -25,6 +25,12 @@ if [ -n "$CRASHLYTICS_TOKEN" ]; then
     echo $CRASHLYTICS_TOKEN >> $PROJECT_DIR/IRCCloud/InfoPlist.h
 fi
 
+if [ $SDK_VERSION == "13.0" ]; then
+     echo "#define MANIFEST_KEY Application Scene Manifest" >> $PROJECT_DIR/IRCCloud/InfoPlist.h
+     echo "#define SCENE_CONFIGURATIONS_KEY UISceneConfigurations" >> $PROJECT_DIR/IRCCloud/InfoPlist.h
+     echo "#define MULTI_WINDOW_KEY UIApplicationSupportsMultipleScenes" >> $PROJECT_DIR/IRCCloud/InfoPlist.h
+fi
+
 touch $PROJECT_DIR/IRCCloud/IRCCloud-Info.plist
 touch $PROJECT_DIR/IRCCloud/IRCCloud-Enterprise-Info.plist
 touch $PROJECT_DIR/ShareExtension/Info.plist
