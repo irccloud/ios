@@ -13,7 +13,11 @@ else
     bN=$(/usr/bin/git rev-parse --short HEAD)
 fi
 echo -n "#define GIT_VERSION " >> $PROJECT_DIR/IRCCloud/InfoPlist.h
-echo $bN >> $PROJECT_DIR/IRCCloud/InfoPlist.h
+if [ $PLATFORM_NAME == "iphonesimulator" ]; then
+    echo `cat $PROJECT_DIR/build-scripts/BUILD` >> $PROJECT_DIR/IRCCloud/InfoPlist.h
+else
+    echo $bN >> $PROJECT_DIR/IRCCloud/InfoPlist.h
+fi
 
 CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/"//g'`
 if [ -n "$CRASHLYTICS_TOKEN" ]; then
