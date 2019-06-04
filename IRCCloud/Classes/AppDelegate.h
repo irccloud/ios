@@ -36,6 +36,7 @@
     __block UIBackgroundTaskIdentifier _background_task;
     void (^_fetchHandler)(UIBackgroundFetchResult);
     void (^_refreshHandler)(UIBackgroundFetchResult);
+    NSMutableArray *_activeScenes;
 }
 
 @property (strong, nonatomic) UIWindow *window;
@@ -51,4 +52,20 @@
 -(void)showMainView:(BOOL)animated;
 -(void)showConnectionView;
 -(void)launchURL:(NSURL *)url;
+-(void)addScene:(id)scene;
+-(void)removeScene:(id)scene;
+-(void)setActiveScene:(UIWindow *)window;
 @end
+
+#ifdef __IPHONE_13_0
+@interface SceneDelegate : NSObject <UIWindowSceneDelegate> {
+    AppDelegate *_appDelegate;
+}
+@property (strong, nonatomic) UIWindow *window;
+
+@property (strong, nonatomic) LoginSplashViewController *loginSplashViewController;
+@property (strong, nonatomic) MainViewController *mainViewController;
+@property (strong, nonatomic) ECSlidingViewController *slideViewController;
+@property (strong, nonatomic) SplashViewController *splashViewController;
+@end
+#endif

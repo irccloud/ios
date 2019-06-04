@@ -1705,7 +1705,8 @@ extern UIImage *__socketClosedBackgroundImage;
             [[EventsDataSource sharedInstance] clearHeightCache];
         [EventsDataSource sharedInstance].widthForHeightCache = self.tableView.bounds.size.width;
         [self->_reloadTimer invalidate];
-        
+        self->_urlHandler.window = self->_tableView.window;
+
         if(@available(iOS 11, *)) {
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
                 self->_stickyAvatarXOffsetConstraint.constant = 20;
@@ -3184,12 +3185,12 @@ extern UIImage *__socketClosedBackgroundImage;
                     if(!extension.length)
                         extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
                     if([[[e.entities objectForKey:@"name"] lowercaseString] hasSuffix:extension.lowercaseString]) {
-                        [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"name"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
+                        [_urlHandler launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"name"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
                     } else {
-                        [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [e.entities objectForKey:@"id"], extension]]];
+                        [_urlHandler launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [e.entities objectForKey:@"id"], extension]]];
                     }
                 } else {
-                    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[e.entities objectForKey:@"url"]];
+                    [_urlHandler launchURL:[e.entities objectForKey:@"url"]];
                 }
             } else
                 [self->_delegate rowSelected:e];
