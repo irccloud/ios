@@ -545,6 +545,7 @@
     self->_hideTimer = nil;
     [self->_connection cancel];
     self->_connection = nil;
+    [((AppDelegate *)[UIApplication sharedApplication].delegate) setActiveScene:self.view.window];
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
 }
 

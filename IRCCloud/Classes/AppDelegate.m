@@ -227,8 +227,8 @@
         self.splashViewController.view.accessibilityIgnoresInvertColors = YES;
     self.window.rootViewController = self.splashViewController;
     self.loginSplashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"LoginSplashViewController"];
-    if(@available(iOS 11, *))
-        self.loginSplashViewController.view.accessibilityIgnoresInvertColors = YES;
+    //if(@available(iOS 11, *))
+    //    self.loginSplashViewController.view.accessibilityIgnoresInvertColors = YES;
     self.mainViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"MainViewController"];
     self.slideViewController = [[ECSlidingViewController alloc] init];
     self.slideViewController.view.backgroundColor = [UIColor blackColor];
@@ -979,4 +979,107 @@
     }
     [session finishTasksAndInvalidate];
 }
+
+-(void)addScene:(id)scene {
+    if(!_activeScenes)
+        _activeScenes = [[NSMutableArray alloc] init];
+    
+    [_activeScenes addObject:scene];
+    
+    if(_activeScenes.count == 1)
+        [self applicationDidBecomeActive:[UIApplication sharedApplication]];
+    
+    [self setActiveScene:[scene window]];
+}
+
+-(void)removeScene:(id)scene {
+    [_activeScenes removeObject:scene];
+
+    if(_activeScenes.count == 0)
+        [self applicationDidEnterBackground:[UIApplication sharedApplication]];
+}
+
+-(void)setActiveScene:(UIWindow *)window {
+#ifdef __IPHONE_13_0
+    for(SceneDelegate *d in _activeScenes) {
+        if(d.window == window) {
+            self.window = d.window;
+            self.splashViewController = d.splashViewController;
+            self.loginSplashViewController = d.loginSplashViewController;
+            self.mainViewController = d.mainViewController;
+            self.slideViewController = d.slideViewController;
+            break;
+        }
+    }
+#endif
+}
+
 @end
+
+#ifdef __IPHONE_13_0
+@implementation SceneDelegate
+-(void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)) {
+    _appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    
+    self.splashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"SplashViewController"];
+    if(@available(iOS 11, *))
+        self.splashViewController.view.accessibilityIgnoresInvertColors = YES;
+    self.window.rootViewController = self.splashViewController;
+    self.loginSplashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"LoginSplashViewController"];
+    //if(@available(iOS 11, *))
+    //    self.loginSplashViewController.view.accessibilityIgnoresInvertColors = YES;
+    self.mainViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"MainViewController"];
+    self.slideViewController = [[ECSlidingViewController alloc] init];
+    self.slideViewController.view.backgroundColor = [UIColor blackColor];
+    self.slideViewController.topViewController = [[UINavigationController alloc] initWithNavigationBarClass:[NavBarHax class] toolbarClass:nil];
+    [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
+    self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
+    if(@available(iOS 11, *))
+        self.slideViewController.view.accessibilityIgnoresInvertColors = YES;
+}
+
+-(void)sceneDidEnterBackground:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
+    [_appDelegate removeScene:self];
+}
+
+-(void)sceneDidBecomeActive:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
+    [_appDelegate addScene:self];
+}
+
+-(void)sceneWillEnterForeground:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
+    if(self.window.rootViewController == self.splashViewController) {
+        NSString *session = [NetworkConnection sharedInstance].session;
+        if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
+            //Store the session in the keychain again to update the access policy
+            [NetworkConnection sharedInstance].session = session;
+            self.window.backgroundColor = [UIColor textareaBackgroundColor];
+            self.window.rootViewController = self.slideViewController;
+        } else {
+            self.window.rootViewController = self.loginSplashViewController;
+        }
+        
+#ifdef DEBUG
+        if(![[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+#endif
+            [self.window addSubview:self.splashViewController.view];
+            
+            if([NetworkConnection sharedInstance].session.length) {
+                [self.splashViewController animate:nil];
+            } else {
+                self.loginSplashViewController.logo.hidden = YES;
+                [self.splashViewController animate:self.loginSplashViewController.logo];
+            }
+            
+            [UIView animateWithDuration:0.25 delay:0.25 options:0 animations:^{
+                self.splashViewController.view.backgroundColor = [UIColor clearColor];
+            } completion:^(BOOL finished) {
+                self.loginSplashViewController.logo.hidden = NO;
+                [self.splashViewController.view removeFromSuperview];
+            }];
+#ifdef DEBUG
+        }
+#endif
+    }
+}
+@end
+#endif

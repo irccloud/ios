@@ -470,6 +470,8 @@
     NSLog(@"Launch: %@", url);
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
+    if(_window)
+        [appDelegate setActiveScene:_window];
     MainViewController *mainViewController = [appDelegate mainViewController];
 
     if([_fileIDs objectForKey:url]) {
@@ -496,7 +498,8 @@
             }
             
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [appDelegate launchURL:result];
+                [self->_fileIDs removeObjectForKey:result];
+                [self launchURL:result];
             }];
         }];
 
@@ -597,12 +600,13 @@
         appDelegate.mainViewController.ignoreVisibilityChanges = YES;
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = ivc;
+        [appDelegate.window addSubview:ivc.view];
         appDelegate.slideViewController.view.frame = appDelegate.window.bounds;
         [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:ivc.view];
         appDelegate.mainViewController.ignoreVisibilityChanges = NO;
         ivc.view.alpha = 0;
         [UIView animateWithDuration:0.5f animations:^{
-            appDelegate.window.rootViewController.view.alpha = 1;
+            ivc.view.alpha = 1;
         } completion:nil];
     }];
 #endif

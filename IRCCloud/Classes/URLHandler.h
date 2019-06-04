@@ -25,6 +25,7 @@ typedef void (^mediaURLResult)(BOOL, NSString *);
 }
 
 @property (nonatomic, copy) NSURL *appCallbackURL;
+@property (strong, nonatomic) UIWindow *window;
 
 + (BOOL)isImageURL:(NSURL *)url;
 + (BOOL)isYouTubeURL:(NSURL *)url;
