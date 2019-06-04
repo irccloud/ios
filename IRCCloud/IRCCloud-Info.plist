@@ -138,9 +138,9 @@
 		<string>SourceSansPro-Semibold.otf</string>
 		<string>FontAwesome.otf</string>
 	</array>
-	<key>UIApplicationSceneManifest</key>
+	<key>MANIFEST_KEY</key>
 	<dict>
-		<key>UISceneConfigurations</key>
+		<key>SCENE_CONFIGURATIONS_KEY</key>
 		<dict>
 			<key>UIWindowSceneSessionRoleApplication</key>
 			<array>
@@ -158,7 +158,7 @@
 				</dict>
 			</array>
 		</dict>
-		<key>UIApplicationSupportsMultipleScenes</key>
+		<key>MULTI_WINDOW_KEY</key>
 		<true/>
 	</dict>
 	<key>UIBackgroundModes</key>
