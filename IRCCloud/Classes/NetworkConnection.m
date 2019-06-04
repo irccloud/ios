@@ -1101,7 +1101,9 @@ volatile BOOL __socketPaused = NO;
                                 e.msg = [entities objectForKey:@"edit_text"];
                                 e.edited = YES;
                             }
-                            e.entities = entities;
+                            NSMutableDictionary *d = e.entities.mutableCopy;
+                            [d setValuesForKeysWithDictionary:entities];
+                            e.entities = d;
                             e.lastEditEID = object.eid;
                             e.formatted = nil;
                             e.formattedMsg = nil;
