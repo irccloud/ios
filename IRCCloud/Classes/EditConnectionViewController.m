@@ -737,7 +737,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     if(indexPath.section >= 3)
         return ([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 2) + 32;
     else
-        return [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize + 32;
+        return UITableViewAutomaticDimension;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -801,7 +801,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize + 32;
+    return UITableViewAutomaticDimension;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

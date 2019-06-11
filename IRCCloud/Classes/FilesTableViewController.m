@@ -41,23 +41,23 @@
     if (self) {
         self->_date = [[UILabel alloc] init];
         self->_date.textColor = [UITableViewCell appearance].detailTextLabelColor;
-        self->_date.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_date.font = [UIFont systemFontOfSize:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleCaption1].pointSize];
         [self.contentView addSubview:self->_date];
 
         self->_name = [[UILabel alloc] init];
         self->_name.textColor = [UITableViewCell appearance].textLabelColor;
-        self->_name.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        self->_name.font = [UIFont boldSystemFontOfSize:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleCaption1].pointSize];
         [self.contentView addSubview:self->_name];
         
         self->_metadata = [[UILabel alloc] init];
         self->_metadata.textColor = [UITableViewCell appearance].detailTextLabelColor;
-        self->_metadata.font = [UIFont systemFontOfSize:FONT_SIZE];
+        self->_metadata.font = [UIFont systemFontOfSize:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleCaption1].pointSize];
         [self.contentView addSubview:self->_metadata];
         
         self->_extension = [[UILabel alloc] init];
         self->_extension.textColor = [UIColor whiteColor];
         self->_extension.backgroundColor = [UIColor unreadBlueColor];
-        self->_extension.font = [UIFont boldSystemFontOfSize:FONT_SIZE];
+        self->_extension.font = [UIFont boldSystemFontOfSize:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleCaption1].pointSize];
         self->_extension.textAlignment = NSTextAlignmentCenter;
         self->_extension.hidden = YES;
         [self.contentView addSubview:self->_extension];
@@ -83,7 +83,7 @@
     frame.size.width -= 8;
     frame.size.height -= 8;
     
-    self->_extension.frame = self->_spinner.frame = self->_thumbnail.frame = CGRectMake(frame.origin.x, frame.origin.y, frame.size.height, frame.size.height);
+    self->_extension.frame = self->_spinner.frame = self->_thumbnail.frame = CGRectMake(frame.origin.x, frame.origin.y, 64, frame.size.height);
     self->_date.frame = CGRectMake(frame.origin.x + 64, frame.origin.y, frame.size.width - 64, frame.size.height / 3);
     self->_name.frame = CGRectMake(frame.origin.x + 64, _date.frame.origin.y + _date.frame.size.height, frame.size.width - 64, frame.size.height / 3);
     self->_metadata.frame = CGRectMake(frame.origin.x + 64, _name.frame.origin.y + _name.frame.size.height, frame.size.width - 64, frame.size.height / 3);
@@ -207,7 +207,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return 64;
+    return ([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleCaption1].pointSize * 3) + 32;
 }
 
 -(void)scrollViewDidScroll:(UIScrollView *)scrollView {

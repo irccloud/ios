@@ -1323,7 +1323,7 @@
     if(indexPath.section == 1 || [[[self->_data objectAtIndex:indexPath.section] objectForKey:@"title"] isEqualToString:@"Font Size"])
         return ([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 2) + 32;
     else
-        return [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize + 32;
+        return UITableViewAutomaticDimension;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -1355,7 +1355,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize + 32;
+    return 40;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
