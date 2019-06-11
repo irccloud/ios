@@ -136,7 +136,7 @@
         frame.size.width -= size.width + 12;
         self->_highlights.frame = CGRectMake(frame.origin.x + 6 + frame.size.width, frame.origin.y + 6, size.width, size.height);
     }
-    self->_label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.height + 6, (self->_type == TYPE_SPAM)?_icon.frame.origin.y-1:frame.origin.y, frame.size.width - 6 - _icon.frame.size.height - 16, (self->_type == TYPE_SPAM)?_icon.frame.size.height:frame.size.height);
+    self->_label.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.width + 6, (self->_type == TYPE_SPAM)?_icon.frame.origin.y-1:frame.origin.y, frame.size.width - 6 - _icon.frame.size.width - 16, (self->_type == TYPE_SPAM)?_icon.frame.size.width:frame.size.height);
     
     if(self->_type == TYPE_SPAM) {
         self->_spamHint.textColor = self->_label.textColor;
@@ -575,9 +575,8 @@
     self->_boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
     d = [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody];
-    self->_normalFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     self->_normalFont = [UIFont fontWithDescriptor:d size:d.pointSize - 2];
-    self->_awesomeFont = [UIFont fontWithName:@"FontAwesome" size:d.pointSize];
+    self->_awesomeFont = [UIFont fontWithName:@"FontAwesome" size:18];
 
     lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
