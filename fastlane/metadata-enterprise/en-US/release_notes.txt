@@ -1,4 +1,4 @@
-• Add an option to disable displaying IRC colors per-channel and globally
-• PNGs uploaded through the Share Extension no longer get converted to JPEGs
-• Improved performance while scrolling and displaying channels with a large number of collapsed joins/parts/quits
+• Fix a crash when tapping on an invalid Pastebin or Photo link
+• Support for iOS 12 notification grouping and improved hidden notification content on iOS 11
+• Add a deep link to the app's setting from the iOS 12 notification settings screen
 • Stability improvements and minor fixes
