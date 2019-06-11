@@ -219,7 +219,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 48;
+    return [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize + 32;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {

@@ -497,10 +497,10 @@
         return height + 20;
     } else {
         if(indexPath.row == 0 && _modeHints.count == 0) {
-            return 48;
+            return [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize + 32;
         } else {
             NSString *hint = [[self->_modeHints objectAtIndex:indexPath.row] objectForKey:@"hint"];
-            return ceil([hint boundingRectWithSize:CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:14]} context:nil].size.height) + 32;
+            return ceil([hint boundingRectWithSize:CGSizeMake(self.tableView.bounds.size.width - offset,CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleCaption1].pointSize]} context:nil].size.height) + [UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize + 32;
         }
     }
 }
