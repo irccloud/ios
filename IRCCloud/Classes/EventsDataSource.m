@@ -238,6 +238,8 @@
             self->_cachedAvatarURL = nil;
             if([self->_hostmask rangeOfString:@"@"].location != NSNotFound) {
                 NSString *ident = [self->_hostmask substringToIndex:[self->_hostmask rangeOfString:@"@"].location];
+                if([ident hasPrefix:@"~"])
+                    ident = [ident substringFromIndex:1];
                 if([ident hasPrefix:@"uid"] || [ident hasPrefix:@"sid"]) {
                     ident = [ident substringFromIndex:3];
                     if(ident.length && [ident intValue]) {
