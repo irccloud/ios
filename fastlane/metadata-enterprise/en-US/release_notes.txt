@@ -1,4 +1,5 @@
-• Fix a crash when tapping on an invalid Pastebin or Photo link
+• Fix a crash when tapping on an invalid pastebin or photo link
+• Fix loading public IRCCloud avatars when hostmask begins with a ~
 • Support for iOS 12 notification grouping and improved hidden notification content on iOS 11
 • Add a deep link to the app's setting from the iOS 12 notification settings screen
 • Stability improvements and minor fixes
