@@ -2968,8 +2968,8 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     NSArray *rows = [tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(tableView.bounds, tableView.contentInset)];
     if(rows.count) {
-        firstRow = [[rows objectAtIndex:0] row] + 1;
-        lastRow = [[rows lastObject] row] + 1;
+        firstRow = [[rows objectAtIndex:0] row];
+        lastRow = [[rows lastObject] row];
     } else {
         self->_stickyAvatar.hidden = YES;
         if(self->_hiddenAvatarRow != -1) {
@@ -3016,7 +3016,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 self->_buffer.scrolledUpFrom = -1;
                 self->_buffer.savedScrollOffset = -1;
                 [self sendHeartbeat];
-            } else if (!_buffer.scrolledUp && lastRow < _data.count) {
+            } else if (!_buffer.scrolledUp && lastRow < (_data.count - 1)) {
                 self->_buffer.scrolledUpFrom = [[self->_data objectAtIndex:lastRow] eid];
                 self->_buffer.scrolledUp = YES;
                 [self->_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
