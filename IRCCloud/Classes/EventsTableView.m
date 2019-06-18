@@ -2961,11 +2961,15 @@ extern UIImage *__socketClosedBackgroundImage;
     UITableView *tableView = self->_tableView;
     NSInteger firstRow = -1;
     NSInteger lastRow = -1;
-    [tableView visibleCells];
+    if(@available(iOS 13, *)) {
+        //visibleCells resets the scroll position on iOS 13
+    } else {
+        [tableView visibleCells];
+    }
     NSArray *rows = [tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(tableView.bounds, tableView.contentInset)];
     if(rows.count) {
-        firstRow = [[rows objectAtIndex:0] row];
-        lastRow = [[rows lastObject] row];
+        firstRow = [[rows objectAtIndex:0] row] + 1;
+        lastRow = [[rows lastObject] row] + 1;
     } else {
         self->_stickyAvatar.hidden = YES;
         if(self->_hiddenAvatarRow != -1) {
