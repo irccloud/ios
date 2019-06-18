@@ -585,6 +585,8 @@
         [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
+    } else if([url.host.lowercaseString isEqualToString:@"maps.apple.com"]) {
+        [[UIApplication sharedApplication] openURL:url];
     } else {
         [self openWebpage:url];
     }
