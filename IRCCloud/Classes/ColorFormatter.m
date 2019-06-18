@@ -2793,7 +2793,7 @@ extern BOOL __compact;
                     url = [NSString stringWithFormat:@"telprompt:%@", [result.phoneNumber stringByReplacingOccurrencesOfString:@" " withString:@""]];
                     break;
                 case NSTextCheckingTypeAddress:
-                    url = [NSString stringWithFormat:@"https://maps.apple.com/maps?q=%@", [result.addressComponents.allValues componentsJoinedByString:@","]];
+                    url = [NSString stringWithFormat:@"https://maps.apple.com/?address=%@", [result.addressComponents.allValues componentsJoinedByString:@","]];
                     break;
                 default:
                     break;
