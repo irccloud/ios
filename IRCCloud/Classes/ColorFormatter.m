@@ -2784,6 +2784,29 @@ extern BOOL __compact;
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:range URL:[NSURL URLWithString:url]]];
             }
         }
+        
+        results = [[NSDataDetector dataDetectorWithTypes:NSTextCheckingTypePhoneNumber|NSTextCheckingTypeAddress error:nil] matchesInString:string options:0 range:NSMakeRange(0, string.length)];
+        for(NSTextCheckingResult *result in results) {
+            NSString *url = nil;
+            switch (result.resultType) {
+                case NSTextCheckingTypePhoneNumber:
+                    url = [NSString stringWithFormat:@"telprompt:%@", [result.phoneNumber stringByReplacingOccurrencesOfString:@" " withString:@""]];
+                    break;
+                case NSTextCheckingTypeAddress:
+                    url = [NSString stringWithFormat:@"https://maps.apple.com/maps?q=%@", [result.addressComponents.allValues componentsJoinedByString:@","]];
+                    break;
+                default:
+                    break;
+            }
+            
+            if(url) {
+                CFStringRef safe_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, (CFStringRef)@"%#/?.;+", (CFStringRef)@"^", kCFStringEncodingUTF8);
+                url = [NSString stringWithString:(__bridge_transfer NSString *)safe_escaped];
+                [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
+                url = nil;
+            }
+        }
+
     }
     return matches;
 }
