@@ -1595,10 +1595,6 @@ extern UIImage *__socketClosedBackgroundImage;
     [self->_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
     self->_scrollTimer = nil;
     self->_requestingBacklog = NO;
-    if(buffer != self->_buffer) {
-        self->_bottomRow = -1;
-        [[ImageCache sharedInstance] clear];
-    }
     if(self->_buffer && _buffer.scrolledUp) {
         [self->_lock lock];
         int row = 0;
@@ -1630,6 +1626,10 @@ extern UIImage *__socketClosedBackgroundImage;
         @synchronized (self->_rowCache) {
             [self->_rowCache removeAllObjects];
         }
+        [self->_expandedSectionEids removeAllObjects];
+        [self->_urlHandler clearFileIDs];
+        self->_bottomRow = -1;
+        [[ImageCache sharedInstance] clear];
     }
     self->_buffer = buffer;
     if(buffer)
@@ -1637,8 +1637,6 @@ extern UIImage *__socketClosedBackgroundImage;
     else
         self->_server = nil;
     self->_earliestEid = 0;
-    [self->_expandedSectionEids removeAllObjects];
-    [self->_urlHandler clearFileIDs];
     [self refresh];
 }
 
@@ -2122,7 +2120,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         self->_buffer.scrolledUpFrom = -1;
                 }
             } else if(self->_buffer.scrolledUp && _buffer.savedScrollOffset > 0) {
-                if((self->_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height) < _tableView.contentSize.height - _tableView.bounds.size.height) {
+                if((self->_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height) <= _tableView.contentSize.height - UIEdgeInsetsInsetRect(_tableView.bounds, _tableView.contentInset).size.height) {
                     self->_tableView.contentOffset = CGPointMake(0, (self->_buffer.savedScrollOffset + _tableView.tableHeaderView.bounds.size.height));
                 } else {
                     [self _scrollToBottom];
