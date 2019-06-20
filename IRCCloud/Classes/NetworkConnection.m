@@ -1185,7 +1185,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
     if(!firstTime && type != lastType && state != kIRCCloudStateDisconnected) {
         CLS_LOG(@"IRCCloud became unreachable, disconnecting websocket");
+        SCNetworkReachabilityRef r = [NetworkConnection sharedInstance].reachability;
+        [NetworkConnection sharedInstance].reachability = nil;
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
+        [NetworkConnection sharedInstance].reachability = r;
         [NetworkConnection sharedInstance].reconnectTimestamp = -1;
         state = kIRCCloudStateDisconnected;
         [[NetworkConnection sharedInstance] performSelectorInBackground:@selector(serialize) withObject:nil];
@@ -1199,7 +1202,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(_connect) withObject:nil waitUntilDone:YES];
     } else if(reachable == kIRCCloudUnreachable && state == kIRCCloudStateConnected) {
         CLS_LOG(@"IRCCloud server became unreachable, disconnecting");
+        SCNetworkReachabilityRef r = [NetworkConnection sharedInstance].reachability;
+        [NetworkConnection sharedInstance].reachability = nil;
         [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:YES];
+        [NetworkConnection sharedInstance].reachability = r;
         [[NetworkConnection sharedInstance] performSelectorInBackground:@selector(serialize) withObject:nil];
     }
     if(reachable == kIRCCloudUnreachable) {
@@ -1765,10 +1771,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [s close];
         }
         
-        if(!_reachability) {
+        if(!_reachability || !_reachabilityValid) {
+            if(self->_reachability)
+                CFRelease(self->_reachability);
             self->_reachability = SCNetworkReachabilityCreateWithName(kCFAllocatorDefault, [IRCCLOUD_HOST cStringUsingEncoding:NSUTF8StringEncoding]);
-            SCNetworkReachabilityScheduleWithRunLoop(self->_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
             SCNetworkReachabilitySetCallback(self->_reachability, ReachabilityCallback, NULL);
+            SCNetworkReachabilityScheduleWithRunLoop(self->_reachability, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
         } else {
             kIRCCloudReachability reachability = [self reachable];
             if(self->_reachabilityValid && reachability != kIRCCloudReachable) {
@@ -1862,10 +1870,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)disconnect {
     CLS_LOG(@"Closing websocket");
-    if(self->_reachability)
+    if(self->_reachability) {
         CFRelease(self->_reachability);
-    self->_reachability = nil;
-    self->_reachabilityValid = NO;
+        self->_reachability = nil;
+        self->_reachabilityValid = NO;
+    }
     if(self->_oobQueue.count) {
         for(OOBFetcher *fetcher in _oobQueue) {
             [fetcher cancel];
@@ -1927,13 +1936,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(socket == self->_socket) {
         CLS_LOG(@"Status Code: %lu", (unsigned long)aStatusCode);
         CLS_LOG(@"Close Message: %@", aMessage);
-        CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
+        CLS_LOG(@"Error: errorDesc=%@, failureReason=%@, code=%li, domain=%@", [aError localizedDescription], [aError localizedFailureReason], (long)aError.code, aError.domain);
         self->_state = kIRCCloudStateDisconnected;
         __socketPaused = NO;
         if(aStatusCode == WebSocketCloseStatusProtocolError) {
             self->_streamId = nil;
             self->_highestEID = 0;
         }
+        if([aError.domain isEqualToString:@"kCFStreamErrorDomainNetDB"])
+            _reconnectTimestamp = 0;
         if(_reconnectTimestamp != 0) {
             [self fail];
         } else {
@@ -1949,7 +1960,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)webSocket:(WebSocket *)socket didReceiveError: (NSError*) aError {
     if(socket == self->_socket) {
-        CLS_LOG(@"Error: errorDesc=%@, failureReason=%@", [aError localizedDescription], [aError localizedFailureReason]);
+        CLS_LOG(@"Error: errorDesc=%@, failureReason=%@, code=%li, domain=%@", [aError localizedDescription], [aError localizedFailureReason], (long)aError.code, aError.domain);
         self->_state = kIRCCloudStateDisconnected;
         __socketPaused = NO;
         if([self reachable] && _reconnectTimestamp != 0) {
