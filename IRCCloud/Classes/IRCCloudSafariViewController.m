@@ -23,6 +23,7 @@
 #import "TUSafariActivity.h"
 #import "AppDelegate.h"
 #import "MainViewController.h"
+#import "UIColor+IRCCloud.h"
 
 @implementation IRCCloudSafariViewController
 
@@ -36,7 +37,8 @@
                  UIApplication *app = [UIApplication sharedApplication];
                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                  MainViewController *mainViewController = [appDelegate mainViewController];
-                 
+
+                 [UIColor clearTheme];
                  UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[self->_url] type:@"URL"];
                  activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];

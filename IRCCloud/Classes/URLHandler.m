@@ -666,6 +666,7 @@
     
     UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:activities];
     activityController.completionWithItemsHandler = ^(NSString *activityType, BOOL completed, NSArray *returnedItems, NSError *activityError) {
+        [UIColor setTheme:[UIColor currentTheme]];
         if(completed) {
             if([activityType hasPrefix:@"com.apple.UIKit.activity."])
                 activityType = [activityType substringFromIndex:25];

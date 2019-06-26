@@ -2808,7 +2808,9 @@ NSArray *_sortedChannels;
         if(state == kIRCCloudStateConnected) {
             EditConnectionViewController *evc = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
             [evc setURL:url];
-            [self.navigationController presentViewController:[[UINavigationController alloc] initWithRootViewController:evc] animated:YES completion:nil];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:evc];
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            [self.navigationController presentViewController:nc animated:YES completion:nil];
         } else {
             self->_urlToOpen = url;
         }
@@ -4771,6 +4773,7 @@ NSArray *_sortedChannels;
             UIPasteboard *pb = [UIPasteboard generalPasteboard];
             [pb setValue:self->_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
         } else if([action isEqualToString:@"Share URL"]) {
+            [UIColor clearTheme];
             UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:self->_selectedURL]] type:@"URL"];
             activityController.popoverPresentationController.sourceView = self.slidingViewController.view;
             activityController.popoverPresentationController.sourceRect = [self->_eventsView.tableView convertRect:self->_selectedRect toView:self.slidingViewController.view];

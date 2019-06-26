@@ -23,6 +23,7 @@
 #import "OpenInFirefoxControllerObjC.h"
 #import "config.h"
 #import "ImageCache.h"
+#import "UIColor+IRCCloud.h"
 
 #define HIDE_DURATION 3
 
@@ -54,6 +55,7 @@
                  [pb setValue:self->_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
              }],
              [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
+                 [UIColor clearTheme];
                  UIApplication *app = [UIApplication sharedApplication];
                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                  MainViewController *mainViewController = [appDelegate mainViewController];
@@ -61,7 +63,7 @@
                  UIActivityViewController *activityController = [URLHandler activityControllerForItems:self->_imageView.image?@[self->_url,self->_imageView.image]:@[self->_url] type:self->_movieController?@"Animation":@"Image"];
 
                  activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
-                 
+
                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
              }],
              [UIPreviewAction actionWithTitle:@"Open in Browser" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
@@ -531,6 +533,7 @@
 }
 
 -(IBAction)shareButtonPressed:(id)sender {
+    [UIColor clearTheme];
     UIActivityViewController *activityController = [URLHandler activityControllerForItems:self->_imageView.image?@[self->_url,_imageView.image]:@[self->_url] type:self->_movieController?@"Animation":@"Image"];
 
     activityController.popoverPresentationController.delegate = self;

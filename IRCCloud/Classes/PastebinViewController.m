@@ -55,6 +55,7 @@
                                   AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                                   MainViewController *mainViewController = [appDelegate mainViewController];
                                   
+                                  [UIColor clearTheme];
                                   UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[url] type:@"Pastebin"];
                                   activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
                                   [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
@@ -214,6 +215,7 @@
 }
 
 -(IBAction)shareButtonPressed:(id)sender {
+    [UIColor clearTheme];
     UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:self->_url]] type:@"Pastebin"];
     activityController.popoverPresentationController.delegate = self;
     activityController.popoverPresentationController.barButtonItem = sender;
