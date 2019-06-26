@@ -32,6 +32,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    self.view.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
+    
     self->_kbSize = CGSizeZero;
 
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
