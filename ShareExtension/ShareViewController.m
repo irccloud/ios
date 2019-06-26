@@ -126,7 +126,17 @@
         AudioServicesPlaySystemSound(weakSelf.sound);
     };
     [UIColor setTheme:@"dawn"];
+#ifdef __IPHONE_13_0
+    if (@available(iOS 13, *)) {
+        [UIColor setTheme:[UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark?@"midnight":@"dawn"];
+    } else {
+        [UIColor setTheme:@"dawn"];
+    }
+#else
+    [UIColor setTheme:@"dawn"];
+#endif
     [super viewDidLoad];
+    self.textView.superview.superview.superview.superview.backgroundColor = [UIColor contentBackgroundColor];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backlogComplete:)
                                                  name:kIRCCloudBacklogCompletedNotification object:nil];
