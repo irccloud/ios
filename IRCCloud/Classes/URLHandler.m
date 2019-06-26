@@ -32,6 +32,7 @@
 #import "config.h"
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
+#import "UIDevice+UIDevice_iPhone6Hax.h"
 
 #ifndef EXTENSION
 @interface OpenInFirefoxActivity : UIActivity
@@ -562,6 +563,10 @@
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pvc];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             [mainViewController.slidingViewController presentViewController:nc animated:YES completion:nil];
         }];
     } else if([url.scheme hasPrefix:@"irc"]) {
