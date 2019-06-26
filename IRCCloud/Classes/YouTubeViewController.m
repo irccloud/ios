@@ -22,6 +22,7 @@
 #import "YouTubeViewController.h"
 #import "AppDelegate.h"
 #import "MainViewController.h"
+#import "UIColor+IRCCloud.h"
 
 #define YTMARGIN 130
 
@@ -46,6 +47,7 @@
                  AppDelegate *appDelegate = (AppDelegate *)app.delegate;
                  MainViewController *mainViewController = [appDelegate mainViewController];
                  
+                 [UIColor clearTheme];
                  UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[self->_url] type:@"Youtube"];
                  activityController.popoverPresentationController.sourceView = mainViewController.slidingViewController.view;
                  [mainViewController.slidingViewController presentViewController:activityController animated:YES completion:nil];
