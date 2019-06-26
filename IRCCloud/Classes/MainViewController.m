@@ -3141,6 +3141,10 @@ NSArray *_sortedChannels;
 }
 
 -(void)statusBarFrameWillChange:(NSNotification *)n {
+    if(@available(iOS 11, *)) {
+        if(self.slidingViewController.view.safeAreaInsets.bottom)
+            return;
+    }
     CGRect newFrame = [[n.userInfo objectForKey:UIApplicationStatusBarFrameUserInfoKey] CGRectValue];
     if(newFrame.size.width > 0 && newFrame.size.width == [UIApplication sharedApplication].statusBarFrame.size.width) {
         [UIView animateWithDuration:0.25f animations:^{
