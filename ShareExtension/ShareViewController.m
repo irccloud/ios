@@ -363,8 +363,10 @@
     if(!self->_uploadStarted) {
         NSLog(@"File upload started");
         self->_uploadStarted = YES;
-        [self reloadConfigurationItems];
-        [self validateContent];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self reloadConfigurationItems];
+            [self validateContent];
+        }];
     }
 }
 
