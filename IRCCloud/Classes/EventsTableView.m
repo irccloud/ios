@@ -337,6 +337,10 @@ extern UIImage *__socketClosedBackgroundImage;
     } else if([viewControllerToCommit isKindOfClass:[PastebinViewController class]]) {
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:viewControllerToCommit];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self.slidingViewController presentViewController:nc animated:YES completion:nil];
     } else {
         [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
