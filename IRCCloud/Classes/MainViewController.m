@@ -285,8 +285,10 @@ NSArray *_sortedChannels;
 
 - (void)applyTheme {
     self->_currentTheme = [UIColor currentTheme];
+#ifdef __IPHONE_13_0
     if (@available(iOS 13, *))
         self.view.window.overrideUserInterfaceStyle = [self->_currentTheme isEqualToString:@"dawn"]?UIUserInterfaceStyleLight:UIUserInterfaceStyleDark;
+#endif
     self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
     self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
