@@ -456,7 +456,7 @@ BOOL __compact = NO;
         [[UITableViewCell appearance] setTextLabelColor:__messageTextColor];
         [[UITableViewCell appearance] setDetailTextLabelColor:[UIColor colorWithRed:0.557 green:0.557 blue:0.576 alpha:1]];
         [[UITableViewCell appearance] setTintColor:nil];
-        [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:nil];
+        [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:__messageTextColor];
         [[UISwitch appearance] setOnTintColor:nil];
         [[UISlider appearance] setTintColor:nil];
         
