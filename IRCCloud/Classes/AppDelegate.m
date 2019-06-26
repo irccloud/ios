@@ -155,6 +155,11 @@
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"browser":[SFSafariViewController class]?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES), @"backgroundUploads":@(YES)}];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
 
+    if (@available(iOS 13, *)) {
+        if([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark)
+            [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"theme":@"midnight"}];
+    }
+    
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"path"]) {
         IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
         IRCCLOUD_PATH = [[NSUserDefaults standardUserDefaults] objectForKey:@"path"];
