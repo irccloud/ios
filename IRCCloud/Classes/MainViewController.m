@@ -3402,6 +3402,7 @@ NSArray *_sortedChannels;
     } else {
         if(self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"]) {
             if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
+                self.navigationItem.rightBarButtonItem = nil;
                 if(self.slidingViewController.underRightViewController) {
                     self.slidingViewController.underRightViewController = nil;
                     [self addChildViewController:self->_usersView];
