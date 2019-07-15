@@ -2716,6 +2716,17 @@ NSArray *_sortedChannels;
     [self->_titleView setNeedsUpdateConstraints];
 }
 
+-(void)showJoinPrompt:(NSString *)channel server:(Server *)s {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Join A Channel" message:[NSString stringWithFormat:@"Would you like to join the channel %@ on %@?", channel, s.name.length?s.name:s.hostname] preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid handler:nil];
+    }]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 -(void)launchURL:(NSURL *)url {
     if([url.path hasPrefix:@"/log-export/"]) {
         LogExportsTableViewController *lvc;
@@ -2766,7 +2777,7 @@ NSArray *_sortedChannels;
             if(b)
                 [self bufferSelected:b.bid];
             else if(state == kIRCCloudStateConnected)
-                [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid handler:nil];
+                [self showJoinPrompt:channel server:s];
             else
                 match = NO;
         }
@@ -2789,7 +2800,7 @@ NSArray *_sortedChannels;
                     if(b)
                         [self bufferSelected:b.bid];
                     else if(state == kIRCCloudStateConnected)
-                        [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid handler:nil];
+                        [self showJoinPrompt:channel server:s];
                     else
                         match = NO;
                 } else {
