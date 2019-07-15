@@ -2717,11 +2717,17 @@ NSArray *_sortedChannels;
 }
 
 -(void)showJoinPrompt:(NSString *)channel server:(Server *)s {
+    NSString *key = nil;
+    NSRange range = [channel rangeOfString:@","];
+    if(range.location != NSNotFound) {
+        key = [channel substringFromIndex:range.location + 1];
+        channel = [channel substringToIndex:range.location];
+    }
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Join A Channel" message:[NSString stringWithFormat:@"Would you like to join the channel %@ on %@?", channel, s.name.length?s.name:s.hostname] preferredStyle:UIAlertControllerStyleAlert];
     
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [[NetworkConnection sharedInstance] join:channel key:nil cid:s.cid handler:nil];
+        [[NetworkConnection sharedInstance] join:channel key:key cid:s.cid handler:nil];
     }]];
     
     [self presentViewController:alert animated:YES completion:nil];
