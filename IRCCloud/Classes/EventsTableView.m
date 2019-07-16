@@ -2638,6 +2638,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
     }
     cell.timestampLeft.font = cell.timestampRight.font = cell.lastSeenEID.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
+    cell.message.font = [ColorFormatter messageFont:e.monospace || __monospacePref];
     cell.message.linkDelegate = self;
     cell.nickname.linkDelegate = self;
     cell.accessory.font = [ColorFormatter awesomeFont];
@@ -3182,7 +3183,7 @@ extern UIImage *__socketClosedBackgroundImage;
         } else if(indexPath.row < _data.count) {
             Event *e = [self->_data objectAtIndex:indexPath.row];
             if([e.type isEqualToString:@"channel_invite"])
-                [self->_conn join:e.oldNick key:nil cid:e.cid handler:nil];
+                [self->_delegate showJoinPrompt:e.oldNick server:[[ServersDataSource sharedInstance] getServer:e.cid]];
             else if([e.type isEqualToString:@"callerid"])
                 [self->_conn say:[NSString stringWithFormat:@"/accept %@", e.nick] to:nil cid:e.cid handler:nil];
             else if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE) {
