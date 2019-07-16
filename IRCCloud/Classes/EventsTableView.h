@@ -27,6 +27,7 @@
 -(void)rowSelected:(Event *)event;
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect link:(NSString *)url;
 -(void)dismissKeyboard;
+-(void)showJoinPrompt:(NSString *)channel server:(Server *)s;
 @end
 
 @interface EventsTableView : UIViewController<LinkLabelDelegate,UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate,UITableViewDataSource,UITableViewDelegate> {
