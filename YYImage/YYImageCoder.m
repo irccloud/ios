@@ -2563,6 +2563,7 @@ CGImageRef YYCGImageCreateWithWebPData(CFDataRef webpData,
         }
         pngDatas[0] = (__bridge id)(frameData);
         CFRelease(frameData);
+        CFRelease(extendedImage);
     }
     
     NSData *firstFrameData = pngDatas[0];

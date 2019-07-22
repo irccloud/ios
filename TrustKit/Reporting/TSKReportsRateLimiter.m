@@ -55,7 +55,7 @@ static NSDate *_lastReportsCacheResetDate = nil;
     
     
     // Create an array containg the gist of the pin failure report; do not include the dates
-    NSArray *pinFailureInfo = @[report.notedHostname, report.hostname, report.port, report.validatedCertificateChain, report.knownPins, [NSNumber numberWithInt:report.validationResult]];
+    NSArray *pinFailureInfo = @[report.notedHostname, report.hostname, report.port, report.validatedCertificateChain, report.knownPins, [NSNumber numberWithInt:(int)report.validationResult]];
     
     
     // Check if the exact same report has already been sent recently

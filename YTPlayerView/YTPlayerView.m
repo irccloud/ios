@@ -418,7 +418,7 @@ NSString static *const kYTPlayerStaticProxyRegexPattern = @"^https://content.goo
   NSMutableArray *levels = [[NSMutableArray alloc] init];
   for (NSString *rawQualityValue in rawQualityValues) {
     YTPlaybackQuality quality = [YTPlayerView playbackQualityForString:rawQualityValue];
-    [levels addObject:[NSNumber numberWithInt:quality]];
+    [levels addObject:[NSNumber numberWithInt:(int)quality]];
   }
   return levels;
 }

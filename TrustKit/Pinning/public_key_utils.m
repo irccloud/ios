@@ -245,7 +245,7 @@ static NSData *getPublicKeyDataFromCertificate(SecCertificateRef certificate)
 NSData *hashSubjectPublicKeyInfoFromCertificate(SecCertificateRef certificate, TSKPublicKeyAlgorithm publicKeyAlgorithm)
 {
     NSData *cachedSubjectPublicKeyInfo = NULL;
-    NSNumber *algorithmKey = [NSNumber numberWithInt:publicKeyAlgorithm];
+    NSNumber *algorithmKey = [NSNumber numberWithInt:(int)publicKeyAlgorithm];
     
     // Have we seen this certificate before? Look for the SPKI in the cache
     NSData *certificateData = (__bridge NSData *)(SecCertificateCopyData(certificate));

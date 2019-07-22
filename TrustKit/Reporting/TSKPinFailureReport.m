@@ -92,7 +92,7 @@
         @"enforce-pinning" : [NSNumber numberWithBool:self.enforcePinning],
         @"validated-certificate-chain" : self.validatedCertificateChain,
         @"known-pins" : self.knownPins,
-        @"validation-result": [NSNumber numberWithInt:self.validationResult],
+        @"validation-result": [NSNumber numberWithInt:(int)self.validationResult],
         @"known-pins-expiration-date": expirationDateStr
     };
     
