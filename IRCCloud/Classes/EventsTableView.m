@@ -96,14 +96,12 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet NSLayoutConstraint *_thumbnailWidth, *_thumbnailHeight;
     IBOutlet UILabel *_filename;
     IBOutlet UIActivityIndicatorView *_spinner;
-    MPMoviePlayerController *_movieController;
 }
 @property (readonly) UIView *background;
 @property (readonly) UILabel *filename;
 @property (readonly) YYAnimatedImageView *thumbnail;
 @property (readonly) NSLayoutConstraint *thumbnailWidth, *thumbnailHeight;
 @property (readonly) UIActivityIndicatorView *spinner;
-@property (nonatomic) MPMoviePlayerController *movieController;
 
 @end
 
@@ -450,14 +448,6 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     
     return items;
-}
-
-- (void)resumePlayback {
-    for(id cell in _rowCache.allValues) {
-        if([cell isKindOfClass:EventsTableCell_Thumbnail.class]) {
-            [((EventsTableCell_Thumbnail *)cell).movieController play];
-        }
-    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -2407,28 +2397,14 @@ extern UIImage *__socketClosedBackgroundImage;
         if([e.entities objectForKey:@"id"]) {
             cell.thumbnail.image = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
         } else {
-            /*if([e.entities objectForKey:@"mp4_loop"]) {
-                if(!cell.movieController) {
-                    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
-                    cell.movieController = [[MPMoviePlayerController alloc] initWithContentURL:[e.entities objectForKey:@"mp4_loop"]];
-                    cell.movieController.controlStyle = MPMovieControlStyleNone;
-                    cell.movieController.view.userInteractionEnabled = NO;
-                    cell.movieController.view.hidden = YES;
-                    cell.movieController.repeatMode = MPMovieRepeatModeOne;
-                    [cell.contentView addSubview:cell.movieController.view];
-                }
-                [cell.movieController play];
-            } else {*/
             cell.thumbnail.image = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
-            //}
         }
         cell.spinner.hidden = YES;
         cell.spinner.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
         cell.thumbnail.hidden = !(cell.thumbnail.image != nil);
-        if(cell.thumbnail.image || cell.movieController) {
+        if(cell.thumbnail.image) {
             if(![[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
                 cell.thumbnail.image = nil;
-                cell.movieController.view.hidden = YES;
                 cell.spinner.hidden = NO;
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     NSLog(@"Image dimensions were missing, reloading table");
@@ -2456,8 +2432,6 @@ extern UIImage *__socketClosedBackgroundImage;
                         [self reloadForEvent:e];
                     }
                     [cell.thumbnail layoutIfNeeded];
-                    cell.movieController.view.frame = cell.thumbnail.frame;
-                    cell.movieController.view.hidden = NO;
                 }
             }
         } else {

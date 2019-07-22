@@ -1870,9 +1870,6 @@ NSArray *_sortedChannels;
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [self->_eventsView resumePlayback];
-    }];
     if(self->_ignoreVisibilityChanges)
         return;
     self->_isShowingPreview = NO;

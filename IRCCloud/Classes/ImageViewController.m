@@ -244,8 +244,9 @@
 
 -(void)_fetchVideo:(NSURL *)url {
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
-    self->_movieController = [[MPMoviePlayerController alloc] initWithContentURL:url];
-    self->_movieController.controlStyle = MPMovieControlStyleNone;
+    self->_movieController = [[AVPlayerViewController alloc] init];
+    self->_movieController.player = [[AVPlayer alloc] initWithURL:url];
+    self->_movieController.showsPlaybackControls = NO;
     self->_movieController.view.userInteractionEnabled = NO;
     self->_movieController.view.frame = self->_scrollView.bounds;
     [self->_scrollView addSubview:self->_movieController.view];
@@ -253,11 +254,16 @@
     [self->_scrollView removeGestureRecognizer:self->_panGesture];
     [self.view addGestureRecognizer:self->_panGesture];
     [self->_progressView removeFromSuperview];
-    [self->_movieController play];
+    [self->_movieController.player play];
     if([UIApplication sharedApplication].delegate.window.rootViewController == self)
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
     [self scrollViewDidZoom:self->_scrollView];
+}
+
+- (void)playerItemDidReachEnd:(NSNotification *)notification {
+    AVPlayerItem *p = [notification object];
+    [p seekToTime:kCMTimeZero];
 }
 
 -(void)load {
@@ -269,7 +275,11 @@
     if(d) {
         if([d objectForKey:@"mp4_loop"]) {
             [self _fetchVideo:[d objectForKey:@"mp4_loop"]];
-            self->_movieController.repeatMode = MPMovieRepeatModeOne;
+            self->_movieController.player.actionAtItemEnd = AVPlayerActionAtItemEndNone;
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                       selector:@selector(playerItemDidReachEnd:)
+                                                           name:AVPlayerItemDidPlayToEndTimeNotification
+                                                         object:[self->_movieController.player currentItem]];
         } else if([d objectForKey:@"mp4"]) {
             [self _fetchVideo:[d objectForKey:@"mp4"]];
         } else if([d objectForKey:@"image"]) {
@@ -509,13 +519,13 @@
     [self setUserActivity:activity];
     [activity becomeCurrent];
     if(self->_movieController)
-        [self->_movieController play];
+        [self->_movieController.player play];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
     [super viewDidDisappear:animated];
     if(self->_movieController)
-        [self->_movieController pause];
+        [self->_movieController.player pause];
     [self->_hideTimer invalidate];
     self->_hideTimer = nil;
 }
