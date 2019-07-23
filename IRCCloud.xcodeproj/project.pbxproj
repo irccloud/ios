@@ -1450,7 +1450,6 @@
 		22D649281B1E371D003BFD86 /* PastebinsTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinsTableViewController.h; sourceTree = "<group>"; };
 		22D649291B1E371D003BFD86 /* PastebinsTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastebinsTableViewController.m; sourceTree = "<group>"; };
 		22D9789B215BC910005C2713 /* IRCCloud FLEX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "IRCCloud FLEX.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		22D9789C215BC910005C2713 /* IRCCloud copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "IRCCloud copy-Info.plist"; path = "/Users/sam/Projects/irccloud-ios/IRCCloud copy-Info.plist"; sourceTree = "<absolute>"; };
 		22D9789E215BC979005C2713 /* FLEXManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLEXManager.h; sourceTree = "<group>"; };
 		22D9789F215BC979005C2713 /* FLEX.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FLEX.h; sourceTree = "<group>"; };
 		22D978A1215BC979005C2713 /* FLEXArrayExplorerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FLEXArrayExplorerViewController.m; sourceTree = "<group>"; };
@@ -1960,7 +1959,6 @@
 				221D4B8E1E23EAD700D403E6 /* NotificationService */,
 				228A056E16D3DABA0029769C /* Frameworks */,
 				228A056D16D3DABA0029769C /* Products */,
-				22D9789C215BC910005C2713 /* IRCCloud copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
