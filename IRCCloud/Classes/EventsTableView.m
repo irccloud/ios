@@ -2612,7 +2612,6 @@ extern UIImage *__socketClosedBackgroundImage;
         }
     }
     cell.timestampLeft.font = cell.timestampRight.font = cell.lastSeenEID.font = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
-    cell.message.font = [ColorFormatter messageFont:e.monospace || __monospacePref];
     cell.message.linkDelegate = self;
     cell.nickname.linkDelegate = self;
     cell.accessory.font = [ColorFormatter awesomeFont];
