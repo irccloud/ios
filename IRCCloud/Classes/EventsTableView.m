@@ -3252,11 +3252,9 @@ extern UIImage *__socketClosedBackgroundImage;
         return @"New Messages marker is above the loaded backlog";
     UITableView *tableView = self->_tableView;
     NSInteger firstRow = -1;
-    NSInteger lastRow = -1;
     NSArray *rows = [tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(tableView.bounds, tableView.contentInset)];
     if(rows.count) {
         firstRow = [[rows objectAtIndex:0] row];
-        lastRow = [[rows lastObject] row];
     } else {
         return @"Empty table view";
     }

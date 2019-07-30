@@ -2840,12 +2840,7 @@ extern BOOL __compact;
                             fg_color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
                             if(fg_color > IRC_COLOR_COUNT) {
                                 count--;
-                                fg_color /= 10;
-                            } else if(fg_color == 99) {
-                                fg_color = -1;
                             }
-                        } else {
-                            fg_color = -1;
                         }
                         [text deleteCharactersInRange:NSMakeRange(i,count)];
                     }
@@ -2864,7 +2859,6 @@ extern BOOL __compact;
                             int color = [[text substringWithRange:NSMakeRange(i, count)] intValue];
                             if(color > IRC_COLOR_COUNT) {
                                 count--;
-                                color /= 10;
                             }
                         }
                         [text deleteCharactersInRange:NSMakeRange(i,count)];
