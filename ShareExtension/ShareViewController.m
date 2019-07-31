@@ -166,6 +166,16 @@
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.title = @"IRCCloud";
     self->_sound = 1001;
+    self.textView.returnKeyType = UIReturnKeySend;
+    self.textView.delegate = self;
+}
+
+-(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if([text isEqualToString:@"\n"]) {
+        [self didSelectPost];
+        return NO;
+    }
+    return YES;
 }
 
 - (void)backlogComplete:(NSNotification *)n {
