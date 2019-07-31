@@ -2021,8 +2021,12 @@ extern BOOL __compact;
 +(void)loadFonts {
     monoTimestampFont = [UIFont fontWithName:@"Hack" size:FONT_SIZE - 3];
     timestampFont = [UIFont systemFontOfSize:FONT_SIZE - 2];
+    if(@available(iOS 10, *)) {
+        arrowFont = nil;
+    } else {
+        arrowFont = [UIFont fontWithName:@"SourceSansPro-Regular" size:FONT_SIZE];
+    }
     awesomeFont = [UIFont fontWithName:@"FontAwesome" size:FONT_SIZE];
-    arrowFont = [UIFont fontWithName:@"SourceSansPro-Regular" size:FONT_SIZE];
     Courier = [UIFont fontWithName:@"Hack" size:FONT_SIZE - 1];
     CourierBold = [UIFont fontWithName:@"Hack-Bold" size:FONT_SIZE - 1];
     CourierOblique = [UIFont fontWithName:@"Hack-Italic" size:FONT_SIZE - 1];
@@ -2151,7 +2155,7 @@ extern BOOL __compact;
             case 0x2192:
             case 0x2194:
             case 0x21D0:
-                if(i < text.length - 1 && [text characterAtIndex:i+1] == 0xFE0E) {
+                if(arrowFont && i < text.length - 1 && [text characterAtIndex:i+1] == 0xFE0E) {
                     [arrowIndex addObject:@(i)];
                 }
                 break;

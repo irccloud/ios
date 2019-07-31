@@ -2363,7 +2363,7 @@ extern UIImage *__socketClosedBackgroundImage;
     if(e.height)
         return e.height;
     else
-        return FONT_SIZE;
+        return ceilf(FONT_SIZE);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
