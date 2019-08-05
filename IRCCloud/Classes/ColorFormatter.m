@@ -2118,17 +2118,7 @@ extern BOOL __compact;
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
     
     if(mentions) {
-        for(NSString *key in mentions.allKeys) {
-            NSArray *mention = [mentions objectForKey:key];
-            NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
-            for(NSArray *position in mention) {
-                if([[position objectAtIndex:0] intValue] + mentionOffset >= 0 && [[position objectAtIndex:0] intValue] + mentionOffset + [[position objectAtIndex:1] intValue] <= input.length) {
-                    [new_mention addObject:@[@([[position objectAtIndex:0] intValue] + mentionOffset),
-                                             @([[position objectAtIndex:1] intValue])]];
-                }
-            }
-            [mentions setObject:new_mention forKey:key];
-        }
+        [self _offsetMentions:mentions start:0 offset:-mentionOffset];
         
         for(NSUInteger i = 0; i < text.length; i++) {
             NSRange r = [text rangeOfComposedCharacterSequenceAtIndex:i];
