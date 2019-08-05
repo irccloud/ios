@@ -2118,6 +2118,18 @@ extern BOOL __compact;
     NSMutableString *text = [[NSMutableString alloc] initWithFormat:@"%@%c", [input stringByReplacingOccurrencesOfString:@"  " withString:@"\u00A0 "], CLEAR];
     
     if(mentions) {
+        for(NSString *key in mentions.allKeys) {
+            NSArray *mention = [mentions objectForKey:key];
+            NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
+            for(NSArray *position in mention) {
+                if([[position objectAtIndex:0] intValue] + mentionOffset >= 0 && [[position objectAtIndex:0] intValue] + mentionOffset + [[position objectAtIndex:1] intValue] <= input.length) {
+                    [new_mention addObject:@[@([[position objectAtIndex:0] intValue] + mentionOffset),
+                                             @([[position objectAtIndex:1] intValue])]];
+                }
+            }
+            [mentions setObject:new_mention forKey:key];
+        }
+        
         for(NSUInteger i = 0; i < text.length; i++) {
             NSRange r = [text rangeOfComposedCharacterSequenceAtIndex:i];
             if(r.length > 1) {
@@ -2128,19 +2140,12 @@ extern BOOL __compact;
         
         for(NSString *key in mentions.allKeys) {
             NSArray *mention = [mentions objectForKey:key];
-            NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
             for(NSArray *old_position in mention) {
                 NSMutableArray *position = old_position.mutableCopy;
-                if([[position objectAtIndex:0] intValue] + mentionOffset >= 0 && [[position objectAtIndex:0] intValue] + mentionOffset + [[position objectAtIndex:1] intValue] <= input.length) {
-                    [position setObject:@([[position objectAtIndex:0] intValue] + mentionOffset) atIndexedSubscript:0];
+                if([[position objectAtIndex:0] intValue] >= 0 && [[position objectAtIndex:0] intValue] + [[position objectAtIndex:1] intValue] <= input.length) {
                     [text replaceCharactersInRange:NSMakeRange([[position objectAtIndex:0] intValue], [[position objectAtIndex:1] intValue]) withString:[@"" stringByPaddingToLength:[[position objectAtIndex:1] intValue] withString:@"A" startingAtIndex:0]];
-                    [new_mention addObject:position];
                 }
             }
-            if(new_mention.count)
-                [mentions setObject:new_mention forKey:key];
-            else
-                [mentions removeObjectForKey:key];
         }
     }
     
