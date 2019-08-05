@@ -2077,7 +2077,7 @@ extern BOOL __compact;
         NSArray *mention = [mentions objectForKey:key];
         NSMutableArray *new_mention = [[NSMutableArray alloc] initWithCapacity:mention.count];
         for(NSArray *position in mention) {
-            if([[position objectAtIndex:0] intValue] > start) {
+            if([[position objectAtIndex:0] intValue] >= start) {
                 [new_mention addObject:@[@([[position objectAtIndex:0] intValue] - offset),
                                          @([[position objectAtIndex:1] intValue])]];
             } else {
