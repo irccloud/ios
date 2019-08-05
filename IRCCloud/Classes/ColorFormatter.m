@@ -2121,8 +2121,8 @@ extern BOOL __compact;
         for(NSUInteger i = 0; i < text.length; i++) {
             NSRange r = [text rangeOfComposedCharacterSequenceAtIndex:i];
             if(r.length > 1) {
-                [self _offsetMentions:mentions start:i offset:-(r.length - 1)];
-                i += r.length;
+                [self _offsetMentions:mentions start:i offset:-1];
+                i++;
             }
         }
         
