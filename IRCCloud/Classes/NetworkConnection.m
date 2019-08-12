@@ -499,11 +499,7 @@ volatile BOOL __socketPaused = NO;
                        }
                    },
                    @"backlog_cache_init": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       CLS_LOG(@"backlog_cache_init for bid%i", object.bid);
-                       [self->_events removeEventsForBuffer:object.bid];
-                       Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:object.bid];
-                       if(b && b.created < object.eid)
-                           b.deferred = 1;
+                       [self->_events removeEventsBefore:object.eid buffer:object.bid];
                    },
                    @"global_system_message": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        if(!self->_resuming && !backlog && [object objectForKey:@"system_message_type"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"eval"] && ![[object objectForKey:@"system_message_type"] isEqualToString:@"refresh"]) {
