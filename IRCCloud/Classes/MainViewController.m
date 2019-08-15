@@ -3415,7 +3415,7 @@ NSArray *_sortedChannels;
         }
     } else {
         if(self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"]) {
-            if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone]) {
+            if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone] && !self->_msgid) {
                 self.navigationItem.rightBarButtonItem = nil;
                 if(self.slidingViewController.underRightViewController) {
                     self.slidingViewController.underRightViewController = nil;
@@ -3431,7 +3431,10 @@ NSArray *_sortedChannels;
                 self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - 442;
                 self->_eventsViewOffsetXConstraint.constant = 0;
             } else {
-                if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
+                if(self->_msgid) {
+                    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_closeThread)];
+                    self.slidingViewController.underRightViewController = nil;
+                } else if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
                     self.navigationItem.rightBarButtonItem = self->_usersButtonItem;
                     if(self.slidingViewController.underRightViewController == nil) {
                         [self->_usersView.view removeFromSuperview];
@@ -3456,7 +3459,10 @@ NSArray *_sortedChannels;
                 }
             }
         } else {
-            if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
+            if(self->_msgid) {
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_closeThread)];
+                self.slidingViewController.underRightViewController = nil;
+            } else if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
                 self.navigationItem.rightBarButtonItem = self->_usersButtonItem;
                 if(self.slidingViewController.underRightViewController == nil)
                     self.slidingViewController.underRightViewController = self->_usersView;
