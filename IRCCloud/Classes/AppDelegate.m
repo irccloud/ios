@@ -782,7 +782,7 @@
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
         }
         [self->_conn serialize];
-        [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 60];
+        [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 5];
         if(background_task == self->_background_task) {
             self->_background_task = UIBackgroundTaskInvalid;
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
