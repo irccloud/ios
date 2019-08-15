@@ -1359,6 +1359,8 @@
         } else {
     #ifndef EXTENSION
             self->_selectedRow = indexPath.row;
+            if([self->_delegate isKindOfClass:MainViewController.class])
+                [(MainViewController *)_delegate clearMsgId];
     #endif
             [self.tableView reloadData];
             [self _updateUnreadIndicators];

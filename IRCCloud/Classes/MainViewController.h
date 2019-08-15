@@ -142,4 +142,5 @@
 -(void)setMsgId:(NSString *)msgId;
 -(void)applyTheme;
 -(void)clearText;
+-(void)clearMsgId;
 @end

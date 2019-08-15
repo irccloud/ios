@@ -3392,6 +3392,10 @@ NSArray *_sortedChannels;
     [self _updateUserListVisibility];
 }
 
+-(void)clearMsgId {
+    self->_eventsView.msgid = self->_msgid = nil;
+}
+
 -(void)_closeThread {
     [self setMsgId:nil];
 }
