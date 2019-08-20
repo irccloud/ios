@@ -633,6 +633,8 @@
     self->_email.textColor = [UITableViewCell appearance].detailTextLabelColor;
     self->_name.textColor = [UITableViewCell appearance].detailTextLabelColor;
     self->_highlights.textColor = [UITableViewCell appearance].detailTextLabelColor;
+    self->_email.frame = CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22);
+    self->_name.frame = CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22);
     [self refresh];
 }
 
