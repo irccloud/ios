@@ -216,6 +216,8 @@
 		223154FD1F26245800BDE367 /* LogExportsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223154FC1F26245800BDE367 /* LogExportsTableViewController.m */; };
 		223154FE1F26245800BDE367 /* LogExportsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223154FC1F26245800BDE367 /* LogExportsTableViewController.m */; };
 		22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
+		2232ABD6230C1D66007431B5 /* UITableViewController+HeaderColorFix.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */; };
+		2232ABD7230C1D66007431B5 /* UITableViewController+HeaderColorFix.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */; };
 		223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
@@ -1197,6 +1199,8 @@
 		223154FB1F26245800BDE367 /* LogExportsTableViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogExportsTableViewController.h; sourceTree = "<group>"; };
 		223154FC1F26245800BDE367 /* LogExportsTableViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LogExportsTableViewController.m; sourceTree = "<group>"; };
 		22324FDF177DE51A008B6912 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		2232ABD4230C1D66007431B5 /* UITableViewController+HeaderColorFix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITableViewController+HeaderColorFix.h"; sourceTree = "<group>"; };
+		2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITableViewController+HeaderColorFix.m"; sourceTree = "<group>"; };
 		223581C1191AD79B00A4B124 /* ImageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUploader.h; sourceTree = "<group>"; };
 		223581C2191AD79B00A4B124 /* ImageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUploader.m; sourceTree = "<group>"; };
 		2236BD621BAA5E0900015753 /* FontAwesome.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.otf; sourceTree = "<group>"; };
@@ -2190,6 +2194,8 @@
 				22A363BB19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m */,
 				22A19C5E178FCCAB00772C60 /* UINavigationController+iPadSux.h */,
 				22A19C5F178FCCAB00772C60 /* UINavigationController+iPadSux.m */,
+				2232ABD4230C1D66007431B5 /* UITableViewController+HeaderColorFix.h */,
+				2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */,
 				2264A2FF19659BB100DCFDDD /* URLHandler.h */,
 				2264A30019659BB100DCFDDD /* URLHandler.m */,
 				2236F64416DD138A007BE535 /* UsersDataSource.h */,
@@ -3550,6 +3556,7 @@
 				229324541E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				225D974D18AA995900065087 /* WebSocket.m in Sources */,
 				225D974E18AA995900065087 /* WebSocketConnectConfig.m in Sources */,
+				2232ABD7230C1D66007431B5 /* UITableViewController+HeaderColorFix.m in Sources */,
 				225D974F18AA995900065087 /* WebSocketFragment.m in Sources */,
 				224333D120162C1B0007A0D3 /* AvatarsTableViewController.m in Sources */,
 				22BB94AB1D425D3800BFB6F0 /* SamlLoginViewController.m in Sources */,
@@ -3673,6 +3680,7 @@
 				229324531E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				22B4287016D831A800498507 /* WebSocket.m in Sources */,
 				22B4287A16D831A800498507 /* WebSocketConnectConfig.m in Sources */,
+				2232ABD6230C1D66007431B5 /* UITableViewController+HeaderColorFix.m in Sources */,
 				22B4287C16D831A800498507 /* WebSocketFragment.m in Sources */,
 				224333D020162C1B0007A0D3 /* AvatarsTableViewController.m in Sources */,
 				22BB94AA1D425A4F00BFB6F0 /* SamlLoginViewController.m in Sources */,

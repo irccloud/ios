@@ -209,7 +209,7 @@
         textView.typingAttributes = self->_currentMessageAttributes;
     else
         self->_currentMessageAttributes = textView.typingAttributes;
-    topicHeader.text = [self tableView:self.tableView titleForHeaderInSection:0];
+    [self.tableView headerViewForSection:0].textLabel.text = [self tableView:self.tableView titleForHeaderInSection:0];
 }
 
 - (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
@@ -378,77 +378,6 @@
 
 #pragma mark - Table view data source
 
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,48)];
-
-    if(!topicHeader) {
-        if(@available(iOS 11, *)) {
-            topicHeader = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,24,self.view.frame.size.width - 32, 20)];
-        } else {
-            topicHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
-        }
-        topicHeader.font = [UIFont systemFontOfSize:14];
-        topicHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
-    }
-    if(!urlHeader) {
-        if(@available(iOS 11, *)) {
-            urlHeader = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,24,self.view.frame.size.width - 32, 20)];
-        } else {
-            urlHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
-        }
-        urlHeader.font = [UIFont systemFontOfSize:14];
-        urlHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
-    }
-    if(!modesHeader) {
-        if(@available(iOS 11, *)) {
-            modesHeader = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,24,self.view.frame.size.width - 32, 20)];
-        } else {
-            modesHeader = [[UILabel alloc] initWithFrame:CGRectMake(16,24,self.view.frame.size.width - 32, 20)];
-        }
-        modesHeader.font = [UIFont systemFontOfSize:14];
-        modesHeader.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
-    }
-    
-    if(section == 1 && !_url.attributedText.length)
-        section++;
-    
-    switch (section) {
-        case 0:
-            [topicHeader removeFromSuperview];
-            topicHeader.text = [self tableView:tableView titleForHeaderInSection:section];
-            [header addSubview:topicHeader];
-            break;
-        case 1:
-            [urlHeader removeFromSuperview];
-            urlHeader.text = [self tableView:tableView titleForHeaderInSection:section];
-            [header addSubview:urlHeader];
-            break;
-        case 2:
-            [modesHeader removeFromSuperview];
-            modesHeader.text = [self tableView:tableView titleForHeaderInSection:section];
-            [header addSubview:modesHeader];
-            break;
-    }
-    
-    return header;
-}
-
--(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
-    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
-    UILabel *label;
-    if(@available(iOS 11, *)) {
-        label = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,4,self.view.frame.size.width - 32, 20)];
-    } else {
-        label = [[UILabel alloc] initWithFrame:CGRectMake(16,4,self.view.frame.size.width - 32, 20)];
-    }
-    label.text = [self tableView:tableView titleForFooterInSection:section];
-    label.font = [UIFont systemFontOfSize:12];
-    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
-    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    [header addSubview:label];
-    return header;
-}
-
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
     if([self->_channel.mode isKindOfClass:[NSString class]] && _channel.mode.length)
         return 2 + (self->_url.attributedText.length ? 1 : 0);
@@ -525,10 +454,6 @@
                 return @"MODE";
     }
     return nil;
-}
-
--(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 48;
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

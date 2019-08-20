@@ -1340,26 +1340,6 @@
     return [[self->_data objectAtIndex:section] objectForKey:@"title"];
 }
 
--(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    UIView *header = [[UIView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,24)];
-    UILabel *label;
-    if(@available(iOS 11, *)) {
-        label = [[UILabel alloc] initWithFrame:CGRectMake(16 + self.view.safeAreaInsets.left,0,self.view.frame.size.width - 32, 20)];
-    } else {
-        label = [[UILabel alloc] initWithFrame:CGRectMake(16,0,self.view.frame.size.width - 32, 20)];
-    }
-    label.text = [self tableView:tableView titleForHeaderInSection:section].uppercaseString;
-    label.font = [UIFont systemFontOfSize:14];
-    label.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
-    label.autoresizingMask = UIViewAutoresizingFlexibleTopMargin;
-    [header addSubview:label];
-    return header;
-}
-
--(CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section {
-    return 40;
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSString *identifier = [NSString stringWithFormat:@"settingscell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];

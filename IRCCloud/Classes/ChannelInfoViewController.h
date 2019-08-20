@@ -33,9 +33,6 @@
     int offset;
     IRCColorPickerView *_colorPickerView;
     NSDictionary *_currentMessageAttributes;
-    UILabel *topicHeader;
-    UILabel *urlHeader;
-    UILabel *modesHeader;
 }
 -(id)initWithChannel:(Channel *)channel;
 @end
