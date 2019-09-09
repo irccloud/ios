@@ -1977,6 +1977,8 @@ extern UIImage *__socketClosedBackgroundImage;
         __timestampWidth += 8;
         
         NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:self->_buffer.bid];
+        _shouldAutoFetch = !_requestingBacklog && events.count < 50;
+        
         if(events.count) {
             NSMutableDictionary *uuids = [[NSMutableDictionary alloc] init];
             for(int i = 0; i < events.count; i++) {
@@ -2087,6 +2089,9 @@ extern UIImage *__socketClosedBackgroundImage;
             self->_tableView.tableHeaderView = nil;
         }
         
+        if(_earliestEid == _buffer.min_eid)
+            self->_shouldAutoFetch = NO;
+        
         @try {
             if(self->_requestingBacklog && backlogEid > 0 && _buffer.scrolledUp) {
                 int markerPos = -1;
@@ -2176,7 +2181,7 @@ extern UIImage *__socketClosedBackgroundImage;
             [self scrollViewDidScroll:self->_tableView];
             [self->_tableView flashScrollIndicators];
             
-            if(self->_buffer.deferred && self->_conn.state == kIRCCloudStateConnected && self->_conn.ready) {
+            if((self->_buffer.deferred || (self->_shouldAutoFetch && (rows.count == 0 || [[rows objectAtIndex:0] row] == 0))) && self->_conn.state == kIRCCloudStateConnected && self->_conn.ready) {
                 [self loadMoreBacklogButtonPressed:nil];
             }
             
