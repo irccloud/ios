@@ -67,7 +67,7 @@
     NSTimeInterval _maxEid, _minEid, _currentCollapsedEid, _earliestEid, _eidToOpen, _lastCollapsedEid;
     NSInteger _newMsgs, _newHighlights, _lastSeenEidPos, _bottomRow;
     NSString *_lastCollpasedDay;
-    BOOL _requestingBacklog, _ready;
+    BOOL _requestingBacklog, _ready, _shouldAutoFetch;
     NSTimer *_heartbeatTimer;
     NSTimer *_scrollTimer;
     NSTimer *_reloadTimer;
