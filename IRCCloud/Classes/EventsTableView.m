@@ -539,6 +539,7 @@ extern UIImage *__socketClosedBackgroundImage;
 - (IBAction)loadMoreBacklogButtonPressed:(id)sender {
     if(self->_conn.ready) {
         self->_requestingBacklog = YES;
+        self->_shouldAutoFetch = NO;
         [self->_conn cancelPendingBacklogRequests];
         [self->_conn requestBacklogForBuffer:self->_buffer.bid server:self->_buffer.cid beforeId:self->_earliestEid completion:nil];
         self->_tableView.tableHeaderView = self->_headerView;
