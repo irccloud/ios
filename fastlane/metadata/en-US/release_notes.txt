@@ -1,6 +1,11 @@
-• Edited messages no longer get detached from their reply thread
-• Fix a crash when tapping on an invalid pastebin or photo link
-• Fix loading public IRCCloud avatars when hostmask begins with a ~
-• Support for iOS 12 notification grouping and improved hidden notification content on iOS 11
-• Add a deep link to the app's setting from the iOS 12 notification settings screen
+• Automatically detect phone numbers and addresses in chat messages
+• Fix an issue where the users show/hide button would appear incorrectly on iPad
+• Prompt before joining channels when tapping a hyperlink
+• Support for channel keys in irc:// URLs
+• Improve playback of imgur MP4 / GIFV URLs
+• Fix the last line of collapsed join/part/quits occasionally being truncated
+• Colourised mentions now appear correctly when the message contains emoji
+• Fix missing 'Done' button when viewing a thread on iPad or large screen iPhones
+• Fix truncated labels in settings dialog on iPad
+• Support for Split View and Dark Mode on iOS 13
 • Stability improvements and minor fixes
