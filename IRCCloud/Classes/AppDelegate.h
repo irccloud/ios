@@ -57,7 +57,6 @@
 -(void)setActiveScene:(UIWindow *)window;
 @end
 
-#ifdef __IPHONE_13_0
 @interface SceneDelegate : NSObject <UIWindowSceneDelegate> {
     AppDelegate *_appDelegate;
 }
@@ -68,4 +67,3 @@
 @property (strong, nonatomic) ECSlidingViewController *slideViewController;
 @property (strong, nonatomic) SplashViewController *splashViewController;
 @end
-#endif

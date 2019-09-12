@@ -155,12 +155,10 @@
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"browser":[SFSafariViewController class]?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES), @"backgroundUploads":@(YES)}];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
 
-#ifdef __IPHONE_13_0
     if (@available(iOS 13, *)) {
         if([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark)
             [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"theme":@"midnight"}];
     }
-#endif
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"path"]) {
         IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
@@ -585,19 +583,11 @@
     }];
 }
 
-#ifdef __IPHONE_13_0
 -(void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)(void))completionHandler {
-#else
--(void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
-#endif
     [self handleAction:[notification.userInfo objectForKey:@"identifier"] userInfo:[notification.userInfo objectForKey:@"userInfo"] response:[[notification.userInfo objectForKey:@"responseInfo"] objectForKey:UIUserNotificationActionResponseTypedTextKey] completionHandler:completionHandler];
 }
 
-#ifdef __IPHONE_13_0
 - (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)(void))completionHandler {
-#else
-- (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)())completionHandler {
-#endif
     [self handleAction:identifier userInfo:userInfo response:[responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey] completionHandler:completionHandler];
 }
 
@@ -1015,7 +1005,6 @@
 }
 
 -(void)setActiveScene:(UIWindow *)window {
-#ifdef __IPHONE_13_0
     for(SceneDelegate *d in _activeScenes) {
         if(d.window == window) {
             self.window = d.window;
@@ -1026,11 +1015,9 @@
             break;
         }
     }
-#endif
 }
 @end
 
-#ifdef __IPHONE_13_0
 @implementation SceneDelegate
 -(void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)) {
     _appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
@@ -1096,4 +1083,3 @@
     }
 }
 @end
-#endif

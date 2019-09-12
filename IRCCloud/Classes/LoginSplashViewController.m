@@ -32,11 +32,9 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-#ifdef __IPHONE_13_0
     if (@available(iOS 13, *)) {
         self.view.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     }
-#endif
     self->_kbSize = CGSizeZero;
 
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
