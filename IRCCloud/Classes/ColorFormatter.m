@@ -2578,7 +2578,7 @@ extern BOOL __compact;
                 int start = [[[mention objectAtIndex:i] objectAtIndex:0] intValue];
                 int length = [[[mention objectAtIndex:i] objectAtIndex:1] intValue];
                 NSString *name = nick;
-                if(start > 0 && [output.string characterAtIndex:start-1] == '@') {
+                if(start > 0 && start < output.string.length && [output.string characterAtIndex:start-1] == '@') {
                     if([mentionData objectForKey:nick])
                         name = [[mentionData objectForKey:nick] objectForKey:@"display_name"];
                     else if(server.isSlack)
