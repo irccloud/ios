@@ -2,9 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>MANIFEST_KEY</key>
+	<key>UIApplicationSceneManifest</key>
 	<dict>
-		<key>SCENE_CONFIGURATIONS_KEY</key>
+		<key>UISceneConfigurations</key>
 		<dict>
 			<key>UIWindowSceneSessionRoleApplication</key>
 			<array>
@@ -22,7 +22,7 @@
 				</dict>
 			</array>
 		</dict>
-		<key>MULTI_WINDOW_KEY</key>
+		<key>UIApplicationSupportsMultipleScenes</key>
 		<true/>
 	</dict>
 	<key>ITSAppUsesNonExemptEncryption</key>
