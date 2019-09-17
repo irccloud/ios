@@ -1019,13 +1019,22 @@ extern UIImage *__socketClosedBackgroundImage;
                             }
                             if(result.range.location == 0 && !__chatOneLinePref) {
                                 eventmsg = [msg substringWithRange:NSMakeRange(3, result.range.length - 6)];
+                                if([eventmsg hasPrefix:@"\n"])
+                                    eventmsg = [eventmsg substringFromIndex:1];
+                                if([eventmsg hasSuffix:@"\n"])
+                                    eventmsg = [eventmsg substringToIndex:eventmsg.length - 1];
                                 event.isCodeBlock = YES;
                                 event.color = [UIColor codeSpanForegroundColor];
                                 event.monospace = YES;
                             } else {
                                 Event *e = [event copy];
                                 e.eid = event.eid + ++event.childEventCount;
-                                e.msg = e.formattedMsg = [msg substringWithRange:NSMakeRange(result.range.location + 3, result.range.length - 6)];
+                                NSString *strippedmsg = [msg substringWithRange:NSMakeRange(result.range.location + 3, result.range.length - 6)];
+                                if([strippedmsg hasPrefix:@"\n"])
+                                    strippedmsg = [strippedmsg substringFromIndex:1];
+                                if([strippedmsg hasSuffix:@"\n"])
+                                    strippedmsg = [strippedmsg substringToIndex:strippedmsg.length - 1];
+                                e.msg = e.formattedMsg = strippedmsg;
                                 e.timestamp = @"";
                                 e.parent = event.eid;
                                 e.isCodeBlock = YES;
