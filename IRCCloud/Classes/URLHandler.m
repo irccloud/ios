@@ -682,7 +682,7 @@
 }
 
 + (int)URLtoBID:(NSURL *)url {
-    if([url.path hasPrefix:@"/irc/"]) {
+    if([url.path hasPrefix:@"/irc/"] && url.pathComponents.count >= 4) {
         NSString *network = [[url.pathComponents objectAtIndex:2] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         NSString *type = [url.pathComponents objectAtIndex:3];
         if([type isEqualToString:@"channel"] || [type isEqualToString:@"messages"]) {
