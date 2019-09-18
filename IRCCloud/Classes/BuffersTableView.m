@@ -685,6 +685,7 @@
 
 - (void)backlogCompleted:(NSNotification *)notification {
     if(notification.object == nil || [notification.object bid] < 1) {
+        _requestingArchives = NO;
         [self performSelectorInBackground:@selector(refresh) withObject:nil];
     } else {
         [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[self->_buffers getBuffer:[notification.object bid]]];
@@ -1226,7 +1227,7 @@
                     cell.label.textColor = [UIColor blackColor];
                     cell.bgColor = [UIColor timestampColor];
                     cell.accessibilityHint = @"Hides archive list";
-                    if([[ServersDataSource sharedInstance] getServer:[[row objectForKey:@"cid"] intValue]].deferred_archives) {
+                    if(_requestingArchives && [[ServersDataSource sharedInstance] getServer:[[row objectForKey:@"cid"] intValue]].deferred_archives) {
                         [cell.activity startAnimating];
                         cell.activity.hidden = NO;
                         cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
@@ -1326,10 +1327,11 @@
                 [self->_expandedArchives removeObjectForKey:@(cid)];
             else
                 [self->_expandedArchives setObject:@YES forKey:@(cid)];
-            [self performSelectorInBackground:@selector(refresh) withObject:nil];
             if([[ServersDataSource sharedInstance] getServer:cid].deferred_archives) {
                 [[NetworkConnection sharedInstance] requestArchives:cid];
+                _requestingArchives = YES;
             }
+            [self performSelectorInBackground:@selector(refresh) withObject:nil];
     #ifndef EXTENSION
         } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
             if(self->_delegate)

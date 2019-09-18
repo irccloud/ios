@@ -58,6 +58,8 @@
     UIFont *_smallFont;
     id<UIViewControllerPreviewing> __previewer;
     UILongPressGestureRecognizer *lp;
+    
+    BOOL _requestingArchives;
 }
 @property UIViewController<BuffersTableViewDelegate> *delegate;
 -(void)setBuffer:(Buffer *)buffer;
