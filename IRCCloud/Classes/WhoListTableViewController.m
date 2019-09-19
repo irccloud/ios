@@ -139,38 +139,20 @@
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     [alert addAction:[UIAlertAction actionWithTitle:@"Send a message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:0];
+        [self dismissViewControllerAnimated:YES completion:nil];
+        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [self->_selectedRow objectForKey:@"nick"]] to:nil cid:self->_event.cid handler:nil];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Whois" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:1];
+        [self dismissViewControllerAnimated:YES completion:nil];
+        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/whois %@", [self->_selectedRow objectForKey:@"nick"]] to:nil cid:self->_event.cid handler:nil];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Copy hostmask" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        [self actionSheet:(UIActionSheet *)alert clickedButtonAtIndex:2];
+        UIPasteboard *pb = [UIPasteboard generalPasteboard];
+        [pb setValue:[NSString stringWithFormat:@"%@!%@", [self->_selectedRow objectForKey:@"nick"], [self->_selectedRow objectForKey:@"usermask"]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
     alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
     alert.popoverPresentationController.sourceView = self.view;
     [self.navigationController presentViewController:alert animated:YES completion:nil];
-}
-
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
-    switch(buttonIndex) {
-        case 0:
-            [self dismissViewControllerAnimated:YES completion:nil];
-            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", [self->_selectedRow objectForKey:@"nick"]] to:nil cid:self->_event.cid handler:nil];
-            break;
-        case 1:
-            [self dismissViewControllerAnimated:YES completion:nil];
-            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/whois %@", [self->_selectedRow objectForKey:@"nick"]] to:nil cid:self->_event.cid handler:nil];
-            break;
-        case 2:
-        {
-            UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            [pb setValue:[NSString stringWithFormat:@"%@!%@", [self->_selectedRow objectForKey:@"nick"], [self->_selectedRow objectForKey:@"usermask"]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-        }
-            break;
-        default:
-            break;
-    }
 }
 @end
