@@ -3832,6 +3832,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)userSelected:(NSString *)nick rect:(CGRect)rect {
+    rect = [_usersView.tableView convertRect:rect toView:self.view];
     self->_selectedRect = rect;
     self->_selectedEvent = nil;
     self->_selectedURL = nil;
@@ -4123,6 +4124,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)rowLongPressed:(Event *)event rect:(CGRect)rect link:(NSString *)url {
+    rect = [_eventsView.tableView convertRect:rect toView:self.view];
     if(event && (event.msg.length || event.groupMsg.length || event.rowType == ROW_THUMBNAIL)) {
         NSString *from = event.from;
         if(!from.length)
