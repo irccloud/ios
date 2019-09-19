@@ -3566,56 +3566,63 @@ NSArray *_sortedChannels;
     self->_selectedUser = nil;
     self->_selectedEvent = nil;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:self->_buffer.cid].nick cid:self->_buffer.cid bid:self->_buffer.bid];
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:nil delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    void (^handler)(UIAlertAction *action) = ^(UIAlertAction *a) {
+        [self actionSheetActionClicked:a.title];
+    };
+    
     if([self->_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
-            [sheet addButtonWithTitle:@"Reconnect"];
-            [sheet addButtonWithTitle:@"Delete"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Reconnect" style:UIAlertActionStyleDefault handler:handler]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDefault handler:handler]];
         } else {
             //[sheet addButtonWithTitle:@"Identify Nickname…"];
-            [sheet addButtonWithTitle:@"Disconnect"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Disconnect" style:UIAlertActionStyleDefault handler:handler]];
         }
-        [sheet addButtonWithTitle:@"Edit Connection"];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:handler]];
     } else if([self->_buffer.type isEqualToString:@"channel"]) {
         if([[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
-            [sheet addButtonWithTitle:@"Leave"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Leave" style:UIAlertActionStyleDefault handler:handler]];
             if([me.mode rangeOfString:@"q"].location != NSNotFound || [me.mode rangeOfString:@"a"].location != NSNotFound || [me.mode rangeOfString:@"o"].location != NSNotFound) {
-                [sheet addButtonWithTitle:@"Ban List"];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ban List" style:UIAlertActionStyleDefault handler:handler]];
             }
-            [sheet addButtonWithTitle:@"Invite to Channel"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Invite to Channel" style:UIAlertActionStyleDefault handler:handler]];
         } else {
-            [sheet addButtonWithTitle:@"Rejoin"];
-            [sheet addButtonWithTitle:(self->_buffer.archived)?@"Unarchive":@"Archive"];
-            [sheet addButtonWithTitle:@"Rename"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Rejoin" style:UIAlertActionStyleDefault handler:handler]];
+            [alert addAction:[UIAlertAction actionWithTitle:(self->_buffer.archived)?@"Unarchive":@"Archive" style:UIAlertActionStyleDefault handler:handler]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Rename" style:UIAlertActionStyleDefault handler:handler]];
         }
-        [sheet addButtonWithTitle:@"Delete"];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDefault handler:handler]];
     } else {
-        [sheet addButtonWithTitle:@"Whois"];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Whois" style:UIAlertActionStyleDefault handler:handler]];
         if(self->_buffer.archived) {
-            [sheet addButtonWithTitle:@"Unarchive"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Unarchive" style:UIAlertActionStyleDefault handler:handler]];
         } else {
-            [sheet addButtonWithTitle:@"Archive"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Archive" style:UIAlertActionStyleDefault handler:handler]];
         }
-        [sheet addButtonWithTitle:@"Rename"];
-        [sheet addButtonWithTitle:@"Delete"];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Rename" style:UIAlertActionStyleDefault handler:handler]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDefault handler:handler]];
     }
-    [sheet addButtonWithTitle:@"Ignore List"];
-    [sheet addButtonWithTitle:@"Add Network"];
-    [sheet addButtonWithTitle:@"Join a Channel"];
-    [sheet addButtonWithTitle:@"Display Options"];
-    [sheet addButtonWithTitle:@"Download Logs"];
-    [sheet addButtonWithTitle:@"Settings"];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ignore List" style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Add Network" style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Join a Channel" style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Display Options" style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Download Logs" style:UIAlertActionStyleDefault handler:handler]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Settings" style:UIAlertActionStyleDefault handler:handler]];
 #ifndef DEBUG
-    [sheet addButtonWithTitle:@"Send Feedback"];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:handler]];
 #endif
-    [sheet addButtonWithTitle:@"Logout"];
-    sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone) {
-        [sheet showInView:self.view];
-    } else {
-        [sheet showFromRect:CGRectMake(self->_bottomBar.frame.origin.x + _settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height) inView:self.view animated:YES];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDefault handler:handler]];
+    if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:handler]];
     }
+
+    alert.popoverPresentationController.sourceRect = CGRectMake(self->_bottomBar.frame.origin.x + _settingsBtn.frame.origin.x, _bottomBar.frame.origin.y,_settingsBtn.frame.size.width,_settingsBtn.frame.size.height);
+    alert.popoverPresentationController.sourceView = self.view;
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)dismissKeyboard {
@@ -3749,73 +3756,74 @@ NSArray *_sortedChannels;
         else
             title = self->_selectedUser.nick;
     }
-    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:title delegate:self cancelButtonTitle:nil destructiveButtonTitle:nil otherButtonTitles:nil];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    
+    void (^handler)(UIAlertAction *action) = ^(UIAlertAction *a) {
+        [self actionSheetActionClicked:a.title];
+    };
     if(self->_selectedURL) {
-        [sheet addButtonWithTitle:@"Copy URL"];
-        [sheet addButtonWithTitle:@"Share URL"];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Copy URL" style:UIAlertActionStyleDefault handler:handler]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Share URL" style:UIAlertActionStyleDefault handler:handler]];
     }
     if(self->_selectedEvent) {
         if([[self->_selectedEvent.entities objectForKey:@"own_file"] intValue]) {
-            [sheet addButtonWithTitle:@"Delete File"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete File" style:UIAlertActionStyleDefault handler:handler]];
         }
         if(self->_selectedEvent.rowType == ROW_THUMBNAIL || _selectedEvent.rowType == ROW_FILE)
-            [sheet addButtonWithTitle:@"Close Preview"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Close Preview" style:UIAlertActionStyleDefault handler:handler]];
         if(self->_selectedEvent.msg.length)
-            [sheet addButtonWithTitle:@"Copy Message"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Copy Message" style:UIAlertActionStyleDefault handler:handler]];
         if(!_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
-            [sheet addButtonWithTitle:@"Reply"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Reply" style:UIAlertActionStyleDefault handler:handler]];
         }
         if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
-            [sheet addButtonWithTitle:@"Edit Message"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Edit Message" style:UIAlertActionStyleDefault handler:handler]];
         }
         if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
-            [sheet addButtonWithTitle:@"Delete Message"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete Message" style:UIAlertActionStyleDefault handler:handler]];
         }
     }
     if(self->_selectedUser) {
         if(self->_buffer.serverIsSlack)
-            [sheet addButtonWithTitle:@"Slack Profile"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Slack Profile" style:UIAlertActionStyleDefault handler:handler]];
         if(!_buffer.serverIsSlack)
-            [sheet addButtonWithTitle:@"Whois"];
-        [sheet addButtonWithTitle:@"Send a Message"];
-        [sheet addButtonWithTitle:@"Mention"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Whois" style:UIAlertActionStyleDefault handler:handler]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Send a Message" style:UIAlertActionStyleDefault handler:handler]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Mention" style:UIAlertActionStyleDefault handler:handler]];
         if(!_buffer.serverIsSlack)
-            [sheet addButtonWithTitle:@"Invite to Channel"];
-        [sheet addButtonWithTitle:@"Ignore"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Invite to Channel" style:UIAlertActionStyleDefault handler:handler]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Ignore" style:UIAlertActionStyleDefault handler:handler]];
         if(!_buffer.serverIsSlack && [self->_buffer.type isEqualToString:@"channel"]) {
             User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:self->_buffer.cid].nick cid:self->_buffer.cid bid:self->_buffer.bid];
             if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound) {
                 if([self->_selectedUser.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound)
-                    [sheet addButtonWithTitle:@"Deop"];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Deop" style:UIAlertActionStyleDefault handler:handler]];
                 else
-                    [sheet addButtonWithTitle:@"Op"];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Op" style:UIAlertActionStyleDefault handler:handler]];
             }
             if([me.mode rangeOfString:server?server.MODE_OPER:@"Y"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OWNER:@"q"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_ADMIN:@"a"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_OP:@"o"].location != NSNotFound || [me.mode rangeOfString:server?server.MODE_HALFOP:@"h"].location != NSNotFound) {
                 if([self->_selectedUser.mode rangeOfString:server?server.MODE_VOICED:@"v"].location != NSNotFound)
-                    [sheet addButtonWithTitle:@"Devoice"];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Devoice" style:UIAlertActionStyleDefault handler:handler]];
                 else
-                    [sheet addButtonWithTitle:@"Voice"];
-                [sheet addButtonWithTitle:@"Kick"];
-                [sheet addButtonWithTitle:@"Ban"];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Voice" style:UIAlertActionStyleDefault handler:handler]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Kick" style:UIAlertActionStyleDefault handler:handler]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ban" style:UIAlertActionStyleDefault handler:handler]];
             }
         }
         if(!_buffer.serverIsSlack)
-            [sheet addButtonWithTitle:@"Copy Hostmask"];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Copy Hostmask" style:UIAlertActionStyleDefault handler:handler]];
     }
     
     if(self->_selectedEvent)
-        [sheet addButtonWithTitle:@"Clear Backlog"];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Clear Backlog" style:UIAlertActionStyleDefault handler:handler]];
 
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
-        sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Cancel"];
-        [sheet showInView:self.view];
-    } else {
-        self->_selectedRect = rect;
-        if(self->_selectedEvent)
-            [sheet showFromRect:rect inView:self->_eventsView.tableView animated:NO];
-        else
-            [sheet showFromRect:rect inView:self->_usersView.tableView animated:NO];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:handler]];
     }
+    
+    alert.popoverPresentationController.sourceRect = rect;
+    alert.popoverPresentationController.sourceView = self.view;
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)_userTapped {
@@ -4768,242 +4776,240 @@ NSArray *_sortedChannels;
     [self presentViewController:alert animated:YES completion:nil];
 }
 
--(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+-(void)actionSheetActionClicked:(NSString *)action {
     [self->_message resignFirstResponder];
     if(self.presentedViewController)
         [self dismissViewControllerAnimated:NO completion:nil];
-    if(buttonIndex != -1) {
-        NSString *action = [actionSheet buttonTitleAtIndex:buttonIndex];
         
-        if([action isEqualToString:@"Copy Message"]) {
-            Event *e = self->_selectedEvent;
-            if(e.parent)
-                e = [[EventsDataSource sharedInstance] event:e.parent buffer:e.bid];
-            UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            NSString *irc;
-            if(e.groupMsg.length) {
-                irc = [NSString stringWithFormat:@"%@ %@",e.timestamp,e.groupMsg];
-            } else if(e.from.length || [e.type isEqualToString:@"buffer_me_msg"]) {
-                irc = [e.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ %c— %@%c %@",e.timestamp,BOLD,e.nick,CLEAR,e.msg]:[NSString stringWithFormat:@"%@ %c<%@>%c %@",e.timestamp,BOLD,e.from,CLEAR,e.msg];
-            } else {
-                irc = [NSString stringWithFormat:@"%@ %@",e.timestamp,e.msg];
-            }
-            irc = [irc stringByReplacingOccurrencesOfString:@"\u00a0" withString:@" "];
-            NSAttributedString *msg = [ColorFormatter format:irc defaultColor:nil mono:NO linkify:NO server:nil links:nil];
-            pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string,@"IRC formatting type":[irc dataUsingEncoding:NSUTF8StringEncoding]}];
-        } else if([action isEqualToString:@"Clear Backlog"]) {
-            int bid = self->_selectedBuffer?_selectedBuffer.bid:self->_selectedEvent.bid;
-            [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
-            if(self->_buffer.bid == bid)
-                [self->_eventsView refresh];
-        } else if([action isEqualToString:@"Copy URL"]) {
-            UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            [pb setValue:self->_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-        } else if([action isEqualToString:@"Share URL"]) {
-            [UIColor clearTheme];
-            UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:self->_selectedURL]] type:@"URL"];
-            activityController.popoverPresentationController.sourceView = self.slidingViewController.view;
-            activityController.popoverPresentationController.sourceRect = [self->_eventsView.tableView convertRect:self->_selectedRect toView:self.slidingViewController.view];
-            [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
-        } else if([action isEqualToString:@"Delete Message"]) {
-            [self dismissKeyboard];
-            [self.view.window endEditing:YES];
-            
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Message" message:@"Are you sure you want to delete this message?" preferredStyle:UIAlertControllerStyleAlert];
-            
-            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                [[NetworkConnection sharedInstance] deleteMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan handler:^(IRCCloudJSONObject *result) {
-                    if(![[result objectForKey:@"success"] boolValue]) {
-                        CLS_LOG(@"Error deleting message: %@", result);
-                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                        [alert show];
-                    }
-                }];
-            }]];
-            
-            [self presentViewController:alert animated:YES completion:nil];
-        } else if([action isEqualToString:@"Edit Message"]) {
-            [self dismissKeyboard];
-            [self.view.window endEditing:YES];
-            
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedEvent.cid];
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Edit message" preferredStyle:UIAlertControllerStyleAlert];
-            
-            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-            [alert addAction:[UIAlertAction actionWithTitle:@"Edit" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
-                    [[NetworkConnection sharedInstance] editMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan msg:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
-                        if(![[result objectForKey:@"success"] boolValue]) {
-                            CLS_LOG(@"Error editing message: %@", result);
-                            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to edit message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                            [alert show];
-                        }
-                    }];
-            }]];
-            
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-                [self presentViewController:alert animated:YES completion:nil];
-            }
-            
-            [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                textField.text = self->_selectedEvent.msg;
-                textField.delegate = self;
-                [textField becomeFirstResponder];
-            }];
-            
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-                [self presentViewController:alert animated:YES completion:nil];
-        } else if([action isEqualToString:@"Delete File"]) {
-            [[NetworkConnection sharedInstance] deleteFile:[self->_selectedEvent.entities objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
-                if([[result objectForKey:@"success"] boolValue]) {
-                    [self->_eventsView uncacheFile:[self->_selectedEvent.entities objectForKey:@"id"]];
-                    [self->_eventsView refresh];
-                } else {
-                    CLS_LOG(@"Error deleting file: %@", result);
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+    if([action isEqualToString:@"Copy Message"]) {
+        Event *e = self->_selectedEvent;
+        if(e.parent)
+            e = [[EventsDataSource sharedInstance] event:e.parent buffer:e.bid];
+        UIPasteboard *pb = [UIPasteboard generalPasteboard];
+        NSString *irc;
+        if(e.groupMsg.length) {
+            irc = [NSString stringWithFormat:@"%@ %@",e.timestamp,e.groupMsg];
+        } else if(e.from.length || [e.type isEqualToString:@"buffer_me_msg"]) {
+            irc = [e.type isEqualToString:@"buffer_me_msg"]?[NSString stringWithFormat:@"%@ %c— %@%c %@",e.timestamp,BOLD,e.nick,CLEAR,e.msg]:[NSString stringWithFormat:@"%@ %c<%@>%c %@",e.timestamp,BOLD,e.from,CLEAR,e.msg];
+        } else {
+            irc = [NSString stringWithFormat:@"%@ %@",e.timestamp,e.msg];
+        }
+        irc = [irc stringByReplacingOccurrencesOfString:@"\u00a0" withString:@" "];
+        NSAttributedString *msg = [ColorFormatter format:irc defaultColor:nil mono:NO linkify:NO server:nil links:nil];
+        pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string,@"IRC formatting type":[irc dataUsingEncoding:NSUTF8StringEncoding]}];
+    } else if([action isEqualToString:@"Clear Backlog"]) {
+        int bid = self->_selectedBuffer?_selectedBuffer.bid:self->_selectedEvent.bid;
+        [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
+        if(self->_buffer.bid == bid)
+            [self->_eventsView refresh];
+    } else if([action isEqualToString:@"Copy URL"]) {
+        UIPasteboard *pb = [UIPasteboard generalPasteboard];
+        [pb setValue:self->_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+    } else if([action isEqualToString:@"Share URL"]) {
+        [UIColor clearTheme];
+        UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:self->_selectedURL]] type:@"URL"];
+        activityController.popoverPresentationController.sourceView = self.slidingViewController.view;
+        activityController.popoverPresentationController.sourceRect = [self->_eventsView.tableView convertRect:self->_selectedRect toView:self.slidingViewController.view];
+        [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
+    } else if([action isEqualToString:@"Delete Message"]) {
+        [self dismissKeyboard];
+        [self.view.window endEditing:YES];
+        
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Message" message:@"Are you sure you want to delete this message?" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+            [[NetworkConnection sharedInstance] deleteMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan handler:^(IRCCloudJSONObject *result) {
+                if(![[result objectForKey:@"success"] boolValue]) {
+                    CLS_LOG(@"Error deleting message: %@", result);
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [alert show];
                 }
             }];
-        } else if([action isEqualToString:@"Close Preview"]) {
-            [self->_eventsView closePreview:self->_selectedEvent];
-        } else if([action isEqualToString:@"Archive"]) {
-            [[NetworkConnection sharedInstance] archiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
-        } else if([action isEqualToString:@"Unarchive"]) {
-            [[NetworkConnection sharedInstance] unarchiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
-        } else if([action isEqualToString:@"Delete"]) {
-            [self _deleteSelectedBuffer];
-        } else if([action isEqualToString:@"Leave"]) {
-            [[NetworkConnection sharedInstance] part:self->_selectedBuffer.name msg:nil cid:self->_selectedBuffer.cid handler:nil];
-        } else if([action isEqualToString:@"Rejoin"]) {
-            [[NetworkConnection sharedInstance] join:self->_selectedBuffer.name key:nil cid:self->_selectedBuffer.cid handler:nil];
-        } else if([action isEqualToString:@"Rename"]) {
-            [self _renameBuffer:self->_selectedBuffer msg:nil];
-        } else if([action isEqualToString:@"Ban List"]) {
-            [[NetworkConnection sharedInstance] mode:@"b" chan:self->_selectedBuffer.name cid:self->_selectedBuffer.cid handler:nil];
-        } else if([action isEqualToString:@"Disconnect"]) {
-            [[NetworkConnection sharedInstance] disconnect:self->_selectedBuffer.cid msg:nil handler:nil];
-        } else if([action isEqualToString:@"Reconnect"]) {
-            [[NetworkConnection sharedInstance] reconnect:self->_selectedBuffer.cid handler:nil];
-        } else if([action isEqualToString:@"Logout"]) {
-            [self dismissKeyboard];
-            [self.view.window endEditing:YES];
-            
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
-            
-            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-            [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                [[NetworkConnection sharedInstance] logout];
-                [self bufferSelected:-1];
-                [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
-            }]];
-            
+        }]];
+        
+        [self presentViewController:alert animated:YES completion:nil];
+    } else if([action isEqualToString:@"Edit Message"]) {
+        [self dismissKeyboard];
+        [self.view.window endEditing:YES];
+        
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedEvent.cid];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Edit message" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Edit" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
+                [[NetworkConnection sharedInstance] editMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan msg:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
+                    if(![[result objectForKey:@"success"] boolValue]) {
+                        CLS_LOG(@"Error editing message: %@", result);
+                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to edit message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                        [alert show];
+                    }
+                }];
+        }]];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
             [self presentViewController:alert animated:YES completion:nil];
-        } else if([action isEqualToString:@"Ignore List"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
-            itv.ignores = s.ignores;
-            itv.cid = s.cid;
-            itv.navigationItem.title = @"Ignore List";
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Mention"]) {
-            [self.slidingViewController resetTopViewWithAnimations:nil onComplete:^{
-                [self showMentionTip];
-                [self _mention];
-            }];
-        } else if([action isEqualToString:@"Edit Connection"]) {
-            [self _editConnection];
-        } else if([action isEqualToString:@"Settings"]) {
-            SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Display Options"]) {
-            DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            dvc.buffer = self->_buffer;
-            dvc.navigationItem.title = self->_titleLabel.text;
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Download Logs"]) {
-            LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            lvc.buffer = self->_buffer;
-            lvc.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Add Network"]) {
-            EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self presentViewController:nc animated:YES completion:nil];
-        } else if([action isEqualToString:@"Take a Photo"] || [action isEqualToString:@"Take Photo or Video"]) {
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
-            [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
-        } else if([action isEqualToString:@"Choose Photo"] || [action isEqualToString:@"Choose Photo or Video"]) {
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
-            [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
-        } else if([action isEqualToString:@"Choose Document"]) {
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
-            [self _chooseFile];
-        } else if([action isEqualToString:@"File Uploads"]) {
-            [self _showUploads];
-        } else if([action isEqualToString:@"Text Snippets"]) {
-            [self _showPastebins];
-        } else if([action isEqualToString:@"Start a Text Snippet"]) {
-            [self _startPastebin];
-        } else if([action isEqualToString:@"Mark All As Read"]) {
-            [self _markAllAsRead];
-        } else if([action isEqualToString:@"Add A Network"]) {
-            [self _addNetwork];
-        } else if([action isEqualToString:@"Reorder"]) {
-            [self _reorder];
-        } else if([action isEqualToString:@"Invite to Channel"]) {
-            [self _inviteToChannel];
-        } else if([action isEqualToString:@"Join a Channel"]) {
-            [self _joinAChannel];
-        } else if([action isEqualToString:@"Whois"]) {
-            if(self->_selectedUser && _selectedUser.nick.length > 0) {
-                if(self->_selectedUser.parted)
-                    [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:nil cid:self->_buffer.cid handler:nil];
-                else
-                    [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:self->_selectedUser.ircserver.length?_selectedUser.ircserver:self->_selectedUser.nick cid:self->_buffer.cid handler:nil];
-            } else if([self->_buffer.type isEqualToString:@"conversation"]) {
-                [[NetworkConnection sharedInstance] whois:self->_buffer.name server:self->_buffer.name cid:self->_buffer.cid handler:nil];
+        }
+        
+        [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            textField.text = self->_selectedEvent.msg;
+            textField.delegate = self;
+            [textField becomeFirstResponder];
+        }];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+            [self presentViewController:alert animated:YES completion:nil];
+    } else if([action isEqualToString:@"Delete File"]) {
+        [[NetworkConnection sharedInstance] deleteFile:[self->_selectedEvent.entities objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
+            if([[result objectForKey:@"success"] boolValue]) {
+                [self->_eventsView uncacheFile:[self->_selectedEvent.entities objectForKey:@"id"]];
+                [self->_eventsView refresh];
+            } else {
+                CLS_LOG(@"Error deleting file: %@", result);
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                [alert show];
             }
-        } else if([action isEqualToString:@"Send Feedback"]) {
-            CLS_LOG(@"Feedback Requested");
+        }];
+    } else if([action isEqualToString:@"Close Preview"]) {
+        [self->_eventsView closePreview:self->_selectedEvent];
+    } else if([action isEqualToString:@"Archive"]) {
+        [[NetworkConnection sharedInstance] archiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
+    } else if([action isEqualToString:@"Unarchive"]) {
+        [[NetworkConnection sharedInstance] unarchiveBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
+    } else if([action isEqualToString:@"Delete"]) {
+        [self _deleteSelectedBuffer];
+    } else if([action isEqualToString:@"Leave"]) {
+        [[NetworkConnection sharedInstance] part:self->_selectedBuffer.name msg:nil cid:self->_selectedBuffer.cid handler:nil];
+    } else if([action isEqualToString:@"Rejoin"]) {
+        [[NetworkConnection sharedInstance] join:self->_selectedBuffer.name key:nil cid:self->_selectedBuffer.cid handler:nil];
+    } else if([action isEqualToString:@"Rename"]) {
+        [self _renameBuffer:self->_selectedBuffer msg:nil];
+    } else if([action isEqualToString:@"Ban List"]) {
+        [[NetworkConnection sharedInstance] mode:@"b" chan:self->_selectedBuffer.name cid:self->_selectedBuffer.cid handler:nil];
+    } else if([action isEqualToString:@"Disconnect"]) {
+        [[NetworkConnection sharedInstance] disconnect:self->_selectedBuffer.cid msg:nil handler:nil];
+    } else if([action isEqualToString:@"Reconnect"]) {
+        [[NetworkConnection sharedInstance] reconnect:self->_selectedBuffer.cid handler:nil];
+    } else if([action isEqualToString:@"Logout"]) {
+        [self dismissKeyboard];
+        [self.view.window endEditing:YES];
+        
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+            [[NetworkConnection sharedInstance] logout];
+            [self bufferSelected:-1];
+            [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+        }]];
+        
+        [self presentViewController:alert animated:YES completion:nil];
+    } else if([action isEqualToString:@"Ignore List"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
+        itv.ignores = s.ignores;
+        itv.cid = s.cid;
+        itv.navigationItem.title = @"Ignore List";
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
+    } else if([action isEqualToString:@"Mention"]) {
+        [self.slidingViewController resetTopViewWithAnimations:nil onComplete:^{
+            [self showMentionTip];
+            [self _mention];
+        }];
+    } else if([action isEqualToString:@"Edit Connection"]) {
+        [self _editConnection];
+    } else if([action isEqualToString:@"Settings"]) {
+        SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
+    } else if([action isEqualToString:@"Display Options"]) {
+        DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        dvc.buffer = self->_buffer;
+        dvc.navigationItem.title = self->_titleLabel.text;
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:dvc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
+    } else if([action isEqualToString:@"Download Logs"]) {
+        LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        lvc.buffer = self->_buffer;
+        lvc.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
+    } else if([action isEqualToString:@"Add Network"]) {
+        EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
+    } else if([action isEqualToString:@"Take a Photo"] || [action isEqualToString:@"Take Photo or Video"]) {
+        if(self.presentedViewController)
+            [self dismissViewControllerAnimated:NO completion:nil];
+        [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
+    } else if([action isEqualToString:@"Choose Photo"] || [action isEqualToString:@"Choose Photo or Video"]) {
+        if(self.presentedViewController)
+            [self dismissViewControllerAnimated:NO completion:nil];
+        [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+    } else if([action isEqualToString:@"Choose Document"]) {
+        if(self.presentedViewController)
+            [self dismissViewControllerAnimated:NO completion:nil];
+        [self _chooseFile];
+    } else if([action isEqualToString:@"File Uploads"]) {
+        [self _showUploads];
+    } else if([action isEqualToString:@"Text Snippets"]) {
+        [self _showPastebins];
+    } else if([action isEqualToString:@"Start a Text Snippet"]) {
+        [self _startPastebin];
+    } else if([action isEqualToString:@"Mark All As Read"]) {
+        [self _markAllAsRead];
+    } else if([action isEqualToString:@"Add A Network"]) {
+        [self _addNetwork];
+    } else if([action isEqualToString:@"Reorder"]) {
+        [self _reorder];
+    } else if([action isEqualToString:@"Invite to Channel"]) {
+        [self _inviteToChannel];
+    } else if([action isEqualToString:@"Join a Channel"]) {
+        [self _joinAChannel];
+    } else if([action isEqualToString:@"Whois"]) {
+        if(self->_selectedUser && _selectedUser.nick.length > 0) {
+            if(self->_selectedUser.parted)
+                [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:nil cid:self->_buffer.cid handler:nil];
+            else
+                [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:self->_selectedUser.ircserver.length?_selectedUser.ircserver:self->_selectedUser.nick cid:self->_buffer.cid handler:nil];
+        } else if([self->_buffer.type isEqualToString:@"conversation"]) {
+            [[NetworkConnection sharedInstance] whois:self->_buffer.name server:self->_buffer.name cid:self->_buffer.cid handler:nil];
+        }
+    } else if([action isEqualToString:@"Send Feedback"]) {
+        CLS_LOG(@"Feedback Requested");
 #ifdef APPSTORE
-            NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
+        NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
 #else
-            NSString *version = [NSString stringWithFormat:@"%@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
+        NSString *version = [NSString stringWithFormat:@"%@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
 #endif
-            NSMutableString *report = [[NSMutableString alloc] initWithFormat:
+        NSMutableString *report = [[NSMutableString alloc] initWithFormat:
 @"Briefly describe the issue below:\n\
 \n\
 \n\
@@ -5014,119 +5020,118 @@ App Version: %@\n\
 OS Version: %@\n\
 Device type: %@\n\
 Network type: %@\n",
-                                       [[NetworkConnection sharedInstance].userInfo objectForKey:@"id"],version,[UIDevice currentDevice].systemVersion,[UIDevice currentDevice].model,[NetworkConnection sharedInstance].isWifi ? @"Wi-Fi" : @"Mobile"];
-            [report appendString:@"==========\nPrefs:\n"];
-            [report appendFormat:@"%@\n", [[NetworkConnection sharedInstance] prefs]];
-            [report appendString:@"==========\nNSUserDefaults:\n"];
-            NSMutableDictionary *d = [NSUserDefaults standardUserDefaults].dictionaryRepresentation.mutableCopy;
-            [d removeObjectForKey:@"logs_cache"];
-            [d removeObjectForKey:@"AppleITunesStoreItemKinds"];
-            [report appendFormat:@"%@\n", d];
+                                   [[NetworkConnection sharedInstance].userInfo objectForKey:@"id"],version,[UIDevice currentDevice].systemVersion,[UIDevice currentDevice].model,[NetworkConnection sharedInstance].isWifi ? @"Wi-Fi" : @"Mobile"];
+        [report appendString:@"==========\nPrefs:\n"];
+        [report appendFormat:@"%@\n", [[NetworkConnection sharedInstance] prefs]];
+        [report appendString:@"==========\nNSUserDefaults:\n"];
+        NSMutableDictionary *d = [NSUserDefaults standardUserDefaults].dictionaryRepresentation.mutableCopy;
+        [d removeObjectForKey:@"logs_cache"];
+        [d removeObjectForKey:@"AppleITunesStoreItemKinds"];
+        [report appendFormat:@"%@\n", d];
 
 #ifdef ENTERPRISE
-            NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
+        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
 #else
-            NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
+        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
 #endif
-            if(sharedcontainer) {
-                fflush(stderr);
-                NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
-                
-                [report appendString:@"==========\nConsole log:\n"];
-                [report appendFormat:@"%@\n", [NSString stringWithContentsOfURL:logfile encoding:NSUTF8StringEncoding error:nil]];
-            }
+        if(sharedcontainer) {
+            fflush(stderr);
+            NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
             
-            if(report.length) {
-                MFMailComposeViewController *mfmc = [[MFMailComposeViewController alloc] init];
-                if(mfmc && [MFMailComposeViewController canSendMail]) {
-                    mfmc.mailComposeDelegate = self;
-                    [mfmc setToRecipients:@[@"team@irccloud.com"]];
-                    [mfmc setSubject:@"IRCCloud for iOS"];
-                    [mfmc setMessageBody:report isHTML:NO];
-                    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                        mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
-                    else
-                        mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                    [self presentViewController:mfmc animated:YES completion:^{
-                        [self _resetStatusBar];
-                    }];
-                } else {
-                    self->_bugReport = report;
-                    self->_alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Copy to Clipboard", nil];
-                    self->_alertView.tag = TAG_BUGREPORT;
-                    [self->_alertView show];
-                }
-            }
+            [report appendString:@"==========\nConsole log:\n"];
+            [report appendFormat:@"%@\n", [NSString stringWithContentsOfURL:logfile encoding:NSUTF8StringEncoding error:nil]];
         }
         
-        if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
-            return;
-        
-        if([action isEqualToString:@"Copy Hostmask"]) {
-            UIPasteboard *pb = [UIPasteboard generalPasteboard];
-            NSString *plaintext = [NSString stringWithFormat:@"%@!%@", _selectedUser.nick, _selectedUser.hostmask];
-            [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-        } else if([action isEqualToString:@"Send a Message"]) {
-            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:self->_selectedUser.nick server:self->_buffer.cid];
-            if(b) {
-                [self bufferSelected:b.bid];
+        if(report.length) {
+            MFMailComposeViewController *mfmc = [[MFMailComposeViewController alloc] init];
+            if(mfmc && [MFMailComposeViewController canSendMail]) {
+                mfmc.mailComposeDelegate = self;
+                [mfmc setToRecipients:@[@"team@irccloud.com"]];
+                [mfmc setSubject:@"IRCCloud for iOS"];
+                [mfmc setMessageBody:report isHTML:NO];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                [self presentViewController:mfmc animated:YES completion:^{
+                    [self _resetStatusBar];
+                }];
             } else {
-                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:self->_buffer.cid handler:nil];
+                self->_bugReport = report;
+                self->_alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Copy to Clipboard", nil];
+                self->_alertView.tag = TAG_BUGREPORT;
+                [self->_alertView show];
             }
-        } else if([action isEqualToString:@"Op"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
-        } else if([action isEqualToString:@"Deop"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
-        } else if([action isEqualToString:@"Voice"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
-        } else if([action isEqualToString:@"Devoice"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
-        } else if([action isEqualToString:@"Ban"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
-            self->_alertView.tag = TAG_BAN;
-            self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            if(self->_selectedUser.hostmask.length)
-                [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
-            else
-                [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
-            [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-            [self->_alertView textFieldAtIndex:0].delegate = self;
-            [self->_alertView show];
-        } else if([action isEqualToString:@"Ignore"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
-            self->_alertView.tag = TAG_IGNORE;
-            self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            if(self->_selectedUser.hostmask.length)
-                [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
-            else
-                [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
-            [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-            [self->_alertView textFieldAtIndex:0].delegate = self;
-            [self->_alertView show];
-        } else if([action isEqualToString:@"Kick"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
-            self->_alertView.tag = TAG_KICK;
-            self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            [self->_alertView textFieldAtIndex:0].delegate = self;
-            [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-            [self->_alertView show];
-        } else if([action isEqualToString:@"Slack Profile"]) {
-            Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-            NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];
-            [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
-        } else if([action isEqualToString:@"Reply"]) {
-            NSString *msgid = self->_selectedEvent.reply;
-            if(!msgid)
-                msgid = self->_selectedEvent.msgid;
-            [self setMsgId:msgid];
         }
+    }
+    
+    if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
+        return;
+    
+    if([action isEqualToString:@"Copy Hostmask"]) {
+        UIPasteboard *pb = [UIPasteboard generalPasteboard];
+        NSString *plaintext = [NSString stringWithFormat:@"%@!%@", _selectedUser.nick, _selectedUser.hostmask];
+        [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+    } else if([action isEqualToString:@"Send a Message"]) {
+        Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:self->_selectedUser.nick server:self->_buffer.cid];
+        if(b) {
+            [self bufferSelected:b.bid];
+        } else {
+            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", _selectedUser.nick] to:nil cid:self->_buffer.cid handler:nil];
+        }
+    } else if([action isEqualToString:@"Op"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
+    } else if([action isEqualToString:@"Deop"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_OP:@"o",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
+    } else if([action isEqualToString:@"Voice"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
+    } else if([action isEqualToString:@"Devoice"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
+    } else if([action isEqualToString:@"Ban"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
+        self->_alertView.tag = TAG_BAN;
+        self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+        if(self->_selectedUser.hostmask.length)
+            [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+        else
+            [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
+        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+        [self->_alertView textFieldAtIndex:0].delegate = self;
+        [self->_alertView show];
+    } else if([action isEqualToString:@"Ignore"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
+        self->_alertView.tag = TAG_IGNORE;
+        self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+        if(self->_selectedUser.hostmask.length)
+            [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
+        else
+            [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
+        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+        [self->_alertView textFieldAtIndex:0].delegate = self;
+        [self->_alertView show];
+    } else if([action isEqualToString:@"Kick"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
+        self->_alertView.tag = TAG_KICK;
+        self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
+        [self->_alertView textFieldAtIndex:0].delegate = self;
+        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
+        [self->_alertView show];
+    } else if([action isEqualToString:@"Slack Profile"]) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];
+        [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:url];
+    } else if([action isEqualToString:@"Reply"]) {
+        NSString *msgid = self->_selectedEvent.reply;
+        if(!msgid)
+            msgid = self->_selectedEvent.msgid;
+        [self setMsgId:msgid];
     }
 }
 
