@@ -102,7 +102,7 @@
             [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
         }]];
     }
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     alert.popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem;
     alert.popoverPresentationController.sourceView = self.view;
     [self presentViewController:alert animated:YES completion:nil];
@@ -230,8 +230,11 @@
         } else {
             msg = @"Failed to upload avatar. Please try again shortly.";
         }
-        [self dismissViewControllerAnimated:YES completion:nil];
-        [[[UIAlertView alloc] initWithTitle:@"Upload Failed" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+        [self dismissViewControllerAnimated:YES completion:^{
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:msg preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
+        }];
     }];
 }
 
@@ -254,7 +257,9 @@
 -(void)fileUploadTooLarge {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         CLS_LOG(@"File upload too large");
-        [[[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(addButtonPressed)];
     }];
 }
@@ -293,7 +298,7 @@
             [[NSUserDefaults standardUserDefaults] setObject:@(YES) forKey:@"avatarImages"];
             [[NSUserDefaults standardUserDefaults] synchronize];
         }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
         alert.popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem;
         alert.popoverPresentationController.sourceView = self.view;
         [self presentViewController:alert animated:YES completion:nil];
@@ -388,7 +393,9 @@
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         [[NetworkConnection sharedInstance] setAvatar:nil orgId:[[[self->_avatars objectAtIndex:indexPath.row] objectForKey:@"orgId"] intValue] handler:^(IRCCloudJSONObject *result) {
             if(![[result objectForKey:@"success"] intValue]) {
-                [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to clear avatar: %@", [result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to clear avatar: %@", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             }
         }];
     }
@@ -404,7 +411,9 @@
             if([[result objectForKey:@"success"] intValue]) {
                 [self cancelButtonPressed];
             } else {
-                [[[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to set avatar: %@", [result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to set avatar: %@", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             }
         }];
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

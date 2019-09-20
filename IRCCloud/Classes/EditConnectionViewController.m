@@ -366,8 +366,10 @@ static NSString * const ServerHasSSLKey = @"ssl";
             } else if([msg isEqualToString:@"unverified"]) {
                 msg = @"You can’t connect to external servers until you confirm your email address";
             }
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alert show];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:msg preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
+
             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
         }
     };
@@ -514,11 +516,13 @@ static NSString * const ServerHasSSLKey = @"ssl";
     if(touch.view.tag == 1) {
         [[NetworkConnection sharedInstance] resendVerifyEmailWithHandler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] boolValue]) {
-                UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-                [av show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             } else {
-                UIAlertView *av = [[UIAlertView alloc] initWithTitle:@"Confirmation Failed" message:[NSString stringWithFormat:@"Unable to send confirmation message: %@. Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-                [av show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Failed" message:[NSString stringWithFormat:@"Unable to send confirmation message: %@. Please try again shortly.", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             }
         }];
     }

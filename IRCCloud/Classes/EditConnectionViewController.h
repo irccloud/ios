@@ -21,7 +21,7 @@
 -(void)setNetwork:(NSString *)network host:(NSString *)host port:(int)port SSL:(BOOL)SSL;
 @end
 
-@interface EditConnectionViewController : UITableViewController<UITextFieldDelegate,NetworkListDelegate,UITextViewDelegate,UIAlertViewDelegate,UIGestureRecognizerDelegate> {
+@interface EditConnectionViewController : UITableViewController<UITextFieldDelegate,NetworkListDelegate,UITextViewDelegate,UIGestureRecognizerDelegate> {
     UITextField *_server;
     UITextField *_port;
     UISwitch *_ssl;

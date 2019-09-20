@@ -274,8 +274,9 @@
                 self->loginView.alpha = 1;
                 self->loadingView.alpha = 0;
                 [UIView commitAnimations];
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:@"Invalid access link" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:@"Invalid access link" preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             });
 #ifndef ENTERPRISE
             [Answers logLoginWithMethod:@"access-link" success:@NO customAttributes:nil];
@@ -481,8 +482,9 @@
                     self->loadingView.alpha = 0;
                     [UIView commitAnimations];
                     [self->activity stopAnimating];
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Email Sent" message:@"We've sent you an access link.  Check your email and follow the instructions to sign in." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Sent" message:@"We've sent you an access link.  Check your email and follow the instructions to sign in." preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                    [self presentViewController:alert animated:YES completion:nil];
                     [self loginHintPressed:nil];
                 });
                 return;
@@ -494,8 +496,9 @@
             self->loadingView.alpha = 0;
             [UIView commitAnimations];
             [self->activity stopAnimating];
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Request Failed" message:@"Unable to request an access link.  Please try again later." delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alert show];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Request Failed" message:@"Unable to request an access link.  Please try again later." preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
         });
     });
 }
@@ -631,8 +634,9 @@
         } else {
             IRCCLOUD_HOST = nil;
             dispatch_async(dispatch_get_main_queue(), ^{
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection Failed" message:@"Please check your host and try again shortly, or contact your system administrator for assistance."  delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Connection Failed" message:@"Please check your host and try again shortly, or contact your system administrator for assistance." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             });
         }
         
@@ -784,8 +788,9 @@
                         message = @"No signups allowed from TOR exit nodes";
                     if([[result objectForKey:@"message"] isEqualToString:@"signup_ip_blocked"])
                         message = @"Your IP address has been blacklisted.";
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:self->name.alpha?@"Sign Up Failed":@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:self->name.alpha?@"Sign Up Failed":@"Login Failed" message:message preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                    [self presentViewController:alert animated:YES completion:nil];
                 });
 #ifndef ENTERPRISE
                 if(nameAlpha) {
@@ -802,8 +807,9 @@
                 self->loadingView.alpha = 0;
                 [UIView commitAnimations];
                 NSString *message = @"Unable to communicate with the IRCCloud servers.  Please try again shortly.";
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Login Failed" message:message delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:message preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             });
         }
     });

@@ -25,7 +25,7 @@
 
 @class ViewController;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate> {
+@interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate> {
     NetworkConnection *_conn;
     URLHandler *_urlHandler;
     id _backlogCompletedObserver;

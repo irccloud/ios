@@ -77,7 +77,6 @@
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;
-    UIAlertView *_alertView;
     NSArray *_data;
     FontSizeCell *_fontSizeCell;
 }

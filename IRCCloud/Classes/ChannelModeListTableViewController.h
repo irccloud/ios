@@ -18,14 +18,13 @@
 #import <UIKit/UIKit.h>
 #import "IRCCloudJSONObject.h"
 
-@interface ChannelModeListTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
+@interface ChannelModeListTableViewController : UITableViewController {
     NSArray *_data;
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
     int _bid;
     int _list;
     UILabel *_placeholder;
-    UIAlertView *_alertView;
     NSString *_mode;
     NSString *_param;
     NSString *_mask;

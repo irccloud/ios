@@ -18,7 +18,7 @@
 #import <UIKit/UIKit.h>
 #import "IRCCloudJSONObject.h"
 
-@interface NamesListTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
+@interface NamesListTableViewController : UITableViewController {
     IRCCloudJSONObject *_event;
     NSArray *_data;
 }

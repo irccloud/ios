@@ -423,8 +423,9 @@
         if([[result objectForKey:@"success"] boolValue]) {
             [self dismissViewControllerAnimated:YES completion:nil];
         } else {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-            [alert show];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to save settings, please try again." preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
         }
     }];

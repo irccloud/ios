@@ -195,18 +195,16 @@
 }
 
 -(void)_removePaste {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Delete Snippet" message:@"Are you sure you want to delete this text snippet?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Delete", nil];
-    [alert show];
-}
-
--(void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
-    if([[alertView buttonTitleAtIndex:buttonIndex] isEqualToString:@"Delete"]) {
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Snippet" message:@"Are you sure you want to delete this text snippet?" preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
         [[NetworkConnection sharedInstance] deletePaste:self->_pasteID handler:nil];
         if(self.navigationController.viewControllers.count == 1)
             [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
         else
             [self.navigationController popViewControllerAnimated:YES];
-    }
+    }]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)_editPaste {

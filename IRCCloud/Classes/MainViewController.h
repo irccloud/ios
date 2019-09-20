@@ -48,7 +48,7 @@
 
 @end
 
-@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,UIAlertViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate,IRCColorPickerViewDelegate,UIDropInteractionDelegate
+@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate,IRCColorPickerViewDelegate,UIDropInteractionDelegate
 > {
     IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_connectingView;
@@ -100,7 +100,6 @@
     NSMutableArray *_pendingEvents;
     int _bidToOpen;
     NSTimeInterval _eidToOpen;
-    UIAlertView *_alertView;
     IRCCloudJSONObject *_alertObject;
     SystemSoundID alertSound;
     CGSize _kbSize;
@@ -110,7 +109,6 @@
     NSTimeInterval _lastNotificationTime;
     BOOL _isShowingPreview;
     NSString *_currentTheme;
-    NSString *_bugReport;
     UpdateSuggestionsTask *_updateSuggestionsTask;
     IRCColorPickerView *_colorPickerView;
     NSDictionary *_currentMessageAttributes;

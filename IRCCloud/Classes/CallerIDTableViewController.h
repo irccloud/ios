@@ -18,12 +18,11 @@
 #import <UIKit/UIKit.h>
 #import "IRCCloudJSONObject.h"
 
-@interface CallerIDTableViewController : UITableViewController<UIAlertViewDelegate,UITextFieldDelegate> {
+@interface CallerIDTableViewController : UITableViewController {
     NSArray *_nicks;
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
     UILabel *_placeholder;
-    UIAlertView *_alertView;
 }
 @property (strong, nonatomic) NSArray *nicks;
 @property (strong, nonatomic) IRCCloudJSONObject *event;

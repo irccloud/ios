@@ -286,8 +286,10 @@
                     CLS_LOG(@"File deleted successfully");
                 } else {
                     CLS_LOG(@"Error deleting file: %@", result);
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to delete file, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                    [self presentViewController:alert animated:YES completion:nil];
+
                     self->_pages = 0;
                     self->_files = nil;
                     self->_canLoadMore = YES;
