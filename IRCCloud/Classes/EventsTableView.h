@@ -102,6 +102,7 @@
 @property (readonly) UIImageView *stickyAvatar;
 @property Buffer *buffer;
 @property NSString *msgid;
+@property (nonatomic) BOOL shouldAutoFetch;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(IBAction)topUnreadBarClicked:(id)sender;
 -(IBAction)bottomUnreadBarClicked:(id)sender;
