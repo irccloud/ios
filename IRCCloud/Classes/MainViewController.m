@@ -2133,6 +2133,7 @@ NSArray *_sortedChannels;
                     self->_buffer.draft = nil;
                     [[EventsDataSource sharedInstance] removeEventsForBuffer:self->_buffer.bid];
                     [self->_eventsView refresh];
+                    self->_eventsView.shouldAutoFetch = NO;
                     return;
 #ifndef APPSTORE
                 } else if([messageString isEqualToString:@"/crash"]) {
