@@ -60,19 +60,6 @@
 #import "ImageCache.h"
 #import "AvatarsTableViewController.h"
 
-#define TAG_BAN 1
-#define TAG_IGNORE 2
-#define TAG_KICK 3
-#define TAG_INVITE 4
-#define TAG_BADCHANNELKEY 5
-#define TAG_FAILEDMSG 7
-#define TAG_LOGOUT 8
-#define TAG_DELETE 9
-#define TAG_JOIN 10
-#define TAG_BUGREPORT 11
-#define TAG_RENAME 12
-#define TAG_MESSAGE 13
-
 extern NSDictionary *emojiMap;
 
 NSArray *_sortedUsers;
@@ -874,8 +861,9 @@ NSArray *_sortedChannels;
                 [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                     if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length)
                         [[NetworkConnection sharedInstance] join:[self->_alertObject objectForKey:@"chan"] key:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:self->_alertObject.cid handler:^(IRCCloudJSONObject *result) {
-                            UIAlertView *v = [[UIAlertView alloc] initWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to join channel: %@. Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-                            [v show];
+                            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to join channel: %@. Please try again shortly.", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                            [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                            [self presentViewController:alert animated:YES completion:nil];
                         }];
                 }]];
                 
@@ -1064,11 +1052,15 @@ NSArray *_sortedChannels;
                     msg = [o objectForKey:@"msg"];
 
                 s = [[ServersDataSource sharedInstance] getServer:o.cid];
-                if (s)
-                    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                else
-                    self->_alertView = [[UIAlertView alloc] initWithTitle:msg message:nil delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [self->_alertView show];
+                if (s) {
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                    [self presentViewController:alert animated:YES completion:nil];
+                } else {
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:msg message:nil preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                    [self presentViewController:alert animated:YES completion:nil];
+                }
             }
             break;
         case kIRCEventStatusChanged:
@@ -2195,8 +2187,9 @@ NSArray *_sortedChannels;
                     self->_buffer.draft = nil;
                     return;
                 } else if([messageString isEqualToString:@"/read"]) {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:self->_eventsView.YUNoHeartbeat delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-                    [alert show];
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:self->_eventsView.YUNoHeartbeat preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                    [self presentViewController:alert animated:YES completion:nil];
                     [self->_message clearText];
                     self->_buffer.draft = nil;
                     return;
@@ -3613,9 +3606,9 @@ NSArray *_sortedChannels;
     [alert addAction:[UIAlertAction actionWithTitle:@"Display Options" style:UIAlertActionStyleDefault handler:handler]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Download Logs" style:UIAlertActionStyleDefault handler:handler]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Settings" style:UIAlertActionStyleDefault handler:handler]];
-#ifndef DEBUG
+//#ifndef DEBUG
     [alert addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:handler]];
-#endif
+//#endif
     [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDefault handler:handler]];
     if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone) {
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:handler]];
@@ -3637,9 +3630,21 @@ NSArray *_sortedChannels;
     if(e.rowType == ROW_FAILED) {
         self->_selectedEvent = e;
         Server *s = [[ServersDataSource sharedInstance] getServer:e.cid];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"This message could not be sent" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Try Again", nil];
-        alert.tag = TAG_FAILEDMSG;
-        [alert show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"This message could not be sent" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Try Again" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            self->_selectedEvent.height = 0;
+            self->_selectedEvent.rowType = ROW_MESSAGE;
+            self->_selectedEvent.bgColor = [UIColor selfBackgroundColor];
+            self->_selectedEvent.pending = YES;
+            self->_selectedEvent.reqId = [[NetworkConnection sharedInstance] say:self->_selectedEvent.command to:self->_buffer.name cid:self->_buffer.cid handler:nil];
+            if(self->_selectedEvent.msg)
+                [self->_pendingEvents addObject:self->_selectedEvent];
+            [self->_eventsView reloadData];
+            if(self->_selectedEvent.reqId < 0)
+                self->_selectedEvent.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:self->_selectedEvent repeats:NO];
+        }]];
+        [self presentViewController:alert animated:YES completion:nil];
     } else if(e.rowType == ROW_REPLY_COUNT) {
         [self setMsgId:[[e.entities objectForKey:@"parent"] msgid]];
     } else {
@@ -3937,24 +3942,55 @@ NSArray *_sortedChannels;
 
 -(void)_inviteToChannel {
     Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedUser?_buffer.cid:self->_selectedBuffer.cid];
-    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
-    self->_alertView.tag = TAG_INVITE;
-    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [self->_alertView textFieldAtIndex:0].delegate = self;
-    [self->_alertView textFieldAtIndex:0].placeholder = self->_selectedUser?@"#channel":@"nickname";
-    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [self->_alertView show];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Invite to channel" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Invite" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+            if(self->_selectedUser)
+                [[NetworkConnection sharedInstance] invite:self->_selectedUser.nick chan:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:self->_buffer.cid handler:nil];
+            else
+                [[NetworkConnection sharedInstance] invite:((UITextField *)[alert.textFields objectAtIndex:0]).text chan:self->_selectedBuffer.name cid:self->_selectedBuffer.cid handler:nil];
+        }
+    }]];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = self->_selectedUser?@"#channel":@"nickname";
+        textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+        [textField becomeFirstResponder];
+    }];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+        [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)_joinAChannel {
     Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
-    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Which channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-    self->_alertView.tag = TAG_JOIN;
-    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [self->_alertView textFieldAtIndex:0].delegate = self;
-    [self->_alertView textFieldAtIndex:0].placeholder = @"#channel";
-    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [self->_alertView show];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Which channel do you want to join?" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",((UITextField *)[alert.textFields objectAtIndex:0]).text] to:nil cid:self->_selectedBuffer.cid handler:nil];
+        }
+    }]];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"#channel";
+        textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+        [textField becomeFirstResponder];
+    }];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+        [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)_renameBuffer:(Buffer *)b msg:(NSString *)msg {
@@ -3978,13 +4014,36 @@ NSArray *_sortedChannels;
         msg = [NSString stringWithFormat:@"Error renaming: %@. Please choose a new name for this %@", msg, b.type];
     }
     Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
-    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Rename", nil];
-    self->_alertView.tag = TAG_RENAME;
-    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [self->_alertView textFieldAtIndex:0].delegate = self;
-    [self->_alertView textFieldAtIndex:0].text = b.name;
-    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [self->_alertView show];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:msg preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Rename" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+            id handler = ^(IRCCloudJSONObject *result) {
+                if([[result objectForKey:@"success"] intValue] == 0) {
+                    CLS_LOG(@"Rename failed: %@", result);
+                    [self _renameBuffer:self->_selectedBuffer msg:[result objectForKey:@"message"]];
+                }
+            };
+            if([self->_selectedBuffer.type isEqualToString:@"channel"])
+                [[NetworkConnection sharedInstance] renameChannel:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:self->_selectedBuffer.cid bid:self->_selectedBuffer.bid handler:handler];
+            else
+                [[NetworkConnection sharedInstance] renameConversation:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:self->_selectedBuffer.cid bid:self->_selectedBuffer.bid handler:handler];
+        }
+    }]];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.text = b.name;
+        textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+        [textField becomeFirstResponder];
+    }];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+        [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
@@ -4077,13 +4136,27 @@ NSArray *_sortedChannels;
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Send a Message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
-        self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Which nick do you want to message?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Message", nil];
-        self->_alertView.tag = TAG_MESSAGE;
-        self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-        [self->_alertView textFieldAtIndex:0].delegate = self;
-        [self->_alertView textFieldAtIndex:0].placeholder = @"nickname";
-        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-        [self->_alertView show];
+        UIAlertController *a = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Which nick do you want to message?" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [a addAction:[UIAlertAction actionWithTitle:@"Message" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            if(((UITextField *)[a.textFields objectAtIndex:0]).text.length) {
+                [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@",((UITextField *)[a.textFields objectAtIndex:0]).text] to:nil cid:self->_selectedBuffer.cid handler:nil];
+            }
+        }]];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+            [self presentViewController:a animated:YES completion:nil];
+        }
+        
+        [a addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            textField.placeholder = @"nickname";
+            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+            [textField becomeFirstResponder];
+        }];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+            [self presentViewController:a animated:YES completion:nil];
     }]];
 
     BOOL activeCount = NO;
@@ -4104,7 +4177,7 @@ NSArray *_sortedChannels;
         [self _reorder];
     }]];
 
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     alert.popoverPresentationController.sourceRect = rect;
     alert.popoverPresentationController.sourceView = self->_buffersView.tableView;
     [self presentViewController:alert animated:YES completion:nil];
@@ -4170,138 +4243,12 @@ NSArray *_sortedChannels;
     [self closeColorPicker];
 }
 
--(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if(self->_alertView) {
-        [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
-        [self alertView:self->_alertView clickedButtonAtIndex:1];
-    }
-    return NO;
-}
-
 -(void)_setSelectedBuffer:(Buffer *)b {
     self->_selectedBuffer = b;
 }
 
 -(void)clearText {
     [self->_message clearText];
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-    
-    switch(alertView.tag) {
-        case TAG_BAN:
-            if([title isEqualToString:@"Ban"]) {
-                if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", [alertView textFieldAtIndex:0].text] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
-            }
-            break;
-        case TAG_IGNORE:
-            if([title isEqualToString:@"Ignore"]) {
-                if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] ignore:[alertView textFieldAtIndex:0].text cid:self->_buffer.cid handler:nil];
-            }
-            break;
-        case TAG_KICK:
-            if([title isEqualToString:@"Kick"]) {
-               [[NetworkConnection sharedInstance] kick:self->_selectedUser.nick chan:self->_buffer.name msg:[alertView textFieldAtIndex:0].text cid:self->_buffer.cid handler:nil];
-            }
-            break;
-        case TAG_INVITE:
-            if([title isEqualToString:@"Invite"]) {
-                if([alertView textFieldAtIndex:0].text.length) {
-                    if(self->_selectedUser)
-                        [[NetworkConnection sharedInstance] invite:self->_selectedUser.nick chan:[alertView textFieldAtIndex:0].text cid:self->_buffer.cid handler:nil];
-                    else
-                        [[NetworkConnection sharedInstance] invite:[alertView textFieldAtIndex:0].text chan:self->_selectedBuffer.name cid:self->_selectedBuffer.cid handler:nil];
-                }
-            }
-            break;
-        case TAG_BADCHANNELKEY:
-            if([title isEqualToString:@"Join"]) {
-                if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] join:[self->_alertObject objectForKey:@"chan"] key:[alertView textFieldAtIndex:0].text cid:self->_alertObject.cid handler:nil];
-            }
-            break;
-        case TAG_FAILEDMSG:
-            if([title isEqualToString:@"Try Again"]) {
-                self->_selectedEvent.height = 0;
-                self->_selectedEvent.rowType = ROW_MESSAGE;
-                self->_selectedEvent.bgColor = [UIColor selfBackgroundColor];
-                self->_selectedEvent.pending = YES;
-                self->_selectedEvent.reqId = [[NetworkConnection sharedInstance] say:self->_selectedEvent.command to:self->_buffer.name cid:self->_buffer.cid handler:nil];
-                if(self->_selectedEvent.msg)
-                    [self->_pendingEvents addObject:self->_selectedEvent];
-                [self->_eventsView reloadData];
-                if(self->_selectedEvent.reqId < 0)
-                    self->_selectedEvent.expirationTimer = [NSTimer scheduledTimerWithTimeInterval:60 target:self selector:@selector(_sendRequestDidExpire:) userInfo:self->_selectedEvent repeats:NO];
-            }
-            break;
-        case TAG_LOGOUT:
-            if([title isEqualToString:@"Logout"]) {
-                [[NetworkConnection sharedInstance] logout];
-                [self bufferSelected:-1];
-                [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
-            }
-            break;
-        case TAG_DELETE:
-            if([title isEqualToString:@"Delete"]) {
-                if([self->_selectedBuffer.type isEqualToString:@"console"]) {
-                    [[NetworkConnection sharedInstance] deleteServer:self->_selectedBuffer.cid handler:nil];
-                } else if(self->_selectedBuffer == nil || _selectedBuffer.bid == -1) {
-                    if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-                        [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
-                    else
-                        [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
-                } else {
-                    [[NetworkConnection sharedInstance] deleteBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
-                }
-            }
-            break;
-        case TAG_JOIN:
-            if([title isEqualToString:@"Join"]) {
-                if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/join %@",[alertView textFieldAtIndex:0].text] to:nil cid:self->_selectedBuffer.cid handler:nil];
-            }
-            break;
-        case TAG_MESSAGE:
-            if([title isEqualToString:@"Message"]) {
-                if([alertView textFieldAtIndex:0].text.length)
-                    [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@",[alertView textFieldAtIndex:0].text] to:nil cid:self->_selectedBuffer.cid handler:nil];
-            }
-            break;
-        case TAG_BUGREPORT:
-            if([title isEqualToString:@"Copy to Clipboard"]) {
-                UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                [pb setValue:self->_bugReport forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-            }
-            self->_bugReport = nil;
-            break;
-        case TAG_RENAME:
-            if([title isEqualToString:@"Rename"]) {
-                id handler = ^(IRCCloudJSONObject *result) {
-                    if([[result objectForKey:@"success"] intValue] == 0) {
-                        CLS_LOG(@"Rename failed: %@", result);
-                        [self _renameBuffer:self->_selectedBuffer msg:[result objectForKey:@"message"]];
-                    }
-                };
-                if([alertView textFieldAtIndex:0].text.length) {
-                    if([self->_selectedBuffer.type isEqualToString:@"channel"])
-                        [[NetworkConnection sharedInstance] renameChannel:[alertView textFieldAtIndex:0].text cid:self->_selectedBuffer.cid bid:self->_selectedBuffer.bid handler:handler];
-                    else
-                        [[NetworkConnection sharedInstance] renameConversation:[alertView textFieldAtIndex:0].text cid:self->_selectedBuffer.cid bid:self->_selectedBuffer.bid handler:handler];
-                }
-            }
-            break;
-    }
-    self->_alertView = nil;
-}
-
--(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
-    if(alertView.alertViewStyle == UIAlertViewStylePlainTextInput && alertView.tag != TAG_KICK && [alertView textFieldAtIndex:0].text.length == 0)
-        return NO;
-    else
-        return YES;
 }
 
 -(void)_choosePhoto:(UIImagePickerControllerSourceType)sourceType {
@@ -4573,8 +4520,9 @@ NSArray *_sortedChannels;
             msg = @"Failed to upload file. Please try again shortly.";
         }
         [self dismissViewControllerAnimated:YES completion:nil];
-        self->_alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:msg delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [self->_alertView show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:msg preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
         [self _hideConnectingView];
     }];
 }
@@ -4583,8 +4531,9 @@ NSArray *_sortedChannels;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         CLS_LOG(@"File upload too large");
         [self dismissViewControllerAnimated:YES completion:nil];
-        self->_alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [self->_alertView show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Sorry, you can’t upload files larger than 15 MB" preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
         [self _hideConnectingView];
     }];
 }
@@ -4612,8 +4561,9 @@ NSArray *_sortedChannels;
 
 -(void)imageUploadDidFail {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        self->_alertView = [[UIAlertView alloc] initWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-        [self->_alertView show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
         [self _hideConnectingView];
     }];
 }
@@ -4773,7 +4723,7 @@ NSArray *_sortedChannels;
         [self presentViewController:nc animated:YES completion:nil];
     }]];
 #endif
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     alert.popoverPresentationController.sourceRect = CGRectMake(self->_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height);
     alert.popoverPresentationController.sourceView = self.view;
     [self presentViewController:alert animated:YES completion:nil];
@@ -4825,8 +4775,9 @@ NSArray *_sortedChannels;
             [[NetworkConnection sharedInstance] deleteMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan handler:^(IRCCloudJSONObject *result) {
                 if(![[result objectForKey:@"success"] boolValue]) {
                     CLS_LOG(@"Error deleting message: %@", result);
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
+                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to delete message, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                    [self presentViewController:alert animated:YES completion:nil];
                 }
             }];
         }]];
@@ -4845,8 +4796,9 @@ NSArray *_sortedChannels;
                 [[NetworkConnection sharedInstance] editMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan msg:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
                     if(![[result objectForKey:@"success"] boolValue]) {
                         CLS_LOG(@"Error editing message: %@", result);
-                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to edit message, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                        [alert show];
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to edit message, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
                     }
                 }];
         }]];
@@ -4870,8 +4822,9 @@ NSArray *_sortedChannels;
                 [self->_eventsView refresh];
             } else {
                 CLS_LOG(@"Error deleting file: %@", result);
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete file, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to delete file, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             }
         }];
     } else if([action isEqualToString:@"Close Preview"]) {
@@ -5046,8 +4999,8 @@ Network type: %@\n",
         }
         
         if(report.length) {
-            MFMailComposeViewController *mfmc = [[MFMailComposeViewController alloc] init];
-            if(mfmc && [MFMailComposeViewController canSendMail]) {
+            MFMailComposeViewController *mfmc = [MFMailComposeViewController canSendMail] ? [[MFMailComposeViewController alloc] init] : nil;
+            if(mfmc) {
                 mfmc.mailComposeDelegate = self;
                 [mfmc setToRecipients:@[@"team@irccloud.com"]];
                 [mfmc setSubject:@"IRCCloud for iOS"];
@@ -5060,10 +5013,13 @@ Network type: %@\n",
                     [self _resetStatusBar];
                 }];
             } else {
-                self->_bugReport = report;
-                self->_alertView = [[UIAlertView alloc] initWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." delegate:self cancelButtonTitle:@"Close" otherButtonTitles:@"Copy to Clipboard", nil];
-                self->_alertView.tag = TAG_BUGREPORT;
-                [self->_alertView show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Copy to Clipboard" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    UIPasteboard *pb = [UIPasteboard generalPasteboard];
+                    [pb setValue:report forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                }]];
+                [self presentViewController:alert animated:YES completion:nil];
             }
         }
     }
@@ -5096,36 +5052,78 @@ Network type: %@\n",
         [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"-%@ %@",s?s.MODE_VOICED:@"v",_selectedUser.nick] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
     } else if([action isEqualToString:@"Ban"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-        self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ban", nil];
-        self->_alertView.tag = TAG_BAN;
-        self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-        if(self->_selectedUser.hostmask.length)
-            [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
-        else
-            [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
-        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-        [self->_alertView textFieldAtIndex:0].delegate = self;
-        [self->_alertView show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Add a ban mask" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Ban" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+                [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+b %@", ((UITextField *)[alert.textFields objectAtIndex:0]).text] chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
+            }
+        }]];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+            [self presentViewController:alert animated:YES completion:nil];
+        }
+        
+        [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            if(self->_selectedUser.hostmask.length)
+                textField.text = [NSString stringWithFormat:@"*!%@", self->_selectedUser.hostmask];
+            else
+                textField.text = [NSString stringWithFormat:@"%@!*", self->_selectedUser.nick];
+            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+            [textField becomeFirstResponder];
+        }];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+            [self presentViewController:alert animated:YES completion:nil];
     } else if([action isEqualToString:@"Ignore"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-        self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Ignore", nil];
-        self->_alertView.tag = TAG_IGNORE;
-        self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-        if(self->_selectedUser.hostmask.length)
-            [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"*!%@", _selectedUser.hostmask];
-        else
-            [self->_alertView textFieldAtIndex:0].text = [NSString stringWithFormat:@"%@!*", _selectedUser.nick];
-        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-        [self->_alertView textFieldAtIndex:0].delegate = self;
-        [self->_alertView show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Ignore" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+                [[NetworkConnection sharedInstance] ignore:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:self->_buffer.cid handler:nil];
+            }
+        }]];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+            [self presentViewController:alert animated:YES completion:nil];
+        }
+        
+        [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            if(self->_selectedUser.hostmask.length)
+                textField.text = [NSString stringWithFormat:@"*!%@", self->_selectedUser.hostmask];
+            else
+                textField.text = [NSString stringWithFormat:@"%@!*", self->_selectedUser.nick];
+            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+            [textField becomeFirstResponder];
+        }];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+            [self presentViewController:alert animated:YES completion:nil];
     } else if([action isEqualToString:@"Kick"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-        self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Kick", nil];
-        self->_alertView.tag = TAG_KICK;
-        self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-        [self->_alertView textFieldAtIndex:0].delegate = self;
-        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-        [self->_alertView show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Kick" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+                [[NetworkConnection sharedInstance] kick:self->_selectedUser.nick chan:self->_buffer.name msg:((UITextField *)[alert.textFields objectAtIndex:0]).text cid:self->_buffer.cid handler:nil];
+            }
+        }]];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+            [self presentViewController:alert animated:YES completion:nil];
+        }
+        
+        [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+            [textField becomeFirstResponder];
+        }];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+            [self presentViewController:alert animated:YES completion:nil];
     } else if([action isEqualToString:@"Slack Profile"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];

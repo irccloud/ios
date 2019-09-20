@@ -150,7 +150,7 @@
         UIPasteboard *pb = [UIPasteboard generalPasteboard];
         [pb setValue:[NSString stringWithFormat:@"%@!%@", [self->_selectedRow objectForKey:@"nick"], [self->_selectedRow objectForKey:@"usermask"]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
     }]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {}]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];
     alert.popoverPresentationController.sourceView = self.view;
     [self.navigationController presentViewController:alert animated:YES completion:nil];

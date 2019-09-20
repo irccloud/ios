@@ -149,21 +149,31 @@
 -(void)addButtonPressed {
     [self.view endEditing:YES];
     Server *s = [[ServersDataSource sharedInstance] getServer:self->_event.cid];
-    self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[_event.type isEqualToString:@"chanfilter_list"]?@"Add this pattern":@"Add this hostmask" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Add", nil];
-    self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-    [self->_alertView textFieldAtIndex:0].delegate = self;
-    [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-    [self->_alertView show];
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[_event.type isEqualToString:@"chanfilter_list"]?@"Add this pattern":@"Add this hostmask" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Add" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+        if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+            [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@", self->_mode, ((UITextField *)[alert.textFields objectAtIndex:0]).text] chan:[self->_event objectForKey:@"channel"] cid:self->_event.cid handler:nil];
+        }
+    }]];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+        [textField becomeFirstResponder];
+    }];
+    
+    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+        [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-}
-
--(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
-    [self alertView:self->_alertView clickedButtonAtIndex:1];
-    return NO;
 }
 
 -(NSString *)setByTextForRow:(NSDictionary *)row {
@@ -253,23 +263,6 @@
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-    
-    if([title isEqualToString:@"Add"]) {
-        [[NetworkConnection sharedInstance] mode:[NSString stringWithFormat:@"+%@ %@", _mode, [alertView textFieldAtIndex:0].text] chan:[self->_event objectForKey:@"channel"] cid:self->_event.cid handler:nil];
-    }
-    
-    self->_alertView = nil;
-}
-
--(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
-    if(alertView.alertViewStyle == UIAlertViewStylePlainTextInput && [alertView textFieldAtIndex:0].text.length == 0)
-        return NO;
-    else
-        return YES;
 }
 
 @end

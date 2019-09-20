@@ -18,7 +18,7 @@
 
 typedef void (^mediaURLResult)(BOOL, NSString *);
 
-@interface URLHandler : NSObject <UIAlertViewDelegate> {
+@interface URLHandler : NSObject {
     NSMutableDictionary *_tasks;
     NSMutableDictionary *_mediaURLs;
     NSMutableDictionary *_fileIDs;

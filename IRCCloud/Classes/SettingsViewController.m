@@ -452,49 +452,50 @@
     return self;
 }
 
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-
-    if([title isEqualToString:@"Confirm"]) {
-        UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-        [spinny startAnimating];
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
-        
-        [[NetworkConnection sharedInstance] changeEmail:self->_email.text password:[alertView textFieldAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
-            if([[result objectForKey:@"success"] boolValue]) {
-                [self saveButtonPressed:nil];
-            } else {
-                if([[result objectForKey:@"message"] isEqualToString:@"oldpassword"]) {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Incorrect password, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
-                } else {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                    [alert show];
-                }
-            }
-        }];
-    }
-    
-    self->_alertView = nil;
-}
-
--(BOOL)alertViewShouldEnableFirstOtherButton:(UIAlertView *)alertView {
-    if(alertView.alertViewStyle == UIAlertViewStyleSecureTextInput && [alertView textFieldAtIndex:0].text.length == 0)
-        return NO;
-    else
-        return YES;
-}
-
 -(void)saveButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
     
     if(sender && [NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"email"] && ![self->_email.text isEqualToString:[[NetworkConnection sharedInstance].userInfo objectForKey:@"email"]]) {
         [self.view endEditing:YES];
-        self->_alertView = [[UIAlertView alloc] initWithTitle:@"Change Your Email Address" message:@"Please enter your current password to confirm this change" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Confirm", nil];
-        self->_alertView.alertViewStyle = UIAlertViewStyleSecureTextInput;
-        [self->_alertView textFieldAtIndex:0].delegate = self;
-        [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-        [self->_alertView show];
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Change Your Email Address" message:@"Please enter your current password to confirm this change" preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Confirm" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+                UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+                [spinny startAnimating];
+                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
+                
+                [[NetworkConnection sharedInstance] changeEmail:self->_email.text password:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
+                    if([[result objectForKey:@"success"] boolValue]) {
+                        [self saveButtonPressed:nil];
+                    } else {
+                        if([[result objectForKey:@"message"] isEqualToString:@"oldpassword"]) {
+                            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Incorrect password, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                            [self presentViewController:alert animated:YES completion:nil];
+                        } else {
+                            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to save settings, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                            [self presentViewController:alert animated:YES completion:nil];
+                        }
+                    }
+                }];
+            }
+        }]];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+            [self presentViewController:alert animated:YES completion:nil];
+        }
+        
+        [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+            textField.secureTextEntry = YES;
+            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+            [textField becomeFirstResponder];
+        }];
+        
+        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+            [self presentViewController:alert animated:YES completion:nil];
     } else {
         UIActivityIndicatorView *spinny = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
         [spinny startAnimating];
@@ -541,14 +542,16 @@
                         [self.tableView endEditing:YES];
                         [self dismissViewControllerAnimated:YES completion:nil];
                     } else {
-                        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                        [alert show];
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to save settings, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
                         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
                     }
                 }];
             } else {
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to save settings, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to save settings, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
                 self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
             }
         }];
@@ -713,11 +716,13 @@
                             [[NetworkConnection sharedInstance] changePassword:[alert.textFields objectAtIndex:0].text newPassword:[alert.textFields objectAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
                                 if([[result objectForKey:@"success"] boolValue]) {
                                     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
-                                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Password Changed" message:@"Your password has been successfully updated and all your other sessions have been logged out" delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                                    [alert show];
+                                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Password Changed" message:@"Your password has been successfully updated and all your other sessions have been logged out" preferredStyle:UIAlertControllerStyleAlert];
+                                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                                    [self presentViewController:alert animated:YES completion:nil];
                                 } else {
-                                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Changing Password" message:[self accountMsg:[result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                                    [alert show];
+                                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error Changing Password" message:[self accountMsg:[result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                                    [self presentViewController:alert animated:YES completion:nil];
                                     CLS_LOG(@"Password not changed: %@", [result objectForKey:@"message"]);
                                     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
                                 }
@@ -746,8 +751,9 @@
                                     [self.tableView endEditing:YES];
                                     [self dismissViewControllerAnimated:YES completion:nil];
                                 } else {
-                                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error Deleting Account" message:[self accountMsg:[result objectForKey:@"message"]] delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                                    [alert show];
+                                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error Deleting Account" message:[self accountMsg:[result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                                    [self presentViewController:alert animated:YES completion:nil];
                                     CLS_LOG(@"Account not deleted: %@", [result objectForKey:@"message"]);
                                     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
                                 }
@@ -1303,15 +1309,6 @@
         return NO;
     }
     return YES;
-}
-
-- (BOOL)textFieldShouldReturn:(UITextField *)textField {
-    if(self->_alertView) {
-        [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
-        [self alertView:self->_alertView clickedButtonAtIndex:1];
-    }
-    [self.tableView endEditing:YES];
-    return NO;
 }
 
 - (void)didReceiveMemoryWarning {

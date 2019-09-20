@@ -419,13 +419,27 @@ extern UIImage *__socketClosedBackgroundImage;
             }]];
             [items addObject:[UIPreviewAction actionWithTitle:@"Invite to Channel" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                 [((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController _setSelectedBuffer:self->_buffer];
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", self->_server.name, self->_server.hostname, self->_server.port] message:@"Invite to channel" delegate:((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController cancelButtonTitle:@"Cancel" otherButtonTitles:@"Invite", nil];
-                alertView.tag = 4;
-                alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-                [alertView textFieldAtIndex:0].delegate = ((AppDelegate *)([UIApplication sharedApplication].delegate)).mainViewController;
-                [alertView textFieldAtIndex:0].placeholder = @"nickname";
-                [alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-                [alertView show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", self->_server.name, self->_server.hostname, self->_server.port] message:@"Invite to channel" preferredStyle:UIAlertControllerStyleAlert];
+                
+                [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Invite" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+                        [[NetworkConnection sharedInstance] invite:((UITextField *)[alert.textFields objectAtIndex:0]).text chan:self->_buffer.name cid:self->_buffer.cid handler:nil];
+                    }
+                }]];
+                
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+                    [self presentViewController:alert animated:YES completion:nil];
+                }
+                
+                [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                    textField.placeholder = @"nickname";
+                    textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+                    [textField becomeFirstResponder];
+                }];
+                
+                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+                    [self presentViewController:alert animated:YES completion:nil];
             }]];
         } else {
             [items addObject:[UIPreviewAction actionWithTitle:@"Rejoin" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {

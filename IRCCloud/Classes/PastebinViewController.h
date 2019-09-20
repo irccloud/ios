@@ -18,7 +18,7 @@
 #import <UIKit/UIKit.h>
 #import "OpenInChromeController.h"
 
-@interface PastebinViewController : UIViewController<UIPopoverPresentationControllerDelegate,UIAlertViewDelegate> {
+@interface PastebinViewController : UIViewController<UIPopoverPresentationControllerDelegate> {
     IBOutlet UIWebView *_webView;
     IBOutlet UIToolbar *_toolbar;
     IBOutlet UIActivityIndicatorView *_activity;

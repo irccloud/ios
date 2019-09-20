@@ -483,7 +483,9 @@
             e_bid = [[d objectForKey:@"bid"] intValue];
         
         if(cid == e_cid && bid == e_bid) {
-            [[[UIAlertView alloc] initWithTitle:@"Export In Progress" message:@"This export is already in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Export In Progress" message:@"This export is already in progress.  We'll email you when it's ready." preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
             self->_pendingExport = -1;
             return;
         }
@@ -495,9 +497,13 @@
                 NSMutableArray *inprogress = self->_inprogress.mutableCopy;
                 [inprogress insertObject:[result objectForKey:@"export"] atIndex:0];
                 self->_inprogress = inprogress;
-                [[[UIAlertView alloc] initWithTitle:@"Exporting" message:@"Your log export is in progress.  We'll email you when it's ready." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Exporting" message:@"Your log export is in progress.  We'll email you when it's ready." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             } else {
-                [[[UIAlertView alloc] initWithTitle:@"Export Failed" message:[NSString stringWithFormat:@"Unable to export log: %@.  Please try again shortly.", [result objectForKey:@"message"]] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Export Failed" message:[NSString stringWithFormat:@"Unable to export log: %@.  Please try again shortly.", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             }
             self->_pendingExport = -1;
             [self.tableView reloadData];
@@ -541,8 +547,12 @@
                 }
                 break;
             case 1:
-                [[[UIAlertView alloc] initWithTitle:@"Preparing Download" message:@"This export is being prepared.  You will recieve a notification when it is ready for download." delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil] show];
+            {
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Preparing Download" message:@"This export is being prepared.  You will recieve a notification when it is ready for download." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
                 break;
+            }
             case 2:
             {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];

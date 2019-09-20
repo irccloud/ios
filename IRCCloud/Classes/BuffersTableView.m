@@ -532,35 +532,6 @@
 #endif
 }
 
--(BOOL)textFieldShouldReturn:(UITextField *)textField {
-    [self->_alertView dismissWithClickedButtonIndex:1 animated:YES];
-    [self alertView:self->_alertView clickedButtonAtIndex:1];
-    return NO;
-}
-
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
-    [self->_delegate dismissKeyboard];
-    [self->_alertView endEditing:YES];
-    NSString *title = [alertView buttonTitleAtIndex:buttonIndex];
-    
-    if([title isEqualToString:@"Join"]) {
-        if([alertView textFieldAtIndex:0].text.length) {
-            NSString *channel = [alertView textFieldAtIndex:0].text;
-            NSString *key = nil;
-            NSUInteger pos = [channel rangeOfString:@" "].location;
-            if(pos != NSNotFound) {
-                key = [channel substringFromIndex:pos + 1];
-                channel = [channel substringToIndex:pos];
-            }
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [[NetworkConnection sharedInstance] join:channel key:key cid:(int)alertView.tag handler:nil];
-            }];
-        }
-    }
-    
-    self->_alertView = nil;
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
@@ -1339,14 +1310,41 @@
         } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL) {
             [self->_delegate dismissKeyboard];
             Server *s = [self->_servers getServer:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue]];
-            self->_alertView = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Join", nil];
-            self->_alertView.alertViewStyle = UIAlertViewStylePlainTextInput;
-            self->_alertView.tag = [[[self->_data objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue];
-            [self->_alertView textFieldAtIndex:0].placeholder = @"#example";
-            [self->_alertView textFieldAtIndex:0].text = @"#";
-            [self->_alertView textFieldAtIndex:0].delegate = self;
-            [self->_alertView textFieldAtIndex:0].tintColor = [UIColor blackColor];
-            [self->_alertView show];
+            
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"What channel do you want to join?" preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                if(((UITextField *)[alert.textFields objectAtIndex:0]).text.length) {
+                    NSString *channel = ((UITextField *)[alert.textFields objectAtIndex:0]).text;
+                    NSString *key = nil;
+                    NSUInteger pos = [channel rangeOfString:@" "].location;
+                    if(pos != NSNotFound) {
+                        key = [channel substringFromIndex:pos + 1];
+                        channel = [channel substringToIndex:pos];
+                    }
+                    [[NetworkConnection sharedInstance] join:channel key:key cid:s.cid handler:^(IRCCloudJSONObject *result) {
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to join channel: %@. Please try again shortly.", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
+                    }];
+                }
+            }]];
+            
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
+                [self presentViewController:alert animated:YES completion:nil];
+            }
+            
+            [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = @"#example";
+                textField.text = @"#";
+                textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
+                textField.delegate = self;
+                [textField becomeFirstResponder];
+            }];
+            
+            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
+                [self presentViewController:alert animated:YES completion:nil];
         } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_COLLAPSED) {
             NSDictionary *d = [self->_data objectAtIndex:indexPath.row];
             if([[d objectForKey:@"archived"] intValue]) {

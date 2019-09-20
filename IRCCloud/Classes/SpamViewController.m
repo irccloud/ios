@@ -69,8 +69,10 @@
     [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
         if(self->_buffersToDelete.count) {
             Server *s = [[ServersDataSource sharedInstance] getServer:self->_cid];
-            UIAlertView *a = [[UIAlertView alloc] initWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"%lu conversations were deleted", (unsigned long)self->_buffersToDelete.count] delegate:nil cancelButtonTitle:@"Close" otherButtonTitles:nil];
-            [a show];
+            
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:[NSString stringWithFormat:@"%lu conversations were deleted", (unsigned long)self->_buffersToDelete.count] preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
         }
     }];
 }

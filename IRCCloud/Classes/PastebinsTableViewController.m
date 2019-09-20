@@ -421,8 +421,9 @@
                 CLS_LOG(@"Pastebin deleted successfully");
             } else {
                 CLS_LOG(@"Error deleting pastebin: %@", result);
-                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Unable to delete snippet, please try again." delegate:self cancelButtonTitle:@"Ok" otherButtonTitles:nil];
-                [alert show];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to delete snippet, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
                 self->_pages = 0;
                 self->_pastes = nil;
                 self->_canLoadMore = YES;
