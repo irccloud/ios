@@ -44,6 +44,7 @@
     NSMutableDictionary *notifyAll = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *disableNotifyAll = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *hideJoinPart = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *showJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *collapseJoinPart = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *expandDisco = [[NSMutableDictionary alloc] init];
@@ -139,16 +140,29 @@
                 [prefs removeObjectForKey:@"channel-notifications-all"];
         }
         
-        if([[prefs objectForKey:@"channel-hideJoinPart"] isKindOfClass:[NSDictionary class]])
-            [hideJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-hideJoinPart"]];
-        if(self->_showJoinPart.on)
-            [hideJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        else
-            [hideJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
-        if(hideJoinPart.count)
-            [prefs setObject:hideJoinPart forKey:@"channel-hideJoinPart"];
-        else
-            [prefs removeObjectForKey:@"channel-hideJoinPart"];
+        if([[prefs objectForKey:@"hideJoinPart"] intValue] == 1) {
+            if([[prefs objectForKey:@"channel-showJoinPart"] isKindOfClass:[NSDictionary class]])
+                [showJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-showJoinPart"]];
+            if(!self->_showJoinPart.on)
+                [showJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [showJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(showJoinPart.count)
+                [prefs setObject:showJoinPart forKey:@"channel-showJoinPart"];
+            else
+                [prefs removeObjectForKey:@"channel-showJoinPart"];
+        } else {
+            if([[prefs objectForKey:@"channel-hideJoinPart"] isKindOfClass:[NSDictionary class]])
+                [hideJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-hideJoinPart"]];
+            if(self->_showJoinPart.on)
+                [hideJoinPart removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [hideJoinPart setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(hideJoinPart.count)
+                [prefs setObject:hideJoinPart forKey:@"channel-hideJoinPart"];
+            else
+                [prefs removeObjectForKey:@"channel-hideJoinPart"];
+        }
 
         if([[prefs objectForKey:@"channel-expandJoinPart"] isKindOfClass:[NSDictionary class]])
             [expandJoinPart addEntriesFromDictionary:[prefs objectForKey:@"channel-expandJoinPart"]];
@@ -497,10 +511,17 @@
                 self->_notifyAll.on = NO;
         }
         
-        if([[[prefs objectForKey:@"channel-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            self->_showJoinPart.on = NO;
-        else
-            self->_showJoinPart.on = YES;
+        if([[prefs objectForKey:@"hideJoinPart"] intValue] == 1) {
+            if([[[prefs objectForKey:@"channel-showJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                self->_showJoinPart.on = YES;
+            else
+                self->_showJoinPart.on = NO;
+        } else {
+            if([[[prefs objectForKey:@"channel-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                self->_showJoinPart.on = NO;
+            else
+                self->_showJoinPart.on = YES;
+        }
 
         if([[prefs objectForKey:@"expandJoinPart"] intValue]) {
             if([[[prefs objectForKey:@"channel-collapseJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
@@ -591,10 +612,17 @@
                 self->_trackUnread.on = YES;
         }
         
-        if([[[prefs objectForKey:@"buffer-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
-            self->_showJoinPart.on = NO;
-        else
-            self->_showJoinPart.on = YES;
+        if([[prefs objectForKey:@"hideJoinPart"] intValue] == 1) {
+            if([[[prefs objectForKey:@"buffer-showJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                self->_showJoinPart.on = YES;
+            else
+                self->_showJoinPart.on = NO;
+        } else {
+            if([[[prefs objectForKey:@"buffer-hideJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                self->_showJoinPart.on = NO;
+            else
+                self->_showJoinPart.on = YES;
+        }
 
         if([[prefs objectForKey:@"expandJoinPart"] intValue]) {
             if([[[prefs objectForKey:@"buffer-collapseJoinPart"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
