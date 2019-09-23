@@ -657,6 +657,7 @@
 - (void)backlogCompleted:(NSNotification *)notification {
     if(notification.object == nil || [notification.object bid] < 1) {
         _requestingArchives = NO;
+        [_expandedArchives removeAllObjects];
         [self performSelectorInBackground:@selector(refresh) withObject:nil];
     } else {
         [self performSelectorInBackground:@selector(refreshBuffer:) withObject:[self->_buffers getBuffer:[notification.object bid]]];
