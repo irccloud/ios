@@ -1775,17 +1775,31 @@ extern UIImage *__socketClosedBackgroundImage;
             __disableQuotePref = [[prefs objectForKey:@"chat-noquote"] boolValue];
             __avatarImages = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
 
-            NSDictionary *hiddenMap;
-            
-            if([self->_buffer.type isEqualToString:@"channel"]) {
-                hiddenMap = [prefs objectForKey:@"channel-hideJoinPart"];
+            __hideJoinPartPref = [[prefs objectForKey:@"hideJoinPart"] boolValue];
+            if(__hideJoinPartPref) {
+                NSDictionary *enableMap;
+                
+                if([self->_buffer.type isEqualToString:@"channel"]) {
+                    enableMap = [prefs objectForKey:@"channel-showJoinPart"];
+                } else {
+                    enableMap = [prefs objectForKey:@"buffer-showJoinPart"];
+                }
+                
+                if(enableMap && [[enableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                    __hideJoinPartPref = NO;
             } else {
-                hiddenMap = [prefs objectForKey:@"buffer-hideJoinPart"];
+                NSDictionary *disableMap;
+                
+                if([self->_buffer.type isEqualToString:@"channel"]) {
+                    disableMap = [prefs objectForKey:@"channel-hideJoinPart"];
+                } else {
+                    disableMap = [prefs objectForKey:@"buffer-hideJoinPart"];
+                }
+                
+                if(disableMap && [[disableMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])
+                    __hideJoinPartPref = YES;
             }
-            
-            if([[prefs objectForKey:@"hideJoinPart"] boolValue] || (hiddenMap && [[hiddenMap objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue])) {
-                __hideJoinPartPref = YES;
-            }
+
             
             __expandJoinPartPref = [[prefs objectForKey:@"expandJoinPart"] boolValue];
             if(__expandJoinPartPref) {
