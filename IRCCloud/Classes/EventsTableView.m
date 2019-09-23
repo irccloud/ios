@@ -3107,34 +3107,42 @@ extern UIImage *__socketClosedBackgroundImage;
                         EventsTableCell *cell = [self->_rowCache objectForKey:[e UUID]];
                         cell.avatar.hidden = !e.isHeader;
                     }
-                    EventsTableCell *cell = [self->_rowCache objectForKey:[[self->_data objectAtIndex: topIndexPath.row] UUID]];
-                    cell.avatar.hidden = YES;
-                    self->_hiddenAvatarRow = topIndexPath.row;
+                    if(topIndexPath.row < self->_data.count) {
+                        EventsTableCell *cell = [self->_rowCache objectForKey:[[self->_data objectAtIndex: topIndexPath.row] UUID]];
+                        cell.avatar.hidden = YES;
+                        self->_hiddenAvatarRow = topIndexPath.row;
+                    }
                 }
             } else {
                 self->_stickyAvatar.hidden = YES;
                 if(self->_hiddenAvatarRow != -1) {
-                    Event *e = [self->_data objectAtIndex:self->_hiddenAvatarRow];
-                    EventsTableCell *cell = [self->_rowCache objectForKey:[e UUID]];
-                    cell.avatar.hidden = !e.isHeader;
+                    if(self->_hiddenAvatarRow < self->_data.count) {
+                        Event *e = [self->_data objectAtIndex:self->_hiddenAvatarRow];
+                        EventsTableCell *cell = [self->_rowCache objectForKey:[e UUID]];
+                        cell.avatar.hidden = !e.isHeader;
+                    }
                     self->_hiddenAvatarRow = -1;
                 }
             }
         } else {
             self->_stickyAvatar.hidden = YES;
             if(self->_hiddenAvatarRow != -1) {
-                Event *e = [self->_data objectAtIndex:self->_hiddenAvatarRow];
-                EventsTableCell *cell = [self->_rowCache objectForKey:[e UUID]];
-                cell.avatar.hidden = !e.isHeader;
+                if(self->_hiddenAvatarRow < self->_data.count) {
+                    Event *e = [self->_data objectAtIndex:self->_hiddenAvatarRow];
+                    EventsTableCell *cell = [self->_rowCache objectForKey:[e UUID]];
+                    cell.avatar.hidden = !e.isHeader;
+                }
                 self->_hiddenAvatarRow = -1;
             }
         }
     } else {
         self->_stickyAvatar.hidden = YES;
         if(self->_hiddenAvatarRow != -1) {
-            Event *e = [self->_data objectAtIndex:self->_hiddenAvatarRow];
-            EventsTableCell *cell = [self->_rowCache objectForKey:[e UUID]];
-            cell.avatar.hidden = !e.isHeader;
+            if(self->_hiddenAvatarRow < self->_data.count) {
+                Event *e = [self->_data objectAtIndex:self->_hiddenAvatarRow];
+                EventsTableCell *cell = [self->_rowCache objectForKey:[e UUID]];
+                cell.avatar.hidden = !e.isHeader;
+            }
             self->_hiddenAvatarRow = -1;
         }
     }
