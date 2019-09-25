@@ -2126,7 +2126,6 @@ extern UIImage *__socketClosedBackgroundImage;
         } else {
             self->_tableView.tableHeaderView = nil;
         }
-        
         if(_earliestEid == _buffer.min_eid)
             self->_shouldAutoFetch = NO;
         
@@ -3160,6 +3159,11 @@ extern UIImage *__socketClosedBackgroundImage;
             self->_hiddenAvatarRow = -1;
         }
     }
+#ifdef DEBUG
+    if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+        self->_tableView.tableHeaderView = nil;
+    }
+#endif
 }
 
 -(void)_replyButtonPressed:(UIControl *)sender {
