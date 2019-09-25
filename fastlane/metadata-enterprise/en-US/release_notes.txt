@@ -1,9 +1,6 @@
-• Automatically detect phone numbers and addresses in chat messages
-• Fix an issue where the users show/hide button would appear incorrectly on iPad
-• Prompt before joining channels when tapping a hyperlink
-• Support for channel keys in irc:// URLs
-• Improve playback of imgur MP4 / GIFV URLs
-• Fix the last line of collapsed join/part/quits occasionally being truncated
-• Fix truncated labels in settings dialog on iPad
-• Support for Split View and Dark Mode on iOS 13
+• The loading spinner on the archives header should no longer appear unexpectedly when resuming the app
+• Adjust some menu positions on iPad
+• Backlog no longer automatically reloads after using the /clear command
+• Fix a crash that could occur when displaying alert and prompt dialogs on iOS 13
+• Show join/parts channel setting now correctly overrides the global join/part setting
 • Stability improvements and minor fixes
