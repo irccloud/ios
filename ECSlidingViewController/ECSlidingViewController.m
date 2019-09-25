@@ -614,7 +614,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
         [NSException raise:@"Invalid Width Layout" format:@"underLeftWidthLayout must be a valid ECViewWidthLayout"];
     }
     int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
-    if(sbheight > 20)
+    if(sbheight > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
         sbheight -= 20;
     if(@available(iOS 11, *)) {
         if(self.view.safeAreaInsets.bottom) {
@@ -624,7 +624,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     CGRect frame = self.underLeftView.frame;
     frame.origin.y = sbheight;
     frame.size.height = self.view.bounds.size.height - sbheight;
-    if([UIApplication sharedApplication].statusBarFrame.size.height > 20)
+    if([UIApplication sharedApplication].statusBarFrame.size.height > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
         frame.size.height += 20;
     self.underLeftView.frame = frame;
 }
