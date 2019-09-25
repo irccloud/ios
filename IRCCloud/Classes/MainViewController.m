@@ -3667,6 +3667,7 @@ NSArray *_sortedChannels;
                 self->_selectedUser.nick = event.fromNick;
                 self->_selectedUser.display_name = event.from;
                 self->_selectedUser.hostmask = event.hostmask;
+                self->_selectedUser.parted = YES;
             }
             [self _mention];
         }
@@ -4956,7 +4957,8 @@ NSArray *_sortedChannels;
             else
                 [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:self->_selectedUser.ircserver.length?_selectedUser.ircserver:self->_selectedUser.nick cid:self->_buffer.cid handler:nil];
         } else if([self->_buffer.type isEqualToString:@"conversation"]) {
-            [[NetworkConnection sharedInstance] whois:self->_buffer.name server:self->_buffer.name cid:self->_buffer.cid handler:nil];
+            User *u = [[UsersDataSource sharedInstance] getUser:self->_buffer.name cid:self->_buffer.cid];
+            [[NetworkConnection sharedInstance] whois:self->_buffer.name server:u.ircserver.length?u.ircserver:nil cid:self->_buffer.cid handler:nil];
         }
     } else if([action isEqualToString:@"Send Feedback"]) {
         CLS_LOG(@"Feedback Requested");
