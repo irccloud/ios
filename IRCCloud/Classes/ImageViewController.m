@@ -398,7 +398,9 @@
             [Answers logContentViewWithName:nil contentType:@"Image" contentId:nil customAttributes:nil];
         }];
     } else {
-        [self fail:@"Unable to display image"];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self fail:@"Unable to display image"];
+        }];
     }
 }
 
