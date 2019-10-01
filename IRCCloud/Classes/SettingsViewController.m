@@ -317,9 +317,25 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.navigationItem.title = @"Theme";
-        self->_themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
-        
+        if (@available(iOS 13, *)) {
+            self->_themes = @[@"Automatic", @"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
+        } else {
+            self->_themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
+        }
+
         NSMutableArray *previews = [[NSMutableArray alloc] init];
+        
+        if (@available(iOS 13, *)) {
+            UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
+            if([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark) {
+                v.backgroundColor = [UIColor blackColor];
+            } else {
+                v.backgroundColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+            }
+            v.layer.borderColor = [UIColor blackColor].CGColor;
+            v.layer.borderWidth = 1.0f;
+            [previews addObject:v];
+        }
         
         UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
         v.backgroundColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
@@ -427,7 +443,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [[NSUserDefaults standardUserDefaults] setObject:[[self->_themes objectAtIndex:indexPath.row] lowercaseString] forKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [UIColor setTheme:[[self->_themes objectAtIndex:indexPath.row] lowercaseString]];
+    [UIColor setTheme];
     [[EventsDataSource sharedInstance] reformat];
     [tableView reloadData];
     UIView *v = self.navigationController.view.superview;

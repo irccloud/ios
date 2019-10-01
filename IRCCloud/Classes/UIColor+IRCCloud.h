@@ -28,8 +28,10 @@
 +(void)setSafeInsets:(UIEdgeInsets)insets;
 +(UIColor *)colorWithHue:(CGFloat)hue saturation:(CGFloat)saturation lightness:(CGFloat)brightness alpha:(CGFloat)alpha;
 +(BOOL)isDarkTheme;
++(void)setTheme;
 +(void)setTheme:(NSString *)theme;
 +(void)clearTheme;
++(void)setCurrentTraits:(UITraitCollection *)traitCollection;
 +(UIColor *)contentBackgroundColor;
 +(UIColor *)messageTextColor;
 +(UIColor *)opersGroupColor;

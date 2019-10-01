@@ -114,7 +114,7 @@
 }
 
 -(void)documentInteractionControllerDidDismissOpenInMenu:(UIDocumentInteractionController *)controller {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
 }
 
 -(void)cacheFileSize:(NSDictionary *)d {
@@ -174,7 +174,7 @@
 }
 
 -(void)viewWillAppear:(BOOL)animated {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [super viewWillAppear:animated];
     self->_iCloudLogs.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];

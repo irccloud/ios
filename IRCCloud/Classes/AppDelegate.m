@@ -31,6 +31,9 @@
 #import "LogExportsTableViewController.h"
 #import "ImageViewController.h"
 #import "SettingsViewController.h"
+#import "ColorFormatter.h"
+#import "EventsDataSource.h"
+#import "AvatarsDataSource.h"
 #if DEBUG
 #import "FLEXManager.h"
 #endif
@@ -157,7 +160,7 @@
 
     if (@available(iOS 13, *)) {
         if([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark)
-            [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"theme":@"midnight"}];
+            [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"theme":@"automatic"}];
     }
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"path"]) {
@@ -200,7 +203,7 @@
     [[NSUserDefaults standardUserDefaults] synchronize];
     
     [ColorFormatter loadFonts];
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [self.mainViewController applyTheme];
     [[EventsDataSource sharedInstance] reformat];
     
@@ -467,7 +470,7 @@
             self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
             self.mainViewController.eidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
-            [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+            [UIColor setTheme];
             [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
             [self showMainView:YES];
@@ -489,7 +492,7 @@
             self.mainViewController.bidToOpen = bid;
             self.mainViewController.eidToOpen = eid;
             CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
-            [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+            [UIColor setTheme];
             [self.mainViewController applyTheme];
             [self.mainViewController bufferSelected:bid];
             [self showMainView:YES];
@@ -554,7 +557,7 @@
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [self.mainViewController applyTheme];
     if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:((UNTextInputNotificationResponse *)response).userText completionHandler:completionHandler];
@@ -568,7 +571,7 @@
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center openSettingsForNotification:(UNNotification *)notification {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+        [UIColor setTheme];
         [self.mainViewController applyTheme];
         [self showMainView:NO];
         SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
@@ -673,7 +676,7 @@
 -(void)showMainView:(BOOL)animated {
     if([NetworkConnection sharedInstance].session.length) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+        [UIColor setTheme];
         [self.mainViewController applyTheme];
         if(animated) {
             if([NetworkConnection sharedInstance].state != kIRCCloudStateConnected)
@@ -1048,6 +1051,8 @@
 }
 
 -(void)sceneWillEnterForeground:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
+    self.window.overrideUserInterfaceStyle = UIUserInterfaceStyleUnspecified;
+
     if(self.window.rootViewController == self.splashViewController) {
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {

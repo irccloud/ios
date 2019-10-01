@@ -510,7 +510,7 @@ NSArray *_sortedChannels;
     self.navigationItem.titleView = self->_titleView;
     self->_connectingProgress.hidden = YES;
     self->_connectingProgress.progress = 0;
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [self _themeChanged];
     [self connectivityChanged:nil];
     [self updateLayout];
@@ -1862,9 +1862,23 @@ NSArray *_sortedChannels;
     [super viewWillAppear:animated];
     if(self->_ignoreVisibilityChanges)
         return;
+    [UIColor setCurrentTraits:self.traitCollection];
+    [UIColor setTheme];
+    if(![self->_currentTheme isEqualToString:[UIColor currentTheme]]) {
+        NSLog(@"Switched from %@ to %@", self->_currentTheme, [UIColor currentTheme]);
+        [self applyTheme];
+        if([ColorFormatter shouldClearFontCache]) {
+            [ColorFormatter clearFontCache];
+            [ColorFormatter loadFonts];
+        }
+        [[EventsDataSource sharedInstance] reformat];
+        [[AvatarsDataSource sharedInstance] clear];
+        
+        [self->_eventsView clearRowCache];
+        [self->_eventsView refresh];
+    }
     self->_isShowingPreview = NO;
     [self->_eventsView viewWillAppear:animated];
-    [self applyTheme];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     for(Event *e in [self->_pendingEvents copy]) {
@@ -2023,7 +2037,6 @@ NSArray *_sortedChannels;
     [self->_doubleTapTimer invalidate];
     self->_doubleTapTimer = nil;
     self->_eidToOpen = -1;
-    self->_currentTheme = nil;
     
     self.slidingViewController.view.autoresizesSubviews = YES;
     [self.slidingViewController resetTopView];
@@ -3301,7 +3314,7 @@ NSArray *_sortedChannels;
                 //Not registered yet
             }
         }
-        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+        [UIColor setTheme];
         [self updateLayout];
         [self->_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
         [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
@@ -4290,13 +4303,13 @@ NSArray *_sortedChannels;
 }
 
 -(void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [self applyTheme];
     [self _resetStatusBar];
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [self applyTheme];
     FileUploader *u = [[FileUploader alloc] init];
     u.delegate = self;
@@ -4314,7 +4327,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [self applyTheme];
     [self _resetStatusBar];
     self->_popover = nil;
@@ -4325,7 +4338,7 @@ NSArray *_sortedChannels;
 }
 
 - (void)_imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [self applyTheme];
     FileMetadataViewController *fvc = nil;
     NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
@@ -4477,7 +4490,7 @@ NSArray *_sortedChannels;
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     CLS_LOG(@"Image picker was cancelled");
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [self applyTheme];
     [self dismissViewControllerAnimated:YES completion:nil];
     [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
