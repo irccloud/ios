@@ -529,6 +529,12 @@ extern UIImage *__socketClosedBackgroundImage;
     [self refresh];
 }
 
+-(void)clearRowCache {
+    @synchronized (self->_rowCache) {
+        [self->_rowCache removeAllObjects];
+    }
+}
+
 -(void)clearCachedHeights {
     if(self->_ready) {
         if([self->_data count]) {

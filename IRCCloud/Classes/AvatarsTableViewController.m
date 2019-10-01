@@ -130,7 +130,7 @@
 
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
     [picker dismissViewControllerAnimated:YES completion:^{
-        [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+        [UIColor setTheme];
         [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
         [picker dismissViewControllerAnimated:YES completion:nil];
         
@@ -207,7 +207,7 @@
 }
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-    [UIColor setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
+    [UIColor setTheme];
     [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
     [picker dismissViewControllerAnimated:YES completion:nil];
 }

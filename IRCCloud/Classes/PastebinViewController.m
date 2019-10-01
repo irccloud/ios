@@ -149,7 +149,7 @@
                 NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                 self->_ownPaste = [[dict objectForKey:@"own_paste"] intValue] == 1;
             }
-            NSURL *url = [NSURL URLWithString:[self->_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@&own_paste=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"], self->_ownPaste ? @"1" : @"0"]];
+            NSURL *url = [NSURL URLWithString:[self->_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@&own_paste=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [UIColor currentTheme], self->_ownPaste ? @"1" : @"0"]];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
             [request setHTTPShouldHandleCookies:NO];
             [self->_webView loadRequest:request];

@@ -131,6 +131,8 @@ NSString *__current_theme;
 
 BOOL __compact = NO;
 
+UITraitCollection *__currentTraitCollection;
+
 @implementation UITextField (IRCCloudAppearanceHax)
 -(void)setPlaceholder:(NSString *)placeholder {
     [self setAttributedPlaceholder:[[NSAttributedString alloc] initWithString:placeholder?placeholder:@"" attributes:@{NSForegroundColorAttributeName:__placeholderColor}]];
@@ -799,6 +801,26 @@ BOOL __compact = NO;
 
 +(NSString *)currentTheme {
     return __current_theme;
+}
+
++(void)setCurrentTraits:(UITraitCollection *)traitCollection {
+    __currentTraitCollection = traitCollection;
+}
+
++(void)setTheme {
+    NSString *theme = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
+    
+    if([theme isEqualToString:@"automatic"]) {
+        if (@available(iOS 13, *)) {
+            if(!__currentTraitCollection)
+                __currentTraitCollection = [UITraitCollection currentTraitCollection];
+            theme = (__currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) ? @"midnight" : @"dawn";
+        } else {
+            theme = @"dawn";
+        }
+    }
+    
+    [self setTheme:theme];
 }
 
 +(UIColor *)contentBackgroundColor {

@@ -113,6 +113,7 @@
 -(void)clearLastSeenMarker;
 -(void)refresh;
 -(void)clearCachedHeights;
+-(void)clearRowCache;
 -(void)uncacheFile:(NSString *)fileID;
 -(void)closePreview:(Event *)event;
 -(NSString *)YUNoHeartbeat;
