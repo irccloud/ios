@@ -3183,6 +3183,7 @@ NSArray *_sortedChannels;
     } else {
         [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
     }
+    [self.slidingViewController adjustLayout];
 }
 
 -(void)updateLayout:(float)sbHeight {
