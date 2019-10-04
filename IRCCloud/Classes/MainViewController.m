@@ -2410,34 +2410,38 @@ NSArray *_sortedChannels;
                     e.entities = @{@"reply":self->_msgid};
                     e.reqId = [[NetworkConnection sharedInstance] reply:msg to:self->_buffer.name cid:self->_buffer.cid msgid:self->_msgid handler:^(IRCCloudJSONObject *result) {
                         if(![[result objectForKey:@"success"] boolValue]) {
-                            [self->_pendingEvents removeObject:e];
-                            e.entities = @{@"reply":self->_msgid};
-                            e.height = 0;
-                            e.pending = NO;
-                            e.rowType = ROW_FAILED;
-                            e.color = [UIColor networkErrorColor];
-                            e.bgColor = [UIColor errorBackgroundColor];
-                            e.formatted = nil;
-                            e.height = 0;
-                            [e.expirationTimer invalidate];
-                            e.expirationTimer = nil;
-                            [self->_eventsView reloadData];
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [self->_pendingEvents removeObject:e];
+                                e.entities = @{@"reply":self->_msgid};
+                                e.height = 0;
+                                e.pending = NO;
+                                e.rowType = ROW_FAILED;
+                                e.color = [UIColor networkErrorColor];
+                                e.bgColor = [UIColor errorBackgroundColor];
+                                e.formatted = nil;
+                                e.height = 0;
+                                [e.expirationTimer invalidate];
+                                e.expirationTimer = nil;
+                                [self->_eventsView reloadData];
+                            }];
                         }
                     }];
                 } else {
                     e.reqId = [[NetworkConnection sharedInstance] say:msg to:self->_buffer.name cid:self->_buffer.cid handler:^(IRCCloudJSONObject *result) {
                         if(![[result objectForKey:@"success"] boolValue]) {
-                            [self->_pendingEvents removeObject:e];
-                            e.height = 0;
-                            e.pending = NO;
-                            e.rowType = ROW_FAILED;
-                            e.color = [UIColor networkErrorColor];
-                            e.bgColor = [UIColor errorBackgroundColor];
-                            e.formatted = nil;
-                            e.height = 0;
-                            [e.expirationTimer invalidate];
-                            e.expirationTimer = nil;
-                            [self->_eventsView reloadData];
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [self->_pendingEvents removeObject:e];
+                                e.height = 0;
+                                e.pending = NO;
+                                e.rowType = ROW_FAILED;
+                                e.color = [UIColor networkErrorColor];
+                                e.bgColor = [UIColor errorBackgroundColor];
+                                e.formatted = nil;
+                                e.height = 0;
+                                [e.expirationTimer invalidate];
+                                e.expirationTimer = nil;
+                                [self->_eventsView reloadData];
+                            }];
                         }
                     }];
                 }

@@ -330,6 +330,7 @@ volatile BOOL __socketPaused = NO;
         server.join_commands = [object objectForKey:@"join_commands"];
         server.fail_info = [object objectForKey:@"fail_info"];
         server.caps = [object objectForKey:@"caps"];
+        server.usermask = [object objectForKey:@"usermask"];
         server.away = (backlog && [self->_awayOverride objectForKey:@(object.cid)])?@"":[object objectForKey:@"away"];
         if([[self.userInfo objectForKey:@"autoaway"] intValue] && [server.away isEqualToString:@"Auto-away"])
             server.away = @"";

@@ -202,10 +202,6 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
   self.topViewSnapshot = [[UIView alloc] initWithFrame:self.topView.bounds];
   [self.topViewSnapshot setAutoresizingMask:self.autoResizeToFillScreen];
   [self.topViewSnapshot addGestureRecognizer:self.resetTapGesture];
-  self.view.translatesAutoresizingMaskIntoConstraints = NO;
-  if(@available(iOS 11, *)) {
-    self.view.insetsLayoutMarginsFromSafeArea = NO;
-  }
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
