@@ -636,6 +636,12 @@
     [[NSUserDefaults standardUserDefaults] setObject:self->_oldTheme forKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] synchronize];
     [UIColor setTheme:self->_oldTheme];
+    if([ColorFormatter shouldClearFontCache]) {
+        [ColorFormatter clearFontCache];
+        [ColorFormatter loadFonts];
+    }
+    [[EventsDataSource sharedInstance] clearFormattingCache];
+    [[AvatarsDataSource sharedInstance] clear];
     [[EventsDataSource sharedInstance] reformat];
     UIView *v = self.navigationController.view.superview;
     [self.navigationController.view removeFromSuperview];
