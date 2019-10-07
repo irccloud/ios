@@ -119,4 +119,6 @@
 -(NSString *)YUNoHeartbeat;
 -(CGRect)rectForEvent:(Event *)event;
 -(void)reloadData;
+-(void)viewWillResize;
+-(void)viewDidResize;
 @end

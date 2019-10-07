@@ -1803,6 +1803,13 @@ NSArray *_sortedChannels;
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
+    if(self->_eventsView.topUnreadView.observationInfo) {
+        @try {
+            [self->_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+        } @catch(id anException) {
+            //Not registered yet
+        }
+    }
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     int height = size.height;
     
@@ -1830,6 +1837,7 @@ NSArray *_sortedChannels;
             [self->_buffersView scrollViewDidScroll:self->_buffersView.tableView];
         }];
     }
+    [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
 }
 
 -(void)_observeKeyboard {
@@ -1839,6 +1847,13 @@ NSArray *_sortedChannels;
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
+    if(self->_eventsView.topUnreadView.observationInfo) {
+        @try {
+            [self->_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
+        } @catch(id anException) {
+            //Not registered yet
+        }
+    }
     self->_kbSize = CGSizeMake(0,0);
     
     [UIView beginAnimations:nil context:NULL];
@@ -1856,6 +1871,7 @@ NSArray *_sortedChannels;
     [UIView commitAnimations];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
+    [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -3177,6 +3193,8 @@ NSArray *_sortedChannels;
 }
 
 -(void)updateLayout {
+    BOOL scrolledUp = _buffer.scrolledUp;
+    CGPoint contentOffset = _eventsView.tableView.contentOffset;
     [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
     if(@available(iOS 11, *)) {
         [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
@@ -3188,6 +3206,11 @@ NSArray *_sortedChannels;
         [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
     }
     [self.slidingViewController adjustLayout];
+    [self.slidingViewController.view layoutIfNeeded];
+    if(!scrolledUp)
+        [self->_eventsView _scrollToBottom];
+    else
+        [self->_eventsView.tableView setContentOffset:contentOffset];
 }
 
 -(void)updateLayout:(float)sbHeight {
@@ -3282,7 +3305,6 @@ NSArray *_sortedChannels;
     [self _updateServerStatus];
     [self _updateUserListVisibility];
     [self _updateGlobalMsg];
-    [self _updateEventsInsets];
     
     [self.view layoutIfNeeded];
     
@@ -3290,6 +3312,8 @@ NSArray *_sortedChannels;
     self.navigationItem.titleView = nil;
     self.navigationItem.titleView = v;
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
+
+    [self _updateEventsInsets];
 }
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
@@ -3301,6 +3325,7 @@ NSArray *_sortedChannels;
             //Not registered yet
         }
     }
+    [self->_eventsView viewWillResize];
     self->_eventActivity.alpha = 1;
     [self->_eventActivity startAnimating];
     [self.slidingViewController resetTopView];
@@ -3321,6 +3346,7 @@ NSArray *_sortedChannels;
         }
         [UIColor setTheme];
         [self updateLayout];
+        [self->_eventsView viewDidResize];
         [self->_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
         [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
     }];
@@ -3372,7 +3398,7 @@ NSArray *_sortedChannels;
 #ifndef APPSTORE
             CLS_LOG(@"Adjusting content offset after changing insets");
 #endif
-            if(floorf(self->_eventsView.tableView.contentOffset.y + diff + (self->_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) > floorf(self->_eventsView.tableView.contentSize.height)) {
+            if(floorf(self->_eventsView.tableView.contentOffset.y + diff + (self->_eventsView.tableView.frame.size.height - _eventsView.tableView.contentInset.top - _eventsView.tableView.contentInset.bottom)) >= floorf(self->_eventsView.tableView.contentSize.height)) {
                 if(!_buffer.scrolledUp)
                     [self->_eventsView _scrollToBottom];
 #ifndef APPSTORE
