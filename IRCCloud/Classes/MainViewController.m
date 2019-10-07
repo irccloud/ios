@@ -310,6 +310,7 @@ NSArray *_sortedChannels;
     self->_eventsView.topUnreadLabel.textColor = [UIColor chatterBarTextColor];
     self->_eventsView.bottomUnreadLabel.textColor = [UIColor chatterBarTextColor];
     self->_eventsView.topUnreadArrow.textColor = self->_eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
+    [self->_eventsView clearRowCache];
     
     self->_borders.backgroundColor = [UIColor iPadBordersColor];
     [[self->_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
