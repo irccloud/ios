@@ -116,6 +116,7 @@
     UIFont *_defaultTextareaFont;
     id<UIViewControllerPreviewing> __previewer;
     BOOL _ignoreVisibilityChanges;
+    BOOL _ignoreInsetChanges;
     NSString *_msgid;
 }
 @property (nonatomic) int cidToOpen;
