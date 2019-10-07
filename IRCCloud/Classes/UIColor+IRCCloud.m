@@ -254,6 +254,16 @@ UITraitCollection *__currentTraitCollection;
 }
 
 +(void)setTheme:(NSString *)theme {
+    if([theme isEqualToString:@"automatic"]) {
+        if (@available(iOS 13, *)) {
+            if(!__currentTraitCollection)
+                __currentTraitCollection = [UITraitCollection currentTraitCollection];
+            theme = (__currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) ? @"midnight" : @"dawn";
+        } else {
+            theme = @"dawn";
+        }
+    }
+
     NSLog(@"Setting theme: %@", theme);
     
     int i = 0;
@@ -808,19 +818,7 @@ UITraitCollection *__currentTraitCollection;
 }
 
 +(void)setTheme {
-    NSString *theme = [[NSUserDefaults standardUserDefaults] objectForKey:@"theme"];
-    
-    if([theme isEqualToString:@"automatic"]) {
-        if (@available(iOS 13, *)) {
-            if(!__currentTraitCollection)
-                __currentTraitCollection = [UITraitCollection currentTraitCollection];
-            theme = (__currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) ? @"midnight" : @"dawn";
-        } else {
-            theme = @"dawn";
-        }
-    }
-    
-    [self setTheme:theme];
+    [self setTheme:[[NSUserDefaults standardUserDefaults] objectForKey:@"theme"]];
 }
 
 +(UIColor *)contentBackgroundColor {
