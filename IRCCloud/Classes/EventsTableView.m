@@ -498,23 +498,22 @@ extern UIImage *__socketClosedBackgroundImage;
         [self scrollViewDidScroll:self->_tableView];
 }
 
--(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
-    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+-(void)viewWillResize {
     self->_ready = NO;
     self->_tableView.hidden = YES;
     self->_stickyAvatar.hidden = YES;
-    [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        if(self->_data.count && self->_buffer.scrolledUp)
-            self->_bottomRow = [[[self->_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self->_tableView.bounds, self->_tableView.contentInset)] lastObject] row];
-        else
-            self->_bottomRow = -1;
-    } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        self->_ready = YES;
-        [self clearCachedHeights];
-        [self updateUnread];
-        [self scrollViewDidScroll:self->_tableView];
-        self->_tableView.hidden = NO;
-    }];
+    if(self->_data.count && self->_buffer.scrolledUp)
+        self->_bottomRow = [[[self->_tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self->_tableView.bounds, self->_tableView.contentInset)] lastObject] row];
+    else
+        self->_bottomRow = -1;
+}
+
+-(void)viewDidResize {
+    self->_ready = YES;
+    [self clearCachedHeights];
+    [self updateUnread];
+    [self scrollViewDidScroll:self->_tableView];
+    self->_tableView.hidden = NO;
 }
 
 -(void)uncacheFile:(NSString *)fileID {
@@ -542,6 +541,7 @@ extern UIImage *__socketClosedBackgroundImage;
             for(Event *e in _data) {
                 e.height = 0;
             }
+            [self clearRowCache];
             [self->_lock unlock];
             self->_ready = NO;
             [self->_tableView reloadData];
