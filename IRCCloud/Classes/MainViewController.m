@@ -3195,7 +3195,6 @@ NSArray *_sortedChannels;
 
 -(void)updateLayout {
     BOOL scrolledUp = _buffer.scrolledUp;
-    CGPoint contentOffset = _eventsView.tableView.contentOffset;
     [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
     if(@available(iOS 11, *)) {
         [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
@@ -3206,6 +3205,7 @@ NSArray *_sortedChannels;
     } else {
         [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
     }
+    CGPoint contentOffset = _eventsView.tableView.contentOffset;
     [self.slidingViewController adjustLayout];
     [self.slidingViewController.view layoutIfNeeded];
     if(!scrolledUp)
@@ -3234,6 +3234,7 @@ NSArray *_sortedChannels;
 
 -(void)transitionToSize:(CGSize)size {
     NSLog(@"Transitioning to size: %f, %f", size.width, size.height);
+    _ignoreInsetChanges = YES;
     CGPoint center = self.slidingViewController.view.center;
     if(self.slidingViewController.underLeftShowing)
         center.x += self->_buffersView.tableView.frame.size.width;
@@ -3314,6 +3315,7 @@ NSArray *_sortedChannels;
     self.navigationItem.titleView = v;
     self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
 
+    _ignoreInsetChanges = NO;
     [self _updateEventsInsets];
 }
 
@@ -3354,6 +3356,8 @@ NSArray *_sortedChannels;
 }
 
 -(void)_updateEventsInsets {
+    if(_ignoreInsetChanges)
+        return;
     self->_bottomBarOffsetConstraint.constant = self->_kbSize.height;
     if(@available(iOS 11, *)) {
         if(self.slidingViewController.view.safeAreaInsets.bottom) {
