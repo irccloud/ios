@@ -1233,9 +1233,11 @@ extern UIImage *__socketClosedBackgroundImage;
                                     [self->_filePropsCache setObject:properties forKey:[entity objectForKey:@"id"]];
                                 }
                                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                    Event *e1 = [self entity:event eid:entity_eid properties:properties];
-                                    [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
-                                    [self reloadForEvent:e1];
+                                    if(self->_buffer.bid == event.bid) {
+                                        Event *e1 = [self entity:event eid:entity_eid properties:properties];
+                                        [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
+                                        [self reloadForEvent:e1];
+                                    }
                                 }];
                             }
                         });
@@ -1272,7 +1274,7 @@ extern UIImage *__socketClosedBackgroundImage;
                                     [self insertEvent:e1 backlog:backlog nextIsGrouped:NO];
                             } else {
                                 [self->_urlHandler fetchMediaURLs:result.URL result:^(BOOL success, NSString *error) {
-                                    if([self->_data containsObject:event]) {
+                                    if([self->_data containsObject:event] && self->_buffer.bid == event.bid) {
                                         if(success) {
                                             Event *e1 = [self entity:event eid:entity_eid properties:[self->_urlHandler MediaURLs:result.URL]];
                                             if([[ImageCache sharedInstance] isValidURL:[e1.entities objectForKey:@"url"]]) {
