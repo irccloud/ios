@@ -660,6 +660,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         unverified.font = [UIFont systemFontOfSize:FONT_SIZE];
         unverified.text = @"You can't connect to external servers until you confirm your email address.\n\nIf you're still waiting for the email, you can tap here to send yourself another confirmation.";
         unverified.tag = 1;
+        unverified.editable = NO;
         unverified.userInteractionEnabled = YES;
 
         self.tableView.tableHeaderView = unverified;

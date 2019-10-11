@@ -524,6 +524,74 @@
         return;
     }
     
+    if([url.host isEqualToString:@"www.irccloud.com"]) {
+        if([url.path isEqualToString:@"/chat/access-link"]) {
+            CLS_LOG(@"Opening access-link from handoff");
+            NSString *u = [[url.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/" withString:@"irccloud://"] stringByReplacingOccurrencesOfString:@"&mobile=1" withString:@""];
+            [[NetworkConnection sharedInstance] logout];
+            appDelegate.loginSplashViewController.accessLink = [NSURL URLWithString:u];
+            appDelegate.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
+            appDelegate.loginSplashViewController.view.alpha = 1;
+            if(appDelegate.window.rootViewController == appDelegate.loginSplashViewController)
+                [appDelegate.loginSplashViewController viewWillAppear:YES];
+            else
+                appDelegate.window.rootViewController = appDelegate.loginSplashViewController;
+            return;
+        } else if([url.path hasPrefix:@"/verify-email/"]) {
+            CLS_LOG(@"Opening verify-email from handoff");
+            [[[NSURLSession sharedSession] dataTaskWithURL:url completionHandler:
+              ^(NSData *data, NSURLResponse *response, NSError *error) {
+                  [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                      if([(NSHTTPURLResponse *)response statusCode] == 200) {
+                          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmed" message:@"Your email address was successfully confirmed" preferredStyle:UIAlertControllerStyleAlert];
+                          [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                          [appDelegate.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                      } else {
+                          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmation Failed" message:@"Unable to confirm your email address.  Please try again shortly." preferredStyle:UIAlertControllerStyleAlert];
+                          [alert addAction:[UIAlertAction actionWithTitle:@"Send Again" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                              [[NetworkConnection sharedInstance] resendVerifyEmailWithHandler:^(IRCCloudJSONObject *result) {
+                                  if([result objectForKey:@"success"]) {
+                                      UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." preferredStyle:UIAlertControllerStyleAlert];
+                                      [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                                      [appDelegate.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                                  } else {
+                                      UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Failed" message:[NSString stringWithFormat:@"Unable to send confirmation message: %@.  Please try again shortly.", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
+                                      [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                                      [appDelegate.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                                  }
+                              }];
+                          }]];
+                          [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
+                          [appDelegate.window.rootViewController presentViewController:alert animated:YES completion:nil];
+                      }
+                  }];
+            }] resume];
+            return;
+        } else if([url.path isEqualToString:@"/"] && [url.fragment hasPrefix:@"!/"]) {
+            NSString *u = [url.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"];
+            if([u hasPrefix:@"irc://ircs://"])
+                u = [u substringFromIndex:6];
+            CLS_LOG(@"Opening URL from handoff: %@", u);
+            [mainViewController launchURL:[NSURL URLWithString:u]];
+            return;
+        } else if([url.path isEqualToString:@"/invite"]) {
+            url = [NSURL URLWithString:[url.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+        } else if([url.path hasPrefix:@"/pastebin/"]) {
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-https://%@%@",url.host,url.path]];
+        } else if([url.path hasPrefix:@"/irc/"]) {
+            [appDelegate showMainView:YES];
+            [mainViewController launchURL:url];
+            return;
+        } else if([url.path hasPrefix:@"/log-export/"]) {
+            [appDelegate showMainView:YES];
+            [mainViewController launchURL:url];
+            return;
+        } else {
+            [[UIApplication sharedApplication] openURL:url];
+            return;
+        }
+    }
+    
     if([url.host hasSuffix:@"irccloud.com"] && [url.path isEqualToString:@"/invite"]) {
         int port = 6667;
         int ssl = 0;

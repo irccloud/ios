@@ -295,7 +295,8 @@
 #endif
     return YES;
 }
--(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
+
+-(BOOL)continueActivity:(NSUserActivity *)userActivity {
     CLS_LOG(@"Continuing activity type: %@", userActivity.activityType);
 #ifdef ENTERPRISE
     if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"])
@@ -313,75 +314,14 @@
             return YES;
         }
     } else if([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
-        if([userActivity.webpageURL.host isEqualToString:@"www.irccloud.com"]) {
-            if([userActivity.webpageURL.path isEqualToString:@"/chat/access-link"]) {
-                CLS_LOG(@"Opening access-link from handoff");
-                NSString *url = [[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/" withString:@"irccloud://"] stringByReplacingOccurrencesOfString:@"&mobile=1" withString:@""];
-                [[NetworkConnection sharedInstance] logout];
-                self.loginSplashViewController.accessLink = [NSURL URLWithString:url];
-                self.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
-                self.loginSplashViewController.view.alpha = 1;
-                if(self.window.rootViewController == self.loginSplashViewController)
-                    [self.loginSplashViewController viewWillAppear:YES];
-                else
-                    self.window.rootViewController = self.loginSplashViewController;
-            } else if([userActivity.webpageURL.path hasPrefix:@"/verify-email/"]) {
-                CLS_LOG(@"Opening verify-email from handoff");
-                [[[NSURLSession sharedSession] dataTaskWithURL:userActivity.webpageURL completionHandler:
-                  ^(NSData *data, NSURLResponse *response, NSError *error) {
-                      [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                          if([(NSHTTPURLResponse *)response statusCode] == 200) {
-                              UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmed" message:@"Your email address was successfully confirmed" preferredStyle:UIAlertControllerStyleAlert];
-                              [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
-                              [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
-                          } else {
-                              UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Confirmation Failed" message:@"Unable to confirm your email address.  Please try again shortly." preferredStyle:UIAlertControllerStyleAlert];
-                              [alert addAction:[UIAlertAction actionWithTitle:@"Send Again" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                                  [[NetworkConnection sharedInstance] resendVerifyEmailWithHandler:^(IRCCloudJSONObject *result) {
-                                      if([result objectForKey:@"success"]) {
-                                          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Sent" message:@"You should shortly receive an email with a link to confirm your address." preferredStyle:UIAlertControllerStyleAlert];
-                                          [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
-                                          [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
-                                      } else {
-                                          UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Confirmation Failed" message:[NSString stringWithFormat:@"Unable to send confirmation message: %@.  Please try again shortly.", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
-                                          [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
-                                          [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
-                                      }
-                                  }];
-                              }]];
-                              [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleDefault handler:nil]];
-                              [self.window.rootViewController presentViewController:alert animated:YES completion:nil];
-                          }
-                      }];
-                }] resume];
-            } else if([userActivity.webpageURL.path isEqualToString:@"/"] && [userActivity.webpageURL.fragment hasPrefix:@"!/"]) {
-                NSString *url = [userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/#!/" withString:@"irc://"];
-                if([url hasPrefix:@"irc://ircs://"])
-                    url = [url substringFromIndex:6];
-                CLS_LOG(@"Opening URL from handoff: %@", url);
-                [self.mainViewController launchURL:[NSURL URLWithString:url]];
-            } else if([userActivity.webpageURL.path isEqualToString:@"/invite"]) {
-                [self launchURL:[NSURL URLWithString:[userActivity.webpageURL.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
-            } else if([userActivity.webpageURL.path hasPrefix:@"/pastebin/"]) {
-                [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"irccloud-paste-https://%@%@",userActivity.webpageURL.host,userActivity.webpageURL.path]]];
-            } else if([userActivity.webpageURL.path hasPrefix:@"/irc/"]) {
-                int bid = [URLHandler URLtoBID:userActivity.webpageURL];
-                if(bid) {
-                    [self.mainViewController bufferSelected:bid];
-                    [self showMainView:YES];
-                }
-            } else if([userActivity.webpageURL.path hasPrefix:@"/log-export/"]) {
-                [self showMainView:YES];
-                [self.mainViewController launchURL:userActivity.webpageURL];
-            } else {
-                [[UIApplication sharedApplication] openURL:userActivity.webpageURL];
-                return NO;
-            }
-            return YES;
-        }
+        [self launchURL:userActivity.webpageURL];
     }
     
     return NO;
+}
+
+-(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
+    return [self continueActivity:userActivity];
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
@@ -1048,6 +988,18 @@
 
 -(void)sceneDidBecomeActive:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
     [_appDelegate addScene:self];
+}
+
+-(void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts API_AVAILABLE(ios(13.0)) {
+    [_appDelegate setActiveScene:self.window];
+    for(UIOpenURLContext *c in URLContexts) {
+        [_appDelegate application:[UIApplication sharedApplication] handleOpenURL:c.URL];
+    }
+}
+
+-(void)scene:(UIScene *)scene continueUserActivity:(NSUserActivity *)userActivity API_AVAILABLE(ios(13.0)) {
+    [_appDelegate setActiveScene:self.window];
+    [_appDelegate continueActivity:userActivity];
 }
 
 -(void)sceneWillEnterForeground:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
