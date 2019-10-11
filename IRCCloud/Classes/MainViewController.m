@@ -2778,6 +2778,49 @@ NSArray *_sortedChannels;
         return;
     }
     
+    if([url.path hasPrefix:@"/irc/"] && url.pathComponents.count >= 4) {
+        NSString *network = [[url.pathComponents objectAtIndex:2] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *type = [url.pathComponents objectAtIndex:3];
+        if([type isEqualToString:@"channel"] || [type isEqualToString:@"messages"]) {
+            NSString *name = [[url.pathComponents objectAtIndex:4] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            
+            for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
+                NSString *serverHost = [s.hostname lowercaseString];
+                if([serverHost hasPrefix:@"irc."])
+                    serverHost = [serverHost substringFromIndex:4];
+                serverHost = [serverHost stringByReplacingOccurrencesOfString:@"_" withString:@"-"];
+                
+                NSString *serverName = [s.name lowercaseString];
+                serverName = [serverName stringByReplacingOccurrencesOfString:@"_" withString:@"-"];
+
+                if([network isEqualToString:serverHost] || [network isEqualToString:serverName]) {
+                    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:s.cid]) {
+                        if(([type isEqualToString:@"channel"] && [b.type isEqualToString:@"channel"]) || ([type isEqualToString:@"messages"] && [b.type isEqualToString:@"conversation"])) {
+                            NSString *bufferName = b.name;
+                            
+                            if([b.type isEqualToString:@"channel"]) {
+                                if([bufferName hasPrefix:@"#"])
+                                    bufferName = [bufferName substringFromIndex:1];
+                                if(![bufferName isEqualToString:[b accessibilityValue]])
+                                    bufferName = b.name;
+                            }
+                            
+                            if([bufferName isEqualToString:name]) {
+                                [self bufferSelected:b.bid];
+                                return;
+                            }
+                        }
+                    }
+                    if([type isEqualToString:@"channel"])
+                        [self showJoinPrompt:name server:s];
+                    else if([type isEqualToString:@"messages"])
+                        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", name] to:nil cid:s.cid handler:nil];
+                }
+            }
+        }
+        return;
+    }
+
     if(self.presentedViewController)
         [self dismissViewControllerAnimated:NO completion:nil];
     
@@ -2787,6 +2830,7 @@ NSArray *_sortedChannels;
         [self presentViewController:yvc animated:NO completion:nil];
         return;
     }
+    
     int port = [url.port intValue];
     int ssl = [url.scheme hasSuffix:@"s"]?1:0;
     BOOL match = NO;
