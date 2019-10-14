@@ -1433,11 +1433,13 @@ NSArray *_sortedChannels;
         case kIRCEventOpenBuffer:
             o = notification.object;
             b = [[BuffersDataSource sharedInstance] getBufferWithName:[o objectForKey:@"name"] server:o.cid];
-            if(b != nil && ![[b.name lowercaseString] isEqualToString:[self->_buffer.name lowercaseString]]) {
-                [self bufferSelected:b.bid];
-            } else {
-                self->_bufferToOpen = [o objectForKey:@"name"];
-                self->_cidToOpen = o.cid;
+            if(_buffer == nil || b.bid != _buffer.bid) {
+                if(b != nil && ![[b.name lowercaseString] isEqualToString:[self->_buffer.name lowercaseString]]) {
+                    [self bufferSelected:b.bid];
+                } else {
+                    self->_bufferToOpen = [o objectForKey:@"name"];
+                    self->_cidToOpen = o.cid;
+                }
             }
             break;
         case kIRCEventUserInfo:
@@ -2757,6 +2759,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)launchURL:(NSURL *)url {
+    self->_urlToOpen = nil;
     if([url.path hasPrefix:@"/log-export/"]) {
         LogExportsTableViewController *lvc;
         
@@ -2834,7 +2837,6 @@ NSArray *_sortedChannels;
     int port = [url.port intValue];
     int ssl = [url.scheme hasSuffix:@"s"]?1:0;
     BOOL match = NO;
-    self->_urlToOpen = nil;
     kIRCCloudState state = [NetworkConnection sharedInstance].state;
     
     if([url.host intValue] > 0 && url.path && url.path.length > 1) {
@@ -2962,8 +2964,12 @@ NSArray *_sortedChannels;
         }
         if(self->_buffer.cid == self->_cidToOpen)
             self->_cidToOpen = -1;
+        else if(self->_cidToOpen > 0)
+            CLS_LOG(@"cid%i selected, but was waiting for cid%i", self->_buffer.cid, self->_cidToOpen);
         if(self->_buffer.bid == self->_bidToOpen)
             self->_bidToOpen = -1;
+        else if(self->_bidToOpen > 0)
+            CLS_LOG(@"bid%i selected, but was waiting for bid%i", self->_buffer.bid, self->_bidToOpen);
         self->_eidToOpen = -1;
         self->_bufferToOpen = nil;
         CLS_LOG(@"BID selected: cid%i bid%i", _buffer.cid, bid);
