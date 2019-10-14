@@ -2402,7 +2402,7 @@ extern UIImage *__socketClosedBackgroundImage;
     }
 }
 
--(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+/*-(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
     [self->_lock lock];
     if(indexPath.row >= self->_data.count) {
         [self->_lock unlock];
@@ -2414,7 +2414,7 @@ extern UIImage *__socketClosedBackgroundImage;
         return e.height;
     else
         return ceilf(FONT_SIZE);
-}
+}*/
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     if([indexPath row] >= self->_data.count) {
