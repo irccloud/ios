@@ -720,16 +720,19 @@ extern UIImage *__socketClosedBackgroundImage;
                                 if(p.rowType == ROW_TIMESTAMP) {
                                     CLS_LOG(@"Removing timestamp row");
                                     [self->_data removeObject:p];
+                                    [self clearRowCache];
                                     i--;
                                 }
                             }
                             CLS_LOG(@"Removing pending event");
                             [self->_data removeObject:e];
+                            [self clearRowCache];
                             i--;
                         }
                         if(e.parent == eid) {
                             CLS_LOG(@"Removing child event");
                             [self->_data removeObject:e];
+                            [self clearRowCache];
                             i--;
                         }
                     }
@@ -1701,12 +1704,14 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)_reloadData {
-    CGPoint offset = self->_tableView.contentOffset;
-    [self->_tableView reloadData];
-    if(self->_buffer.scrolledUp) {
-        self->_tableView.contentOffset = offset;
-    } else {
-        [self _scrollToBottom];
+    @synchronized(self) {
+        CGPoint offset = self->_tableView.contentOffset;
+        [self->_tableView reloadData];
+        if(self->_buffer.scrolledUp) {
+            self->_tableView.contentOffset = offset;
+        } else {
+            [self _scrollToBottom];
+        }
     }
 }
 
