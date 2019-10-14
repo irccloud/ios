@@ -1433,13 +1433,11 @@ NSArray *_sortedChannels;
         case kIRCEventOpenBuffer:
             o = notification.object;
             b = [[BuffersDataSource sharedInstance] getBufferWithName:[o objectForKey:@"name"] server:o.cid];
-            if(_buffer == nil || b.bid != _buffer.bid) {
-                if(b != nil && ![[b.name lowercaseString] isEqualToString:[self->_buffer.name lowercaseString]]) {
-                    [self bufferSelected:b.bid];
-                } else {
-                    self->_bufferToOpen = [o objectForKey:@"name"];
-                    self->_cidToOpen = o.cid;
-                }
+            if(!b) {
+                self->_bufferToOpen = [o objectForKey:@"name"];
+                self->_cidToOpen = o.cid;
+            } else if (b != self->_buffer) {
+                [self bufferSelected:b.bid];
             }
             break;
         case kIRCEventUserInfo:
