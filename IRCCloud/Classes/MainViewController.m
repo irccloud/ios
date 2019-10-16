@@ -3349,9 +3349,11 @@ NSArray *_sortedChannels;
         frame.size.width -= self->_buffersView.tableView.frame.size.width;
     self->_connectingView.frame = self->_titleView.frame = frame;
 
+    [self _updateUserListVisibility];
+    [self.view layoutIfNeeded];
+
     [self _updateTitleArea];
     [self _updateServerStatus];
-    [self _updateUserListVisibility];
     [self _updateGlobalMsg];
     
     [self.view layoutIfNeeded];
