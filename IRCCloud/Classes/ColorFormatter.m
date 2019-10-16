@@ -1979,7 +1979,7 @@ extern BOOL __compact;
         NSString *IRI_LABEL = [NSString stringWithFormat:@"[%@](?:[%@_\\-]{0,61}[%@]){0,1}", LABEL_CHAR, LABEL_CHAR, LABEL_CHAR];
         NSString *PUNYCODE_TLD = @"xn\\-\\-[\\w\\-]{0,58}\\w";
         NSString *PROTOCOL = @"[a-z_-]+://";
-        NSString *WORD_BOUNDARY = @"(?:\\W|$|^)";
+        NSString *WORD_BOUNDARY = @"(?=\\b|$|^)";
         NSString *USER_INFO = @"(?:[a-zA-Z0-9\\$\\-\\_\\.\\+\\!\\*\\'\\(\\)\
 \\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,64}(?:\\:(?:[a-zA-Z0-9\\$\\-\\_\
 \\.\\+\\!\\*\\'\\(\\)\\,\\;\\?\\&\\=]|(?:\\%[a-fA-F0-9]{2})){1,25})?\\@";
