@@ -258,32 +258,28 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 - (void)adjustLayout
 {
-  BOOL hasGestureBar = NO;
-  if(@available(iOS 11, *)) {
+  if(@available(iOS 13, *)) {
+      BOOL hasGestureBar = NO;
       hasGestureBar = self.view.safeAreaInsets.bottom > 0 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
-  }
-  if(!hasGestureBar) {
-    int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
-    if(sbheight > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
-      sbheight -= 20;
-    if(@available(iOS 11, *)) {
-      if(self.view.safeAreaInsets.bottom) {
-          sbheight = self.view.safeAreaInsets.top;
+      if(!hasGestureBar) {
+        int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
+        if(sbheight > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
+          sbheight -= 20;
+        if(self.view.safeAreaInsets.bottom) {
+            sbheight = self.view.safeAreaInsets.top;
+        }
+        CGRect frame = self.topView.frame;
+        frame.origin.y = sbheight;
+        frame.size.height = self.view.bounds.size.height - sbheight;
+        if([UIApplication sharedApplication].statusBarFrame.size.height > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
+          frame.size.height += 20;
+        if(self.view.safeAreaInsets.bottom) {
+          frame.size.height -= self.view.safeAreaInsets.bottom;
+        }
+        self.topView.frame = frame;
+        _topViewController.view.layer.shadowOffset = CGSizeZero;
+        _topViewController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.view.bounds].CGPath;
       }
-    }
-    CGRect frame = self.topView.frame;
-    frame.origin.y = sbheight;
-    frame.size.height = self.view.bounds.size.height - sbheight;
-    if([UIApplication sharedApplication].statusBarFrame.size.height > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
-      frame.size.height += 20;
-    if(@available(iOS 11, *)) {
-      if(self.view.safeAreaInsets.bottom) {
-        frame.size.height -= self.view.safeAreaInsets.bottom;
-      }
-    }
-    self.topView.frame = frame;
-    _topViewController.view.layer.shadowOffset = CGSizeZero;
-    _topViewController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.view.layer.bounds].CGPath;
   }
 
   self.topViewSnapshot.frame = self.topView.bounds;
