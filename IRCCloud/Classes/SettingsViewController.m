@@ -507,7 +507,6 @@
         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.secureTextEntry = YES;
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-            [textField becomeFirstResponder];
         }];
         
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -722,11 +721,13 @@
                         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                             textField.placeholder = @"Current Password";
                             textField.secureTextEntry = YES;
+                            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                         }];
                         
                         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                             textField.placeholder = @"New Password";
                             textField.secureTextEntry = YES;
+                            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                         }];
                         
                         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
@@ -760,6 +761,7 @@
                         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                             textField.placeholder = @"Password";
                             textField.secureTextEntry = YES;
+                            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                         }];
 
                         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];

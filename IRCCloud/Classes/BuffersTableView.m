@@ -1342,7 +1342,6 @@
                 textField.text = @"#";
                 textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                 textField.delegate = self;
-                [textField becomeFirstResponder];
             }];
             
             if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
