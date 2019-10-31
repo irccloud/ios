@@ -109,7 +109,6 @@
     
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-        [textField becomeFirstResponder];
     }];
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)

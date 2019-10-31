@@ -873,8 +873,7 @@ NSArray *_sortedChannels;
                 }
                 
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
-                    textField.delegate = self;
-                    [textField becomeFirstResponder];
+                    textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                 }];
                 
                 if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -3880,9 +3879,9 @@ NSArray *_sortedChannels;
         if(!_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Reply" style:UIAlertActionStyleDefault handler:handler]];
         }
-        if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
+        //if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Edit Message" style:UIAlertActionStyleDefault handler:handler]];
-        }
+        //}
         if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Delete Message" style:UIAlertActionStyleDefault handler:handler]];
         }
@@ -4059,7 +4058,6 @@ NSArray *_sortedChannels;
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = self->_selectedUser?@"#channel":@"nickname";
         textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-        [textField becomeFirstResponder];
     }];
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -4084,7 +4082,6 @@ NSArray *_sortedChannels;
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = @"#channel";
         textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-        [textField becomeFirstResponder];
     }];
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -4137,7 +4134,6 @@ NSArray *_sortedChannels;
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.text = b.name;
         textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-        [textField becomeFirstResponder];
     }];
     
     if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -4250,7 +4246,6 @@ NSArray *_sortedChannels;
         [a addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.placeholder = @"nickname";
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-            [textField becomeFirstResponder];
         }];
         
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -4907,8 +4902,7 @@ NSArray *_sortedChannels;
         
         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.text = self->_selectedEvent.msg;
-            textField.delegate = self;
-            [textField becomeFirstResponder];
+            textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
         }];
         
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -5170,7 +5164,6 @@ Network type: %@\n",
             else
                 textField.text = [NSString stringWithFormat:@"%@!*", self->_selectedUser.nick];
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-            [textField becomeFirstResponder];
         }];
         
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -5196,7 +5189,6 @@ Network type: %@\n",
             else
                 textField.text = [NSString stringWithFormat:@"%@!*", self->_selectedUser.nick];
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-            [textField becomeFirstResponder];
         }];
         
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
@@ -5218,7 +5210,6 @@ Network type: %@\n",
         
         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
-            [textField becomeFirstResponder];
         }];
         
         if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)

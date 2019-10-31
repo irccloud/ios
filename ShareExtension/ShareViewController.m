@@ -311,6 +311,7 @@
                         textField.text = self->_filename;
                         textField.delegate = self;
                         textField.placeholder = @"Filename";
+                        textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                     }];
                     [c addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                         self->_filename = [[c.textFields objectAtIndex:0] text];
