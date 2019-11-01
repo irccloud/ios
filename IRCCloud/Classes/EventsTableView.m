@@ -2443,7 +2443,7 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.filename.text = [e.entities objectForKey:@"name"];
         
         if([e.entities objectForKey:@"id"] || [[e.entities objectForKey:@"name"] length] || [[e.entities objectForKey:@"description"] length]) {
-            cell.background.backgroundColor = [UIColor connectionBarColor];
+            cell.background.backgroundColor = [UIColor navBarColor];
         } else {
             cell.background.backgroundColor = [UIColor clearColor];
         }
