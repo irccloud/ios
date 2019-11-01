@@ -2443,7 +2443,7 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.filename.text = [e.entities objectForKey:@"name"];
         
         if([e.entities objectForKey:@"id"] || [[e.entities objectForKey:@"name"] length] || [[e.entities objectForKey:@"description"] length]) {
-            cell.background.backgroundColor = [UIColor bufferBackgroundColor];
+            cell.background.backgroundColor = [UIColor connectionBarColor];
         } else {
             cell.background.backgroundColor = [UIColor clearColor];
         }
@@ -2563,7 +2563,7 @@ extern UIImage *__socketClosedBackgroundImage;
         cell.mimeType.numberOfLines = 1;
         cell.mimeType.lineBreakMode = NSLineBreakByTruncatingTail;
         
-        cell.background.backgroundColor = [UIColor bufferBackgroundColor];
+        cell.background.backgroundColor = [UIColor connectionBarColor];
     }
     
     if(e.rowType == ROW_REPLY_COUNT) {
