@@ -347,18 +347,12 @@
         self->_dirtyBIDs = [[NSMutableDictionary alloc] init];
         self->_lastEIDs = [[NSMutableDictionary alloc] init];
         self->_events_sorted = [[NSMutableDictionary alloc] init];
+        self->_msgIDs = [[NSMutableDictionary alloc] init];
         if(self->_events) {
             for(NSNumber *bid in _events) {
                 NSMutableArray *events = [self->_events objectForKey:bid];
                 NSMutableDictionary *events_sorted = [[NSMutableDictionary alloc] init];
-                for(Event *e in events) {
-                    [events_sorted setObject:e forKey:@(e.eid)];
-                    if(!e.pending) {
-                        if(![self->_lastEIDs objectForKey:@(e.bid)] || [[self->_lastEIDs objectForKey:@(e.bid)] doubleValue] < e.eid)
-                            [self->_lastEIDs setObject:@(e.eid) forKey:@(e.bid)];
-                    }
-                }
-                
+                NSMutableDictionary *msgids = [[NSMutableDictionary alloc] init];
                 if(events.count > 1000) {
                     CLS_LOG(@"Cleaning up excessive backlog in BID: bid%@", bid);
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid.intValue];
@@ -370,10 +364,20 @@
                     while(events.count > 1000) {
                         Event *e = [events firstObject];
                         [events removeObject:e];
-                        [events_sorted removeObjectForKey:@(e.eid)];
+                    }
+                }
+
+                for(Event *e in events) {
+                    [events_sorted setObject:e forKey:@(e.eid)];
+                    if(e.msgid.length)
+                        [msgids setObject:e forKey:e.msgid];
+                    if(!e.pending) {
+                        if(![self->_lastEIDs objectForKey:@(e.bid)] || [[self->_lastEIDs objectForKey:@(e.bid)] doubleValue] < e.eid)
+                            [self->_lastEIDs setObject:@(e.eid) forKey:@(e.bid)];
                     }
                 }
                 [self->_events_sorted setObject:events_sorted forKey:bid];
+                [self->_msgIDs setObject:msgids forKey:bid];
                 [[self->_events objectForKey:bid] sortUsingSelector:@selector(compare:)];
             }
             [self clearPendingAndFailed];
@@ -1040,6 +1044,14 @@
             [self->_events_sorted setObject:events_sorted forKey:@(event.bid)];
         }
         [events_sorted setObject:event forKey:@(event.eid)];
+        if(event.msgid.length) {
+            NSMutableDictionary *msgids = [self->_msgIDs objectForKey:@(event.bid)];
+            if(!msgids) {
+                msgids = [[NSMutableDictionary alloc] init];
+                [self->_msgIDs setObject:msgids forKey:@(event.bid)];
+            }
+            [msgids setObject:event forKey:event.msgid];
+        }
         if(!event.pending && (![self->_lastEIDs objectForKey:@(event.bid)] || [[self->_lastEIDs objectForKey:@(event.bid)] doubleValue] < event.eid)) {
             [self->_lastEIDs setObject:@(event.eid) forKey:@(event.bid)];
         } else {
@@ -1059,6 +1071,10 @@
         event = [[Event alloc] init];
         event.bid = object.bid;
         event.eid = object.eid;
+        if([[object objectForKey:@"msgid"] isKindOfClass:[NSString class]])
+            event.msgid = [object objectForKey:@"msgid"];
+        else
+            event.msgid = nil;
         [self addEvent: event];
     }
     
@@ -1151,12 +1167,18 @@
     return [[self->_events_sorted objectForKey:@(bid)] objectForKey:@(eid)];
 }
 
+-(Event *)message:(NSString *)msgid buffer:(int)bid {
+    return [[self->_msgIDs objectForKey:@(bid)] objectForKey:msgid];
+}
+
 -(void)removeEvent:(NSTimeInterval)eid buffer:(int)bid {
     @synchronized(self->_events) {
         for(Event *event in [self->_events objectForKey:@(bid)]) {
             if(event.eid == eid) {
                 [[self->_events objectForKey:@(bid)] removeObject:event];
                 [[self->_events_sorted objectForKey:@(bid)] removeObjectForKey:@(eid)];
+                if(event.msgid.length)
+                    [[self->_msgIDs objectForKey:@(bid)] removeObjectForKey:event.msgid];
                 break;
             }
         }
@@ -1167,6 +1189,7 @@
     @synchronized(self->_events) {
         [self->_events removeObjectForKey:@(bid)];
         [self->_events_sorted removeObjectForKey:@(bid)];
+        [self->_msgIDs removeObjectForKey:@(bid)];
         CLS_LOG(@"Removing all events for bid%i", bid);
     }
 }
@@ -1181,6 +1204,8 @@
                 [events removeObject:e];
                 [[self->_events objectForKey:@(bid)] removeObject:e];
                 [[self->_events_sorted objectForKey:@(bid)] removeObjectForKey:@(e.eid)];
+                if(e.msgid.length)
+                    [[self->_msgIDs objectForKey:@(bid)] removeObjectForKey:e.msgid];
             }
         }
     }
@@ -1218,6 +1243,8 @@
         for(Event *event in eventsToRemove) {
             [[self->_events objectForKey:@(bid)] removeObject:event];
             [[self->_events_sorted objectForKey:@(bid)] removeObjectForKey:@(event.eid)];
+            if(event.msgid.length)
+                [[self->_msgIDs objectForKey:@(bid)] removeObjectForKey:event.msgid];
         }
     }
 }
