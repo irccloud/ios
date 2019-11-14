@@ -1070,13 +1070,10 @@ volatile BOOL __socketPaused = NO;
             BOOL found = NO;
             NSString *msgId = [entities objectForKey:@"delete"];
             if(msgId.length) {
-                NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
-                for(Event *e in events) {
-                    if([e.msgid isEqualToString:msgId]) {
-                        [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                        found = YES;
-                        break;
-                    }
+                Event *e = [[EventsDataSource sharedInstance] message:msgId buffer:object.bid];
+                if(e) {
+                    [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
+                    found = YES;
                 }
             }
             if(found) {
@@ -1084,30 +1081,26 @@ volatile BOOL __socketPaused = NO;
                     [self postObject:object forEvent:kIRCEventMessageChanged];
             } else {
                 [self->_pendingEdits addObject:object];
-                CLS_LOG(@"Queued delete for msgID %@", msgId);
             }
         } else if([entities objectForKey:@"edit"]) {
             BOOL found = NO;
             NSString *msgId = [entities objectForKey:@"edit"];
             if(msgId.length) {
-                NSArray *events = [[EventsDataSource sharedInstance] eventsForBuffer:object.bid];
-                for(Event *e in events) {
-                    if([e.msgid isEqualToString:msgId]) {
-                        if(object.eid >= e.lastEditEID) {
-                            if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class] && [[entities objectForKey:@"edit_text"] length]) {
-                                e.msg = [entities objectForKey:@"edit_text"];
-                                e.edited = YES;
-                            }
-                            NSMutableDictionary *d = e.entities.mutableCopy;
-                            [d setValuesForKeysWithDictionary:entities];
-                            e.entities = d;
-                            e.lastEditEID = object.eid;
-                            e.formatted = nil;
-                            e.formattedMsg = nil;
+                Event *e = [[EventsDataSource sharedInstance] message:msgId buffer:object.bid];
+                if(e) {
+                    if(object.eid >= e.lastEditEID) {
+                        if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class] && [[entities objectForKey:@"edit_text"] length]) {
+                            e.msg = [entities objectForKey:@"edit_text"];
+                            e.edited = YES;
                         }
-                        found = YES;
-                        break;
+                        NSMutableDictionary *d = e.entities.mutableCopy;
+                        [d setValuesForKeysWithDictionary:entities];
+                        e.entities = d;
+                        e.lastEditEID = object.eid;
+                        e.formatted = nil;
+                        e.formattedMsg = nil;
                     }
+                    found = YES;
                 }
             }
             if(found) {
@@ -1115,10 +1108,10 @@ volatile BOOL __socketPaused = NO;
                     [self postObject:object forEvent:kIRCEventMessageChanged];
             } else {
                 [self->_pendingEdits addObject:object];
-                CLS_LOG(@"Queued edit for msgID %@", msgId);
             }
         }
     }
+    CLS_LOG(@"Queued pending edits: %lu", (unsigned long)self->_pendingEdits.count);
 }
 
 //Adapted from http://stackoverflow.com/a/17057553/1406639

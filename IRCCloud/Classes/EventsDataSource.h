@@ -133,6 +133,7 @@
     NSMutableDictionary *_events_sorted;
     NSMutableDictionary *_dirtyBIDs;
     NSMutableDictionary *_lastEIDs;
+    NSMutableDictionary *_msgIDs;
     NSDictionary *_formatterMap;
     NSUInteger _widthForHeightCache;
 }
@@ -146,6 +147,7 @@
 -(void)addEvent:(Event *)event;
 -(Event *)addJSONObject:(IRCCloudJSONObject *)object;
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid;
+-(Event *)message:(NSString *)msgid buffer:(int)bid;
 -(void)removeEvent:(NSTimeInterval)eid buffer:(int)bid;
 -(void)removeEventsForBuffer:(int)bid;
 -(void)pruneEventsForBuffer:(int)bid maxSize:(int)size;
