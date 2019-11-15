@@ -1025,6 +1025,9 @@
     @synchronized(self->_events) {
         [self->_events removeAllObjects];
         [self->_events_sorted removeAllObjects];
+        [self->_msgIDs removeAllObjects];
+        [self->_dirtyBIDs removeAllObjects];
+        [self->_lastEIDs removeAllObjects];
         CLS_LOG(@"EventsDataSource cleared");
     }
 }
@@ -1448,6 +1451,8 @@
         for(Event *e in eventsToRemove) {
             [[self->_events objectForKey:@(e.bid)] removeObject:e];
             [[self->_events_sorted objectForKey:@(e.bid)] removeObjectForKey:@(e.eid)];
+            if(e.msgid.length)
+                [[self->_msgIDs objectForKey:@(e.bid)] removeObjectForKey:e.msgid];
             if(e.expirationTimer && [e.expirationTimer isValid])
                 [e.expirationTimer invalidate];
             e.expirationTimer = nil;
