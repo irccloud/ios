@@ -82,11 +82,19 @@ extern UIImage *__socketClosedBackgroundImage;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
 @property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter, *replyXOffset, *avatarTop;
 @property (readonly) UIControl *replyButton;
+@property (nonatomic) NSURL *largeAvatarURL;
+
+-(IBAction)avatarTapped:(UITapGestureRecognizer *)sender;
 @end
 
 @implementation EventsTableCell
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
+}
+
+-(IBAction)avatarTapped:(UITapGestureRecognizer *)sender {
+    [(AppDelegate *)[UIApplication sharedApplication].delegate setActiveScene:self.window];
+    [(AppDelegate *)[UIApplication sharedApplication].delegate launchURL:_largeAvatarURL];
 }
 @end
 
@@ -2364,49 +2372,47 @@ extern UIImage *__socketClosedBackgroundImage;
     Event *e = [self->_data objectAtIndex:indexPath.row];
     [self->_lock unlock];
     @synchronized (e) {
-        if(e.height == 0) {
-            if(e.rowType == ROW_THUMBNAIL) {
-                float width = self.tableView.bounds.size.width/2;
-                if(![[[e.entities objectForKey:@"properties"] objectForKey:@"width"] intValue] || ![[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
-                    CGSize size = CGSizeZero;
-                    
-                    if([e.entities objectForKey:@"id"] && [[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)]) {
-                        YYImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
-                        if(img)
-                            size = img.size;
-                    } else if([[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"thumb"]]) {
-                        YYImage *img = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
-                        if(img)
-                            size = img.size;
+        if(e.rowType == ROW_THUMBNAIL) {
+            float width = self.tableView.bounds.size.width/2;
+            if(![[[e.entities objectForKey:@"properties"] objectForKey:@"width"] intValue] || ![[[e.entities objectForKey:@"properties"] objectForKey:@"height"] intValue]) {
+                CGSize size = CGSizeZero;
+                
+                if([e.entities objectForKey:@"id"] && [[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)]) {
+                    YYImage *img = [[ImageCache sharedInstance] imageForFileID:[e.entities objectForKey:@"id"] width:(int)(width * [UIScreen mainScreen].scale)];
+                    if(img)
+                        size = img.size;
+                } else if([[ImageCache sharedInstance] isLoaded:[e.entities objectForKey:@"thumb"]]) {
+                    YYImage *img = [[ImageCache sharedInstance] imageForURL:[e.entities objectForKey:@"thumb"]];
+                    if(img)
+                        size = img.size;
+                }
+                if(size.width > 0 && size.height > 0) {
+                    NSMutableDictionary *entities = [e.entities mutableCopy];
+                    if(size.width > width) {
+                        float ratio = width / size.width;
+                        size.width = width;
+                        size.height = size.height * ratio;
+                    } else {
+                        size.width *= [UIScreen mainScreen].scale;
+                        size.height *= [UIScreen mainScreen].scale;
                     }
-                    if(size.width > 0 && size.height > 0) {
-                        NSMutableDictionary *entities = [e.entities mutableCopy];
-                        if(size.width > width) {
-                            float ratio = width / size.width;
-                            size.width = width;
-                            size.height = size.height * ratio;
-                        } else {
-                            size.width *= [UIScreen mainScreen].scale;
-                            size.height *= [UIScreen mainScreen].scale;
-                        }
-                        [entities setObject:@{@"width":@(size.width), @"height":@(size.height)} forKey:@"properties"];
-                        e.entities = entities;
-                    }
+                    [entities setObject:@{@"width":@(size.width), @"height":@(size.height)} forKey:@"properties"];
+                    e.entities = entities;
                 }
             }
-            if(e.formattedMsg && !e.formatted)
-                [self _format:e];
-            UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
-            cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
-            [cell setNeedsLayout];
-            [cell layoutIfNeeded];
-            e.height = ceilf([cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height);
         }
+        if(e.formattedMsg && !e.formatted)
+            [self _format:e];
+        UITableViewCell *cell = [self tableView:tableView cellForRowAtIndexPath:indexPath];
+        cell.bounds = CGRectMake(0,0,self.tableView.bounds.size.width,cell.bounds.size.height);
+        [cell setNeedsLayout];
+        [cell layoutIfNeeded];
+        e.height = ceilf([cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height);
         return e.height;
     }
 }
 
-/*-(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
+-(CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath {
     [self->_lock lock];
     if(indexPath.row >= self->_data.count) {
         [self->_lock unlock];
@@ -2418,7 +2424,7 @@ extern UIImage *__socketClosedBackgroundImage;
         return e.height;
     else
         return ceilf(FONT_SIZE);
-}*/
+}
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     if([indexPath row] >= self->_data.count) {
@@ -2644,6 +2650,11 @@ extern UIImage *__socketClosedBackgroundImage;
                     cell.avatar.image = image;
                     cell.avatar.layer.cornerRadius = 5.0;
                     cell.avatar.layer.masksToBounds = YES;
+                    cell.avatar.userInteractionEnabled = YES;
+                    cell.largeAvatarURL = [e avatar:[UIScreen mainScreen].bounds.size.width * [UIScreen mainScreen].scale];
+                } else {
+                    cell.avatar.userInteractionEnabled = NO;
+                    cell.largeAvatarURL = nil;
                 }
                 
                 if(![[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:avatarURL].path] || needsRefresh) {

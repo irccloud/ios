@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
-    <device id="retina4_7" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
-        <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15703"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -16,7 +13,7 @@
             <rect key="frame" x="0.0" y="0.0" width="428" height="45"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="428" height="44.5"/>
+                <rect key="frame" x="0.0" y="0.0" width="428" height="45"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mCi-xX-5DS">
@@ -27,24 +24,24 @@
                         </constraints>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Air-U6-OOz">
-                        <rect key="frame" x="0.0" y="41.5" width="428" height="3"/>
+                        <rect key="frame" x="0.0" y="42" width="428" height="3"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="3" id="iBt-k6-x0q"/>
                         </constraints>
                     </view>
                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KgT-oH-O7i">
-                        <rect key="frame" x="0.0" y="21.5" width="428" height="1"/>
+                        <rect key="frame" x="0.0" y="22" width="428" height="1"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="1" id="2y0-hA-t78"/>
                         </constraints>
                     </view>
                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FYg-pz-vsM">
-                        <rect key="frame" x="150" y="0.0" width="128.5" height="44.5"/>
+                        <rect key="frame" x="150" y="0.0" width="128.5" height="45"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New Messages" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Cd-th-WEc">
-                                <rect key="frame" x="6" y="0.0" width="116.5" height="44.5"/>
+                                <rect key="frame" x="6" y="0.0" width="116.5" height="45"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -74,18 +71,18 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qsr-vg-LVN">
-                        <rect key="frame" x="104" y="-4" width="264" height="54.5"/>
+                        <rect key="frame" x="104" y="-4" width="264" height="55"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="c4u-g2-2uu">
-                        <rect key="frame" x="102" y="2" width="4" height="42.5"/>
+                        <rect key="frame" x="102" y="2" width="4" height="43"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="width" constant="4" id="AJh-cH-BSg"/>
                         </constraints>
                     </view>
                     <label verifyAmbiguity="off" opaque="NO" clipsSubviews="YES" contentMode="left" horizontalCompressionResistancePriority="1000" verticalCompressionResistancePriority="1000" placeholderIntrinsicWidth="infinite" placeholderIntrinsicHeight="infinite" text="" textAlignment="natural" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsLetterSpacingToFitWidth="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="V3s-xQ-nVF" customClass="LinkLabel">
-                        <rect key="frame" x="110" y="2" width="252" height="42.5"/>
+                        <rect key="frame" x="110" y="2" width="252" height="43"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -118,17 +115,21 @@
                     </view>
                     <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="9aa-Ko-5ri">
                         <rect key="frame" x="66" y="4" width="44" height="44"/>
+                        <gestureRecognizers/>
                         <constraints>
                             <constraint firstAttribute="width" constant="44" id="AhO-xV-4Mx"/>
                             <constraint firstAttribute="height" constant="44" id="N6m-U7-nrr"/>
                         </constraints>
+                        <connections>
+                            <outletCollection property="gestureRecognizers" destination="uTr-V1-KHO" appends="YES" id="FqS-8g-sYq"/>
+                        </connections>
                     </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WPz-RI-MPI">
-                        <rect key="frame" x="0.0" y="44.5" width="428" height="0.0"/>
+                        <rect key="frame" x="0.0" y="45" width="428" height="0.0"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="none" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="XqQ-by-tQa">
-                        <rect key="frame" x="0.0" y="1" width="428" height="40.5"/>
+                        <rect key="frame" x="0.0" y="1" width="428" height="41"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -188,6 +189,7 @@
                     <constraint firstItem="mCi-xX-5DS" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="yvD-dx-jsg"/>
                 </constraints>
             </tableViewCellContentView>
+            <gestureRecognizers/>
             <connections>
                 <outlet property="_accessory" destination="oeb-cI-59G" id="uC5-yF-SeU"/>
                 <outlet property="_avatar" destination="9aa-Ko-5ri" id="Pj6-Ze-4N6"/>
@@ -219,7 +221,13 @@
                 <outlet property="_timestampWidth" destination="JaC-Af-7TS" id="p4s-yM-2aO"/>
                 <outlet property="_topBorder" destination="mCi-xX-5DS" id="ljq-0k-Bvd"/>
             </connections>
-            <point key="canvasLocation" x="79" y="52.5"/>
+            <point key="canvasLocation" x="114.49275362318842" y="35.15625"/>
         </tableViewCell>
+        <tapGestureRecognizer id="uTr-V1-KHO">
+            <connections>
+                <action selector="avatarTapped:" destination="KGk-i7-Jjw" id="fZi-BT-bBu"/>
+                <outlet property="delegate" destination="-1" id="jie-EB-V5D"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
 </document>
