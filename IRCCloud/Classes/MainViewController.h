@@ -118,6 +118,7 @@
     BOOL _ignoreVisibilityChanges;
     BOOL _ignoreInsetChanges;
     NSString *_msgid;
+    UIView *_leftBorder, *_rightBorder;
 }
 @property (nonatomic) int cidToOpen;
 @property (nonatomic) int bidToOpen;
