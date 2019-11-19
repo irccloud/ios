@@ -230,7 +230,12 @@
         } else if([self->_avatarURL hasPrefix:@"https://"]) {
             if([self->_avatarURL containsString:@"{size}"]) {
                 CSURITemplate *template = [CSURITemplate URITemplateWithString:self->_avatarURL error:nil];
-                self->_cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@"72"} error:nil]];
+                if(size <= 72)
+                    self->_cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@"72"} error:nil]];
+                else if(size <= 192)
+                    self->_cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@"192"} error:nil]];
+                else
+                    self->_cachedAvatarURL = [NSURL URLWithString:[template relativeStringWithVariables:@{@"size":@"512"} error:nil]];
             } else {
                 self->_cachedAvatarURL = [NSURL URLWithString:self->_avatarURL];
             }
