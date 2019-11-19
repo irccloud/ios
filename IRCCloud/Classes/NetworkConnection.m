@@ -2136,6 +2136,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     
     [self->_idleTimer invalidate];
     self->_idleTimer = nil;
+    self->_reconnectTimestamp = -1;
 }
 
 -(void)scheduleIdleTimer {
@@ -2146,8 +2147,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(self->_reconnectTimestamp == 0)
         return;
     
-    self->_idleTimer = [NSTimer scheduledTimerWithTimeInterval:self->_idleInterval target:self selector:@selector(_idle) userInfo:nil repeats:NO];
-    self->_reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
+    if(self->_idleInterval > 0) {
+        self->_idleTimer = [NSTimer scheduledTimerWithTimeInterval:self->_idleInterval target:self selector:@selector(_idle) userInfo:nil repeats:NO];
+        self->_reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
+    }
 }
 
 -(void)_idle {
