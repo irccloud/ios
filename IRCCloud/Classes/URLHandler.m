@@ -121,6 +121,8 @@
 
 #define IS_IRCCLOUD_AVATAR(url) ([[url.host lowercaseString] isEqualToString:@"static.irccloud-cdn.com"] && [url.path hasPrefix:@"/avatar-redirect/s"])
 
+#define IS_SLACK_AVATAR(url) ([[url.host lowercaseString] hasSuffix:@".slack-edge.com"] && ([url.path hasSuffix:@"-72"] || [url.path hasSuffix:@"-192"] || [url.path hasSuffix:@"-512"]))
+
 -(instancetype)init {
     self = [super init];
     
@@ -450,7 +452,7 @@
 {
     NSString *l = [url.path lowercaseString];
     // Use pre-processor macros instead of variables so conditions are still evaluated lazily
-    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || /*IS_INSTAGRAM(url) ||*/ IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url) || IS_XKCD(url) || IS_IRCCLOUD_AVATAR(url));
+    return ([url.scheme.lowercaseString isEqualToString:@"http"] || [url.scheme.lowercaseString isEqualToString:@"https"]) && (HAS_IMAGE_SUFFIX(l) || IS_IMGUR(url) || IS_FLICKR(url) || /*IS_INSTAGRAM(url) ||*/ IS_DROPLR(url) || IS_CLOUDAPP(url) || IS_STEAM(url) || IS_LEET(url) || IS_GIPHY(url) || IS_WIKI(url) || IS_TWIMG(url) || IS_XKCD(url) || IS_IRCCLOUD_AVATAR(url) || IS_SLACK_AVATAR(url));
 }
 
 + (BOOL)isYouTubeURL:(NSURL *)url
