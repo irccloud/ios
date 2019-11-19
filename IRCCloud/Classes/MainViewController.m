@@ -1680,6 +1680,15 @@ NSArray *_sortedChannels;
             [self _showConnectingView];
             if([NetworkConnection sharedInstance].reconnectTimestamp > 0) {
                 int seconds = (int)([NetworkConnection sharedInstance].reconnectTimestamp - [[NSDate date] timeIntervalSince1970]) + 1;
+                if(seconds < 0) {
+                    seconds = 0;
+                    if([NetworkConnection sharedInstance].session.length && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                        CLS_LOG(@"Reconnect timestamp in the past, reconnecting");
+                        [[NetworkConnection sharedInstance] connect:NO];
+                    } else {
+                        CLS_LOG(@"Reconnect timestamp in the past but app is in the background");
+                    }
+                }
                 [self->_connectingStatus setText:[NSString stringWithFormat:@"Reconnecting in 0:%02i", seconds]];
                 self->_connectingProgress.progress = 0;
                 self->_connectingProgress.hidden = YES;
