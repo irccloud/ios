@@ -13,3 +13,4 @@ Preview.html
 fastlane/report.xml
 fastlane/.env
 screenshots/
+Gemfile.lock
