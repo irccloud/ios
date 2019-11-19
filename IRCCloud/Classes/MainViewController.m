@@ -312,7 +312,7 @@ NSArray *_sortedChannels;
     self->_eventsView.topUnreadArrow.textColor = self->_eventsView.bottomUnreadArrow.textColor = [UIColor chatterBarTextColor];
     [self->_eventsView clearRowCache];
     
-    self->_borders.backgroundColor = [UIColor iPadBordersColor];
+    self->_borders.backgroundColor = _leftBorder.backgroundColor = _rightBorder.backgroundColor = [UIColor iPadBordersColor];
     [[self->_borders.subviews objectAtIndex:0] setBackgroundColor:[UIColor contentBackgroundColor]];
     
     self->_eventActivity.activityIndicatorViewStyle = self->_headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
@@ -453,10 +453,6 @@ NSArray *_sortedChannels;
     self.slidingViewController.underLeftWidthLayout = ECFixedRevealWidth;
     self.slidingViewController.underRightWidthLayout = ECFixedRevealWidth;
 
-    self.navigationController.view.layer.shadowOpacity = 0.75f;
-    self.navigationController.view.layer.shadowRadius = 2.0f;
-    self.navigationController.view.layer.shadowColor = [UIColor blackColor].CGColor;
-
     self->_menuBtn = [UIButton buttonWithType:UIButtonTypeCustom];
     [self->_menuBtn setImage:[[UIImage imageNamed:@"menu"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self->_menuBtn addTarget:self action:@selector(listButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -534,6 +530,14 @@ NSArray *_sortedChannels;
     if (@available(iOS 11, *)) {
         [self.view addInteraction:[[UIDropInteraction alloc] initWithDelegate:self]];
     }
+    
+    _leftBorder = [[UIView alloc] init];
+    _leftBorder.backgroundColor = [UIColor iPadBordersColor];
+    [self.navigationController.view addSubview:_leftBorder];
+    _rightBorder = [[UIView alloc] init];
+    _rightBorder.backgroundColor = [UIColor iPadBordersColor];
+    [self.navigationController.view addSubview:_rightBorder];
+    self.navigationController.view.clipsToBounds = NO;
 }
 
 -(BOOL)dropInteraction:(UIDropInteraction *)interaction canHandleSession:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
@@ -3369,7 +3373,10 @@ NSArray *_sortedChannels;
     UIView *v = self.navigationItem.titleView;
     self.navigationItem.titleView = nil;
     self.navigationItem.titleView = v;
-    self.navigationController.view.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.slidingViewController.view.layer.bounds].CGPath;
+    self.navigationController.view.layer.shadowPath = nil;
+    
+    _leftBorder.frame = CGRectMake(-1,0,1,size.height);
+    _rightBorder.frame = CGRectMake(size.width + 1,0,1,size.height);
 
     _ignoreInsetChanges = NO;
     [self _updateEventsInsets];
@@ -3557,6 +3564,10 @@ NSArray *_sortedChannels;
                 if(@available(iOS 11, *)) {
                     self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
                     self->_eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
+                }
+                if(self.slidingViewController.underRightViewController) {
+                    self->_eventsViewWidthConstraint.constant++;
+                    self->_eventsViewOffsetXConstraint.constant++;
                 }
             }
         } else {
