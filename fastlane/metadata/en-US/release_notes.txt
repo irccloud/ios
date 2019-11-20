@@ -1,8 +1,6 @@
-• Add an option to automatically switch between Dawn and Midnight themes based on the current iOS dark mode setting
-• Fix status bar overlapping the navigation bar when rotating from landscape to portrait on some devices
-• Fix an issue that could messages to show the wrong avatar while being sent
-• Image thumbnails can no longer unexpectedly appear in the wrong channel
-• Fix scroll position when showing/hiding the keyboard
-• Fix opening e-mail verification and access link URLs on iOS 13
-• Improved detection of hyperlinks
+• Fix an issue that prevented the cursor from being dragged in various alert dialogs on iOS 13
+• Improve the background color of inline image thumbnails on Dawn and Midnight themes
+• Speed up backlog loading times for Slack connections
+• The reconnect countdown timer no longer displays negative values
+• Tapping an avatar will now display a larger version
 • Stability improvements and minor fixes
