@@ -3894,7 +3894,7 @@ NSArray *_sortedChannels;
         }
         if(self->_selectedEvent.rowType == ROW_THUMBNAIL || _selectedEvent.rowType == ROW_FILE)
             [alert addAction:[UIAlertAction actionWithTitle:@"Close Preview" style:UIAlertActionStyleDefault handler:handler]];
-        if(self->_selectedEvent.msg.length)
+        if(self->_selectedEvent.msg.length || self->_selectedEvent.groupMsg.length)
             [alert addAction:[UIAlertAction actionWithTitle:@"Copy Message" style:UIAlertActionStyleDefault handler:handler]];
         if(!_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Reply" style:UIAlertActionStyleDefault handler:handler]];
