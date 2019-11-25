@@ -29,6 +29,8 @@
     UITextField *_realname;
     UITextField *_nspass;
     UITextField *_serverpass;
+    UISwitch *_revealnspass;
+    UISwitch *_revealserverpass;
     UITextField *_network;
     UITextView *_commands;
     UITextView *_channels;

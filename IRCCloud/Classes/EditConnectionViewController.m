@@ -433,6 +433,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
     [self updateWidth:width view:_commands];
     [self updateWidth:width view:_channels];
 
+    self->_nspass.secureTextEntry = !self->_revealnspass.on;
+    self->_serverpass.secureTextEntry = !self->_revealserverpass.on;
+
     if(self->_url) {
         int port = [self->_url.port intValue];
         int ssl = [self->_url.scheme hasSuffix:@"s"]?1:0;
@@ -579,7 +582,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     self->_port.delegate = self;
     
     self->_ssl = [[UISwitch alloc] init];
-    
+
     self->_nickname = [[UITextField alloc] initWithFrame:CGRectZero];
     self->_nickname.text = @"";
     self->_nickname.textAlignment = NSTextAlignmentRight;
@@ -622,6 +625,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
     self->_nspass.delegate = self;
     self->_nspass.secureTextEntry = YES;
 
+    self->_revealnspass = [[UISwitch alloc] init];
+    [self->_revealnspass addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
+
     self->_serverpass = [[UITextField alloc] initWithFrame:CGRectZero];
     self->_serverpass.text = @"";
     self->_serverpass.textAlignment = NSTextAlignmentRight;
@@ -633,6 +639,9 @@ static NSString * const ServerHasSSLKey = @"ssl";
     self->_serverpass.returnKeyType = UIReturnKeyDone;
     self->_serverpass.delegate = self;
     self->_serverpass.secureTextEntry = YES;
+    
+    self->_revealserverpass = [[UISwitch alloc] init];
+    [self->_revealserverpass addTarget:self action:@selector(refresh) forControlEvents:UIControlEventValueChanged];
 
     self->_commands = [[UITextView alloc] initWithFrame:CGRectZero];
     self->_commands.text = @"";
@@ -764,7 +773,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         case 1:
             return 2;
         case 2:
-            return 2;
+            return 4;
         case 3:
             return 1;
         case 4:
@@ -850,8 +859,16 @@ static NSString * const ServerHasSSLKey = @"ssl";
                     cell.accessoryView = self->_nspass;
                     break;
                 case 1:
-                    cell.textLabel.text = @"Server";
+                    cell.textLabel.text = @"Reveal NickServ Password";
+                    cell.accessoryView = self->_revealnspass;
+                    break;
+                case 2:
+                    cell.textLabel.text = @"Server Password";
                     cell.accessoryView = self->_serverpass;
+                    break;
+                case 3:
+                    cell.textLabel.text = @"Reveal Server Password";
+                    cell.accessoryView = self->_revealserverpass;
                     break;
             }
             break;
