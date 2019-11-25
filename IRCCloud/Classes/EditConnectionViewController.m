@@ -422,7 +422,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
 }
 
 -(void)refresh {
-    float width = self.tableView.frame.size.width / 2;
+    float width = self.tableView.frame.size.width / 3;
     [self updateWidth:width view:_server];
     [self updateWidth:width view:_port];
     [self updateWidth:width view:_nickname];
@@ -835,7 +835,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
                     cell.accessoryView = self->_port;
                     break;
                 case 3:
-                    cell.textLabel.text = @"Use SSL";
+                    cell.textLabel.text = @"Secure port";
                     cell.accessoryView = self->_ssl;
                     break;
             }
@@ -847,7 +847,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
                     cell.accessoryView = self->_nickname;
                     break;
                 case 1:
-                    cell.textLabel.text = @"Real name";
+                    cell.textLabel.text = @"Full name (optional)";
                     cell.accessoryView = self->_realname;
                     break;
             }
@@ -855,19 +855,19 @@ static NSString * const ServerHasSSLKey = @"ssl";
         case 2:
             switch(row) {
                 case 0:
-                    cell.textLabel.text = @"NickServ";
+                    cell.textLabel.text = @"NickServ password";
                     cell.accessoryView = self->_nspass;
                     break;
                 case 1:
-                    cell.textLabel.text = @"Reveal NickServ Password";
+                    cell.textLabel.text = @"Reveal NickServ password";
                     cell.accessoryView = self->_revealnspass;
                     break;
                 case 2:
-                    cell.textLabel.text = @"Server Password";
+                    cell.textLabel.text = @"Server password";
                     cell.accessoryView = self->_serverpass;
                     break;
                 case 3:
-                    cell.textLabel.text = @"Reveal Server Password";
+                    cell.textLabel.text = @"Reveal server password";
                     cell.accessoryView = self->_revealserverpass;
                     break;
             }
