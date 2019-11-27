@@ -3793,7 +3793,9 @@ NSArray *_sortedChannels;
 }
 
 -(void)_mention {
-    if(!_selectedUser)
+    NSString *from = self->_selectedUser.nick;
+
+    if(!from)
         return;
 
     [[NSUserDefaults standardUserDefaults] setObject:@YES forKey:@"mentionTip"];
@@ -3803,7 +3805,6 @@ NSArray *_sortedChannels;
     if(self->_message.text.length == 0) {
         self->_message.text = self->_buffer.serverIsSlack ? [NSString stringWithFormat:@"@%@ ",_selectedUser.nick] : [NSString stringWithFormat:@"%@: ",_selectedUser.nick];
     } else {
-        NSString *from = self->_selectedUser.nick;
         NSInteger oldPosition = self->_message.selectedRange.location;
         NSString *text = self->_message.text;
         NSInteger start = oldPosition - 1;
