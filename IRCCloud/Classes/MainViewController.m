@@ -5074,11 +5074,7 @@ NSArray *_sortedChannels;
         }
     } else if([action isEqualToString:@"Send Feedback"]) {
         CLS_LOG(@"Feedback Requested");
-#ifdef APPSTORE
-        NSString *version = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"];
-#else
-        NSString *version = [NSString stringWithFormat:@"%@-%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
-#endif
+        NSString *version = [NSString stringWithFormat:@"%@ (%@)",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
         NSMutableString *report = [[NSMutableString alloc] initWithFormat:
 @"Briefly describe the issue below:\n\
 \n\

@@ -1678,18 +1678,18 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)_scrollToBottom {
     @try {
-    [self->_lock lock];
-    [self->_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
-    self->_scrollTimer = nil;
-    if(self->_data.count) {
-        [self->_tableView reloadData];
-        [self->_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_data.count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-        if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
-            [self scrollViewDidScroll:self->_tableView];
-    }
-    self->_buffer.scrolledUp = NO;
-    self->_buffer.scrolledUpFrom = -1;
-    [self->_lock unlock];
+        [self->_lock lock];
+        [self->_scrollTimer performSelectorOnMainThread:@selector(invalidate) withObject:nil waitUntilDone:YES];
+        self->_scrollTimer = nil;
+        if(self->_data.count) {
+            [self->_tableView reloadData];
+            [self->_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_data.count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+            if([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+                [self scrollViewDidScroll:self->_tableView];
+        }
+        self->_buffer.scrolledUp = NO;
+        self->_buffer.scrolledUpFrom = -1;
+        [self->_lock unlock];
     } @catch (NSException * e) {
         CLS_LOG(@"Failed to scroll down, will retry shortly. Exception: %@", e);
         [self performSelectorOnMainThread:@selector(scrollToBottom) withObject:nil waitUntilDone:YES];
