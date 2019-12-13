@@ -5207,7 +5207,7 @@
 				OTHER_LDFLAGS = "-lstdc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "App Store";
+				PROVISIONING_PROFILE_SPECIFIER = Crashlytics;
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
