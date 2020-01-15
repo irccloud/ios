@@ -121,6 +121,9 @@
 
 //Some centering magic from: http://stackoverflow.com/a/2189336/1406639
 -(void)scrollViewDidZoom:(UIScrollView *)pScrollView {
+    if(self->_movieController)
+        return;
+    
     CGRect innerFrame = self->_imageView.frame;
     CGRect scrollerBounds = pScrollView.bounds;
     
@@ -249,6 +252,7 @@
     self->_movieController.showsPlaybackControls = NO;
     self->_movieController.view.userInteractionEnabled = NO;
     self->_movieController.view.frame = self->_scrollView.bounds;
+    self->_movieController.view.backgroundColor = [UIColor clearColor];
     [self->_scrollView addSubview:self->_movieController.view];
     self->_scrollView.userInteractionEnabled = NO;
     [self->_scrollView removeGestureRecognizer:self->_panGesture];
@@ -474,6 +478,8 @@
             case UIGestureRecognizerStateChanged:
                 frame.origin.y = [recognizer translationInView:self.view].y;
                 self->_scrollView.frame = frame;
+                if(self->_movieController)
+                    self->_movieController.view.frame = self->_scrollView.bounds;
                 self->_progressView.center = self->_scrollView.center;
                 self.view.backgroundColor = [UIColor colorWithWhite:0 alpha:1-(fabs([recognizer translationInView:self.view].y) / self.view.frame.size.height / 2)];
                 break;
