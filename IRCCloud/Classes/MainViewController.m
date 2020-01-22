@@ -1465,10 +1465,6 @@ NSArray *_sortedChannels;
             if(e.bid == self->_buffer.bid) {
                 if(e.isHighlight) {
                     [self showMentionTip];
-                    User *u = [[UsersDataSource sharedInstance] getUser:e.from cid:e.cid bid:e.bid];
-                    if(u && u.lastMention < e.eid) {
-                        u.lastMention = e.eid;
-                    }
                 }
                 if(!e.isSelf && !_buffer.scrolledUp && !self.view.accessibilityElementsHidden) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
