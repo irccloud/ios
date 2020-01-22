@@ -80,6 +80,7 @@
         decodeInt(self->_away);
         decodeObject(self->_away_msg);
         decodeDouble(self->_lastMention);
+        decodeDouble(self->_lastMessage);
         decodeObject(self->_ircserver);
         decodeObject(self->_display_name);
     }
@@ -96,6 +97,7 @@
     encodeInt(self->_away);
     encodeObject(self->_away_msg);
     encodeDouble(self->_lastMention);
+    encodeDouble(self->_lastMessage);
     encodeObject(self->_ircserver);
     encodeObject(self->_display_name);
 }
