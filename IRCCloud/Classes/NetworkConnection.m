@@ -381,16 +381,29 @@ volatile BOOL __socketPaused = NO;
                 if((!backlog || self->_resuming || [[self->_oobQueue firstObject] bid] == -1) && event.eid > self->_highestEID) {
                     self->_highestEID = event.eid;
                 }
-                if(event.eid > b.last_seen_eid && [event isImportant:b.type] && (event.isHighlight || [b.type isEqualToString:@"conversation"])) {
-                    BOOL show = YES;
-                    if([[self->_servers getServer:event.cid].ignore match:event.ignoreMask] || [[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
-                        show = NO;
+                if([event isImportant:b.type]) {
+                    User *u = [self->_users getUser:event.from cid:event.cid bid:event.bid];
+                    if(u) {
+                        if(u.lastMessage < event.eid) {
+                            u.lastMessage = event.eid;
+                        }
+                        if(event.isHighlight) {
+                            if(u.lastMention < event.eid) {
+                                u.lastMention = event.eid;
+                            }
+                        }
                     }
-                    
-                    if(show && ![self->_notifications getNotification:event.eid bid:event.bid]) {
-                        [self->_notifications notify:[NSString stringWithFormat:@"<%@> %@",event.from,event.msg] category:event.type cid:event.cid bid:event.bid eid:event.eid];
-                        if(!backlog)
-                            [self->_notifications updateBadgeCount];
+                    if(event.eid > b.last_seen_eid && (event.isHighlight || [b.type isEqualToString:@"conversation"])) {
+                        BOOL show = YES;
+                        if([[self->_servers getServer:event.cid].ignore match:event.ignoreMask] || [[[[self prefs] objectForKey:@"buffer-disableTrackUnread"] objectForKey:@(b.bid)] integerValue]) {
+                            show = NO;
+                        }
+                        
+                        if(show && ![self->_notifications getNotification:event.eid bid:event.bid]) {
+                            [self->_notifications notify:[NSString stringWithFormat:@"<%@> %@",event.from,event.msg] category:event.type cid:event.cid bid:event.bid eid:event.eid];
+                            if(!backlog)
+                                [self->_notifications updateBadgeCount];
+                        }
                     }
                 }
                 if((!backlog && !self->_resuming) || event.reqId > 0) {

@@ -55,12 +55,17 @@
 }
 
 -(NSComparisonResult)compareByMentionTime:(User *)aUser {
-    if(self->_lastMention == aUser.lastMention)
-        return [self->_lowercase_nick localizedStandardCompare:aUser.lowercase_nick];
-    else if(self->_lastMention > aUser.lastMention)
-        return NSOrderedAscending;
-    else
+    if(self->_lastMention < aUser.lastMention) {
         return NSOrderedDescending;
+    } else if(self->_lastMention > aUser.lastMention) {
+        return NSOrderedAscending;
+    } else if(self->_lastMessage < aUser.lastMessage) {
+        return NSOrderedDescending;
+    } else if(self->_lastMessage > aUser.lastMessage) {
+        return NSOrderedAscending;
+    } else {
+        return [self->_lowercase_nick localizedStandardCompare:aUser.lowercase_nick];
+    }
 }
 
 -(id)initWithCoder:(NSCoder *)aDecoder {
