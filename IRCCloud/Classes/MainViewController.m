@@ -4328,6 +4328,7 @@ NSArray *_sortedChannels;
             self->_selectedUser = nil;
         }
         self->_selectedEvent = event;
+        self->_selectedRect = rect;
         self->_selectedURL = url;
         if([self->_selectedURL hasPrefix:@"irccloud-paste-"])
             self->_selectedURL = [self->_selectedURL substringFromIndex:15];
@@ -4871,9 +4872,9 @@ NSArray *_sortedChannels;
     } else if([action isEqualToString:@"Share URL"]) {
         [UIColor clearTheme];
         UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:self->_selectedURL]] type:@"URL"];
-        activityController.popoverPresentationController.sourceView = self.slidingViewController.view;
-        activityController.popoverPresentationController.sourceRect = [self->_eventsView.tableView convertRect:self->_selectedRect toView:self.slidingViewController.view];
-        [self.slidingViewController presentViewController:activityController animated:YES completion:nil];
+        activityController.popoverPresentationController.sourceView = self.view;
+        activityController.popoverPresentationController.sourceRect = self->_selectedRect;
+        [self presentViewController:activityController animated:YES completion:nil];
     } else if([action isEqualToString:@"Delete Message"]) {
         [self dismissKeyboard];
         [self.view.window endEditing:YES];
