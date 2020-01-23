@@ -221,6 +221,7 @@ extern UIImage *__socketClosedBackgroundImage;
     self->_tableView.estimatedSectionFooterHeight = 0;
     lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;
+    lp.cancelsTouchesInView = YES;
     lp.delegate = self;
     [self->_tableView addGestureRecognizer:lp];
     self->_topUnreadView.backgroundColor = [UIColor chatterBarColor];

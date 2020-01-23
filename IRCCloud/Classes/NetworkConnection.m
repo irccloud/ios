@@ -384,14 +384,10 @@ volatile BOOL __socketPaused = NO;
                 if([event isImportant:b.type]) {
                     User *u = [self->_users getUser:event.from cid:event.cid bid:event.bid];
                     if(u) {
-                        if(u.lastMessage < event.eid) {
+                        if(u.lastMessage < event.eid)
                             u.lastMessage = event.eid;
-                        }
-                        if(event.isHighlight) {
-                            if(u.lastMention < event.eid) {
-                                u.lastMention = event.eid;
-                            }
-                        }
+                        if(event.isHighlight && u.lastMention < event.eid)
+                            u.lastMention = event.eid;
                     }
                     if(event.eid > b.last_seen_eid && (event.isHighlight || [b.type isEqualToString:@"conversation"])) {
                         BOOL show = YES;
