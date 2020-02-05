@@ -19,6 +19,16 @@ Screenshots
 &nbsp;
 <img src="https://blog.irccloud.com/static/ios-announce/iphone-chat-case.png" height="640">
 
+Shortcuts
+------
+* Switch to previous channel: ⌘ + ↑
+* Switch to next channel: ⌘ + ↓
+* Switch to previous unread channel: ⇧ + ⌘ + ↑
+* Switch to next unread channel: ⇧ + ⌘ + ↓
+* Complete nicknames and channels: ⇥
+* Mark channel as read: ⌘ + R
+* Mark all channels as read: ⇧ + ⌘ + R
+
 Requirements
 ------
 * Xcode 9
