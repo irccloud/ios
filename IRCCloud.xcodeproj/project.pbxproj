@@ -389,7 +389,7 @@
 		2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
 		2265DC8A1C722E7A00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
-		226E641D23F19E74001CE069 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 226E641C23F19E74001CE069 /* GoogleService-Info.plist */; };
+		226E642323F1C6AA001CE069 /* GoogleService-Info.plist in CopyFiles */ = {isa = PBXBuildFile; fileRef = 226E642223F1C6AA001CE069 /* GoogleService-Info.plist */; };
 		226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		226F080A1E5DFEC1003EED23 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
@@ -1095,6 +1095,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		226E642123F1C696001CE069 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				226E642323F1C6AA001CE069 /* GoogleService-Info.plist in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		22772F91197EC42E001A9890 /* Embed App Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1294,7 +1304,7 @@
 		2265DC881C722E6B00382C7C /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
-		226E641C23F19E74001CE069 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		226E642223F1C6AA001CE069 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		226EB6001B4C2E8600C432C7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		226F080C1E6495C8003EED23 /* WhoWasTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoWasTableViewController.h; sourceTree = "<group>"; };
 		226F080D1E6495C8003EED23 /* WhoWasTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoWasTableViewController.m; sourceTree = "<group>"; };
@@ -2110,7 +2120,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				226E641C23F19E74001CE069 /* GoogleService-Info.plist */,
+				226E642223F1C6AA001CE069 /* GoogleService-Info.plist */,
 				22D9789D215BC979005C2713 /* FLEX */,
 				2238761B1F70036900943160 /* WebP.framework */,
 				223876101F70035300943160 /* YYImage */,
@@ -2948,6 +2958,8 @@
 				2200DB4A18B7F1C400343583 /* ShellScript */,
 				22772F91197EC42E001A9890 /* Embed App Extensions */,
 				4B9DD9AAB9D711078225DC14 /* [CP] Embed Pods Frameworks */,
+				226E642423F1C91F001CE069 /* ShellScript */,
+				226E642123F1C696001CE069 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -3305,7 +3317,6 @@
 				2250176A1783434900066E71 /* Safari@2x.png in Resources */,
 				2250176B1783434900066E71 /* Safari@2x~ipad.png in Resources */,
 				221067201F28C3BB0075A18F /* Hack-Bold.ttf in Resources */,
-				226E641D23F19E74001CE069 /* GoogleService-Info.plist in Resources */,
 				22F4A9CA1CB5424F00359049 /* Launch.storyboard in Resources */,
 				2250176C1783434900066E71 /* Safari~ipad.png in Resources */,
 				224FCF331787286000FC3879 /* licenses.txt in Resources */,
@@ -3484,6 +3495,24 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "CRASHLYTICS_TOKEN=`grep CRASHLYTICS_TOKEN $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nCRASHLYTICS_SECRET=`grep CRASHLYTICS_SECRET $PROJECT_DIR/IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'`\nif [ -n \"$CRASHLYTICS_TOKEN\" ]; then ./Fabric.framework/run $CRASHLYTICS_TOKEN $CRASHLYTICS_SECRET; fi";
+		};
+		226E642423F1C91F001CE069 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/IRCCloud/GoogleService-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "echo touch $SRCROOT/IRCCloud/GoogleService-Info.plist\ntouch $SRCROOT/IRCCloud/GoogleService-Info.plist\n";
 		};
 		22D97893215BC910005C2713 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;

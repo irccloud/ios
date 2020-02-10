@@ -2034,8 +2034,11 @@ extern UIImage *__socketClosedBackgroundImage;
         if(self->_conn.state == kIRCCloudStateConnected)
             [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
         
-        FIRTrace *trace = [FIRPerformance startTraceWithName:@"loadBacklog"];
-
+        FIRTrace *trace;
+#ifdef CRASHLYTICS_TOKEN
+        if([FIROptions defaultOptions])
+            trace = [FIRPerformance startTraceWithName:@"loadBacklog"];
+#endif
         UIFont *f = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
         if(__secondsPref)

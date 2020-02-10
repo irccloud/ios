@@ -3,6 +3,7 @@
 build/
 IRCCloud/config.h
 IRCCloud/InfoPlist.h
+IRCCloud/GoogleService-Info.plist
 /*.png
 /*.sh
 /*.mobileprovision

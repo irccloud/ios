@@ -115,7 +115,10 @@ volatile BOOL __socketPaused = NO;
     
     if(self->_connection) {
 #ifndef EXTENSION
-        self->_trace = [FIRPerformance startTraceWithName:@"fetchOOB"];
+#ifdef CRASHLYTICS_TOKEN
+        if([FIROptions defaultOptions])
+            self->_trace = [FIRPerformance startTraceWithName:@"fetchOOB"];
+#endif
 #endif
         self->_running = YES;
         [self->_connection start];
