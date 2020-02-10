@@ -37,6 +37,7 @@
 #if DEBUG
 #import "FLEXManager.h"
 #endif
+@import Firebase;
 
 #ifdef DEBUG
 @implementation NSURLRequest(CertificateHack)
@@ -103,6 +104,8 @@
     }
 #endif
 #ifdef CRASHLYTICS_TOKEN
+    if([FIROptions defaultOptions])
+        [FIRApp configure];
     [Fabric with:@[CrashlyticsKit]];
 #endif
     if (@available(iOS 10, *)) {

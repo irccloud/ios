@@ -24,6 +24,7 @@
 #import "config.h"
 #import "ImageCache.h"
 #import "UIColor+IRCCloud.h"
+@import Firebase;
 
 #define HIDE_DURATION 3
 
@@ -261,7 +262,10 @@
     [self->_movieController.player play];
     if([UIApplication sharedApplication].delegate.window.rootViewController == self)
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
-    [Answers logContentViewWithName:nil contentType:@"Animation" contentId:nil customAttributes:nil];
+    [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
+        kFIRParameterContentType:@"Animation"
+    }];
+
     [self scrollViewDidZoom:self->_scrollView];
 }
 
@@ -399,7 +403,9 @@
             [UIView commitAnimations];
             if([UIApplication sharedApplication].delegate.window.rootViewController == self)
                 [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
-            [Answers logContentViewWithName:nil contentType:@"Image" contentId:nil customAttributes:nil];
+            [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
+                kFIRParameterContentType:@"Image"
+            }];
         }];
     } else {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{

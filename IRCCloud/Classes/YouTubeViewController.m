@@ -23,6 +23,7 @@
 #import "AppDelegate.h"
 #import "MainViewController.h"
 #import "UIColor+IRCCloud.h"
+@import Firebase;
 
 #define YTMARGIN 130
 
@@ -188,7 +189,9 @@
     [self->_activity startAnimating];
     [self.view addSubview:self->_activity];
     
-    [Answers logContentViewWithName:nil contentType:@"Youtube" contentId:nil customAttributes:nil];
+    [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
+        kFIRParameterContentType:@"Youtube"
+    }];
 }
 
 -(void)_YTWrapperTapped {

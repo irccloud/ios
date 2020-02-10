@@ -33,6 +33,7 @@
 #import "ARChromeActivity.h"
 #import "TUSafariActivity.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+@import Firebase;
 
 #ifndef EXTENSION
 @interface OpenInFirefoxActivity : UIActivity
@@ -660,7 +661,9 @@
         player.player = [[AVPlayer alloc] initWithURL:url];
         [mainViewController presentViewController:player animated:YES completion:nil];
         [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
-        [Answers logContentViewWithName:nil contentType:@"Video" contentId:nil customAttributes:nil];
+        [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
+            kFIRParameterContentType:@"Video"
+        }];
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
     } else if([url.host.lowercaseString isEqualToString:@"maps.apple.com"]) {
@@ -745,7 +748,10 @@
                 activityType = [activityType substringFromIndex:25];
             if([activityType hasPrefix:@"com.apple."])
                 activityType = [activityType substringFromIndex:10];
-            [Answers logShareWithMethod:activityType contentName:nil contentType:type contentId:nil customAttributes:nil];
+            [FIRAnalytics logEventWithName:kFIREventShare parameters:@{
+                kFIRParameterMethod:activityType,
+                kFIRParameterContentType:type
+            }];
         }
     };
     return activityController;

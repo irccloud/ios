@@ -22,6 +22,7 @@
 #import "OnePasswordExtension.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "SamlLoginViewController.h"
+@import Firebase;
 
 @implementation LoginSplashViewController
 
@@ -266,7 +267,10 @@
             self->forgotPasswordSignup.alpha = 0;
             [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
 #ifndef ENTERPRISE
-            [Answers logLoginWithMethod:@"access-link" success:@YES customAttributes:nil];
+            [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                kFIRParameterMethod:@"access-link",
+                kFIRParameterSuccess:@(1)
+            }];
 #endif
         } else {
             dispatch_async(dispatch_get_main_queue(), ^{
@@ -279,7 +283,10 @@
                 [self presentViewController:alert animated:YES completion:nil];
             });
 #ifndef ENTERPRISE
-            [Answers logLoginWithMethod:@"access-link" success:@NO customAttributes:nil];
+            [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                kFIRParameterMethod:@"access-link",
+                kFIRParameterSuccess:@(0)
+            }];
 #endif
         }
     });
@@ -739,9 +746,15 @@
                 [d synchronize];
 #ifndef ENTERPRISE
                 if(nameAlpha) {
-                    [Answers logSignUpWithMethod:@"email" success:@YES customAttributes:nil];
+                    [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
+                        kFIRParameterSignUpMethod:@"email",
+                        kFIRParameterSuccess:@(1)
+                    }];
                 } else {
-                    [Answers logLoginWithMethod:@"email" success:@YES customAttributes:nil];
+                    [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                        kFIRParameterMethod:@"email",
+                        kFIRParameterSuccess:@(1)
+                    }];
                 }
                 if(!self->_gotCredentialsFromPasswordManager) {
                     SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
@@ -794,9 +807,17 @@
                 });
 #ifndef ENTERPRISE
                 if(nameAlpha) {
-                    [Answers logSignUpWithMethod:@"email" success:@NO customAttributes:[result objectForKey:@"message"]?@{@"Failure": [result objectForKey:@"message"]}:nil];
+                    [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
+                        kFIRParameterSignUpMethod:@"email",
+                        kFIRParameterSuccess:@(0),
+                        @"failure":[result objectForKey:@"message"]
+                    }];
                 } else {
-                    [Answers logLoginWithMethod:@"email" success:@NO customAttributes:[result objectForKey:@"message"]?@{@"Failure": [result objectForKey:@"message"]}:nil];
+                    [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                        kFIRParameterMethod:@"email",
+                        kFIRParameterSuccess:@(0),
+                        @"failure":[result objectForKey:@"message"]
+                    }];
                 }
 #endif
             }

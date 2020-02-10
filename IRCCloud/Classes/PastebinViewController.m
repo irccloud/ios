@@ -24,6 +24,7 @@
 #import "AppDelegate.h"
 #import "PastebinEditorViewController.h"
 #import "UIColor+IRCCloud.h"
+@import Firebase;
 
 @implementation PastebinViewController
 
@@ -85,7 +86,9 @@
     self->_lineNumbers.enabled = NO;
     self->_lineNumbers.on = YES;
     [self _fetch];
-    [Answers logContentViewWithName:nil contentType:@"Pastebin" contentId:nil customAttributes:nil];
+    [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
+        kFIRParameterContentType:@"Pastebin"
+    }];
     [self didMoveToParentViewController:nil];
 }
 

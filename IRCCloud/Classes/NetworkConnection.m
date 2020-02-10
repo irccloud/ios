@@ -21,6 +21,8 @@
 #import "UIColor+IRCCloud.h"
 #import "ImageCache.h"
 #import "TrustKit.h"
+@import Firebase;
+@import FirebasePerformance;
 
 NSString *_userAgent = nil;
 NSString *kIRCCloudConnectivityNotification = @"com.irccloud.notification.connectivity";
@@ -56,6 +58,9 @@ volatile BOOL __socketPaused = NO;
     NSURLConnection *_connection;
     int _bid;
     void (^_completionHandler)(BOOL);
+#ifndef EXTENSION
+    FIRTrace *_trace;
+#endif
 }
 @property (readonly) NSString *url;
 @property int bid;
@@ -98,6 +103,9 @@ volatile BOOL __socketPaused = NO;
     self->_cancelled = YES;
     self->_running = NO;
     [self->_connection cancel];
+#ifndef EXTENSION
+    [self->_trace stop];
+#endif
 }
 -(void)start {
     if(self->_cancelled || _running) {
@@ -106,6 +114,9 @@ volatile BOOL __socketPaused = NO;
     }
     
     if(self->_connection) {
+#ifndef EXTENSION
+        self->_trace = [FIRPerformance startTraceWithName:@"fetchOOB"];
+#endif
         self->_running = YES;
         [self->_connection start];
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
@@ -132,6 +143,9 @@ volatile BOOL __socketPaused = NO;
     }];
     self->_running = NO;
     self->_cancelled = YES;
+#ifndef EXTENSION
+    [self->_trace stop];
+#endif
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if(self->_cancelled) {
@@ -147,6 +161,9 @@ volatile BOOL __socketPaused = NO;
         }
     }];
     self->_running = NO;
+#ifndef EXTENSION
+    [self->_trace stop];
+#endif
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(self->_cancelled)
@@ -170,6 +187,9 @@ volatile BOOL __socketPaused = NO;
     //NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     if(!self->_cancelled) {
         [self->_parser parse:data];
+#ifndef EXTENSION
+        [self->_trace incrementMetric:@"parse" byInt:1];
+#endif
     } else {
         CLS_LOG(@"Ignoring data for cancelled OOB fetcher");
     }
@@ -601,6 +621,7 @@ volatile BOOL __socketPaused = NO;
                        [self->_events reformat];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
+                       [FIRAnalytics setUserID:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
                        CLS_LOG(@"Prefs: %@", [self prefs]);
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },

@@ -21,6 +21,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		0548CFDE1ED36F21D59A23D2 /* Pods_ShareExtension_Enterprise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 79C6F12AF9980ABD5F6D1E81 /* Pods_ShareExtension_Enterprise.framework */; };
+		0F42FE271B3105DA25634264 /* Pods_NotificationService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0E5AD60EADD0779A2E3E257B /* Pods_NotificationService.framework */; };
 		1A5703431A73FB1200D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
 		1A5703441A73FB1200D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
 		1A5703451A73FC7600D58225 /* Fabric.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703421A73FB1200D58225 /* Fabric.framework */; };
@@ -387,6 +389,7 @@
 		2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
 		2265DC8A1C722E7A00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
 		22695F5516E8FC9900E01DF8 /* CollapsedEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */; };
+		226E641D23F19E74001CE069 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 226E641C23F19E74001CE069 /* GoogleService-Info.plist */; };
 		226EB6011B4C2E8600C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		226EB6021B4C2E8C00C432C7 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226EB6001B4C2E8600C432C7 /* AVFoundation.framework */; };
 		226F080A1E5DFEC1003EED23 /* ImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80B51E48ABB200A243E7 /* ImageCache.m */; };
@@ -961,6 +964,12 @@
 		22F4A9CB1CB5424F00359049 /* Launch.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 22F4A9C91CB5424F00359049 /* Launch.storyboard */; };
 		22F5C4BD1791F205005E09A9 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
+		2D09C24E152C6127A7F56DAF /* Pods_IRCCloud_Enterprise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18364AEA06199D58BCD9A151 /* Pods_IRCCloud_Enterprise.framework */; };
+		6E7E72678F14B4CFF5CBC70D /* Pods_NotificationService_Enterprise.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E99ADD375783B2EF3FD42BFF /* Pods_NotificationService_Enterprise.framework */; };
+		C58D83E3C5E424EB09908129 /* Pods_IRCCloud_FLEX.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D440DC5EB3DDFEEEC925FAC9 /* Pods_IRCCloud_FLEX.framework */; };
+		DD7783D3B973FA47D5E7E8C4 /* Pods_IRCCloudUnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3C1BE16A279D62CB1978ABF5 /* Pods_IRCCloudUnitTests.framework */; };
+		F58D5CF3EC6CDA89EC76E98D /* Pods_IRCCloud.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 16F60E452E43B73BDBF8DF07 /* Pods_IRCCloud.framework */; };
+		FD092E5C35444F698D129F90 /* Pods_ShareExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B633C31CE9129F6052A1353A /* Pods_ShareExtension.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1125,6 +1134,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0E5AD60EADD0779A2E3E257B /* Pods_NotificationService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NotificationService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		16F60E452E43B73BDBF8DF07 /* Pods_IRCCloud.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_IRCCloud.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		18364AEA06199D58BCD9A151 /* Pods_IRCCloud_Enterprise.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_IRCCloud_Enterprise.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A5703421A73FB1200D58225 /* Fabric.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Fabric.framework; sourceTree = "<group>"; };
 		1A5703471A74145400D58225 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		1A61413D1E6EDF30004B6025 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/System/Library/Frameworks/AdSupport.framework; sourceTree = DEVELOPER_DIR; };
@@ -1140,6 +1152,7 @@
 		1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = EnterpriseLogo.xcassets; sourceTree = "<group>"; };
 		1A7382AA18D0A9A30039FDB3 /* Logo.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Logo.xcassets; sourceTree = "<group>"; };
 		1ADCE22D1D2FCD78000B379F /* UITests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UITests.swift; sourceTree = "<group>"; };
+		1ED60BD5C375D0A3C459CA55 /* Pods-NotificationService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService.release.xcconfig"; path = "Target Support Files/Pods-NotificationService/Pods-NotificationService.release.xcconfig"; sourceTree = "<group>"; };
 		2200DB4618B7EDF100343583 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		2200DB4B18B7F1FD00343583 /* Crashlytics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Crashlytics.framework; sourceTree = "<group>"; };
 		2200DB4D18B81BEB00343583 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
@@ -1281,6 +1294,7 @@
 		2265DC881C722E6B00382C7C /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		22695F5316E8FC9800E01DF8 /* CollapsedEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollapsedEvents.h; sourceTree = "<group>"; };
 		22695F5416E8FC9800E01DF8 /* CollapsedEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CollapsedEvents.m; sourceTree = "<group>"; };
+		226E641C23F19E74001CE069 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		226EB6001B4C2E8600C432C7 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		226F080C1E6495C8003EED23 /* WhoWasTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WhoWasTableViewController.h; sourceTree = "<group>"; };
 		226F080D1E6495C8003EED23 /* WhoWasTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WhoWasTableViewController.m; sourceTree = "<group>"; };
@@ -1637,6 +1651,34 @@
 		22F5C4BC1791F205005E09A9 /* a.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = a.caf; sourceTree = "<group>"; };
 		22F9EE1A16DE6F21004615C0 /* EventsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EventsDataSource.h; sourceTree = "<group>"; };
 		22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = EventsDataSource.m; sourceTree = "<group>"; };
+		34F1F585083FE0E3EBE29DC2 /* Pods-IRCCloud Enterprise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud Enterprise.debug.xcconfig"; path = "Target Support Files/Pods-IRCCloud Enterprise/Pods-IRCCloud Enterprise.debug.xcconfig"; sourceTree = "<group>"; };
+		36210DCB8F1FD0A3D2230EA2 /* Pods-ShareExtension Enterprise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension Enterprise.release.xcconfig"; path = "Target Support Files/Pods-ShareExtension Enterprise/Pods-ShareExtension Enterprise.release.xcconfig"; sourceTree = "<group>"; };
+		39CAD7833FDE319143BB13AF /* Pods-NotificationService.appstore.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService.appstore.xcconfig"; path = "Target Support Files/Pods-NotificationService/Pods-NotificationService.appstore.xcconfig"; sourceTree = "<group>"; };
+		3C1BE16A279D62CB1978ABF5 /* Pods_IRCCloudUnitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_IRCCloudUnitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DFF4B28D332212ECD8B2572 /* Pods-IRCCloud FLEX.appstore.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud FLEX.appstore.xcconfig"; path = "Target Support Files/Pods-IRCCloud FLEX/Pods-IRCCloud FLEX.appstore.xcconfig"; sourceTree = "<group>"; };
+		456125E965CEA1D5D22D4A29 /* Pods-NotificationService Enterprise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService Enterprise.debug.xcconfig"; path = "Target Support Files/Pods-NotificationService Enterprise/Pods-NotificationService Enterprise.debug.xcconfig"; sourceTree = "<group>"; };
+		45C1AFC805A21CA4016C2370 /* Pods-IRCCloudUnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloudUnitTests.release.xcconfig"; path = "Target Support Files/Pods-IRCCloudUnitTests/Pods-IRCCloudUnitTests.release.xcconfig"; sourceTree = "<group>"; };
+		4A67E126E9DAEECFC135B29C /* Pods-ShareExtension.appstore.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.appstore.xcconfig"; path = "Target Support Files/Pods-ShareExtension/Pods-ShareExtension.appstore.xcconfig"; sourceTree = "<group>"; };
+		4C7C18D7B998D7E74FBA0EE5 /* Pods-ShareExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.release.xcconfig"; path = "Target Support Files/Pods-ShareExtension/Pods-ShareExtension.release.xcconfig"; sourceTree = "<group>"; };
+		6416E579091F3C95A0707D42 /* Pods-ShareExtension Enterprise.appstore.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension Enterprise.appstore.xcconfig"; path = "Target Support Files/Pods-ShareExtension Enterprise/Pods-ShareExtension Enterprise.appstore.xcconfig"; sourceTree = "<group>"; };
+		6D0B9BF31610AED2BFDC6CF8 /* Pods-IRCCloud.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud.debug.xcconfig"; path = "Target Support Files/Pods-IRCCloud/Pods-IRCCloud.debug.xcconfig"; sourceTree = "<group>"; };
+		76842BDEA755F3F5680CF96C /* Pods-NotificationService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService.debug.xcconfig"; path = "Target Support Files/Pods-NotificationService/Pods-NotificationService.debug.xcconfig"; sourceTree = "<group>"; };
+		79C6F12AF9980ABD5F6D1E81 /* Pods_ShareExtension_Enterprise.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ShareExtension_Enterprise.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		7DDF86E14489BD4267E45732 /* Pods-IRCCloudUnitTests.appstore.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloudUnitTests.appstore.xcconfig"; path = "Target Support Files/Pods-IRCCloudUnitTests/Pods-IRCCloudUnitTests.appstore.xcconfig"; sourceTree = "<group>"; };
+		91B416B31DC4E2C393D1310E /* Pods-NotificationService Enterprise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService Enterprise.release.xcconfig"; path = "Target Support Files/Pods-NotificationService Enterprise/Pods-NotificationService Enterprise.release.xcconfig"; sourceTree = "<group>"; };
+		99AFB1FA553A0FA909CDF374 /* Pods-ShareExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension.debug.xcconfig"; path = "Target Support Files/Pods-ShareExtension/Pods-ShareExtension.debug.xcconfig"; sourceTree = "<group>"; };
+		A440FB58FBDB940E2AEC8895 /* Pods-IRCCloud.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud.release.xcconfig"; path = "Target Support Files/Pods-IRCCloud/Pods-IRCCloud.release.xcconfig"; sourceTree = "<group>"; };
+		B633C31CE9129F6052A1353A /* Pods_ShareExtension.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ShareExtension.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		BC0C9E41688C493DBB5B154D /* Pods-IRCCloud.appstore.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud.appstore.xcconfig"; path = "Target Support Files/Pods-IRCCloud/Pods-IRCCloud.appstore.xcconfig"; sourceTree = "<group>"; };
+		D440DC5EB3DDFEEEC925FAC9 /* Pods_IRCCloud_FLEX.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_IRCCloud_FLEX.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCB85281D8B3473C75CF88B1 /* Pods-IRCCloud FLEX.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud FLEX.debug.xcconfig"; path = "Target Support Files/Pods-IRCCloud FLEX/Pods-IRCCloud FLEX.debug.xcconfig"; sourceTree = "<group>"; };
+		E0CFB473325C96BB30B7B0C8 /* Pods-IRCCloud Enterprise.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud Enterprise.release.xcconfig"; path = "Target Support Files/Pods-IRCCloud Enterprise/Pods-IRCCloud Enterprise.release.xcconfig"; sourceTree = "<group>"; };
+		E23CA352F2D6875ABB27A1F6 /* Pods-IRCCloud FLEX.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud FLEX.release.xcconfig"; path = "Target Support Files/Pods-IRCCloud FLEX/Pods-IRCCloud FLEX.release.xcconfig"; sourceTree = "<group>"; };
+		E5974216994377CF03748091 /* Pods-NotificationService Enterprise.appstore.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NotificationService Enterprise.appstore.xcconfig"; path = "Target Support Files/Pods-NotificationService Enterprise/Pods-NotificationService Enterprise.appstore.xcconfig"; sourceTree = "<group>"; };
+		E95F6BEF7CF2E29C501BC671 /* Pods-IRCCloudUnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloudUnitTests.debug.xcconfig"; path = "Target Support Files/Pods-IRCCloudUnitTests/Pods-IRCCloudUnitTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E99ADD375783B2EF3FD42BFF /* Pods_NotificationService_Enterprise.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NotificationService_Enterprise.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		ED7A0E9A81482325C660F55E /* Pods-IRCCloud Enterprise.appstore.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-IRCCloud Enterprise.appstore.xcconfig"; path = "Target Support Files/Pods-IRCCloud Enterprise/Pods-IRCCloud Enterprise.appstore.xcconfig"; sourceTree = "<group>"; };
+		F69145B7112E66849EC79B7F /* Pods-ShareExtension Enterprise.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ShareExtension Enterprise.debug.xcconfig"; path = "Target Support Files/Pods-ShareExtension Enterprise/Pods-ShareExtension Enterprise.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1666,6 +1708,7 @@
 				22103506197EFC0500AB414F /* Twitter.framework in Frameworks */,
 				2238763D1F70062000943160 /* WebP.framework in Frameworks */,
 				22103507197EFC0500AB414F /* UIKit.framework in Frameworks */,
+				FD092E5C35444F698D129F90 /* Pods_ShareExtension.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1686,6 +1729,7 @@
 				221D4BCD1E23F5EC00D403E6 /* Security.framework in Frameworks */,
 				221D4BCE1E23F5EC00D403E6 /* SystemConfiguration.framework in Frameworks */,
 				2238763F1F70062200943160 /* WebP.framework in Frameworks */,
+				0F42FE271B3105DA25634264 /* Pods_NotificationService.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1706,6 +1750,7 @@
 				1A61414E1E6EDF30004B6025 /* Security.framework in Frameworks */,
 				1A61414F1E6EDF30004B6025 /* SystemConfiguration.framework in Frameworks */,
 				223876401F70062200943160 /* WebP.framework in Frameworks */,
+				6E7E72678F14B4CFF5CBC70D /* Pods_NotificationService_Enterprise.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1713,6 +1758,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD7783D3B973FA47D5E7E8C4 /* Pods_IRCCloudUnitTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1750,6 +1796,7 @@
 				225D978518AA995900065087 /* CoreGraphics.framework in Frameworks */,
 				1A5703441A73FB1200D58225 /* Fabric.framework in Frameworks */,
 				2200DB4F18BCF9D100343583 /* Crashlytics.framework in Frameworks */,
+				2D09C24E152C6127A7F56DAF /* Pods_IRCCloud_Enterprise.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1787,6 +1834,7 @@
 				228A057216D3DABA0029769C /* Foundation.framework in Frameworks */,
 				1A5703431A73FB1200D58225 /* Fabric.framework in Frameworks */,
 				228A057416D3DABA0029769C /* CoreGraphics.framework in Frameworks */,
+				F58D5CF3EC6CDA89EC76E98D /* Pods_IRCCloud.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1831,6 +1879,7 @@
 				22D9786A215BC910005C2713 /* Foundation.framework in Frameworks */,
 				22D9786B215BC910005C2713 /* Fabric.framework in Frameworks */,
 				22D9786C215BC910005C2713 /* CoreGraphics.framework in Frameworks */,
+				C58D83E3C5E424EB09908129 /* Pods_IRCCloud_FLEX.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1859,6 +1908,7 @@
 				22DB252C1982DF2B0008728E /* SystemConfiguration.framework in Frameworks */,
 				22DB252D1982DF2B0008728E /* Twitter.framework in Frameworks */,
 				22DB252E1982DF2B0008728E /* UIKit.framework in Frameworks */,
+				0548CFDE1ED36F21D59A23D2 /* Pods_ShareExtension_Enterprise.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1963,6 +2013,7 @@
 				221D4B8E1E23EAD700D403E6 /* NotificationService */,
 				228A056E16D3DABA0029769C /* Frameworks */,
 				228A056D16D3DABA0029769C /* Products */,
+				7CF0BE4739CE6912111DBBD1 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2025,6 +2076,14 @@
 				22324FDF177DE51A008B6912 /* SystemConfiguration.framework */,
 				2250173F178340AB00066E71 /* Twitter.framework */,
 				228A056F16D3DABA0029769C /* UIKit.framework */,
+				16F60E452E43B73BDBF8DF07 /* Pods_IRCCloud.framework */,
+				18364AEA06199D58BCD9A151 /* Pods_IRCCloud_Enterprise.framework */,
+				D440DC5EB3DDFEEEC925FAC9 /* Pods_IRCCloud_FLEX.framework */,
+				3C1BE16A279D62CB1978ABF5 /* Pods_IRCCloudUnitTests.framework */,
+				0E5AD60EADD0779A2E3E257B /* Pods_NotificationService.framework */,
+				E99ADD375783B2EF3FD42BFF /* Pods_NotificationService_Enterprise.framework */,
+				B633C31CE9129F6052A1353A /* Pods_ShareExtension.framework */,
+				79C6F12AF9980ABD5F6D1E81 /* Pods_ShareExtension_Enterprise.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2051,6 +2110,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				226E641C23F19E74001CE069 /* GoogleService-Info.plist */,
 				22D9789D215BC979005C2713 /* FLEX */,
 				2238761B1F70036900943160 /* WebP.framework */,
 				223876101F70035300943160 /* YYImage */,
@@ -2743,6 +2803,37 @@
 			name = OpenInFirefoxClient;
 			sourceTree = "<group>";
 		};
+		7CF0BE4739CE6912111DBBD1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6D0B9BF31610AED2BFDC6CF8 /* Pods-IRCCloud.debug.xcconfig */,
+				A440FB58FBDB940E2AEC8895 /* Pods-IRCCloud.release.xcconfig */,
+				BC0C9E41688C493DBB5B154D /* Pods-IRCCloud.appstore.xcconfig */,
+				34F1F585083FE0E3EBE29DC2 /* Pods-IRCCloud Enterprise.debug.xcconfig */,
+				E0CFB473325C96BB30B7B0C8 /* Pods-IRCCloud Enterprise.release.xcconfig */,
+				ED7A0E9A81482325C660F55E /* Pods-IRCCloud Enterprise.appstore.xcconfig */,
+				DCB85281D8B3473C75CF88B1 /* Pods-IRCCloud FLEX.debug.xcconfig */,
+				E23CA352F2D6875ABB27A1F6 /* Pods-IRCCloud FLEX.release.xcconfig */,
+				3DFF4B28D332212ECD8B2572 /* Pods-IRCCloud FLEX.appstore.xcconfig */,
+				E95F6BEF7CF2E29C501BC671 /* Pods-IRCCloudUnitTests.debug.xcconfig */,
+				45C1AFC805A21CA4016C2370 /* Pods-IRCCloudUnitTests.release.xcconfig */,
+				7DDF86E14489BD4267E45732 /* Pods-IRCCloudUnitTests.appstore.xcconfig */,
+				76842BDEA755F3F5680CF96C /* Pods-NotificationService.debug.xcconfig */,
+				1ED60BD5C375D0A3C459CA55 /* Pods-NotificationService.release.xcconfig */,
+				39CAD7833FDE319143BB13AF /* Pods-NotificationService.appstore.xcconfig */,
+				456125E965CEA1D5D22D4A29 /* Pods-NotificationService Enterprise.debug.xcconfig */,
+				91B416B31DC4E2C393D1310E /* Pods-NotificationService Enterprise.release.xcconfig */,
+				E5974216994377CF03748091 /* Pods-NotificationService Enterprise.appstore.xcconfig */,
+				99AFB1FA553A0FA909CDF374 /* Pods-ShareExtension.debug.xcconfig */,
+				4C7C18D7B998D7E74FBA0EE5 /* Pods-ShareExtension.release.xcconfig */,
+				4A67E126E9DAEECFC135B29C /* Pods-ShareExtension.appstore.xcconfig */,
+				F69145B7112E66849EC79B7F /* Pods-ShareExtension Enterprise.debug.xcconfig */,
+				36210DCB8F1FD0A3D2230EA2 /* Pods-ShareExtension Enterprise.release.xcconfig */,
+				6416E579091F3C95A0707D42 /* Pods-ShareExtension Enterprise.appstore.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -2750,6 +2841,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 221034F5197EFBAF00AB414F /* Build configuration list for PBXNativeTarget "ShareExtension" */;
 			buildPhases = (
+				5A03DCCAB4CB9A5B6F587EA3 /* [CP] Check Pods Manifest.lock */,
 				221034E3197EFBAF00AB414F /* Sources */,
 				221034E4197EFBAF00AB414F /* Frameworks */,
 				221034E5197EFBAF00AB414F /* Resources */,
@@ -2768,6 +2860,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 221D4B961E23EAD700D403E6 /* Build configuration list for PBXNativeTarget "NotificationService" */;
 			buildPhases = (
+				FB109089D4710746FE393FB5 /* [CP] Check Pods Manifest.lock */,
 				221D4B891E23EAD600D403E6 /* Sources */,
 				221D4B8A1E23EAD600D403E6 /* Frameworks */,
 				221D4B8B1E23EAD600D403E6 /* Resources */,
@@ -2786,6 +2879,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 221D4B9F1E23EB4900D403E6 /* Build configuration list for PBXNativeTarget "NotificationService Enterprise" */;
 			buildPhases = (
+				BFBAF9C2502FACE495CBDC1E /* [CP] Check Pods Manifest.lock */,
 				221D4B9B1E23EB4900D403E6 /* Sources */,
 				221D4B9D1E23EB4900D403E6 /* Frameworks */,
 				221D4B9E1E23EB4900D403E6 /* Resources */,
@@ -2804,6 +2898,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 224589CE1DCA19BB00D3110A /* Build configuration list for PBXNativeTarget "IRCCloudUnitTests" */;
 			buildPhases = (
+				0FDA90C1BEE2FB0A01641D80 /* [CP] Check Pods Manifest.lock */,
 				224589C01DCA19BB00D3110A /* Sources */,
 				224589C11DCA19BB00D3110A /* Frameworks */,
 				224589C21DCA19BB00D3110A /* Resources */,
@@ -2822,11 +2917,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 225D979C18AA995900065087 /* Build configuration list for PBXNativeTarget "IRCCloud Enterprise" */;
 			buildPhases = (
+				BF53984D3CD60F79F91A8D02 /* [CP] Check Pods Manifest.lock */,
 				225D973718AA995900065087 /* Sources */,
 				225D977818AA995900065087 /* Frameworks */,
 				225D978718AA995900065087 /* Resources */,
 				2200DB4E18BCF97B00343583 /* ShellScript */,
 				22DB253C1982DFFB0008728E /* Embed App Extensions */,
+				156BA762D2D533888EB39BD1 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2844,11 +2941,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 228A05A716D3DABB0029769C /* Build configuration list for PBXNativeTarget "IRCCloud" */;
 			buildPhases = (
+				BE39777AEB98C1E83749AB78 /* [CP] Check Pods Manifest.lock */,
 				228A056816D3DABA0029769C /* Sources */,
 				228A056916D3DABA0029769C /* Frameworks */,
 				228A056A16D3DABA0029769C /* Resources */,
 				2200DB4A18B7F1C400343583 /* ShellScript */,
 				22772F91197EC42E001A9890 /* Embed App Extensions */,
+				4B9DD9AAB9D711078225DC14 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2885,11 +2984,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 22D97897215BC910005C2713 /* Build configuration list for PBXNativeTarget "IRCCloud FLEX" */;
 			buildPhases = (
+				62DFEFB2618EF959B35CB2FD /* [CP] Check Pods Manifest.lock */,
 				22D9778D215BC910005C2713 /* Sources */,
 				22D9784E215BC910005C2713 /* Frameworks */,
 				22D9786D215BC910005C2713 /* Resources */,
 				22D97893215BC910005C2713 /* ShellScript */,
 				22D97894215BC910005C2713 /* Embed App Extensions */,
+				01DEE7170EE1959EA7CD05F9 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2908,6 +3009,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 22DB25331982DF2B0008728E /* Build configuration list for PBXNativeTarget "ShareExtension Enterprise" */;
 			buildPhases = (
+				77CC4FE36F91450CD3B2ECB9 /* [CP] Check Pods Manifest.lock */,
 				22DB24FB1982DF2B0008728E /* Sources */,
 				22DB251F1982DF2B0008728E /* Frameworks */,
 				22DB252F1982DF2B0008728E /* Resources */,
@@ -3203,6 +3305,7 @@
 				2250176A1783434900066E71 /* Safari@2x.png in Resources */,
 				2250176B1783434900066E71 /* Safari@2x~ipad.png in Resources */,
 				221067201F28C3BB0075A18F /* Hack-Bold.ttf in Resources */,
+				226E641D23F19E74001CE069 /* GoogleService-Info.plist in Resources */,
 				22F4A9CA1CB5424F00359049 /* Launch.storyboard in Resources */,
 				2250176C1783434900066E71 /* Safari~ipad.png in Resources */,
 				224FCF331787286000FC3879 /* licenses.txt in Resources */,
@@ -3278,6 +3381,84 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		01DEE7170EE1959EA7CD05F9 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IRCCloud FLEX/Pods-IRCCloud FLEX-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher-framework/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac-framework/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities-framework/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IRCCloud FLEX/Pods-IRCCloud FLEX-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		0FDA90C1BEE2FB0A01641D80 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-IRCCloudUnitTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		156BA762D2D533888EB39BD1 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IRCCloud Enterprise/Pods-IRCCloud Enterprise-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher-framework/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac-framework/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities-framework/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IRCCloud Enterprise/Pods-IRCCloud Enterprise-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		2200DB4A18B7F1C400343583 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -3331,6 +3512,188 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
 			shellScript = "$SRCROOT/build-scripts/git-revision.sh\n";
+		};
+		4B9DD9AAB9D711078225DC14 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-IRCCloud/Pods-IRCCloud-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher-framework/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac-framework/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleUtilities-framework/GoogleUtilities.framework",
+				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-IRCCloud/Pods-IRCCloud-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5A03DCCAB4CB9A5B6F587EA3 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ShareExtension-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		62DFEFB2618EF959B35CB2FD /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-IRCCloud FLEX-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		77CC4FE36F91450CD3B2ECB9 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-ShareExtension Enterprise-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BE39777AEB98C1E83749AB78 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-IRCCloud-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BF53984D3CD60F79F91A8D02 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-IRCCloud Enterprise-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BFBAF9C2502FACE495CBDC1E /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NotificationService Enterprise-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		FB109089D4710746FE393FB5 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-NotificationService-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -4169,6 +4532,7 @@
 /* Begin XCBuildConfiguration section */
 		221034F6197EFBAF00AB414F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 99AFB1FA553A0FA909CDF374 /* Pods-ShareExtension.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -4199,7 +4563,10 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development com.irccloud.IRCCloud.ShareExtension";
@@ -4209,6 +4576,7 @@
 		};
 		221034F7197EFBAF00AB414F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4C7C18D7B998D7E74FBA0EE5 /* Pods-ShareExtension.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -4238,7 +4606,10 @@
 					"-DNS_BLOCK_ASSERTIONS=1",
 					"-DEXTENSION",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "Crashlytics ShareExtension";
@@ -4248,6 +4619,7 @@
 		};
 		221034F8197EFBAF00AB414F /* AppStore */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4A67E126E9DAEECFC135B29C /* Pods-ShareExtension.appstore.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -4279,7 +4651,10 @@
 					"-DAPPSTORE",
 					"-DEXTENSION",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "App Store ShareExtension";
@@ -4289,6 +4664,7 @@
 		};
 		221D4B971E23EAD700D403E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 76842BDEA755F3F5680CF96C /* Pods-NotificationService.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -4323,6 +4699,7 @@
 		};
 		221D4B981E23EAD700D403E6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1ED60BD5C375D0A3C459CA55 /* Pods-NotificationService.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -4361,6 +4738,7 @@
 		};
 		221D4B991E23EAD700D403E6 /* AppStore */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 39CAD7833FDE319143BB13AF /* Pods-NotificationService.appstore.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -4400,6 +4778,7 @@
 		};
 		221D4BA01E23EB4900D403E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 456125E965CEA1D5D22D4A29 /* Pods-NotificationService Enterprise.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -4434,6 +4813,7 @@
 		};
 		221D4BA11E23EB4900D403E6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 91B416B31DC4E2C393D1310E /* Pods-NotificationService Enterprise.release.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -4472,6 +4852,7 @@
 		};
 		221D4BA21E23EB4900D403E6 /* AppStore */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E5974216994377CF03748091 /* Pods-NotificationService Enterprise.appstore.xcconfig */;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ENABLE_MODULES = YES;
@@ -4511,6 +4892,7 @@
 		};
 		224589CB1DCA19BB00D3110A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E95F6BEF7CF2E29C501BC671 /* Pods-IRCCloudUnitTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -4538,6 +4920,7 @@
 		};
 		224589CC1DCA19BB00D3110A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 45C1AFC805A21CA4016C2370 /* Pods-IRCCloudUnitTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -4566,6 +4949,7 @@
 		};
 		224589CD1DCA19BB00D3110A /* AppStore */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7DDF86E14489BD4267E45732 /* Pods-IRCCloudUnitTests.appstore.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ANALYZER_NONNULL = YES;
@@ -4594,6 +4978,7 @@
 		};
 		225D979D18AA995900065087 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 34F1F585083FE0E3EBE29DC2 /* Pods-IRCCloud Enterprise.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
@@ -4612,7 +4997,10 @@
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
 				OTHER_CFLAGS = "-DENTERPRISE";
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
 				PROVISIONING_PROFILE_SPECIFIER = "match Development com.irccloud.enterprise";
@@ -4622,6 +5010,7 @@
 		};
 		225D979E18AA995900065087 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E0CFB473325C96BB30B7B0C8 /* Pods-IRCCloud Enterprise.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
@@ -4641,7 +5030,10 @@
 					"-DNS_BLOCK_ASSERTIONS=1",
 					"-DENTERPRISE",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
 				PROVISIONING_PROFILE_SPECIFIER = "Crashlytics-Enterprise";
@@ -4757,6 +5149,7 @@
 		};
 		228A05A816D3DABB0029769C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6D0B9BF31610AED2BFDC6CF8 /* Pods-IRCCloud.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
@@ -4773,7 +5166,10 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development com.irccloud.IRCCloud";
@@ -4783,6 +5179,7 @@
 		};
 		228A05A916D3DABB0029769C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A440FB58FBDB940E2AEC8895 /* Pods-IRCCloud.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
@@ -4799,7 +5196,10 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = Crashlytics;
@@ -4914,6 +5314,7 @@
 		};
 		22D97898215BC910005C2713 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = DCB85281D8B3473C75CF88B1 /* Pods-IRCCloud FLEX.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
@@ -4934,7 +5335,10 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development com.irccloud.IRCCloud";
@@ -4944,6 +5348,7 @@
 		};
 		22D97899215BC910005C2713 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E23CA352F2D6875ABB27A1F6 /* Pods-IRCCloud FLEX.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
@@ -4960,7 +5365,10 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = Crashlytics;
@@ -4970,6 +5378,7 @@
 		};
 		22D9789A215BC910005C2713 /* AppStore */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DFF4B28D332212ECD8B2572 /* Pods-IRCCloud FLEX.appstore.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
@@ -4986,7 +5395,10 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "App Store";
@@ -4996,6 +5408,7 @@
 		};
 		22DB25341982DF2B0008728E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F69145B7112E66849EC79B7F /* Pods-ShareExtension Enterprise.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -5029,7 +5442,10 @@
 					"-DEXTENSION",
 					"-DENTERPRISE",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
 				PROVISIONING_PROFILE_SPECIFIER = "match Development com.irccloud.enterprise.ShareExtension";
@@ -5039,6 +5455,7 @@
 		};
 		22DB25351982DF2B0008728E /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 36210DCB8F1FD0A3D2230EA2 /* Pods-ShareExtension Enterprise.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -5069,7 +5486,10 @@
 					"-DEXTENSION",
 					"-DENTERPRISE",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
 				PROVISIONING_PROFILE_SPECIFIER = "Crashlytics ShareExtension-Enterprise";
@@ -5079,6 +5499,7 @@
 		};
 		22DB25361982DF2B0008728E /* AppStore */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6416E579091F3C95A0707D42 /* Pods-ShareExtension Enterprise.appstore.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -5111,7 +5532,10 @@
 					"-DEXTENSION",
 					"-DENTERPRISE",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise.ShareExtension;
 				PRODUCT_NAME = "ShareExtension Enterprise";
 				PROVISIONING_PROFILE_SPECIFIER = "App Store Enterprise ShareExtension";
@@ -5188,6 +5612,7 @@
 		};
 		22DE05C318DB52D700590FC3 /* AppStore */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BC0C9E41688C493DBB5B154D /* Pods-IRCCloud.appstore.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
@@ -5204,7 +5629,10 @@
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = Crashlytics;
@@ -5214,6 +5642,7 @@
 		};
 		22DE05C518DB52D700590FC3 /* AppStore */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = ED7A0E9A81482325C660F55E /* Pods-IRCCloud Enterprise.appstore.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
@@ -5236,7 +5665,10 @@
 					"-DAPPSTORE",
 					"-DENTERPRISE",
 				);
-				OTHER_LDFLAGS = "-lstdc++";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lstdc++",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.enterprise;
 				PRODUCT_NAME = IRCEnterprise;
 				PROVISIONING_PROFILE_SPECIFIER = "App Store Enterprise";
