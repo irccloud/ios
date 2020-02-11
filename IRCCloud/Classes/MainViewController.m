@@ -59,6 +59,7 @@
 #import "LogExportsTableViewController.h"
 #import "ImageCache.h"
 #import "AvatarsTableViewController.h"
+@import Firebase;
 
 extern NSDictionary *emojiMap;
 
@@ -2088,6 +2089,8 @@ NSArray *_sortedChannels;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
+    if([FIROptions defaultOptions])
+        [FIRAnalytics setScreenName:NSStringFromClass(self.class) screenClass:nil];
 }
 
 - (void)didReceiveMemoryWarning {

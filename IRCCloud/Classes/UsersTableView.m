@@ -21,6 +21,7 @@
 #import "UIColor+IRCCloud.h"
 #import "ECSlidingViewController.h"
 #import "ColorFormatter.h"
+@import Firebase;
 
 #define TYPE_HEADING 0
 #define TYPE_USER 1
@@ -347,6 +348,16 @@
         self->_headingFont = self->_countFont = self->_userFont = [UIFont fontWithDescriptor:d size:FONT_SIZE];
     }
     [self.tableView reloadData];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if([FIROptions defaultOptions]) {
+        if(animated && self.parentViewController)
+            [FIRAnalytics setScreenName:NSStringFromClass(self.parentViewController.class) screenClass:nil];
+        else
+            [FIRAnalytics setScreenName:NSStringFromClass(self.class) screenClass:nil];
+    }
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {

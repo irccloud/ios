@@ -603,6 +603,11 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     [[NSNotificationCenter defaultCenter] postNotificationName:ECSlidingViewTopDidReset object:self userInfo:nil];
+    if([self.topViewController isKindOfClass:UINavigationController.class]) {
+      [((UINavigationController *)self.topViewController).visibleViewController viewDidAppear:NO];
+    } else {
+      [self.topViewController viewDidAppear:NO];
+    }
   });
   [self.topView removeGestureRecognizer:self.resetTapGesture];
   [self removeTopViewSnapshot];

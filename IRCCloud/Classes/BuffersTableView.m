@@ -28,6 +28,7 @@
 #import "FontAwesome.h"
 #import "EventsTableView.h"
 #import "MainViewController.h"
+@import Firebase;
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -208,6 +209,16 @@
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [self performSelectorInBackground:@selector(refresh) withObject:nil];
+}
+
+- (void)viewDidAppear:(BOOL)animated {
+    [super viewDidAppear:animated];
+    if([FIROptions defaultOptions]) {
+        if(animated && self.parentViewController)
+            [FIRAnalytics setScreenName:NSStringFromClass(self.parentViewController.class) screenClass:nil];
+        else
+            [FIRAnalytics setScreenName:NSStringFromClass(self.class) screenClass:nil];
+    }
 }
 
 - (void)refresh {

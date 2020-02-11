@@ -58,9 +58,6 @@ volatile BOOL __socketPaused = NO;
     NSURLConnection *_connection;
     int _bid;
     void (^_completionHandler)(BOOL);
-#ifndef EXTENSION
-    FIRTrace *_trace;
-#endif
 }
 @property (readonly) NSString *url;
 @property int bid;
@@ -103,9 +100,6 @@ volatile BOOL __socketPaused = NO;
     self->_cancelled = YES;
     self->_running = NO;
     [self->_connection cancel];
-#ifndef EXTENSION
-    [self->_trace stop];
-#endif
 }
 -(void)start {
     if(self->_cancelled || _running) {
@@ -114,12 +108,6 @@ volatile BOOL __socketPaused = NO;
     }
     
     if(self->_connection) {
-#ifndef EXTENSION
-#ifdef CRASHLYTICS_TOKEN
-        if([FIROptions defaultOptions])
-            self->_trace = [FIRPerformance startTraceWithName:@"fetchOOB"];
-#endif
-#endif
         self->_running = YES;
         [self->_connection start];
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
@@ -146,9 +134,6 @@ volatile BOOL __socketPaused = NO;
     }];
     self->_running = NO;
     self->_cancelled = YES;
-#ifndef EXTENSION
-    [self->_trace stop];
-#endif
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if(self->_cancelled) {
@@ -164,9 +149,6 @@ volatile BOOL __socketPaused = NO;
         }
     }];
     self->_running = NO;
-#ifndef EXTENSION
-    [self->_trace stop];
-#endif
 }
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(self->_cancelled)
@@ -189,9 +171,14 @@ volatile BOOL __socketPaused = NO;
 - (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
     //NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
     if(!self->_cancelled) {
+#ifndef EXTENSION
+        FIRTrace *trace;
+        if([FIROptions defaultOptions])
+            trace = [FIRPerformance startTraceWithName:@"parseOOB"];
+#endif
         [self->_parser parse:data];
 #ifndef EXTENSION
-        [self->_trace incrementMetric:@"parse" byInt:1];
+        [trace stop];
 #endif
     } else {
         CLS_LOG(@"Ignoring data for cancelled OOB fetcher");
@@ -2459,9 +2446,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
         }
     }
-#endif
-#ifndef EXTENSION
     [[ImageCache sharedInstance] purge];
+    [FIRAnalytics resetAnalyticsData];
 #endif
     [self cancelIdleTimer];
 }

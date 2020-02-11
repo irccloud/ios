@@ -301,6 +301,8 @@
 
 -(BOOL)continueActivity:(NSUserActivity *)userActivity {
     CLS_LOG(@"Continuing activity type: %@", userActivity.activityType);
+    if([FIROptions defaultOptions])
+        [FIRAnalytics handleUserActivity:userActivity];
 #ifdef ENTERPRISE
     if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"])
 #else
@@ -328,6 +330,8 @@
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    if([FIROptions defaultOptions])
+        [FIRAnalytics handleOpenURL:url];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     if([url.scheme hasPrefix:@"irccloud"]) {
@@ -826,6 +830,8 @@
         imageUploadCompletionHandler = completionHandler;
     } else {
         CLS_LOG(@"Unrecognized background task: %@", identifier);
+        if([FIROptions defaultOptions])
+            [FIRAnalytics handleEventsForBackgroundURLSession:identifier completionHandler:completionHandler];
         completionHandler();
     }
 }
