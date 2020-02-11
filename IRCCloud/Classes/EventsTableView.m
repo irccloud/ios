@@ -1123,9 +1123,13 @@ extern UIImage *__socketClosedBackgroundImage;
                         [self _addItem:e1 eid:e1.eid];
                         event.formattedMsg = [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from];
                     } else {
-                        NSInteger oldLength = event.formattedMsg.length;
-                        event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from], event.formattedMsg];
-                        event.mentionOffset += event.formattedMsg.length - oldLength;
+                        NSString *formattedMsg = event.formattedMsg;
+                        NSInteger mentionOffset = event.mentionOffset;
+                        NSInteger oldLength = formattedMsg.length;
+                        formattedMsg = [NSString stringWithFormat:@"%@ %@", [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from], formattedMsg];
+                        mentionOffset += formattedMsg.length - oldLength;
+                        event.formattedMsg = formattedMsg;
+                        event.mentionOffset = mentionOffset;
                     }
                 }
             } else if([type isEqualToString:@"kicked_channel"]) {
@@ -2313,7 +2317,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         NSString *formattedMsg = e.formattedMsg;
         if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
-            formattedMsg = [NSString stringWithFormat:@"\u2001\u2005%@",e.formattedMsg];
+            formattedMsg = [NSString stringWithFormat:@"\u2001\u2005%@",formattedMsg];
 
         e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:self->_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:e.mentionOffset + (formattedMsg.length - e.formattedMsg.length) mentionData:[e.entities objectForKey:@"mention_data"]];
 
