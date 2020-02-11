@@ -70,6 +70,9 @@ platform :ios do
         sh "cd .. && agvtool new-version -all #{options[:build]}"
     end
     
+    # Install CocoaPods
+    cocoapods(podfile: "./Podfile")
+
     # Build an ipa
     gym(
       scheme: scheme,
@@ -84,7 +87,7 @@ platform :ios do
         }
       }
     )
-    
+
     # Reset the build number
     if options[:build]
         sh "cd .. && agvtool new-version -all #{default_build_number}"
@@ -96,6 +99,8 @@ platform :ios do
         skip_metadata: true,
         skip_screenshots: true
     )
+    
+    upload_symbols_to_crashlytics(gsp_path: "./IRCCloud/GoogleService-Info.plist")
   end
 
   desc "Print version"
@@ -172,29 +177,6 @@ platform :ios do
     match(type: "adhoc", force_for_new_devices: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
     match(type: "adhoc", force_for_new_devices: true, app_identifier: "com.irccloud.IRCCloud.NotificationService")
   end
-
-  desc "Build and upload an ad-hoc release to Crashlytics"
-  lane :beta do
-    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud")
-    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud.ShareExtension")
-    match(type: "adhoc", readonly: true, app_identifier: "com.irccloud.IRCCloud.NotificationService")
-    
-    root_directory = "#{File.expand_path(File.dirname(__FILE__))}/../"
-    CRASHLYTICS_TOKEN=Fastlane::Actions.sh_control_output("grep CRASHLYTICS_TOKEN #{root_directory}IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'",print_command_output: false).strip
-    CRASHLYTICS_SECRET=Fastlane::Actions.sh_control_output("grep CRASHLYTICS_SECRET #{root_directory}IRCCloud/config.h | awk '{print $3}' | sed 's/\"//g'",print_command_output: false).strip
-
-    raise "Missing Crashlytics API key" unless CRASHLYTICS_TOKEN != ''
-    raise "Missing Crashlytics API secret" unless CRASHLYTICS_SECRET != ''
-
-    notes = prompt(text: "Release Notes: ", multi_line_end_keyword: "$")
-
-    gym(scheme: "IRCCloud", export_method: "ad-hoc", clean: true, configuration: "Release")
-    crashlytics(api_token: CRASHLYTICS_TOKEN, build_secret: CRASHLYTICS_SECRET, groups: ["irccloud","ios-testers","ios-public-beta"], notes: notes)
-
-    gym(scheme: "IRCCloud Enterprise", export_method: "ad-hoc", clean: true, configuration: "Release")
-    crashlytics(api_token: CRASHLYTICS_TOKEN, build_secret: CRASHLYTICS_SECRET, groups: ["irccloud","ios-enterprise"], notes: notes)
-  end
-
 end
 
 

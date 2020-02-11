@@ -51,11 +51,6 @@ Upload metadata
 fastlane ios updateadhoc
 ```
 Make sure all devices are added to the ad-hoc profile
-### ios beta
-```
-fastlane ios beta
-```
-Build and upload an ad-hoc release to Crashlytics
 
 ----
 
