@@ -21,16 +21,22 @@ Screenshots
 
 Requirements
 ------
-* Xcode 9
-* iOS 11 SDK
-* An iPhone, iPad, or iPod Touch running iOS 8.0 or newer
-
 _A code signing key from Apple is required to deploy apps to a device.
 Without a developer key, the app can only be installed on the iPhone/iPad Simulator._
 
+* CocoaPods
+* Xcode 11.3
+* iOS 13 SDK
+* An iPhone, iPad, or iPod Touch running iOS 8.0 or newer
+
+Run the following command from the Terminal to install the required libraries, and then open the generated IRCCloud.xcworkspace file to build and run the app.
+```
+$ pod install
+```
+
 License
 ------
-Copyright (C) 2017 IRCCloud, Ltd.
+Copyright (C) 2020 IRCCloud, Ltd.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
