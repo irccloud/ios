@@ -50,6 +50,11 @@ NSLock *__serializeLock = nil;
 NSLock *__userInfoLock = nil;
 volatile BOOL __socketPaused = NO;
 
+@interface NetworkConnection (Firebase) {
+}
+@property FIRHTTPMetric *httpMetric;
+@end
+
 @interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
     SBJson5Parser *_parser;
     NSString *_url;
@@ -58,6 +63,7 @@ volatile BOOL __socketPaused = NO;
     NSURLConnection *_connection;
     int _bid;
     void (^_completionHandler)(BOOL);
+    FIRHTTPMetric *_metric;
 }
 @property (readonly) NSString *url;
 @property int bid;
@@ -85,6 +91,7 @@ volatile BOOL __socketPaused = NO;
         }];
         self->_cancelled = NO;
         self->_running = NO;
+        self->_metric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:self->_url] HTTPMethod:FIRHTTPMethodGET];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self->_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
@@ -100,6 +107,7 @@ volatile BOOL __socketPaused = NO;
     self->_cancelled = YES;
     self->_running = NO;
     [self->_connection cancel];
+    [self->_metric stop];
 }
 -(void)start {
     if(self->_cancelled || _running) {
@@ -109,6 +117,7 @@ volatile BOOL __socketPaused = NO;
     
     if(self->_connection) {
         self->_running = YES;
+        [self->_metric start];
         [self->_connection start];
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
     } else {
@@ -134,6 +143,7 @@ volatile BOOL __socketPaused = NO;
     }];
     self->_running = NO;
     self->_cancelled = YES;
+    [self->_metric stop];
 }
 - (void)connectionDidFinishLoading:(NSURLConnection *)connection {
     if(self->_cancelled) {
@@ -157,7 +167,11 @@ volatile BOOL __socketPaused = NO;
 	return request;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
-	if(!self->_cancelled && [response statusCode] != 200) {
+    self->_metric.responseCode = response.statusCode;
+    self->_metric.responseContentType = response.MIMEType;
+    self->_metric.responsePayloadSize = response.expectedContentLength;
+    [self->_metric stop];
+    if(!self->_cancelled && [response statusCode] != 200) {
         CLS_LOG(@"HTTP status code: %li", (long)[response statusCode]);
 		CLS_LOG(@"HTTP headers: %@", [response allHeaderFields]);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -1305,7 +1319,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(NSData *)_get:(NSURL *)url {
     NSData *data;
-    NSURLResponse *response = nil;
+    NSHTTPURLResponse *response = nil;
     NSError *error = nil;
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
@@ -1314,7 +1328,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(self.session.length && [url.scheme isEqualToString:@"https"] && [url.host isEqualToString:IRCCLOUD_HOST])
         [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     
+    FIRHTTPMetric *metric = [[FIRHTTPMetric alloc] initWithURL:request.URL HTTPMethod:FIRHTTPMethodGET];
+    [metric start];
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    metric.responseCode = response.statusCode;
+    metric.responseContentType = response.MIMEType;
+    metric.responsePayloadSize = data.length;
+    [metric stop];
     return data;
 }
 
@@ -1405,7 +1425,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
     
     NSData *data;
-    NSURLResponse *response = nil;
+    NSHTTPURLResponse *response = nil;
     NSError *error = nil;
     if(self.session.length && ![args objectForKey:@"session"])
         [body appendFormat:@"&session=%@", self.session];
@@ -1422,7 +1442,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
     
+    FIRHTTPMetric *metric = [[FIRHTTPMetric alloc] initWithURL:request.URL HTTPMethod:FIRHTTPMethodPOST];
+    metric.requestPayloadSize = body.length;
     data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    metric.responseCode = response.statusCode;
+    metric.responseContentType = response.MIMEType;
+    metric.responsePayloadSize = data.length;
+    [metric stop];
     
     if(error) {
         CLS_LOG(@"HTTP request failed: %@ %@", error.localizedDescription, error.localizedFailureReason);
@@ -1856,6 +1882,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self->_resultHandlers removeAllObjects];
         
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+        self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
         WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
                                                                          tlsSettings:[@{
                                                                          (NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
@@ -1864,7 +1891,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                                                                              headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
                                                                    verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
         self->_socket = [WebSocket webSocketWithConfig:config delegate:self];
-        
+        [self.httpMetric start];
         [self->_socket open];
     }
 }
@@ -1923,6 +1950,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
         [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
         [self performSelectorInBackground:@selector(requestConfiguration) withObject:nil];
+        [self.httpMetric setResponseCode:200];
+        [self.httpMetric stop];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }
@@ -2540,4 +2569,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
   
 }
 
+-(FIRHTTPMetric *)httpMetric {
+    return self->_httpMetric;
+}
+-(void)setHttpMetric:(FIRHTTPMetric *)metric {
+    self->_httpMetric = metric;
+}
 @end
