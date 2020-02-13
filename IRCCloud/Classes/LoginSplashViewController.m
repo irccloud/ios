@@ -747,7 +747,7 @@
 #ifndef ENTERPRISE
                 if(nameAlpha) {
                     [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                        kFIRParameterSignUpMethod:@"email",
+                        kFIRParameterMethod:@"email",
                         kFIRParameterSuccess:@(1)
                     }];
                 } else {
@@ -808,7 +808,7 @@
 #ifndef ENTERPRISE
                 if(nameAlpha) {
                     [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                        kFIRParameterSignUpMethod:@"email",
+                        kFIRParameterMethod:@"email",
                         kFIRParameterSuccess:@(0),
                         @"failure":[result objectForKey:@"message"]
                     }];
