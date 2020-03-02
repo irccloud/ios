@@ -1,6 +1,6 @@
-• Fix an issue that prevented the cursor from being dragged in various alert dialogs on iOS 13
-• Improve the background color of inline image thumbnails on Dawn and Midnight themes
-• Speed up backlog loading times for Slack connections
-• The reconnect countdown timer no longer displays negative values
-• Tapping an avatar will now display a larger version
+• Emoji 12.1 :emocodes:
+• Sort nick completion suggestions by highlights, recently spoken, and then alphabetically
+• Fix centering of gifv animations in the image viewer
+• Fix "Share URL" menu action on iPad
+• Fix long press gesture unexpectedly opening URLs
 • Stability improvements and minor fixes
