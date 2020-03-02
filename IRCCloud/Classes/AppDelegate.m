@@ -104,8 +104,10 @@
     }
 #endif
 #ifdef CRASHLYTICS_TOKEN
-    if([FIROptions defaultOptions])
+    if([FIROptions defaultOptions]) {
         [FIRApp configure];
+        [FIRAnalytics setUserID:nil];
+    }
     [Fabric with:@[CrashlyticsKit]];
 #endif
     if (@available(iOS 10, *)) {

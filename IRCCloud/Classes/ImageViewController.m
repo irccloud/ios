@@ -306,7 +306,6 @@
 }
 
 - (void)_fetchImage:(NSURL *)url {
-    CLS_LOG(@"Fetching image: %@", url);
     NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:url].path;
     if([[NSFileManager defaultManager] fileExistsAtPath:cacheFile]) {
         self->_imageData = [[NSData alloc] initWithContentsOfFile:cacheFile].mutableCopy;

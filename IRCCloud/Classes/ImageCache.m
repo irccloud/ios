@@ -195,7 +195,6 @@
                 NSURL *cache = [self pathForURL:url];
                 [[NSFileManager defaultManager] createDirectoryAtURL:self->_cachePath withIntermediateDirectories:YES attributes:nil error:nil];
                 [[NSFileManager defaultManager] copyItemAtURL:location toURL:cache error:nil];
-                NSLog(@"Downloaded %@ to %@", url, cache);
                 NSData *data = [NSData dataWithContentsOfURL:cache];
                 if(data.length) {
                     YYImage *img = [YYImage imageWithData:data scale:[UIScreen mainScreen].scale];

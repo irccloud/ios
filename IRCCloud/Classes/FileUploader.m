@@ -522,7 +522,6 @@
     }
     NSDictionary *d = [NSJSONSerialization JSONObjectWithData:self->_response options:kNilOptions error:nil];
     if(d) {
-        CLS_LOG(@"Upload finished: %@", d);
         if([[d objectForKey:@"success"] intValue] == 1) {
             self->_id = [d objectForKey:@"id"];
             self->_finished = YES;
@@ -530,6 +529,7 @@
                 [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename?_filename:@"" originalFilename:self->_originalFilename?_originalFilename:@"" avatar:self->_avatar orgId:self->_orgId]];
             }
         } else {
+            CLS_LOG(@"Upload failed: %@", d);
             [self->_delegate fileUploadDidFail:[d objectForKey:@"message"]];
         }
     } else {

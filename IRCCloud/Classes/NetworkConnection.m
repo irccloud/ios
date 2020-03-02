@@ -163,13 +163,13 @@ volatile BOOL __socketPaused = NO;
 - (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
     if(self->_cancelled)
         return nil;
-	CLS_LOG(@"Fetching: %@", [request URL]);
+	CLS_LOG(@"Fetching backlog");
 	return request;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
     self->_metric.responseCode = response.statusCode;
     self->_metric.responseContentType = response.MIMEType;
-    self->_metric.responsePayloadSize = response.expectedContentLength;
+    self->_metric.responsePayloadSize = (long)response.expectedContentLength;
     [self->_metric stop];
     if(!self->_cancelled && [response statusCode] != 200) {
         CLS_LOG(@"HTTP status code: %li", (long)[response statusCode]);
@@ -625,7 +625,6 @@ volatile BOOL __socketPaused = NO;
                        [self->_events reformat];
 #endif
                        [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
-                       [FIRAnalytics setUserID:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
                        CLS_LOG(@"Prefs: %@", [self prefs]);
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },
@@ -2252,7 +2251,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(self->_oobQueue.count == 1) {
             [self->_queue addOperationWithBlock:^{
                 @autoreleasepool {
-                    CLS_LOG(@"Starting fetcher for URL: %@", url);
+                    CLS_LOG(@"Starting OOB fetcher");
                     [fetcher start];
                 }
             }];

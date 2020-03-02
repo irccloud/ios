@@ -474,7 +474,6 @@
 - (void)launchURL:(NSURL *)url
 {
 #ifndef EXTENSION
-    NSLog(@"Launch: %@", url);
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
     if(_window)
