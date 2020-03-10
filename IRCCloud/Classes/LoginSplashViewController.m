@@ -807,17 +807,31 @@
                 });
 #ifndef ENTERPRISE
                 if(nameAlpha) {
-                    [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                        kFIRParameterMethod:@"email",
-                        kFIRParameterSuccess:@(0),
-                        @"failure":[result objectForKey:@"message"]
-                    }];
+                    if([result objectForKey:@"message"]) {
+                        [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
+                            kFIRParameterMethod:@"email",
+                            kFIRParameterSuccess:@(0),
+                            @"failure":[result objectForKey:@"message"]
+                        }];
+                    } else {
+                        [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
+                            kFIRParameterMethod:@"email",
+                            kFIRParameterSuccess:@(0)
+                        }];
+                    }
                 } else {
-                    [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                        kFIRParameterMethod:@"email",
-                        kFIRParameterSuccess:@(0),
-                        @"failure":[result objectForKey:@"message"]
-                    }];
+                    if([result objectForKey:@"message"]) {
+                        [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                            kFIRParameterMethod:@"email",
+                            kFIRParameterSuccess:@(0),
+                            @"failure":[result objectForKey:@"message"]
+                        }];
+                    } else {
+                        [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                            kFIRParameterMethod:@"email",
+                            kFIRParameterSuccess:@(0)
+                        }];
+                    }
                 }
 #endif
             }
