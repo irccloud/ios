@@ -29,7 +29,7 @@
     self->_msg = message;
     self->_filenameSet = YES;
     if(self->_finished && _id.length) {
-        [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename originalFilename:self->_originalFilename avatar:self->_avatar orgId:self->_orgId]];
+        [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename originalFilename:self->_originalFilename avatar:self->_avatar orgId:self->_orgId cid:self->_cid]];
     } else {
         if(self->_backgroundID)
             [self _updateBackgroundUploadMetadata];
@@ -482,7 +482,7 @@
     if(!tasks)
         tasks = [[NSMutableDictionary alloc] init];
     
-    [tasks setObject:@{@"service":@"irccloud", @"bid":@(self->_bid), @"original_filename":self->_originalFilename?_originalFilename:@"", @"msg":self->_msg?_msg:@"", @"filename":self->_filename?_filename:@"", @"avatar":@(self->_avatar), @"orgId":@(self->_orgId)} forKey:self->_backgroundID];
+    [tasks setObject:@{@"service":@"irccloud", @"bid":@(self->_bid), @"original_filename":self->_originalFilename?_originalFilename:@"", @"msg":self->_msg?_msg:@"", @"filename":self->_filename?_filename:@"", @"avatar":@(self->_avatar), @"orgId":@(self->_orgId), @"cid":@(self->_cid)} forKey:self->_backgroundID];
     
     [d setObject:tasks forKey:@"uploadtasks"];
     
@@ -526,7 +526,7 @@
             self->_id = [d objectForKey:@"id"];
             self->_finished = YES;
             if(self->_filenameSet || _avatar) {
-                [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename?_filename:@"" originalFilename:self->_originalFilename?_originalFilename:@"" avatar:self->_avatar orgId:self->_orgId]];
+                [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename?_filename:@"" originalFilename:self->_originalFilename?_originalFilename:@"" avatar:self->_avatar orgId:self->_orgId cid:self->_cid]];
             }
         } else {
             CLS_LOG(@"Upload failed: %@", d);

@@ -33,6 +33,7 @@
     NSMutableData *_response;
     NSObject<FileUploaderDelegate> *_delegate;
     NSObject<FileUploaderMetadataDelegate> *_metadatadelegate;
+    int _cid;
     int _bid;
     BOOL _filenameSet;
     BOOL _finished;
@@ -50,7 +51,7 @@
 }
 @property NSObject<FileUploaderDelegate> *delegate;
 @property NSObject<FileUploaderMetadataDelegate> *metadatadelegate;
-@property int bid, orgId;
+@property int bid, orgId, cid;
 @property NSString *originalFilename, *mimeType;
 @property BOOL finished, avatar;
 -(void)uploadVideo:(NSURL *)file;

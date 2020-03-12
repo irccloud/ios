@@ -1695,9 +1695,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids} handler:resultHandler];
 }
 
--(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId {
+-(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId cid:(int)cid {
     if(avatar) {
-        if(orgId == -1) {
+        if(cid) {
+            return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"cid":[NSString stringWithFormat:@"%i", cid]}];
+        } else if(orgId == -1) {
             return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"primary":@"1"}];
         } else {
             return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"org":[NSString stringWithFormat:@"%i", orgId]}];
@@ -1771,6 +1773,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         else
             return [self _sendRequest:@"set-avatar" args:@{@"clear":@"1", @"org":@(orgId)} handler:resultHandler];
     }
+}
+
+-(int)setAvatar:(NSString *)avatarId cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
+    if(avatarId)
+        return [self _sendRequest:@"set-avatar" args:@{@"id":avatarId, @"cid":@(cid)} handler:resultHandler];
+    else
+        return [self _sendRequest:@"set-avatar" args:@{@"clear":@"1", @"cid":@(cid)} handler:resultHandler];
 }
 
 -(int)setNetworkName:(NSString *)name cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {

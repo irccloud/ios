@@ -157,10 +157,15 @@
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
             u.avatar = YES;
-            if(self->_server)
-                u.orgId = self->_server.orgId;
-            else
+            if(self->_server) {
+                if(self->_server.orgId) {
+                    u.orgId = self->_server.orgId;
+                } else {
+                    u.cid = self->_server.cid;
+                }
+            } else {
                 u.orgId = -1;
+            }
             
             if(refURL) {
                 CLS_LOG(@"Loading metadata from asset library");
@@ -329,6 +334,7 @@
                               @"id":s.avatar,
                               @"url":url,
                               @"orgId":@(s.orgId),
+                              @"cid":@(s.cid)
                               }];
         }
     }
@@ -391,23 +397,25 @@
 
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        [[NetworkConnection sharedInstance] setAvatar:nil orgId:[[[self->_avatars objectAtIndex:indexPath.row] objectForKey:@"orgId"] intValue] handler:^(IRCCloudJSONObject *result) {
+        IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
             if(![[result objectForKey:@"success"] intValue]) {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:[NSString stringWithFormat:@"Unable to clear avatar: %@", [result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
                 [self presentViewController:alert animated:YES completion:nil];
             }
-        }];
+        };
+        if([[[self->_avatars objectAtIndex:indexPath.row] objectForKey:@"orgId"] intValue] == 0) {
+            [[NetworkConnection sharedInstance] setAvatar:nil cid:[[[self->_avatars objectAtIndex:indexPath.row] objectForKey:@"cid"] intValue] handler:handler];
+        } else {
+            [[NetworkConnection sharedInstance] setAvatar:nil orgId:[[[self->_avatars objectAtIndex:indexPath.row] objectForKey:@"orgId"] intValue] handler:handler];
+        }
     }
 }
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(self->_avatars) {
         NSDictionary *row = [self->_avatars objectAtIndex:[indexPath row]];
-        int orgId = -1;
-        if(self->_server && _server.orgId)
-            orgId = self->_server.orgId;
-        [[NetworkConnection sharedInstance] setAvatar:[row objectForKey:@"id"] orgId:orgId handler:^(IRCCloudJSONObject *result) {
+        IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] intValue]) {
                 [self cancelButtonPressed];
             } else {
@@ -415,7 +423,19 @@
                 [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
                 [self presentViewController:alert animated:YES completion:nil];
             }
-        }];
+        };
+        int orgId = -1;
+        if(self->_server) {
+            if(_server.orgId)
+                orgId = self->_server.orgId;
+            else if(_server.avatars_supported)
+                orgId = 0;
+        }
+        if(orgId == 0) {
+            [[NetworkConnection sharedInstance] setAvatar:[row objectForKey:@"id"] cid:_server.cid handler:handler];
+        } else {
+            [[NetworkConnection sharedInstance] setAvatar:[row objectForKey:@"id"] orgId:orgId handler:handler];
+        }
         [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
 }

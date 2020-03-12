@@ -859,7 +859,7 @@
         } else if([[r objectForKey:@"success"] intValue] == 1) {
             if([[dict objectForKey:@"service"] isEqualToString:@"irccloud"]) {
                 CLS_LOG(@"Finalizing IRCCloud upload");
-                NSDictionary *o = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"] avatar:[[dict objectForKey:@"avatar"] boolValue] orgId:[[dict objectForKey:@"original_filename"] intValue]];
+                NSDictionary *o = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"] avatar:[[dict objectForKey:@"avatar"] boolValue] orgId:[[dict objectForKey:@"orgId"] intValue] cid:[[dict objectForKey:@"cid"] intValue]];
                 if([[r objectForKey:@"success"] intValue] == 1) {
                     CLS_LOG(@"IRCCloud upload successful");
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
