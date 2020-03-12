@@ -992,6 +992,18 @@ volatile BOOL __socketPaused = NO;
                                [self postObject:object forEvent:kIRCEventNickChange];
                        }
                    },
+                   @"avatar_change": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       if(!backlog) {
+                           Server *s = [self->_servers getServer:object.cid];
+                           if(s) {
+                               s.avatar = [[object objectForKey:@"avatar"] isKindOfClass:NSString.class] ? [object objectForKey:@"avatar"] : nil;
+                               s.avatarURL = [[object objectForKey:@"avatar_url"] isKindOfClass:NSString.class] ? [object objectForKey:@"avatar_url"] : nil;
+                           }
+                           
+                           if(!self->_resuming)
+                               [self postObject:object forEvent:kIRCEventAvatarChange];
+                       }
+                   },
                    @"empty_msg": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        @synchronized (self) {
                            [self->_pendingEdits addObject:object];
@@ -1072,7 +1084,6 @@ volatile BOOL __socketPaused = NO;
                                            @"whowas_response":@(kIRCEventWhoWas),
                                            @"trace_response":@(kIRCEventTraceResponse),
                                            @"export_finished":@(kIRCEventLogExportFinished),
-                                           @"avatar_change":@(kIRCEventAvatarChange),
                                            @"chanfilter_list":@(kIRCEventChanFilterList),
                                            @"text":@(kIRCEventTextList)
                                            };
