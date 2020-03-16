@@ -222,7 +222,7 @@
     }
 }
 
-- (void)_addBuffer:(Buffer *)buffer data:(NSMutableArray *)data prefs:(NSDictionary *)prefs server:(Server *)server collapsed:(BOOL)collapsed unread:(int)unread highlights:(int)highlights firstUnreadPosition:(NSInteger *)firstUnreadPosition lastUnreadPosition:(NSInteger *)lastUnreadPosition firstHighlightPosition:(NSInteger *)firstHighlightPosition lastHighlightPosition:(NSInteger *)lastHighlightPosition {
+- (void)_addBuffer:(Buffer *)buffer data:(NSMutableArray *)data prefs:(NSDictionary *)prefs server:(Server *)server collapsed:(NSDictionary *)collapsed unread:(int)unread highlights:(int)highlights firstUnreadPosition:(NSInteger *)firstUnreadPosition lastUnreadPosition:(NSInteger *)lastUnreadPosition firstHighlightPosition:(NSInteger *)firstHighlightPosition lastHighlightPosition:(NSInteger *)lastHighlightPosition {
     int type = -1;
     int key = 0;
     int joined = 1;
@@ -321,7 +321,7 @@
                         unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                         highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                         
-                        [self _addBuffer:buffer data:data prefs:prefs server:server collapsed:NO unread:unread highlights:highlights firstUnreadPosition:&firstUnreadPosition lastUnreadPosition:&lastUnreadPosition firstHighlightPosition:&firstHighlightPosition lastHighlightPosition:&lastHighlightPosition];
+                        [self _addBuffer:buffer data:data prefs:prefs server:server collapsed:nil unread:unread highlights:highlights firstUnreadPosition:&firstUnreadPosition lastUnreadPosition:&lastUnreadPosition firstHighlightPosition:&firstHighlightPosition lastHighlightPosition:&lastHighlightPosition];
 
                         if(buffer.bid == self->_selectedBuffer.bid)
                             selectedRow = data.count - 1;
