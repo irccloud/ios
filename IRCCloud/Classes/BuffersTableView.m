@@ -1425,6 +1425,7 @@
             }
             return;
     #endif
+        } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_PINNED) {
         } else {
     #ifndef EXTENSION
             self->_selectedRow = indexPath.row;
