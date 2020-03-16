@@ -26,6 +26,8 @@
 @property (readonly) UILabel *icon;
 @end
 
+UIImage *__tintedReorderImage = nil;
+
 @implementation ReorderCell
 
 -(id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier {
@@ -42,12 +44,31 @@
 
 -(void)layoutSubviews {
     [super layoutSubviews];
-    CGRect frame = self.contentView.frame;
+    CGRect frame = self.contentView.bounds;
     frame.origin.x = 10;
+    frame.size.width -= 20;
     self.contentView.frame = frame;
-    self.textLabel.frame = CGRectMake(22,0,self.contentView.frame.size.width - 22,self.contentView.frame.size.height);
+    self.textLabel.frame = CGRectMake(frame.origin.x + 16,0,frame.size.width - 22,frame.size.height);
 }
 
+- (void)setEditing:(BOOL)editing animated:(BOOL)animated {
+    [super setEditing:editing animated:animated];
+    
+    for(UIView *v in self.subviews) {
+        if([v isKindOfClass:NSClassFromString(@"UITableViewCellReorderControl")]) {
+            for(UIView *v1 in v.subviews) {
+                if([v1 isKindOfClass:UIImageView.class]) {
+                    UIImageView *iv = (UIImageView *)v1;
+                    if(__tintedReorderImage == nil) {
+                        __tintedReorderImage = [iv.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+                    }
+                    iv.image = __tintedReorderImage;
+                    iv.tintColor = [UIColor bufferTextColor];
+                }
+            }
+        }
+    }
+}
 @end
 
 @implementation ServerReorderViewController

@@ -160,6 +160,8 @@
 		221D4BFF1E291C5400D403E6 /* CSURITemplate.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D649231B1E0719003BFD86 /* CSURITemplate.m */; };
 		221E3F4C1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
 		221E3F4D1AD2DEE00090934B /* FilesTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */; };
+		221E85F2241FBF3E00EB5120 /* PinReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E85F0241FBD9300EB5120 /* PinReorderViewController.m */; };
+		221E85F3241FBF3F00EB5120 /* PinReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221E85F0241FBD9300EB5120 /* PinReorderViewController.m */; };
 		221EB2F01F8F965E00A71428 /* EventsTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 221EB2ED1F8F965E00A71428 /* EventsTableCell.xib */; };
 		221EB2F11F8F965E00A71428 /* EventsTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 221EB2ED1F8F965E00A71428 /* EventsTableCell.xib */; };
 		221EB2F41F962C2D00A71428 /* EventsTableCell_File.xib in Resources */ = {isa = PBXBuildFile; fileRef = 221EB2F21F962C2C00A71428 /* EventsTableCell_File.xib */; };
@@ -1191,6 +1193,8 @@
 		221D4BAB1E23F24F00D403E6 /* NotificationService Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "NotificationService Enterprise.entitlements"; sourceTree = SOURCE_ROOT; };
 		221E3F4A1AD2DEE00090934B /* FilesTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FilesTableViewController.h; sourceTree = "<group>"; };
 		221E3F4B1AD2DEE00090934B /* FilesTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FilesTableViewController.m; sourceTree = "<group>"; };
+		221E85F0241FBD9300EB5120 /* PinReorderViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PinReorderViewController.m; sourceTree = "<group>"; };
+		221E85F1241FBD9300EB5120 /* PinReorderViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PinReorderViewController.h; sourceTree = "<group>"; };
 		221EB2ED1F8F965E00A71428 /* EventsTableCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = EventsTableCell.xib; sourceTree = "<group>"; };
 		221EB2F21F962C2C00A71428 /* EventsTableCell_File.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EventsTableCell_File.xib; sourceTree = "<group>"; };
 		221EB2F31F962C2D00A71428 /* EventsTableCell_Thumbnail.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EventsTableCell_Thumbnail.xib; sourceTree = "<group>"; };
@@ -2244,6 +2248,8 @@
 				221390FD1B115CD000ECF001 /* PastebinEditorViewController.m */,
 				22C2E0551B0E2E4800387B4B /* PastebinViewController.h */,
 				22C2E0561B0E2E4800387B4B /* PastebinViewController.m */,
+				221E85F1241FBD9300EB5120 /* PinReorderViewController.h */,
+				221E85F0241FBD9300EB5120 /* PinReorderViewController.m */,
 				22BB94A91D425A4E00BFB6F0 /* SamlLoginViewController.h */,
 				22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */,
 				22462B5018906B03009EF986 /* ServerReorderViewController.h */,
@@ -3953,6 +3959,7 @@
 				224333D120162C1B0007A0D3 /* AvatarsTableViewController.m in Sources */,
 				22BB94AB1D425D3800BFB6F0 /* SamlLoginViewController.m in Sources */,
 				223876221F70047E00943160 /* YYAnimatedImageView.m in Sources */,
+				221E85F3241FBF3F00EB5120 /* PinReorderViewController.m in Sources */,
 				225D975018AA995900065087 /* WebSocketMessage.m in Sources */,
 				2293243C1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				225D975118AA995900065087 /* IRCCloudJSONObject.m in Sources */,
@@ -4077,6 +4084,7 @@
 				224333D020162C1B0007A0D3 /* AvatarsTableViewController.m in Sources */,
 				22BB94AA1D425A4F00BFB6F0 /* SamlLoginViewController.m in Sources */,
 				2238761D1F70047D00943160 /* YYAnimatedImageView.m in Sources */,
+				221E85F2241FBF3E00EB5120 /* PinReorderViewController.m in Sources */,
 				22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */,
 				2293243B1E8945D700ADAA22 /* parse_configuration.m in Sources */,
 				22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */,

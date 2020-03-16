@@ -59,6 +59,7 @@
 #import "LogExportsTableViewController.h"
 #import "ImageCache.h"
 #import "AvatarsTableViewController.h"
+#import "PinReorderViewController.h"
 @import Firebase;
 
 extern NSDictionary *emojiMap;
@@ -4286,9 +4287,81 @@ NSArray *_sortedChannels;
             [self spamSelected:self->_selectedBuffer.cid];
         }]];
     }
-    [alert addAction:[UIAlertAction actionWithTitle:@"Reorder" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reorder Connections" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         [self _reorder];
     }]];
+    
+    if(!self->_selectedBuffer.archived && ([self->_selectedBuffer.type isEqualToString:@"channel"] || [self->_selectedBuffer.type isEqualToString:@"conversation"])) {
+        BOOL pinned = NO;
+        
+        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+        
+        if([[prefs objectForKey:@"pinnedBuffers"] isKindOfClass:NSArray.class] && [(NSArray *)[prefs objectForKey:@"pinnedBuffers"] count] > 0) {
+            for(NSNumber *n in [prefs objectForKey:@"pinnedBuffers"]) {
+                if(n.intValue == self->_selectedBuffer.bid) {
+                    pinned = YES;
+                    break;
+                }
+            }
+        }
+        
+        if(pinned) {
+            [alert addAction:[UIAlertAction actionWithTitle:@"Reorder Pins" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                PinReorderViewController *pvc = [[PinReorderViewController alloc] initWithStyle:UITableViewStylePlain];
+                [self.slidingViewController resetTopView];
+                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pvc];
+                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                else
+                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+                [self presentViewController:nc animated:YES completion:nil];
+            }]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Remove Pin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                NSMutableDictionary *mutablePrefs = prefs.mutableCopy;
+                NSMutableArray *pinnedBuffers;
+                if([[prefs objectForKey:@"pinnedBuffers"] isKindOfClass:NSArray.class] && [(NSArray *)[prefs objectForKey:@"pinnedBuffers"] count] > 0) {
+                    pinnedBuffers = ((NSArray *)[prefs objectForKey:@"pinnedBuffers"]).mutableCopy;
+                } else {
+                    pinnedBuffers = [[NSMutableArray alloc] init];
+                }
+                [pinnedBuffers removeObject:@(self->_selectedBuffer.bid)];
+                [mutablePrefs setObject:pinnedBuffers forKey:@"pinnedBuffers"];
+                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
+                NSString *json = [writer stringWithObject:mutablePrefs];
+
+                [[NetworkConnection sharedInstance] setPrefs:json handler:^(IRCCloudJSONObject *result) {
+                    if(![[result objectForKey:@"success"] boolValue]) {
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to save settings, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
+                    }
+                }];
+            }]];
+        } else {
+            [alert addAction:[UIAlertAction actionWithTitle:[self->_selectedBuffer.type isEqualToString:@"channel"]?@"Pin Channel":@"Pin Conversation" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                NSMutableDictionary *mutablePrefs = prefs.mutableCopy;
+                NSMutableArray *pinnedBuffers;
+                if([[prefs objectForKey:@"pinnedBuffers"] isKindOfClass:NSArray.class] && [(NSArray *)[prefs objectForKey:@"pinnedBuffers"] count] > 0) {
+                    pinnedBuffers = ((NSArray *)[prefs objectForKey:@"pinnedBuffers"]).mutableCopy;
+                } else {
+                    pinnedBuffers = [[NSMutableArray alloc] init];
+                }
+                [pinnedBuffers addObject:@(self->_selectedBuffer.bid)];
+                [mutablePrefs setObject:pinnedBuffers forKey:@"pinnedBuffers"];
+                SBJson5Writer *writer = [[SBJson5Writer alloc] init];
+                NSString *json = [writer stringWithObject:mutablePrefs];
+
+                [[NetworkConnection sharedInstance] setPrefs:json handler:^(IRCCloudJSONObject *result) {
+                    if(![[result objectForKey:@"success"] boolValue]) {
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to save settings, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
+                    }
+                }];
+            }]];
+        }
+    }
 
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     alert.popoverPresentationController.sourceRect = rect;
