@@ -1625,8 +1625,19 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(int)setPrefs:(NSString *)prefs handler:(IRCCloudAPIResultHandler)resultHandler {
+#ifdef DEBUG
+if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+    self->_prefs = [NSJSONSerialization JSONObjectWithData:[prefs dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:nil];
+    [self postObject:nil forEvent:kIRCEventUserInfo];
+    resultHandler([[IRCCloudJSONObject alloc] initWithDictionary:@{@"success":@YES}]);
+    return 1;
+} else {
+#endif
     self->_prefs = nil;
     return [self _sendRequest:@"set-prefs" args:@{@"prefs":prefs} handler:resultHandler];
+#ifdef DEBUG
+}
+#endif
 }
 
 -(int)setRealname:(NSString *)realname highlights:(NSString *)highlights autoaway:(BOOL)autoaway handler:(IRCCloudAPIResultHandler)resultHandler {

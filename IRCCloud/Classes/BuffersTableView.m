@@ -298,16 +298,16 @@
         NSMutableDictionary *pinned = [[NSMutableDictionary alloc] init];
         
         if([[prefs objectForKey:@"pinnedBuffers"] isKindOfClass:NSArray.class] && [(NSArray *)[prefs objectForKey:@"pinnedBuffers"] count] > 0) {
-            [data addObject:@{
-             @"type":@TYPE_PINNED,
-             @"name":@"Pinned"
-             }];
-
             for(NSNumber *n in [prefs objectForKey:@"pinnedBuffers"]) {
-                [pinned setObject:@YES forKey:n];
-                
                 Buffer *buffer = [[BuffersDataSource sharedInstance] getBuffer:n.intValue];
-                if(buffer) {
+                if(buffer && buffer.archived == 0) {
+                    if(pinned.count == 0) {
+                        [data addObject:@{
+                         @"type":@TYPE_PINNED,
+                         @"name":@"Pinned"
+                         }];
+                    }
+                    [pinned setObject:@YES forKey:n];
                     Server *server = [[ServersDataSource sharedInstance] getServer:buffer.cid];
                     int type = -1;
                     if([buffer.type isEqualToString:@"channel"] || buffer.isMPDM) {
