@@ -2867,11 +2867,15 @@ extern BOOL __compact;
                 if(range.location + range.length < string.length && [string characterAtIndex:range.location + range.length - 1] != '/' && [string characterAtIndex:range.location + range.length] == '/')
                     range.length++;
                 NSString *url = [string substringWithRange:result.range];
-                if([self unbalanced:url] || [url hasSuffix:@"."] || [url hasSuffix:@"?"] || [url hasSuffix:@"!"] || [url hasSuffix:@","] || [url hasSuffix:@":"] || [url hasSuffix:@";"]) {
+                if([url hasSuffix:@"."] || [url hasSuffix:@"?"] || [url hasSuffix:@"!"] || [url hasSuffix:@","] || [url hasSuffix:@":"] || [url hasSuffix:@";"]) {
                     url = [url substringToIndex:url.length - 1];
                     range.length--;
                 }
-                
+                if([self unbalanced:url]) {
+                    url = [url substringToIndex:url.length - 1];
+                    range.length--;
+                }
+
                 NSString *scheme = nil;
                 NSString *credentials = @"";
                 NSString *hostname = @"";
