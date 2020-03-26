@@ -100,7 +100,7 @@ platform :ios do
         skip_screenshots: true
     )
     
-    upload_symbols_to_crashlytics(gsp_path: "./IRCCloud/GoogleService-Info.plist")
+    upload_symbols_to_crashlytics()
   end
 
   desc "Print version"

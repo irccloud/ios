@@ -18,3 +18,4 @@ screenshots/
 Gemfile.lock
 Podfile.lock
 Pods/
+.env
