@@ -222,7 +222,8 @@
     }
 }
 
-- (void)_addBuffer:(Buffer *)buffer data:(NSMutableArray *)data prefs:(NSDictionary *)prefs server:(Server *)server collapsed:(NSDictionary *)collapsed unread:(int)unread highlights:(int)highlights firstUnreadPosition:(NSInteger *)firstUnreadPosition lastUnreadPosition:(NSInteger *)lastUnreadPosition firstHighlightPosition:(NSInteger *)firstHighlightPosition lastHighlightPosition:(NSInteger *)lastHighlightPosition {
+- (NSMutableDictionary *)_addBuffer:(Buffer *)buffer data:(NSMutableArray *)data prefs:(NSDictionary *)prefs server:(Server *)server collapsed:(NSDictionary *)collapsed unread:(int)unread highlights:(int)highlights firstUnreadPosition:(NSInteger *)firstUnreadPosition lastUnreadPosition:(NSInteger *)lastUnreadPosition firstHighlightPosition:(NSInteger *)firstHighlightPosition lastHighlightPosition:(NSInteger *)lastHighlightPosition {
+    NSMutableDictionary *entry = nil;
     int type = -1;
     int key = 0;
     int joined = 1;
@@ -256,20 +257,26 @@
         }
         
         if(buffer.bid == self->_selectedBuffer.bid || !collapsed || [self->_expandedCids objectForKey:@(buffer.cid)]) {
-            [data addObject:@{
-             @"type":@(type),
-             @"cid":@(buffer.cid),
-             @"bid":@(buffer.bid),
-             @"name":buffer.displayName?buffer.displayName:buffer.name,
-             @"unread":@(unread),
-             @"highlights":@(highlights),
-             @"archived":@0,
-             @"joined":@(joined),
-             @"key":@(key),
-             @"timeout":@(buffer.timeout),
-             @"hint":buffer.accessibilityValue?buffer.accessibilityValue:@"",
-             @"status":server.status
-             }];
+            NSString *serverName = server.name;
+            if(!serverName || serverName.length == 0)
+                serverName = server.hostname;
+
+            entry = @{
+            @"type":@(type),
+            @"cid":@(buffer.cid),
+            @"bid":@(buffer.bid),
+            @"name":buffer.displayName?buffer.displayName:buffer.name,
+            @"unread":@(unread),
+            @"highlights":@(highlights),
+            @"archived":@0,
+            @"joined":@(joined),
+            @"key":@(key),
+            @"timeout":@(buffer.timeout),
+            @"hint":buffer.accessibilityValue?buffer.accessibilityValue:@"",
+            @"status":server.status,
+            @"server":serverName
+            }.mutableCopy;
+            [data addObject:entry];
         }
         if(unread > 0 && *firstUnreadPosition == -1)
             *firstUnreadPosition = data.count - 1;
@@ -280,6 +287,7 @@
         if(highlights > 0 && (*lastHighlightPosition == -1 || *lastHighlightPosition < data.count - 1))
             *lastHighlightPosition = data.count - 1;
     }
+    return entry;
 }
 
 - (void)refresh {
@@ -295,19 +303,19 @@
         NSInteger selectedRow = -1;
         
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
-        NSMutableDictionary *pinned = [[NSMutableDictionary alloc] init];
+        NSMutableSet *pinnedBIDs = [[NSMutableSet alloc] init];
+        NSMutableDictionary *pinnedNames = [[NSMutableDictionary alloc] init];
         
         if([[prefs objectForKey:@"pinnedBuffers"] isKindOfClass:NSArray.class] && [(NSArray *)[prefs objectForKey:@"pinnedBuffers"] count] > 0) {
             for(NSNumber *n in [prefs objectForKey:@"pinnedBuffers"]) {
                 Buffer *buffer = [[BuffersDataSource sharedInstance] getBuffer:n.intValue];
                 if(buffer && buffer.archived == 0) {
-                    if(pinned.count == 0) {
+                    if(pinnedBIDs.count == 0) {
                         [data addObject:@{
                          @"type":@TYPE_PINNED,
                          @"name":@"Pinned"
                          }];
                     }
-                    [pinned setObject:@YES forKey:n];
                     Server *server = [[ServersDataSource sharedInstance] getServer:buffer.cid];
                     int type = -1;
                     if([buffer.type isEqualToString:@"channel"] || buffer.isMPDM) {
@@ -321,7 +329,17 @@
                         unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                         highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
                         
-                        [self _addBuffer:buffer data:data prefs:prefs server:server collapsed:nil unread:unread highlights:highlights firstUnreadPosition:&firstUnreadPosition lastUnreadPosition:&lastUnreadPosition firstHighlightPosition:&firstHighlightPosition lastHighlightPosition:&lastHighlightPosition];
+                        NSMutableDictionary *d = [self _addBuffer:buffer data:data prefs:prefs server:server collapsed:nil unread:unread highlights:highlights firstUnreadPosition:&firstUnreadPosition lastUnreadPosition:&lastUnreadPosition firstHighlightPosition:&firstHighlightPosition lastHighlightPosition:&lastHighlightPosition];
+                        
+                        NSMutableDictionary *last = [pinnedNames objectForKey:[d objectForKey:@"name"]];
+                        [pinnedNames setObject:d forKey:[d objectForKey:@"name"]];
+                        if(last) {
+                            if(![[last objectForKey:@"name"] hasSuffix:@")"]) {
+                                [last setObject:[NSString stringWithFormat:@"%@ (%@)", [last objectForKey:@"name"], [last objectForKey:@"server"]] forKey:@"name"];
+                            }
+                            [d setObject:[NSString stringWithFormat:@"%@ (%@)", [d objectForKey:@"name"], [d objectForKey:@"server"]] forKey:@"name"];
+                        }
+                        [pinnedBIDs addObject:n];
 
                         if(buffer.bid == self->_selectedBuffer.bid)
                             selectedRow = data.count - 1;
@@ -402,7 +420,7 @@
             if(collapsed)
                 [data addObject:collapsed];
             for(Buffer *buffer in buffers) {
-                if([pinned objectForKey:@(buffer.bid)])
+                if([pinnedBIDs containsObject:@(buffer.bid)])
                     continue;
                 int type = -1;
                 if([buffer.type isEqualToString:@"channel"] || buffer.isMPDM) {

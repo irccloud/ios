@@ -18,6 +18,7 @@
 
 @interface PinReorderViewController : UITableViewController {
     NSMutableArray *buffers;
+    NSMutableDictionary *nameCounts;
 }
 
 @end

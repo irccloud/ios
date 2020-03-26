@@ -75,6 +75,14 @@
     } else {
         buffers = [[NSMutableArray alloc] init];
     }
+    nameCounts = [[NSMutableDictionary alloc] init];
+    for(NSNumber *bid in buffers) {
+        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid.intValue];
+        if(b) {
+            int count = [[nameCounts objectForKey:b.displayName] intValue];
+            [nameCounts setObject:@(count + 1) forKey:b.displayName];
+        }
+    }
     [self.tableView reloadData];
 }
 
@@ -109,8 +117,19 @@
         cell = [[ReorderCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"reordercell"];
 
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[buffers objectAtIndex:indexPath.row] intValue]];
+    NSString *name = b.displayName;
+    if([[nameCounts objectForKey:b.displayName] intValue] > 1) {
+        Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+        if(s) {
+            NSString *serverName = s.name;
+            if(!serverName || serverName.length == 0)
+                serverName = s.hostname;
+
+            name = [name stringByAppendingFormat:@" (%@)", serverName];
+        }
+    }
     
-    cell.textLabel.text = b.displayName;
+    cell.textLabel.text = name;
     cell.icon.text = nil;
     if([b.type isEqualToString:@"channel"]) {
         Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:b.bid];
