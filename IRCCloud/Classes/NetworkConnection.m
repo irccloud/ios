@@ -1486,6 +1486,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":@"*"} handler:resultHandler];
 }
 
+-(NSDictionary *)POSTreply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid {
+    if(!message)
+        message = @"";
+    return [self _postRequest:@"/chat/reply" args:@{@"cid":[@(cid) stringValue], @"reply":message, @"to":to, @"msgid":msgid}];
+}
+
 -(int)reply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid handler:(IRCCloudAPIResultHandler)resultHandler {
     if(!message)
         message = @"";

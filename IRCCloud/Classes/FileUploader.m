@@ -64,7 +64,10 @@
                     self->_msg = @"";
                 }
                 self->_msg = [self->_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
-                [[NetworkConnection sharedInstance] POSTsay:self->_msg to:b.name cid:b.cid];
+                if(self->_msgid.length > 0)
+                    [[NetworkConnection sharedInstance] POSTreply:self->_msg to:b.name cid:b.cid msgid:self->_msgid];
+                else
+                    [[NetworkConnection sharedInstance] POSTsay:self->_msg to:b.name cid:b.cid];
                 [self->_delegate fileUploadDidFinish];
             }
         }
@@ -482,7 +485,7 @@
     if(!tasks)
         tasks = [[NSMutableDictionary alloc] init];
     
-    [tasks setObject:@{@"service":@"irccloud", @"bid":@(self->_bid), @"original_filename":self->_originalFilename?_originalFilename:@"", @"msg":self->_msg?_msg:@"", @"filename":self->_filename?_filename:@"", @"avatar":@(self->_avatar), @"orgId":@(self->_orgId), @"cid":@(self->_cid)} forKey:self->_backgroundID];
+    [tasks setObject:@{@"service":@"irccloud", @"bid":@(self->_bid), @"original_filename":self->_originalFilename?_originalFilename:@"", @"msg":self->_msg?self->_msg:@"", @"filename":self->_filename?_filename:@"", @"avatar":@(self->_avatar), @"orgId":@(self->_orgId), @"cid":@(self->_cid), @"msgid":self->_msgid?self->_msgid:@""} forKey:self->_backgroundID];
     
     [d setObject:tasks forKey:@"uploadtasks"];
     

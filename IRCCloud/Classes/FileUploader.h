@@ -48,11 +48,12 @@
     NSString *_mimeType;
     NSString *_backgroundID;
     NSString *_boundary;
+    NSString *_msgid;
 }
 @property NSObject<FileUploaderDelegate> *delegate;
 @property NSObject<FileUploaderMetadataDelegate> *metadatadelegate;
 @property int bid, orgId, cid;
-@property NSString *originalFilename, *mimeType;
+@property NSString *originalFilename, *mimeType, *msgid;
 @property BOOL finished, avatar;
 -(void)uploadVideo:(NSURL *)file;
 -(void)uploadFile:(NSURL *)file;

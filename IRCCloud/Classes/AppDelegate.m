@@ -865,12 +865,17 @@
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
                     if(b) {
                         NSString *msg = [dict objectForKey:@"msg"];
+                        NSString *msgid = [dict objectForKey:@"msgid"];
                         if(msg.length)
                             msg = [msg stringByAppendingString:@" "];
                         else
                             msg = @"";
                         msg = [msg stringByAppendingFormat:@"%@", [[o objectForKey:@"file"] objectForKey:@"url"]];
-                        [[NetworkConnection sharedInstance] POSTsay:msg to:b.name cid:b.cid];
+                        
+                        if(msgid.length > 0)
+                            [[NetworkConnection sharedInstance] POSTreply:msg to:b.name cid:b.cid msgid:msgid];
+                        else
+                            [[NetworkConnection sharedInstance] POSTsay:msg to:b.name cid:b.cid];
                         [self.mainViewController fileUploadDidFinish];
                         AudioServicesPlaySystemSound(1001);
                         if(imageUploadCompletionHandler)

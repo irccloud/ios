@@ -1326,6 +1326,7 @@ extern UIImage *__socketClosedBackgroundImage;
     e1.entities = properties;
     e1.avatar = parent.avatar;
     e1.avatarURL = parent.avatarURL;
+    e1.msgid = self->_msgid;
 
     if([properties objectForKey:@"id"]) {
         if([[properties objectForKey:@"mime_type"] hasPrefix:@"image/"])

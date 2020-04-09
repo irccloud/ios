@@ -561,6 +561,7 @@ NSArray *_sortedChannels;
         FileUploader *u = [[FileUploader alloc] init];
         u.delegate = self;
         u.bid = self->_buffer.bid;
+        u.msgid = self->_msgid;
         NSString *UTI = i.registeredTypeIdentifiers.lastObject;
         u.originalFilename = i.suggestedName;
         if(![u.originalFilename containsString:@"."] && ![UTI hasPrefix:@"dyn."]) {
@@ -4487,6 +4488,7 @@ NSArray *_sortedChannels;
     FileUploader *u = [[FileUploader alloc] init];
     u.delegate = self;
     u.bid = self->_buffer.bid;
+    u.msgid = self->_msgid;
     [u uploadFile:url];
     FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
@@ -4532,6 +4534,7 @@ NSArray *_sortedChannels;
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
             u.bid = self->_buffer.bid;
+            u.msgid = self->_msgid;
             fvc = [[FileMetadataViewController alloc] initWithUploader:u];
             if(picker == nil || picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
                 [fvc showCancelButton];
@@ -4680,8 +4683,8 @@ NSArray *_sortedChannels;
 }
 
 -(void)fileUploadProgress:(float)progress {
-    if(!self.presentedViewController) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if(!self.presentedViewController) {
             if(self.navigationItem.titleView != self->_connectingView) {
                 [self _showConnectingView];
                 self->_connectingStatus.text = @"Uploading";
@@ -4689,8 +4692,8 @@ NSArray *_sortedChannels;
             }
             self->_connectingProgress.hidden = NO;
             [self->_connectingProgress setProgress:progress animated:YES];
-        }];
-    }
+        }
+    }];
 }
 
 -(void)fileUploadDidFail:(NSString *)reason {

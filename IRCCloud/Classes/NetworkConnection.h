@@ -207,6 +207,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(id)fetchOOB:(NSString *)url;
 -(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid;
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(NSDictionary *)POSTreply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid;
 -(int)reply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid handler:(IRCCloudAPIResultHandler)handler;
 -(int)heartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid handler:(IRCCloudAPIResultHandler)handler;
 -(int)heartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids handler:(IRCCloudAPIResultHandler)handler;
