@@ -1,6 +1,4 @@
-• Emoji 12.1 :emocodes:
-• Sort nick completion suggestions by highlights, recently spoken, and then alphabetically
-• Fix centering of gifv animations in the image viewer
-• Fix "Share URL" menu action on iPad
-• Fix long press gesture unexpectedly opening URLs
+• Pinned channels and conversations
+• Support for uploading and managing avatars for 3rd party IRCv3 servers
+• Support for uploading files in reply threads
 • Stability improvements and minor fixes
