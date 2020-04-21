@@ -321,6 +321,28 @@
     for(Server *s in [ServersDataSource sharedInstance].getServers) {
         if(s.avatar.length && ![s.avatar isEqualToString:[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"]]) {
             NSURL *url = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":s.avatar, @"modifiers":[NSString stringWithFormat:@"w%i", (int)(64 * [UIScreen mainScreen].scale)]} error:nil]];
+            if(url) {
+                if(![[ImageCache sharedInstance] imageForURL:url]) {
+                    [[ImageCache sharedInstance] fetchURL:url completionHandler:^(BOOL success) {
+                        if(success) {
+                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                [self.tableView reloadData];
+                            }];
+                        }
+                    }];
+                }
+                [data addObject:@{@"label":[NSString stringWithFormat:@"%@ on %@", s.nick, s.name.length?s.name:s.hostname],
+                                  @"id":s.avatar,
+                                  @"url":url,
+                                  @"orgId":@(s.orgId),
+                                  @"cid":@(s.cid)
+                                  }];
+            }
+        }
+    }
+    if([[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"] isKindOfClass:NSString.class] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"] length]) {
+        NSURL *url = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"], @"modifiers":[NSString stringWithFormat:@"w%i", (int)(64 * [UIScreen mainScreen].scale)]} error:nil]];
+        if(url) {
             if(![[ImageCache sharedInstance] imageForURL:url]) {
                 [[ImageCache sharedInstance] fetchURL:url completionHandler:^(BOOL success) {
                     if(success) {
@@ -330,30 +352,12 @@
                     }
                 }];
             }
-            [data addObject:@{@"label":[NSString stringWithFormat:@"%@ on %@", s.nick, s.name.length?s.name:s.hostname],
-                              @"id":s.avatar,
+            [data addObject:@{@"label":@"Public avatar",
+                              @"id":[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"],
                               @"url":url,
-                              @"orgId":@(s.orgId),
-                              @"cid":@(s.cid)
+                              @"orgId":@(-1),
                               }];
         }
-    }
-    if([[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"] isKindOfClass:NSString.class] && [[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"] length]) {
-        NSURL *url = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"], @"modifiers":[NSString stringWithFormat:@"w%i", (int)(64 * [UIScreen mainScreen].scale)]} error:nil]];
-        if(![[ImageCache sharedInstance] imageForURL:url]) {
-            [[ImageCache sharedInstance] fetchURL:url completionHandler:^(BOOL success) {
-                if(success) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self.tableView reloadData];
-                    }];
-                }
-            }];
-        }
-        [data addObject:@{@"label":@"Public avatar",
-                          @"id":[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"],
-                          @"url":url,
-                          @"orgId":@(-1),
-                          }];
     }
 
     self->_avatars = data;
