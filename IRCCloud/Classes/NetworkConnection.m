@@ -993,7 +993,7 @@ volatile BOOL __socketPaused = NO;
                        }
                    },
                    @"avatar_change": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       if(!backlog) {
+                       if(!backlog && [[object objectForKey:@"self"] boolValue]) {
                            Server *s = [self->_servers getServer:object.cid];
                            if(s) {
                                s.avatar = [[object objectForKey:@"avatar"] isKindOfClass:NSString.class] ? [object objectForKey:@"avatar"] : nil;
