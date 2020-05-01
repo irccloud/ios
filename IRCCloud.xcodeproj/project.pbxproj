@@ -5239,7 +5239,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = Crashlytics;
+				PROVISIONING_PROFILE_SPECIFIER = "App Store";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -5672,7 +5672,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = Crashlytics;
+				PROVISIONING_PROFILE_SPECIFIER = "App Store";
 				WRAPPER_EXTENSION = app;
 			};
 			name = AppStore;
