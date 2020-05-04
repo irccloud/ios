@@ -1,4 +1,2 @@
-• Pinned channels and conversations
-• Support for uploading and managing avatars for 3rd party IRCv3 servers
-• Support for uploading files in reply threads
+• Fix an issue that could cause the incorrect avatar to appear briefly while sending a message
 • Stability improvements and minor fixes
