@@ -346,7 +346,6 @@
                     server.blocksDeletes = YES;
                     server.blocksReplies = YES;
                     server.blocksReactions = YES;
-                    break;
                 }
                 if([tag isEqualToString:@"draft/edit"] || [tag isEqualToString:@"draft/edit-text"])
                     server.blocksEdits = YES;
@@ -358,6 +357,16 @@
                     server.blocksReplies = YES;
                 if([tag isEqualToString:@"draft/reply"] || [tag isEqualToString:@"draft/react"])
                     server.blocksReactions = YES;
+                if([tag isEqualToString:@"-draft/edit"] || [tag isEqualToString:@"-draft/edit-text"])
+                    server.blocksEdits = NO;
+                if([tag isEqualToString:@"-typing"] || [tag isEqualToString:@"-draft/typing"])
+                    server.blocksTyping = NO;
+                if([tag isEqualToString:@"-draft/delete"])
+                    server.blocksDeletes = NO;
+                if([tag isEqualToString:@"-draft/reply"])
+                    server.blocksReplies = NO;
+                if([tag isEqualToString:@"-draft/react"])
+                    server.blocksReactions = NO;
             }
         }
     }
