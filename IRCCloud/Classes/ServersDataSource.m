@@ -340,6 +340,14 @@
         if([[server.isupport objectForKey:@"CLIENTTAGDENY"] isKindOfClass:[NSString class]]) {
             NSArray *tags = [[server.isupport objectForKey:@""] componentsSeparatedByString:@","];
             for(NSString *tag in tags) {
+                if([tag isEqualToString:@"*"]) {
+                    server.blocksEdits = YES;
+                    server.blocksTyping = YES;
+                    server.blocksDeletes = YES;
+                    server.blocksReplies = YES;
+                    server.blocksReactions = YES;
+                    break;
+                }
                 if([tag isEqualToString:@"draft/edit"] || [tag isEqualToString:@"draft/edit-text"])
                     server.blocksEdits = YES;
                 if([tag isEqualToString:@"typing"] || [tag isEqualToString:@"draft/typing"])
