@@ -3898,13 +3898,13 @@ NSArray *_sortedChannels;
             [alert addAction:[UIAlertAction actionWithTitle:@"Close Preview" style:UIAlertActionStyleDefault handler:handler]];
         if(self->_selectedEvent.msg.length || self->_selectedEvent.groupMsg.length)
             [alert addAction:[UIAlertAction actionWithTitle:@"Copy Message" style:UIAlertActionStyleDefault handler:handler]];
-        if(!_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
+        if(!server.blocksReplies && !_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Reply" style:UIAlertActionStyleDefault handler:handler]];
         }
-        if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId) && self->_selectedEvent.chan) {
+        if(!server.blocksEdits && self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId) && self->_selectedEvent.chan) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Edit Message" style:UIAlertActionStyleDefault handler:handler]];
         }
-        if(self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
+        if(!server.blocksDeletes && self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Delete Message" style:UIAlertActionStyleDefault handler:handler]];
         }
     }

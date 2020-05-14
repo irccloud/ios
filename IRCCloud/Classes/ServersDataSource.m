@@ -331,6 +331,27 @@
         for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:cid]) {
             b.chantypes = server.CHANTYPES;
         }
+        
+        server.blocksEdits = NO;
+        server.blocksTyping = NO;
+        server.blocksDeletes = NO;
+        server.blocksReplies = NO;
+        server.blocksReactions = NO;
+        if([[server.isupport objectForKey:@"CLIENTTAGDENY"] isKindOfClass:[NSString class]]) {
+            NSArray *tags = [[server.isupport objectForKey:@""] componentsSeparatedByString:@","];
+            for(NSString *tag in tags) {
+                if([tag isEqualToString:@"draft/edit"] || [tag isEqualToString:@"draft/edit-text"])
+                    server.blocksEdits = YES;
+                if([tag isEqualToString:@"typing"] || [tag isEqualToString:@"draft/typing"])
+                    server.blocksTyping = YES;
+                if([tag isEqualToString:@"draft/delete"])
+                    server.blocksDeletes = YES;
+                if([tag isEqualToString:@"draft/reply"])
+                    server.blocksReplies = YES;
+                if([tag isEqualToString:@"draft/reply"] || [tag isEqualToString:@"draft/react"])
+                    server.blocksReactions = YES;
+            }
+        }
     }
 }
 
