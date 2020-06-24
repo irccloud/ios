@@ -513,7 +513,7 @@
     }
     
     if([[UIApplication sharedApplication] respondsToSelector:NSSelectorFromString(@"_deactivateReachability")])
-        objc_msgSend([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
+        ((id (*)(id, SEL)) objc_msgSend)([UIApplication sharedApplication], NSSelectorFromString(@"_deactivateReachability"));
     
     if(mainViewController.slidingViewController.presentedViewController) {
         [mainViewController.slidingViewController dismissViewControllerAnimated:NO completion:^{

@@ -52,11 +52,11 @@
     int _slack;
     NSArray *_caps;
     NSMutableDictionary *_collapsed;
-    BOOL blocksEdits;
-    BOOL blocksReplies;
-    BOOL blocksReactions;
-    BOOL blocksDeletes;
-    BOOL blocksTyping;
+    BOOL _blocksEdits;
+    BOOL _blocksReplies;
+    BOOL _blocksReactions;
+    BOOL _blocksDeletes;
+    BOOL _blocksTyping;
 }
 @property (nonatomic, assign) int cid, port, ssl, order, deferred_archives, orgId, avatars_supported, slack;
 @property (nonatomic, copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname, *ircserver, *avatar, *avatarURL, *from;

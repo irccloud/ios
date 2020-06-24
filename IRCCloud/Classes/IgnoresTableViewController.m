@@ -98,16 +98,11 @@
         }
     }]];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-        [self presentViewController:alert animated:YES completion:nil];
-    }
-    
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
     }];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-        [self presentViewController:alert animated:YES completion:nil];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)didReceiveMemoryWarning {

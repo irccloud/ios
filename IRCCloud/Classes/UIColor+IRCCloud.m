@@ -468,7 +468,7 @@ UITraitCollection *__currentTraitCollection;
         [[UITableViewCell appearance] setTextLabelColor:__messageTextColor];
         [[UITableViewCell appearance] setDetailTextLabelColor:[UIColor colorWithRed:0.557 green:0.557 blue:0.576 alpha:1]];
         [[UITableViewCell appearance] setTintColor:nil];
-        [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:__messageTextColor];
+        [[UILabel appearanceWhenContainedInInstancesOfClasses:@[UITableViewHeaderFooterView.class]] setTextColor:__messageTextColor];
         [[UISwitch appearance] setOnTintColor:nil];
         [[UISlider appearance] setTintColor:nil];
         
@@ -480,8 +480,8 @@ UITraitCollection *__currentTraitCollection;
         
         [[UIScrollView appearance] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
         
-        [[UITableViewCell appearanceWhenContainedIn:[UIImagePickerController class], nil] setBackgroundColor:nil];
-        [[UIScrollView appearanceWhenContainedIn:[UIImagePickerController class], nil] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
+        [[UITableViewCell appearanceWhenContainedInInstancesOfClasses:@[UIImagePickerController.class]] setBackgroundColor:nil];
+        [[UIScrollView appearanceWhenContainedInInstancesOfClasses:@[UIImagePickerController.class]] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
         
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
@@ -745,7 +745,7 @@ UITraitCollection *__currentTraitCollection;
         [[UITableViewCell appearance] setTextLabelColor:color_text4];
         [[UITableViewCell appearance] setDetailTextLabelColor:color_text7];
         [[UITableViewCell appearance] setTintColor:color_text7];
-        [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:color_text8];
+        [[UILabel appearanceWhenContainedInInstancesOfClasses:@[UITableViewHeaderFooterView.class]] setTextColor:color_text8];
         [[UISwitch appearance] setOnTintColor:color_text7];
         [[UISlider appearance] setTintColor:color_text7];
         
@@ -757,8 +757,8 @@ UITraitCollection *__currentTraitCollection;
         
         [[UIScrollView appearance] setIndicatorStyle:UIScrollViewIndicatorStyleWhite];
 
-        [[UITableViewCell appearanceWhenContainedIn:[UIImagePickerController class], nil] setBackgroundColor:nil];
-        [[UIScrollView appearanceWhenContainedIn:[UIImagePickerController class], nil] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
+        [[UITableViewCell appearanceWhenContainedInInstancesOfClasses:@[UIImagePickerController.class]] setBackgroundColor:nil];
+        [[UIScrollView appearanceWhenContainedInInstancesOfClasses:@[UIImagePickerController.class]] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
 
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
@@ -789,7 +789,7 @@ UITraitCollection *__currentTraitCollection;
     [[UITableViewCell appearance] setTextLabelColor:nil];
     [[UITableViewCell appearance] setDetailTextLabelColor:nil];
     [[UITableViewCell appearance] setTintColor:nil];
-    [[UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil] setTextColor:nil];
+    [[UILabel appearanceWhenContainedInInstancesOfClasses:@[UITableViewHeaderFooterView.class]] setTextColor:nil];
     [[UISwitch appearance] setOnTintColor:nil];
     [[UISlider appearance] setTintColor:nil];
     
@@ -801,8 +801,8 @@ UITraitCollection *__currentTraitCollection;
     
     [[UIScrollView appearance] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
     
-    [[UITableViewCell appearanceWhenContainedIn:[UIImagePickerController class], nil] setBackgroundColor:nil];
-    [[UIScrollView appearanceWhenContainedIn:[UIImagePickerController class], nil] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
+    [[UITableViewCell appearanceWhenContainedInInstancesOfClasses:@[UIImagePickerController.class]] setBackgroundColor:nil];
+    [[UIScrollView appearanceWhenContainedInInstancesOfClasses:@[UIImagePickerController.class]] setIndicatorStyle:UIScrollViewIndicatorStyleDefault];
     
     [[UINavigationBar appearance] setBackgroundImage:nil forBarMetrics:UIBarMetricsDefault];
     [[UINavigationBar appearance] setTitleTextAttributes:nil];

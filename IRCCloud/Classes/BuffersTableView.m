@@ -1419,10 +1419,6 @@
                 }
             }]];
             
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-                [self presentViewController:alert animated:YES completion:nil];
-            }
-            
             [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                 textField.placeholder = @"#example";
                 textField.text = @"#";
@@ -1430,8 +1426,7 @@
                 textField.delegate = self;
             }];
             
-            if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-                [self presentViewController:alert animated:YES completion:nil];
+            [self presentViewController:alert animated:YES completion:nil];
         } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_COLLAPSED) {
             NSDictionary *d = [self->_data objectAtIndex:indexPath.row];
             if([[d objectForKey:@"archived"] intValue]) {

@@ -438,17 +438,12 @@ extern UIImage *__socketClosedBackgroundImage;
                     }
                 }]];
                 
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-                    [self presentViewController:alert animated:YES completion:nil];
-                }
-                
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.placeholder = @"nickname";
                     textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                 }];
                 
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-                    [self presentViewController:alert animated:YES completion:nil];
+                [self presentViewController:alert animated:YES completion:nil];
             }]];
         } else {
             [items addObject:[UIPreviewAction actionWithTitle:@"Rejoin" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {

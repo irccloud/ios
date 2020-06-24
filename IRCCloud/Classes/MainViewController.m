@@ -187,14 +187,6 @@ NSArray *_sortedChannels;
         if(suggestions.count == 0) {
             if(self->_nickCompletionView.alpha > 0) {
                 [UIView animateWithDuration:0.25 animations:^{ self->_nickCompletionView.alpha = 0; } completion:nil];
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-                    self->_message.internalTextView.autocorrectionType = UITextAutocorrectionTypeYes;
-                    [self->_message.internalTextView reloadInputViews];
-                    id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
-                    if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
-                        objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), YES);
-                    }
-                }
                 _sortedChannels = nil;
                 _sortedUsers = nil;
             }
@@ -207,15 +199,6 @@ NSArray *_sortedChannels;
                 self->_message.delegate = nil;
                 self->_message.text = text;
                 self->_message.selectedRange = NSMakeRange(text.length, 0);
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-                    self->_message.internalTextView.autocorrectionType = UITextAutocorrectionTypeNo;
-                    [self->_message.internalTextView reloadInputViews];
-                    id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
-                    if([k respondsToSelector:NSSelectorFromString(@"_setAutocorrects:")]) {
-                        objc_msgSend(k, NSSelectorFromString(@"_setAutocorrects:"), NO);
-                        objc_msgSend(k, NSSelectorFromString(@"removeAutocorrectPrompt"));
-                    }
-                }
                 if(self->_force && self->_nickCompletionView.selection == -1) {
                     [self->_nickCompletionView setSelection:0];
                     NSString *text = self->_message.text;
@@ -875,16 +858,11 @@ NSArray *_sortedChannels;
                         }];
                 }]];
                 
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-                    [self presentViewController:alert animated:YES completion:nil];
-                }
-                
                 [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                     textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                 }];
                 
-                if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-                    [self presentViewController:alert animated:YES completion:nil];
+                [self presentViewController:alert animated:YES completion:nil];
             }];}
             break;
         case kIRCEventAlert:
@@ -1825,12 +1803,10 @@ NSArray *_sortedChannels;
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     int height = size.height;
     
-    if(@available(iOS 9, *)) {
-        CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
-        height = [UIScreen mainScreen].applicationFrame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height - origin.y;
-        if(@available(iOS 11, *)) {
-            height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
-        }
+    CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
+    height = [UIScreen mainScreen].applicationFrame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height - origin.y;
+    if(@available(iOS 11, *)) {
+        height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
     }
     if(height != self->_kbSize.height) {
         self->_kbSize = size;
@@ -1963,7 +1939,7 @@ NSArray *_sortedChannels;
                 if(!granted)
                     CLS_LOG(@"Notification permission denied: %@", error);
             }];
-        } else if(@available(iOS 9, *)) {
+        } else {
             UIMutableUserNotificationAction *replyAction = [[UIMutableUserNotificationAction alloc] init];
             replyAction.identifier = @"reply";
             replyAction.title = @"Reply";
@@ -2015,8 +1991,6 @@ NSArray *_sortedChannels;
             [callerid setActions:@[retryAction] forContext:UIUserNotificationActionContextMinimal];
             
             [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:[NSSet setWithObjects:buffer_msg, buffer_me_msg, invite, callerid, retry, nil]]];
-        } else {
-            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:nil]];
         }
 #ifdef DEBUG
         NSLog(@"This is a debug build, skipping APNs registration");
@@ -2125,10 +2099,10 @@ NSArray *_sortedChannels;
 -(void)sendButtonPressed:(id)sender {
     @synchronized(self->_message) {
         if(self->_message.text && _message.text.length) {
-            id k = objc_msgSend(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
+            id k = ((id (*)(id, SEL)) objc_msgSend)(NSClassFromString(@"UIKeyboard"), NSSelectorFromString(@"activeKeyboard"));
             SEL sel = NSSelectorFromString(@"acceptAutocorrection");
             if([k respondsToSelector:sel]) {
-                objc_msgSend(k, sel);
+                ((id (*)(id, SEL)) objc_msgSend)(k, sel);
             }
             
             NSAttributedString *messageText = self->_message.attributedText;
@@ -2315,58 +2289,56 @@ NSArray *_sortedChannels;
                 } else if([messageString isEqualToString:@"/badge"]) {
                     [self->_message clearText];
                     self->_buffer.draft = nil;
-                    if(@available(iOS 9, *)) {
-                        [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                NSMutableString *msg = [[NSMutableString alloc] init];
-                                [msg appendFormat:@"Notification Center currently has %lu notifications\n", (unsigned long)notifications.count];
-                                for(UNNotification *n in notifications) {
-                                    NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                                    [msg appendFormat:@"ID: %@ BID: %i EID: %f\n", n.request.identifier, [[d objectAtIndex:1] intValue], [[d objectAtIndex:2] doubleValue]];
+                    [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            NSMutableString *msg = [[NSMutableString alloc] init];
+                            [msg appendFormat:@"Notification Center currently has %lu notifications\n", (unsigned long)notifications.count];
+                            for(UNNotification *n in notifications) {
+                                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                                [msg appendFormat:@"ID: %@ BID: %i EID: %f\n", n.request.identifier, [[d objectAtIndex:1] intValue], [[d objectAtIndex:2] doubleValue]];
+                            }
+                            
+                            for(UNNotification *n in notifications) {
+                                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+                                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
+                                [msg appendFormat:@"BID %i last_seen_eid: %f extraHighlights: %i\n", b.bid, b.last_seen_eid, b.extraHighlights];
+                                if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
+                                    [msg appendFormat:@"Stale notification: %@\n", n.request.identifier];
                                 }
-                                
-                                for(UNNotification *n in notifications) {
-                                    NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
-                                    [msg appendFormat:@"BID %i last_seen_eid: %f extraHighlights: %i\n", b.bid, b.last_seen_eid, b.extraHighlights];
-                                    if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || [[d objectAtIndex:2] doubleValue] <= b.last_seen_eid) {
-                                        [msg appendFormat:@"Stale notification: %@\n", n.request.identifier];
-                                    }
-                                }
-                                
-                                CLS_LOG(@"%@", msg);
-                                
-                                Event *e = [[Event alloc] init];
-                                e.cid = s.cid;
-                                e.bid = self->_buffer.bid;
-                                e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
-                                if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
-                                    e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
-                                e.isSelf = YES;
-                                e.from = nil;
-                                e.nick = nil;
-                                e.msg = msg;
-                                e.type = @"buffer_msg";
-                                e.color = [UIColor timestampColor];
-                                if([self->_buffer.name isEqualToString:s.nick])
-                                    e.bgColor = [UIColor whiteColor];
-                                else
-                                    e.bgColor = [UIColor selfBackgroundColor];
-                                e.rowType = 0;
-                                e.formatted = nil;
-                                e.formattedMsg = nil;
-                                e.groupMsg = nil;
-                                e.linkify = YES;
-                                e.targetMode = nil;
-                                e.isHighlight = NO;
-                                e.reqId = -1;
-                                e.pending = YES;
-                                [self->_eventsView scrollToBottom];
-                                [[EventsDataSource sharedInstance] addEvent:e];
-                                [self->_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
-                            }];
+                            }
+                            
+                            CLS_LOG(@"%@", msg);
+                            
+                            Event *e = [[Event alloc] init];
+                            e.cid = s.cid;
+                            e.bid = self->_buffer.bid;
+                            e.eid = [[NSDate date] timeIntervalSince1970] * 1000000;
+                            if(e.eid < [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid])
+                                e.eid = [[EventsDataSource sharedInstance] lastEidForBuffer:e.bid] + 1000;
+                            e.isSelf = YES;
+                            e.from = nil;
+                            e.nick = nil;
+                            e.msg = msg;
+                            e.type = @"buffer_msg";
+                            e.color = [UIColor timestampColor];
+                            if([self->_buffer.name isEqualToString:s.nick])
+                                e.bgColor = [UIColor whiteColor];
+                            else
+                                e.bgColor = [UIColor selfBackgroundColor];
+                            e.rowType = 0;
+                            e.formatted = nil;
+                            e.formattedMsg = nil;
+                            e.groupMsg = nil;
+                            e.linkify = YES;
+                            e.targetMode = nil;
+                            e.isHighlight = NO;
+                            e.reqId = -1;
+                            e.pending = YES;
+                            [self->_eventsView scrollToBottom];
+                            [[EventsDataSource sharedInstance] addEvent:e];
+                            [self->_eventsView insertEvent:e backlog:NO nextIsGrouped:NO];
                         }];
-                    }
+                    }];
                     return;
                 }
                 
@@ -3476,8 +3448,6 @@ NSArray *_sortedChannels;
 #endif
             } else if(diff > 0 || _buffer.scrolledUp)
                 self->_eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + diff);
-            else if([[UIDevice currentDevice].systemVersion isEqualToString:@"8.1"]) //The last line seems to get eaten when the table is fully scrolled down on iOS 8.1
-                self->_eventsView.tableView.contentOffset = CGPointMake(0, _eventsView.tableView.contentOffset.y + fabs(diff));
         }
     }
 }
@@ -4073,17 +4043,12 @@ NSArray *_sortedChannels;
         }
     }]];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-        [self presentViewController:alert animated:YES completion:nil];
-    }
-    
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = self->_selectedUser?@"#channel":@"nickname";
         textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
     }];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-        [self presentViewController:alert animated:YES completion:nil];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)_joinAChannel {
@@ -4097,17 +4062,12 @@ NSArray *_sortedChannels;
         }
     }]];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-        [self presentViewController:alert animated:YES completion:nil];
-    }
-    
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.placeholder = @"#channel";
         textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
     }];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-        [self presentViewController:alert animated:YES completion:nil];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)_renameBuffer:(Buffer *)b msg:(NSString *)msg {
@@ -4149,17 +4109,12 @@ NSArray *_sortedChannels;
         }
     }]];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-        [self presentViewController:alert animated:YES completion:nil];
-    }
-    
     [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
         textField.text = b.name;
         textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
     }];
     
-    if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-        [self presentViewController:alert animated:YES completion:nil];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect {
@@ -4261,17 +4216,12 @@ NSArray *_sortedChannels;
             }
         }]];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-            [self presentViewController:a animated:YES completion:nil];
-        }
-        
         [a addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.placeholder = @"nickname";
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
         }];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-            [self presentViewController:a animated:YES completion:nil];
+        [self presentViewController:a animated:YES completion:nil];
     }]];
 
     BOOL activeCount = NO;
@@ -4993,17 +4943,12 @@ NSArray *_sortedChannels;
                 }];
         }]];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-            [self presentViewController:alert animated:YES completion:nil];
-        }
-        
         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.text = self->_selectedEvent.msg;
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
         }];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-            [self presentViewController:alert animated:YES completion:nil];
+        [self presentViewController:alert animated:YES completion:nil];
     } else if([action isEqualToString:@"Delete File"]) {
         [[NetworkConnection sharedInstance] deleteFile:[self->_selectedEvent.entities objectForKey:@"id"] handler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] boolValue]) {
@@ -5247,10 +5192,6 @@ Network type: %@\n",
             }
         }]];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-            [self presentViewController:alert animated:YES completion:nil];
-        }
-        
         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             if(self->_selectedUser.hostmask.length)
                 textField.text = [NSString stringWithFormat:@"*!%@", self->_selectedUser.hostmask];
@@ -5259,8 +5200,7 @@ Network type: %@\n",
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
         }];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-            [self presentViewController:alert animated:YES completion:nil];
+        [self presentViewController:alert animated:YES completion:nil];
     } else if([action isEqualToString:@"Ignore"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Ignore messages from this mask" preferredStyle:UIAlertControllerStyleAlert];
@@ -5272,10 +5212,6 @@ Network type: %@\n",
             }
         }]];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-            [self presentViewController:alert animated:YES completion:nil];
-        }
-        
         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             if(self->_selectedUser.hostmask.length)
                 textField.text = [NSString stringWithFormat:@"*!%@", self->_selectedUser.hostmask];
@@ -5284,8 +5220,7 @@ Network type: %@\n",
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
         }];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-            [self presentViewController:alert animated:YES completion:nil];
+        [self presentViewController:alert animated:YES completion:nil];
     } else if([action isEqualToString:@"Kick"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Give a reason for kicking" preferredStyle:UIAlertControllerStyleAlert];
@@ -5297,16 +5232,11 @@ Network type: %@\n",
             }
         }]];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 9) {
-            [self presentViewController:alert animated:YES completion:nil];
-        }
-        
         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
         }];
         
-        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] >= 9)
-            [self presentViewController:alert animated:YES completion:nil];
+        [self presentViewController:alert animated:YES completion:nil];
     } else if([action isEqualToString:@"Slack Profile"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@/team/%@", s.slackBaseURL, _selectedUser.nick]];
@@ -5461,7 +5391,6 @@ Network type: %@\n",
 }
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
-    if(@available(iOS 9, *)) {
     return @[
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:) discoverabilityTitle:@"Switch to previous channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:) discoverabilityTitle:@"Switch to next channel"],
@@ -5480,26 +5409,6 @@ Network type: %@\n",
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageUp" modifierFlags:0 action:@selector(onPgUpPressed:)],
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageDown" modifierFlags:0 action:@selector(onPgDownPressed:)],
              ];
-    } else {
-        return @[
-            [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:)],
-            [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:)],
-            [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
-            [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
-            [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate action:@selector(onAltUpPressed:)],
-            [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate action:@selector(onAltDownPressed:)],
-            [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
-            [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(onCmdRPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftCmdRPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"b" modifierFlags:UIKeyModifierCommand action:@selector(onCmdBPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"i" modifierFlags:UIKeyModifierCommand action:@selector(onCmdIPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"u" modifierFlags:UIKeyModifierCommand action:@selector(onCmdUPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageUp" modifierFlags:0 action:@selector(onPgUpPressed:)],
-            [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageDown" modifierFlags:0 action:@selector(onPgDownPressed:)],
-        ];
-    }
 }
 
 -(void)getMessageAttributesBold:(BOOL *)bold italic:(BOOL *)italic underline:(BOOL *)underline {
