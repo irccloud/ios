@@ -901,8 +901,10 @@ extern UIImage *__socketClosedBackgroundImage;
                     msg = @"";
                 }
                 event.timestamp = nil;
+                event.collapsed = NO;
             } else {
                 msg = (nextIsGrouped && _currentCollapsedEid != event.eid)?@"":[self->_collapsedEvents collapse];
+                event.collapsed = YES;
             }
             if(msg == nil && [type isEqualToString:@"nickchange"])
                 msg = [NSString stringWithFormat:@"%@ → %c%@%c", event.oldNick, BOLD, [self->_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO displayName:nil], BOLD];
@@ -1465,6 +1467,7 @@ extern UIImage *__socketClosedBackgroundImage;
         return;
     @synchronized(self) {
         [self->_lock lock];
+        e.groupEid = self->_currentCollapsedEid;
         NSInteger insertPos = -1;
         NSString *lastDay = nil;
         NSDate *date = [NSDate dateWithTimeIntervalSince1970:e.time];
@@ -1491,7 +1494,6 @@ extern UIImage *__socketClosedBackgroundImage;
             e.formatted = nil;
             e.height = 0;
         }
-        e.groupEid = self->_currentCollapsedEid;
         
         if(eid > _maxEid || _data.count == 0 || (eid == e.eid && [e compare:[self->_data objectAtIndex:self->_data.count - 1]] == NSOrderedDescending)) {
             //Message at bottom

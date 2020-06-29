@@ -204,6 +204,8 @@
 -(NSTimeInterval)time {
     if(self->_serverTime > 0)
         return _serverTime / 1000;
+    else if(self->_collapsed)
+        return (self->_groupEid / 1000000) + [NetworkConnection sharedInstance].clockOffset;
     else
         return (self->_eid / 1000000) + [NetworkConnection sharedInstance].clockOffset;
 }
