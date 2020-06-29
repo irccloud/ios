@@ -452,7 +452,8 @@
     [v addSubview: self.navigationController.view];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.view.backgroundColor = [UIColor navBarColor];
-    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
+    [self.navigationController setNeedsStatusBarAppearanceUpdate];
 }
 @end
 
@@ -644,7 +645,6 @@
     [v addSubview: self.navigationController.view];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.view.backgroundColor = [UIColor navBarColor];
-    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -945,6 +945,7 @@
     [super viewDidLoad];
     
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
 
     self->_email = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
     self->_email.text = @"";

@@ -56,6 +56,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
     self->_fileSizes = [[NSMutableDictionary alloc] init];
     self->_downloadingURLs = [[NSMutableDictionary alloc] init];
     self->_iCloudLogs = [[UISwitch alloc] init];

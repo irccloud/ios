@@ -27,6 +27,10 @@
     self->_logo.center = CGPointMake(self.view.center.x, 39 + [UIApplication sharedApplication].statusBarFrame.size.height);
 }
 
+-(UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

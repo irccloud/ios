@@ -697,7 +697,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
-        
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
+
     self->_showMembers = [[UISwitch alloc] init];
     self->_notifyAll = [[UISwitch alloc] init];
     self->_trackUnread = [[UISwitch alloc] init];

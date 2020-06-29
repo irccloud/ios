@@ -719,4 +719,10 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     self.underRightView.frame = frame;
 }
 
+-(UIStatusBarStyle)preferredStatusBarStyle {
+    if(self.topViewController)
+        return self.topViewController.preferredStatusBarStyle;
+    else
+        return UIStatusBarStyleDefault;
+}
 @end

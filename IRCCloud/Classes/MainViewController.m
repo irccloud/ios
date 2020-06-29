@@ -302,9 +302,9 @@ NSArray *_sortedChannels;
     
     self->_eventActivity.activityIndicatorViewStyle = self->_headerActivity.activityIndicatorViewStyle = [UIColor activityIndicatorViewStyle];
     
-    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
-
     self->_globalMsg.linkAttributes = [UIColor lightLinkAttributes];
+    
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
 }
 
 - (void)viewDidLoad {
@@ -619,7 +619,6 @@ NSArray *_sortedChannels;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 [self presentViewController:nc animated:YES completion:nil];
-                [self _resetStatusBar];
             }
         }];
     }
@@ -4397,17 +4396,12 @@ NSArray *_sortedChannels;
     picker.delegate = (id)self;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone || sourceType == UIImagePickerControllerSourceTypeCamera) {
         [UIColor clearTheme];
-        [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
         [self presentViewController:picker animated:YES completion:nil];
-    } else if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone]) {
+    } else {
         [UIColor clearTheme];
         picker.modalPresentationStyle = UIModalPresentationFormSheet;
         picker.preferredContentSize = CGSizeMake(540, 576);
         [self presentViewController:picker animated:YES completion:nil];
-    } else {
-        self->_popover = [[UIPopoverController alloc] initWithContentViewController:picker];
-        self->_popover.delegate = self;
-        [self->_popover presentPopoverFromRect:CGRectMake(self->_bottomBar.frame.origin.x + _uploadsBtn.frame.origin.x, _bottomBar.frame.origin.y,_uploadsBtn.frame.size.width,_uploadsBtn.frame.size.height) inView:self.view permittedArrowDirections:UIPopoverArrowDirectionDown animated:YES];
     }
 }
 
@@ -4429,7 +4423,6 @@ NSArray *_sortedChannels;
 -(void)documentPickerWasCancelled:(UIDocumentPickerViewController *)controller {
     [UIColor setTheme];
     [self applyTheme];
-    [self _resetStatusBar];
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
@@ -4448,18 +4441,6 @@ NSArray *_sortedChannels;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     [self presentViewController:nc animated:YES completion:nil];
-    [self _resetStatusBar];
-}
-
--(void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
-    [UIColor setTheme];
-    [self applyTheme];
-    [self _resetStatusBar];
-    self->_popover = nil;
-}
-
-- (void)_resetStatusBar {
-    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
 }
 
 - (void)_imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
@@ -4585,24 +4566,14 @@ NSArray *_sortedChannels;
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     }
     
-    if(self->_popover) {
-        [self->_popover dismissPopoverAnimated:YES];
-        if(nc)
-            [self presentViewController:nc animated:YES completion:nil];
-    } else if(self.presentedViewController) {
+    if(self.presentedViewController) {
         [self dismissViewControllerAnimated:YES completion:^{
-            [self _resetStatusBar];
             if(nc)
                 [self presentViewController:nc animated:YES completion:nil];
         }];
     } else if(nc) {
         [self presentViewController:nc animated:YES completion:nil];
     }
-    
-    if(!nc)
-        [self dismissViewControllerAnimated:YES completion:^{
-            [self _resetStatusBar];
-        }];
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
@@ -5140,9 +5111,7 @@ Network type: %@\n",
                     mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
                 else
                     mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                [self presentViewController:mfmc animated:YES completion:^{
-                    [self _resetStatusBar];
-                }];
+                [self presentViewController:mfmc animated:YES completion:nil];
             } else {
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];

@@ -101,6 +101,7 @@
     [super viewDidLoad];
     self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
     self.navigationItem.title = @"File Uploads";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed:)];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemEdit target:self action:@selector(editButtonPressed:)];

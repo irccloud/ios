@@ -214,7 +214,8 @@
     [super viewDidLoad];
     self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
     self.navigationController.navigationBar.clipsToBounds = YES;
-    
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
+
     self->_footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
     self->_footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     UIActivityIndicatorView *a = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];

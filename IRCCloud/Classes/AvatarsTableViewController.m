@@ -75,6 +75,7 @@
     [super viewDidLoad];
     self.navigationItem.title = @"Choose An Avatar";
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
     if(self.navigationController.viewControllers.count == 1)
         self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCamera target:self action:@selector(addButtonPressed)];
@@ -122,8 +123,6 @@
     } else {
         picker.modalPresentationStyle = UIModalPresentationPopover;
         picker.popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem;
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)
-            [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleDefault];
         [self presentViewController:picker animated:YES completion:nil];
     }
 }
@@ -131,7 +130,6 @@
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info {
     [picker dismissViewControllerAnimated:YES completion:^{
         [UIColor setTheme];
-        [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
         [picker dismissViewControllerAnimated:YES completion:nil];
         
         NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
@@ -213,7 +211,6 @@
 
 -(void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
     [UIColor setTheme];
-    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
     [picker dismissViewControllerAnimated:YES completion:nil];
 }
 

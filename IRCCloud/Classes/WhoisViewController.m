@@ -217,6 +217,7 @@
 -(void)loadView {
     [super loadView];
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
     self->_label.frame = CGRectMake(12,2,self.view.bounds.size.width-24, [LinkTextView heightOfString:self->_label.attributedText constrainedToWidth:self.view.bounds.size.width-24]+12);
     self->_scrollView.frame = self.view.frame;
     self->_scrollView.contentSize = self->_label.frame.size;

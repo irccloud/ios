@@ -49,7 +49,6 @@
     [self.tableView endEditing:YES];
     [self->_uploader setFilename:self->_filename.text message:self->_msg.text];
     [self dismissViewControllerAnimated:YES completion:nil];
-    [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
 }
 
 -(void)didMoveToParentViewController:(UIViewController *)parent {
@@ -57,16 +56,11 @@
         [self->_uploader cancel];
 }
 
--(void)_resetStatusBar {
-    [[UIApplication sharedApplication] setStatusBarStyle:[UIColor isDarkTheme]?UIStatusBarStyleLightContent:UIStatusBarStyleDefault];
-}
-
 -(void)cancelButtonPressed:(id)sender {
     [self.tableView endEditing:YES];
     [self->_uploader cancel];
     
     [self dismissViewControllerAnimated:YES completion:nil];
-    [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
 }
 
 -(void)showCancelButton {
@@ -108,7 +102,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
+
     self->_filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22)];
     self->_filename.textAlignment = NSTextAlignmentRight;
     self->_filename.textColor = [UITableViewCell appearance].detailTextLabelColor;

@@ -15,6 +15,7 @@
 //  limitations under the License.
 
 #import "ImgurLoginViewController.h"
+#import "UIColor+IRCCloud.h"
 #import "config.h"
 
 @implementation ImgurLoginViewController
@@ -30,6 +31,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
     NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
     if (cookies != nil && cookies.count > 0) {
         for (NSHTTPCookie *cookie in cookies) {

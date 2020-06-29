@@ -93,6 +93,7 @@ UIImage *__tintedReorderImage = nil;
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
     self.tableView.separatorColor = [UIColor clearColor];
     self.tableView.editing = YES;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];

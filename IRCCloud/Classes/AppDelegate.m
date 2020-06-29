@@ -255,8 +255,6 @@
         self.mainViewController.eidToOpen = [[[[launchOptions objectForKey:UIApplicationLaunchOptionsRemoteNotificationKey] objectForKey:@"d"] objectAtIndex:2] doubleValue];
     }
 
-    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent animated:YES];
-
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {

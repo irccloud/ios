@@ -260,8 +260,6 @@
     [self.view addGestureRecognizer:self->_panGesture];
     [self->_progressView removeFromSuperview];
     [self->_movieController.player play];
-    if([UIApplication sharedApplication].delegate.window.rootViewController == self)
-        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
     [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
         kFIRParameterContentType:@"Animation"
     }];
@@ -400,8 +398,6 @@
             [UIView setAnimationDuration:0.25];
             self->_imageView.alpha = 1;
             [UIView commitAnimations];
-            if([UIApplication sharedApplication].delegate.window.rootViewController == self)
-                [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
             [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
                 kFIRParameterContentType:@"Image"
             }];
@@ -415,7 +411,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
+
     if(@available(iOS 11, *))
         self->_imageView.accessibilityIgnoresInvertColors = YES;
 
@@ -431,6 +427,14 @@
     
     if(self->_previewing)
         self->_toolbar.hidden = YES;
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent;
+}
+
+-(BOOL)prefersStatusBarHidden {
+    return YES;
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {

@@ -48,7 +48,7 @@
 
 @end
 
-@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,UIPopoverControllerDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate,IRCColorPickerViewDelegate,UIDropInteractionDelegate
+@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,ImageUploaderDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate,IRCColorPickerViewDelegate,UIDropInteractionDelegate
 > {
     IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_connectingView;
@@ -105,7 +105,6 @@
     CGSize _kbSize;
     NickCompletionView *_nickCompletionView;
     NSTimer *_nickCompletionTimer;
-    UIPopoverController *_popover;
     NSTimeInterval _lastNotificationTime;
     BOOL _isShowingPreview;
     NSString *_currentTheme;

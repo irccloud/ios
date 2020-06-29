@@ -98,6 +98,7 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_doneButtonPressed)];
     self->_chrome = [[OpenInChromeController alloc] init];
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
     self.automaticallyAdjustsScrollViewInsets = NO;
 
     self->_lineNumbers = [[UISwitch alloc] initWithFrame:CGRectZero];

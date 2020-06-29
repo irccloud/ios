@@ -548,6 +548,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     NSString *name = [userInfo objectForKey:@"name"];
     
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
 
     self->_network = [[UITextField alloc] initWithFrame:CGRectZero];
     self->_network.placeholder = @"Network";

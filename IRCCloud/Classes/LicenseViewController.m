@@ -28,6 +28,7 @@
     [super viewDidLoad];
     self.navigationItem.title = @"Licenses";
     self.navigationController.navigationBar.clipsToBounds = YES;
+    self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
     UITextView *tv = [[UITextView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,self.view.frame.size.height)];
     tv.textColor = [UIColor messageTextColor];
     tv.backgroundColor = [UIColor contentBackgroundColor];
