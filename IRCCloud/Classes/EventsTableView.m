@@ -328,7 +328,6 @@ extern UIImage *__socketClosedBackgroundImage;
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = viewControllerToCommit;
         [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
-        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
         [viewControllerToCommit didMoveToParentViewController:nil];
     } else if([viewControllerToCommit isKindOfClass:[YouTubeViewController class]]) {
         viewControllerToCommit.modalPresentationStyle = UIModalPresentationCustom;

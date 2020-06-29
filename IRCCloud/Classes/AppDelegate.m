@@ -329,7 +329,7 @@
     return [self continueActivity:userActivity];
 }
 
-- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
     if([FIROptions defaultOptions])
         [FIRAnalytics handleOpenURL:url];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -1007,7 +1007,7 @@
 -(void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts API_AVAILABLE(ios(13.0)) {
     [_appDelegate setActiveScene:self.window];
     for(UIOpenURLContext *c in URLContexts) {
-        [_appDelegate application:[UIApplication sharedApplication] handleOpenURL:c.URL];
+        [_appDelegate application:[UIApplication sharedApplication] handleOpenURL:c.URL options:nil];
     }
 }
 

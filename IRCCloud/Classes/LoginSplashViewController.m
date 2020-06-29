@@ -107,7 +107,7 @@
     
     sourceSansPro = [UIFont fontWithName:@"SourceSansPro-Regular" size:16];
     
-    self.view.frame = [UIScreen mainScreen].applicationFrame;
+    self.view.frame = [UIScreen mainScreen].bounds;
     username.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, username.frame.size.height)];
     username.leftViewMode = UITextFieldViewModeAlways;
     username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, username.frame.size.height)];

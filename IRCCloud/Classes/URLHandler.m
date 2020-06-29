@@ -659,7 +659,6 @@
         player.modalPresentationStyle = UIModalPresentationFullScreen;
         player.player = [[AVPlayer alloc] initWithURL:url];
         [mainViewController presentViewController:player animated:YES completion:nil];
-        [[UIApplication sharedApplication] setStatusBarHidden:YES withAnimation:UIStatusBarAnimationSlide];
         [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
             kFIRParameterContentType:@"Video"
         }];

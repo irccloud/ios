@@ -230,7 +230,7 @@
 
     self->_messageFooter = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, 32)];
     self->_messageFooter.backgroundColor = [UIColor clearColor];
-    self->_messageFooter.textColor = [UILabel appearanceWhenContainedIn:[UITableViewHeaderFooterView class], nil].textColor;
+    self->_messageFooter.textColor = [UILabel appearanceWhenContainedInInstancesOfClasses:@[UITableViewHeaderFooterView.class]].textColor;
     self->_messageFooter.textAlignment = NSTextAlignmentCenter;
     self->_messageFooter.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self->_messageFooter.numberOfLines = 0;

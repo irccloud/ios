@@ -1803,7 +1803,7 @@ NSArray *_sortedChannels;
     int height = size.height;
     
     CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
-    height = [UIScreen mainScreen].applicationFrame.size.height + [UIApplication sharedApplication].statusBarFrame.size.height - origin.y;
+    height = [UIScreen mainScreen].bounds.size.height + [UIApplication sharedApplication].statusBarFrame.size.height - origin.y;
     if(@available(iOS 11, *)) {
         height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
     }
@@ -4590,7 +4590,6 @@ NSArray *_sortedChannels;
     [UIColor setTheme];
     [self applyTheme];
     [self dismissViewControllerAnimated:YES completion:nil];
-    [self performSelector:@selector(_resetStatusBar) withObject:nil afterDelay:0.1];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     [self _hideConnectingView];
