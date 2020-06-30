@@ -72,8 +72,7 @@
 -(void)_fetchPaste {
     NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":self->_pasteID, @"type":@"json"} error:nil];
     
-    NSURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]];
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    [[[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             NSLog(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
         } else {
@@ -84,7 +83,7 @@
             self->_extension = [dict objectForKey:@"extension"];
         }
         self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Save" style:UIBarButtonItemStyleDone target:self action:@selector(sendButtonPressed:)];
-    }];
+    }] resume];
 }
 
 -(void)sendButtonPressed:(id)sender {

@@ -67,8 +67,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
 #endif
     
-    NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:NetworksListLink]];
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    [[[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:NetworksListLink] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             NSLog(@"Error fetching remote networks list. Error %li : %@", (long)error.code, error.userInfo);
             
@@ -81,11 +80,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
                 NSDictionary *server = [(NSArray *)network[NetworkServersKey] objectAtIndex:0];
                 if(server) {
                     [networks addObject:@{
-                                          @"network": network[NetworkNameKey],
-                                          @"host": server[ServerHostNameKey],
-                                          @"port": server[ServerPortKey],
-                                          @"SSL": server[ServerHasSSLKey]
-                                          }];
+                        @"network": network[NetworkNameKey],
+                        @"host": server[ServerHostNameKey],
+                        @"port": server[ServerPortKey],
+                        @"SSL": server[ServerHasSSLKey]
+                    }];
                 }
             }
             self->_networks = networks;
@@ -95,7 +94,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
         [self->_activityIndicator removeFromSuperview];
         
         [self.tableView reloadData];
-    }];
+    }] resume];
 }
 
 - (void)didReceiveMemoryWarning {

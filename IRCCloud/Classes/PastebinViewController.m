@@ -146,7 +146,7 @@
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:[NSString stringWithFormat:@"session=%@",NetworkConnection.sharedInstance.session] forHTTPHeaderField:@"Cookie"];
 
-        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             if (error) {
                 NSLog(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
             } else {
@@ -178,7 +178,7 @@
                     
                 }
             }];
-        }];
+        }] resume];
     }
 }
 

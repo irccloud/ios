@@ -219,7 +219,7 @@
         } else if([url.host.lowercaseString isEqualToString:@"cl.ly"]) {
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
-            [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
                     NSLog(@"Error fetching cl.ly metadata. Error %li : %@", (long)error.code, error.userInfo);
                     callback(NO,error.localizedDescription);
@@ -236,13 +236,13 @@
                         callback(NO,@"This image type is not supported");
                     }
                 }
-            }];
+            }] resume];
         } else if([url.path hasPrefix:@"/wiki/"] && [url.absoluteString containsString:@"/File:"]) {
             NSString *title = [url.absoluteString substringFromIndex:[url.absoluteString rangeOfString:@"/File:"].location + 1];
             NSURL *wikiurl = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", title] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:wikiurl];
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
-            [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+            [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
                     NSLog(@"Error fetching MediaWiki metadata. Error %li : %@", (long)error.code, error.userInfo);
                     callback(NO,error.localizedDescription);
@@ -260,7 +260,7 @@
                         callback(NO,@"This image type is not supported");
                     }
                 }
-            }];
+            }] resume];
         } else if([url.host.lowercaseString isEqualToString:@"xkcd.com"] || [url.host.lowercaseString hasSuffix:@".xkcd.com"]) {
             [self _loadXKCD:url result:callback];
         }
@@ -270,7 +270,7 @@
 -(void)_loadOembed:(NSString *)url result:(mediaURLResult)callback original_url:(NSURL *)original_url {
     NSURL *URL = [NSURL URLWithString:url];
     NSURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             NSLog(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
@@ -304,14 +304,14 @@
                 callback(NO,@"This URL type is not supported");
             }
         }
-    }];
+    }] resume];
 }
 
 -(void)_loadGiphy:(NSString *)gifID result:(mediaURLResult)callback original_url:(NSURL *)original_url {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.giphy.com/v1/gifs/%@?api_key=dc6zaTOxFJmzC", gifID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             NSLog(@"Error fetching giphy. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
@@ -340,7 +340,7 @@
                 callback(NO,@"Unexpected response from server");
             }
         }
-    }];
+    }] resume];
 }
 
 -(void)_loadImgur:(NSString *)ID type:(NSString *)type result:(mediaURLResult)callback original_url:(NSURL *)original_url {
@@ -355,7 +355,7 @@
     [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
 #endif
     
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
@@ -422,14 +422,14 @@
                 callback(NO,@"Unexpected response from server");
             }
         }
-    }];
+    }] resume];
 }
 
 -(void)_loadXKCD:(NSURL *)original_url result:(mediaURLResult)callback {
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/info.0.json", original_url.absoluteString]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             NSLog(@"Error fetching xkcd. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
@@ -448,7 +448,7 @@
                 callback(NO,@"Unexpected response from server");
             }
         }
-    }];
+    }] resume];
 }
 
 + (BOOL)isImageURL:(NSURL *)url
@@ -482,7 +482,7 @@
 
     if([_fileIDs objectForKey:url]) {
         NSURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, [_fileIDs objectForKey:url]]]];
-        [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue mainQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+        [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             NSURL *result = url;
             if (error) {
                 NSLog(@"Error fetching file metadata. Error %li : %@", (long)error.code, error.userInfo);
@@ -507,7 +507,7 @@
                 [self->_fileIDs removeObjectForKey:result];
                 [self launchURL:result];
             }];
-        }];
+        }] resume];
 
         return;
     }

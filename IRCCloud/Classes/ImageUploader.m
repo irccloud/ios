@@ -51,7 +51,7 @@
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"refresh_token=%@&client_id=%@&client_secret=%@&grant_type=refresh_token", [d objectForKey:@"imgur_refresh_token"], @IMGUR_KEY, @IMGUR_SECRET] dataUsingEncoding:NSUTF8StringEncoding]];
     
-    [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
+    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             NSLog(@"Error renewing token. Error %li : %@", (long)error.code, error.userInfo);
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -73,7 +73,7 @@
                 [self->_delegate performSelector:@selector(imageUploadNotAuthorized) withObject:nil afterDelay:0.25];
             }
         }
-    }];
+    }] resume];
 #else
     [self->_delegate performSelector:@selector(imageUploadNotAuthorized) withObject:nil afterDelay:0.25];
 #endif
