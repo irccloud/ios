@@ -178,11 +178,7 @@
         for(NSString *channel in channels) {
             NSUInteger offset = data.length;
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@" • %@\n", channel] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
-            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)channel, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-            if(url_escaped != NULL) {
-                [links addObject:[NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(offset + 3, data.length - offset - 3) URL:[NSURL URLWithString:[NSString stringWithFormat:@"irc://%i/%@", s.cid, url_escaped]]]];
-                CFRelease(url_escaped);
-            }
+            [links addObject:[NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(offset + 3, data.length - offset - 3) URL:[NSURL URLWithString:[NSString stringWithFormat:@"irc://%i/%@", s.cid, [channel stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]]]];
         }
     }
 }

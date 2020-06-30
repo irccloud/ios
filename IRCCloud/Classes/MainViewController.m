@@ -2764,10 +2764,10 @@ NSArray *_sortedChannels;
     }
     
     if([url.path hasPrefix:@"/irc/"] && url.pathComponents.count >= 4) {
-        NSString *network = [[url.pathComponents objectAtIndex:2] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *network = [[url.pathComponents objectAtIndex:2] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
         NSString *type = [url.pathComponents objectAtIndex:3];
         if([type isEqualToString:@"channel"] || [type isEqualToString:@"messages"]) {
-            NSString *name = [[url.pathComponents objectAtIndex:4] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSString *name = [[url.pathComponents objectAtIndex:4] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
             
             for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
                 NSString *serverHost = [s.hostname lowercaseString];
@@ -2826,7 +2826,7 @@ NSArray *_sortedChannels;
         if(s != nil) {
             match = YES;
             CFStringRef path = CFURLCopyPath((CFURLRef)url);
-            NSString *channel = [[(__bridge NSString *)path stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding] substringFromIndex:1];
+            NSString *channel = [[(__bridge NSString *)path stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]] substringFromIndex:1];
             CFRelease(path);
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
             if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
@@ -3050,7 +3050,8 @@ NSArray *_sortedChannels;
 -(void)userActivityWillSave:(NSUserActivity *)activity {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
 #ifndef ENTERPRISE
-        CFStringRef draft_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)(self->_message.text?self->_message.text:@""), NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
+    NSString *draft_escaped = self->_message.text?self->_message.text:@"";
+    draft_escaped = [draft_escaped stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
     Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
     if([self->_buffer.type isEqualToString:@"console"]) {
         if(self->_message.text.length)
@@ -3060,12 +3061,11 @@ NSArray *_sortedChannels;
         activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", s.hostname];
     } else {
         if(self->_message.text.length)
-            activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#?/text=%@&url=%@%@:%i/%@", draft_escaped, s.ssl?@"ircs://":@"", s.hostname, s.port, [self->_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#?/text=%@&url=%@%@:%i/%@", draft_escaped, s.ssl?@"ircs://":@"", s.hostname, s.port, [self->_buffer.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
         else
-            activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@%@:%i/%@", s.ssl?@"ircs://":@"", s.hostname, s.port, [self->_buffer.name stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@%@:%i/%@", s.ssl?@"ircs://":@"", s.hostname, s.port, [self->_buffer.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
         activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", self->_buffer.name];
     }
-    CFRelease(draft_escaped);
 #endif
         [activity addUserInfoEntriesFromDictionary:@{@"bid":@(self->_buffer.bid), @"cid":@(self->_buffer.cid), @"draft":(self->_message.text?self->_message.text:@"")}];
     }];

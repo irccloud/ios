@@ -2773,11 +2773,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     } else {
                         NSString *url = [[e.formatted attributedSubstringFromRange:result.range] string];
                         if(![url hasPrefix:@"irc"]) {
-                            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                            if(url_escaped != NULL) {
-                                url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                                CFRelease(url_escaped);
-                            }
+                            url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]];
                         }
                         NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
                         if(u)
@@ -2799,11 +2795,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     } else {
                         NSString *url = [[e.formattedRealname attributedSubstringFromRange:result.range] string];
                         if(![url hasPrefix:@"irc"]) {
-                            CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                            if(url_escaped != NULL) {
-                                url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, url_escaped];
-                                CFRelease(url_escaped);
-                            }
+                            url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]];
                         }
                         NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
                         if(u)
@@ -3260,7 +3252,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     if(!extension.length)
                         extension = [@"." stringByAppendingString:[[e.entities objectForKey:@"mime_type"] substringFromIndex:[[e.entities objectForKey:@"mime_type"] rangeOfString:@"/"].location + 1]];
                     if([[[e.entities objectForKey:@"name"] lowercaseString] hasSuffix:extension.lowercaseString]) {
-                        [_urlHandler launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"name"] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
+                        [_urlHandler launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [[e.entities objectForKey:@"name"] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]]];
                     } else {
                         [_urlHandler launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/%@%@", [[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[e.entities objectForKey:@"id"]} error:nil], [e.entities objectForKey:@"id"], extension]]];
                     }

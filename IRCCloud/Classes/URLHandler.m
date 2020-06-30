@@ -145,11 +145,11 @@
     
     if([[url.host lowercaseString] isEqualToString:@"www.dropbox.com"]) {
         if([url.path hasPrefix:@"/s/"])
-            url = [NSURL URLWithString:[NSString stringWithFormat:@"https://dl.dropboxusercontent.com%@", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            url = [NSURL URLWithString:[NSString stringWithFormat:@"https://dl.dropboxusercontent.com%@", [url.path stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
         else
             url = [NSURL URLWithString:[NSString stringWithFormat:@"%@?dl=1", url.absoluteString]];
     } else if(([[url.host lowercaseString] isEqualToString:@"d.pr"] || [[url.host lowercaseString] isEqualToString:@"droplr.com"]) && [url.path hasPrefix:@"/i/"] && ![url.path hasSuffix:@"+"]) {
-        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://droplr.com%@+", [url.path stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        url = [NSURL URLWithString:[NSString stringWithFormat:@"https://droplr.com%@+", [url.path stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
     } else if([[url.host lowercaseString] isEqualToString:@"imgur.com"] || [[url.host lowercaseString] isEqualToString:@"m.imgur.com"]) {
         return nil;
     } else if([[url.host lowercaseString] isEqualToString:@"i.imgur.com"]) {
@@ -239,7 +239,7 @@
             }];
         } else if([url.path hasPrefix:@"/wiki/"] && [url.absoluteString containsString:@"/File:"]) {
             NSString *title = [url.absoluteString substringFromIndex:[url.absoluteString rangeOfString:@"/File:"].location + 1];
-            NSURL *wikiurl = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", title] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            NSURL *wikiurl = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", title] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:wikiurl];
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
             [NSURLConnection sendAsynchronousRequest:request queue:[NSOperationQueue currentQueue] completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -760,10 +760,10 @@
 
 + (int)URLtoBID:(NSURL *)url {
     if([url.path hasPrefix:@"/irc/"] && url.pathComponents.count >= 4) {
-        NSString *network = [[url.pathComponents objectAtIndex:2] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+        NSString *network = [[url.pathComponents objectAtIndex:2] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
         NSString *type = [url.pathComponents objectAtIndex:3];
         if([type isEqualToString:@"channel"] || [type isEqualToString:@"messages"]) {
-            NSString *name = [[url.pathComponents objectAtIndex:4] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            NSString *name = [[url.pathComponents objectAtIndex:4] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
             
             for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
                 NSString *serverHost = [s.hostname lowercaseString];

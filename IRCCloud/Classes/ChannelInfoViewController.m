@@ -284,11 +284,7 @@
             } else {
                 NSString *url = [[self->_topic attributedSubstringFromRange:result.range] string];
                 if(![url hasPrefix:@"irc"]) {
-                    CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                    if(url_escaped != NULL) {
-                        url = [NSString stringWithFormat:@"irc://%i/%@", server.cid, url_escaped];
-                        CFRelease(url_escaped);
-                    }
+                    url = [NSString stringWithFormat:@"irc://%i/%@", server.cid, [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]];
                 }
                 [self->_topicLabel addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
             }
@@ -325,11 +321,7 @@
             } else {
                 NSString *url = [[self->_topic attributedSubstringFromRange:result.range] string];
                 if(![url hasPrefix:@"irc"]) {
-                    CFStringRef url_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-                    if(url_escaped != NULL) {
-                        url = [NSString stringWithFormat:@"irc://%i/%@", server.cid, url_escaped];
-                        CFRelease(url_escaped);
-                    }
+                    url = [NSString stringWithFormat:@"irc://%i/%@", server.cid, [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]];
                 }
                 [self->_url addLinkToURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]] withRange:result.range];
             }

@@ -1424,15 +1424,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(NSDictionary *)_postRequest:(NSString *)path args:(NSDictionary *)args {
-    CFStringRef escaped = NULL;
     NSMutableString *body = [[NSMutableString alloc] init];
     
     for (NSString *key in args.allKeys) {
         if(body.length)
             [body appendString:@"&"];
-        escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)[args objectForKey:key], NULL, (CFStringRef)@"&+/?=[]();:^", kCFStringEncodingUTF8);
-        [body appendFormat:@"%@=%@",key,escaped];
-        CFRelease(escaped);
+        [body appendFormat:@"%@=%@",key,[[args objectForKey:key] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]];
     }
     
     NSData *data;
