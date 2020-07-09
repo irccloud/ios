@@ -1336,7 +1336,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    if(self.session.length && [url.scheme isEqualToString:@"https"] && [url.host isEqualToString:IRCCLOUD_HOST])
+    if(self.session.length > 1 && [url.scheme isEqualToString:@"https"] && [url.host isEqualToString:IRCCLOUD_HOST])
         [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     
     FIRHTTPMetric *metric = [[FIRHTTPMetric alloc] initWithURL:request.URL HTTPMethod:FIRHTTPMethodGET];
@@ -1429,13 +1429,13 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     for (NSString *key in args.allKeys) {
         if(body.length)
             [body appendString:@"&"];
-        [body appendFormat:@"%@=%@",key,[[args objectForKey:key] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]];
+        [body appendFormat:@"%@=%@",key,[[args objectForKey:key] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"\"#%<>[\\]^`{|}+"].invertedSet]];
     }
     
     NSData *data;
     NSHTTPURLResponse *response = nil;
     NSError *error = nil;
-    if(self.session.length && ![args objectForKey:@"session"])
+    if(self.session.length > 1 && ![args objectForKey:@"session"])
         [body appendFormat:@"&session=%@", self.session];
     
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, path]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
@@ -1445,7 +1445,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         [request setValue:[args objectForKey:@"token"] forHTTPHeaderField:@"x-auth-formtoken"];
     if([args objectForKey:@"session"])
         [request setValue:[NSString stringWithFormat:@"session=%@",[args objectForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
-    else if(self.session.length)
+    else if(self.session.length > 1)
         [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
@@ -1820,12 +1820,12 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             return;
         }
         
-        if(IRCCLOUD_HOST.length < 1) {
+        if(IRCCLOUD_HOST == nil || IRCCLOUD_HOST.length < 1) {
             CLS_LOG(@"Not connecting, no host");
             return;
         }
         
-        if(self.session.length < 1) {
+        if(_session.length < 1) {
             CLS_LOG(@"Not connecting, no session");
             return;
         }
@@ -1955,7 +1955,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         self->_highestEID = 0;
     }
     self->_reconnectTimestamp = 0;
-    [self cancelIdleTimer];
+    [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
     self->_state = kIRCCloudStateDisconnected;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
     [self->_socket close];
@@ -1992,17 +1992,19 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)fail {
-    [self clearOOB];
-    self->_failCount++;
-    if(self->_failCount < 4)
-        self->_idleInterval = self->_failCount;
-    else if(self->_failCount < 10)
-        self->_idleInterval = 10;
-    else
-        self->_idleInterval = 30;
-    self->_reconnectTimestamp = -1;
-    CLS_LOG(@"Fail count: %i will reconnect in %f seconds", _failCount, _idleInterval);
-    [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+    if(self->_session) {
+        [self clearOOB];
+        self->_failCount++;
+        if(self->_failCount < 4)
+            self->_idleInterval = self->_failCount;
+        else if(self->_failCount < 10)
+            self->_idleInterval = 10;
+        else
+            self->_idleInterval = 30;
+        self->_reconnectTimestamp = -1;
+        CLS_LOG(@"Fail count: %i will reconnect in %f seconds", _failCount, _idleInterval);
+        [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
+    }
 }
 
 -(void)webSocket:(WebSocket *)socket didClose:(NSUInteger) aStatusCode message:(NSString*) aMessage error:(NSError*) aError {
@@ -2177,6 +2179,8 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                     [self postObject:object forEvent:kIRCEventAlert];
                 } else if([[object objectForKey:@"message"] isEqualToString:@"auth"]) {
                     [self postObject:object forEvent:kIRCEventAuthFailure];
+                    if([[object objectForKey:@"_reqid"] intValue] == 0)
+                        [self logout];
                 } else if([[object objectForKey:@"message"] isEqualToString:@"set_shard"]) {
                     if([object objectForKey:@"websocket_host"])
                         IRCCLOUD_HOST = [object objectForKey:@"websocket_host"];
@@ -2208,7 +2212,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                     }];
             }
         }
-        if(!backlog && _reconnectTimestamp != 0)
+        if(!backlog && _reconnectTimestamp != -1)
             [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
     }
 }
@@ -2539,6 +2543,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     if(!err) {
         self->_keychainFailCount = 0;
         self->_session = [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
+        if(self->_session.length <= 1) {
+            NSLog(@"Removing invalid session");
+            [self setSession:nil];
+        }
         return _session;
     } else {
         self->_keychainFailCount++;

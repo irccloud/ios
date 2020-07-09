@@ -719,6 +719,18 @@
         IRCCLOUD_HOST = @"www.irccloud.com";
 #endif
         NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
+        if(!result) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [UIView beginAnimations:nil context:nil];
+                self->loginView.alpha = 1;
+                self->loadingView.alpha = 0;
+                [UIView commitAnimations];
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Communication Error" message:@"Unable to fetch configuration. Please try again shortly." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
+            });
+            return;
+        }
         IRCCLOUD_HOST = [result objectForKey:@"api_host"];
         [self _stripIRCCloudHost];
         
