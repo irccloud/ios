@@ -230,7 +230,7 @@
 #endif
         config.HTTPCookieStorage = nil;
         config.URLCache = nil;
-        config.requestCachePolicy = NSURLCacheStorageNotAllowed;
+        config.requestCachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
         config.discretionary = NO;
         session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
         self->_body = [[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding];
