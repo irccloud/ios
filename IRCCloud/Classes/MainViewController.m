@@ -2146,7 +2146,7 @@ NSArray *_sortedChannels;
 #ifndef APPSTORE
                 } else if([messageString isEqualToString:@"/crash"]) {
                     CLS_LOG(@"/crash requested");
-                    [[Crashlytics sharedInstance] crash];
+                    assert(NO);
                 } else if([messageString isEqualToString:@"/compact 1"]) {
                     CLS_LOG(@"Set compact");
                     NSMutableDictionary *p = [[NetworkConnection sharedInstance] prefs].mutableCopy;

@@ -11,7 +11,7 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
-    #import "Crashlytics/Crashlytics.h"
+    @import FirebaseCrashlytics;
 #endif
 
 #define OBJC_STRINGIFY(x) @#x
@@ -30,4 +30,4 @@
 #define SupportedOrientationsReturnType UIInterfaceOrientationMask
 
 #undef CLS_LOG
-#define CLS_LOG(__FORMAT__, ...) CLSNSLog((@"%s line %d $ " __FORMAT__), __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__)
+#define CLS_LOG(__FORMAT__, ...) [[FIRCrashlytics crashlytics] logWithFormat:@"%s line %d $ " __FORMAT__, __PRETTY_FUNCTION__, __LINE__, ##__VA_ARGS__]

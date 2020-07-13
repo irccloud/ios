@@ -617,7 +617,7 @@ volatile BOOL __socketPaused = NO;
 #endif
                        [self->_events reformat];
 #endif
-                       [[Crashlytics sharedInstance] setUserIdentifier:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
+                       [[FIRCrashlytics crashlytics] setUserID:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
                        CLS_LOG(@"Prefs: %@", [self prefs]);
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },

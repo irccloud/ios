@@ -15,7 +15,6 @@
 //  limitations under the License.
 
 #import <SafariServices/SafariServices.h>
-#import <Fabric/Fabric.h>
 #import <AdSupport/AdSupport.h>
 #import <Intents/Intents.h>
 #import "AppDelegate.h"
@@ -108,7 +107,6 @@
         [FIRApp configure];
         [FIRAnalytics setUserID:nil];
     }
-    [Fabric with:@[CrashlyticsKit]];
 #endif
     if (@available(iOS 10, *)) {
         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
