@@ -21,13 +21,7 @@ static NSString *const firefoxScheme = @"firefox:";
 
 // Custom function that does complete percent escape for constructing the URL.
 static NSString *encodeByAddingPercentEscapes(NSString *string) {
-    NSString *encodedString = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(
-    kCFAllocatorDefault,
-    (CFStringRef)string,
-    NULL,
-    (CFStringRef)@"!*'();:@&=+$,/?%#[]",
-    kCFStringEncodingUTF8));
-    return encodedString;
+    return [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"!*'();:@&=+$,/?%#[]"].invertedSet];
 }
 
 // Checks if Firefox is installed.
