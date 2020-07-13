@@ -1,6 +1,5 @@
 /*
   ARChromeActivity.h
-
   Copyright (c) 2012 Alex Robinson
   
   Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -15,15 +14,15 @@
 
 @interface ARChromeActivity : UIActivity
 
-// Empty by default. Either set this in the initializer, or set this property.
-@property (strong, nonatomic) NSURL *callbackURL;
+/// Uses the "CFBundleName" from your Info.plist by default.
+@property (strong, nonatomic, nonnull) NSString *callbackSource;
 
-// Uses the "CFBundleName" from your Info.plist by default.
-@property (strong, nonatomic) NSString *callbackSource;
+/// The text beneath the icon. Defaults to "Open in Chrome".
+@property (strong, nonatomic, nonnull) NSString *activityTitle;
 
-// The text beneath the icon. Defaults to "Chrome".
-@property (strong, nonatomic) NSString *activityTitle;
+/// Empty by default. Either set this in the initializer, or set this property. For iOS 9+, make sure you register the Chrome URL scheme in your Info.plist. See the demo project.
+@property (strong, nonatomic, nullable) NSURL *callbackURL;
 
-- (id)initWithCallbackURL:(NSURL *)callbackURL;
+- (nonnull id)initWithCallbackURL:(nullable NSURL *)callbackURL;
 
 @end
