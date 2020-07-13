@@ -491,12 +491,15 @@ typedef NS_ENUM(NSUInteger, YYAnimatedImageType) {
     LOCK(
          bufferedImage = buffer[@(nextIndex)];
          if (bufferedImage) {
-             if ((int)_incrBufferCount < _totalFrameCount) {
+             if ((int)_incrBufferCount < (int)_totalFrameCount) {
                  [buffer removeObjectForKey:@(nextIndex)];
              }
              [self willChangeValueForKey:@"currentAnimatedImageIndex"];
              _curIndex = nextIndex;
              [self didChangeValueForKey:@"currentAnimatedImageIndex"];
+             if (_curIndex + 1 == _totalFrameCount && self.loopCompletionBlock) {
+                 self.loopCompletionBlock(_totalLoop - _curLoop);
+             }
              _curFrame = bufferedImage == (id)[NSNull null] ? nil : bufferedImage;
              if (_curImageHasContentsRect) {
                  _curContentsRect = [image animatedImageContentsRectAtIndex:_curIndex];
@@ -526,9 +529,12 @@ typedef NS_ENUM(NSUInteger, YYAnimatedImageType) {
 }
 
 - (void)displayLayer:(CALayer *)layer {
-    if (_curFrame) {
-        layer.contents = (__bridge id)_curFrame.CGImage;
-    }
+    UIImage *frame = _curFrame;
+    if(!frame)
+        frame = self.image;
+
+    layer.contents = (__bridge id)frame.CGImage;
+    layer.contentsScale = frame.scale;
 }
 
 - (void)setContentsRect:(CGRect)rect forImage:(UIImage *)image{
@@ -586,7 +592,7 @@ typedef NS_ENUM(NSUInteger, YYAnimatedImageType) {
              [self didChangeValueForKey:@"currentAnimatedImageIndex"];
              self->_curFrame = [self->_curAnimatedImage animatedImageFrameAtIndex:self->_curIndex];
              if (self->_curImageHasContentsRect) {
-                 self->_curContentsRect = [self->_curAnimatedImage animatedImageContentsRectAtIndex:self->_curIndex];
+            self->_curContentsRect = [self->_curAnimatedImage animatedImageContentsRectAtIndex:self->_curIndex];
              }
              self->_time = 0;
              self->_loopEnd = NO;

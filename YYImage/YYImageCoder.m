@@ -15,8 +15,20 @@
 #import <ImageIO/ImageIO.h>
 #import <Accelerate/Accelerate.h>
 #import <QuartzCore/QuartzCore.h>
+
+#if __has_include(<MobileCoreServices/MobileCoreServices.h>)
 #import <MobileCoreServices/MobileCoreServices.h>
+#else
+#import <CoreServices/CoreServices.h>
+#endif
+
+#if TARGET_OS_IOS
+#if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_9_0
 #import <AssetsLibrary/AssetsLibrary.h>
+#else
+#import <Photos/Photos.h>
+#endif
+#endif
 #import <objc/runtime.h>
 #import <pthread.h>
 #import <zlib.h>
@@ -24,13 +36,13 @@
 
 
 #ifndef YYIMAGE_WEBP_ENABLED
-#if __has_include(<webp/decode.h>) && __has_include(<webp/encode.h>) && \
-    __has_include(<webp/demux.h>)  && __has_include(<webp/mux.h>)
+#if __has_include(<WebP/decode.h>) && __has_include(<WebP/encode.h>) && \
+    __has_include(<WebP/demux.h>)  && __has_include(<WebP/mux.h>)
 #define YYIMAGE_WEBP_ENABLED 1
-#import <webp/decode.h>
-#import <webp/encode.h>
-#import <webp/demux.h>
-#import <webp/mux.h>
+#import <WebP/decode.h>
+#import <WebP/encode.h>
+#import <WebP/demux.h>
+#import <WebP/mux.h>
 #elif __has_include("webp/decode.h") && __has_include("webp/encode.h") && \
       __has_include("webp/demux.h")  && __has_include("webp/mux.h")
 #define YYIMAGE_WEBP_ENABLED 1
@@ -2561,9 +2573,9 @@ CGImageRef YYCGImageCreateWithWebPData(CFDataRef webpData,
             CFRelease(extendedImage);
             return nil;
         }
+        CFRelease(extendedImage);
         pngDatas[0] = (__bridge id)(frameData);
         CFRelease(frameData);
-        CFRelease(extendedImage);
     }
     
     NSData *firstFrameData = pngDatas[0];
@@ -2793,23 +2805,73 @@ CGImageRef YYCGImageCreateWithWebPData(CFDataRef webpData,
     objc_setAssociatedObject(self, @selector(yy_isDecodedForDisplay), @(isDecodedForDisplay), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (void)yy_saveToAlbumWithCompletionBlock:(void(^)(NSURL *assetURL, NSError *error))completionBlock {
+#if TARGET_OS_IOS &&  __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_9_0
+- (PHAsset *)_getAssetFromlocalIdentifier:(NSString *)localIdentifier{
+    if(localIdentifier == nil){
+        NSLog(@"Cannot get asset from localID because it is nil");
+        return nil;
+    }
+    PHFetchResult *result = [PHAsset fetchAssetsWithLocalIdentifiers:@[localIdentifier] options:nil];
+    if(result.count){
+        return result[0];
+    }
+    return nil;
+}
+#endif
+
+- (void)yy_saveToAlbumWithCompletionBlock:(void(^)(BOOL success, id asset)) completionBlock {
+#if TARGET_OS_IOS
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSData *data = [self _yy_dataRepresentationForSystem:YES];
+        #if __IPHONE_OS_VERSION_MAX_ALLOWED < __IPHONE_9_0
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
         [library writeImageDataToSavedPhotosAlbum:data metadata:nil completionBlock:^(NSURL *assetURL, NSError *error){
+            BOOL success = YES;
+            PHAsset *asset = nil;
+            if (error) {
+                success = NO;
+            } else {
+                PHFetchResult *result = [PHAsset fetchAssetsWithALAssetURLs:@[assetURL] options:nil];
+                asset = [result firstObject];
+            }
+            
             if (!completionBlock) return;
             if (pthread_main_np()) {
-                completionBlock(assetURL, error);
+                completionBlock(success, asset);
             } else {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    completionBlock(assetURL, error);
+                    completionBlock(success, asset);
                 });
             }
         }];
+        #else
+        __block PHObjectPlaceholder *placeholderAsset=nil;
+        [[PHPhotoLibrary sharedPhotoLibrary] performChanges:^{
+            if (@available(iOS 9, *)) {
+                PHAssetCreationRequest *newAssetRequest = [PHAssetCreationRequest creationRequestForAsset];
+                [newAssetRequest addResourceWithType:PHAssetResourceTypePhoto data:data options:nil];
+                placeholderAsset = newAssetRequest.placeholderForCreatedAsset;
+            } else {
+                PHAssetChangeRequest *newAssetRequest = [PHAssetChangeRequest creationRequestForAssetFromImage:[UIImage imageWithData:data]];
+                placeholderAsset = newAssetRequest.placeholderForCreatedAsset;
+            }
+        } completionHandler:^(BOOL success, NSError * _Nullable error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                if (success) {
+                    PHAsset *asset = [self _getAssetFromlocalIdentifier:placeholderAsset.localIdentifier];
+                    if (completionBlock) completionBlock(YES, asset);
+                } else {
+                    if (completionBlock) completionBlock(NO, nil);
+                }
+            });
+        }];
+        #endif
     });
+#else
+    NSDictionary *userInfo = @{ NSLocalizedDescriptionKey : @"yy_saveToAlbumWithCompletionBlock failed: operation unavailable on Apple TV." };
+    completionBlock(nil, [NSError errorWithDomain:@"com.ibireme.webimage" code:-1 userInfo:userInfo]);
+#endif
 }
-
 - (NSData *)yy_imageDataRepresentation {
     return [self _yy_dataRepresentationForSystem:NO];
 }
