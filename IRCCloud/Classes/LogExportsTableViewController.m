@@ -166,13 +166,13 @@
 }
 
 -(void)refresh {
-    @synchronized(self.tableView) {
-        NSMutableDictionary *logs = [[NetworkConnection sharedInstance] getLogExports].mutableCopy;
+    [[NetworkConnection sharedInstance] getLogExportsWithHandler:^(IRCCloudJSONObject *result) {
+        NSMutableDictionary *logs = result.dictionary.mutableCopy;
         [logs removeObjectForKey:@"timezones"];
         [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:logs] forKey:@"logs_cache"];
         
         [self refresh:logs];
-    }
+    }];
 }
 
 -(void)viewWillAppear:(BOOL)animated {
@@ -182,7 +182,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"])
         [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
-    [self performSelectorInBackground:@selector(refresh) withObject:nil];
+    [self refresh];
 }
 
 -(void)viewWillDisappear:(BOOL)animated {
@@ -195,7 +195,7 @@
     
     switch(event) {
         case kIRCEventLogExportFinished:
-            [self performSelectorInBackground:@selector(refresh) withObject:nil];
+            [self refresh];
             break;
         default:
             break;
@@ -587,7 +587,7 @@
                                 [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
                                 [self->_downloadingURLs removeObjectForKey:url];
                                 [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
-                                [self refresh];
+                                [self performSelectorOnMainThread:@selector(refresh) withObject:nil waitUntilDone:YES];
                             }];
                         });
                     }]];
@@ -626,7 +626,7 @@
 #endif
     config.HTTPCookieStorage = nil;
     config.URLCache = nil;
-    config.requestCachePolicy = NSURLCacheStorageNotAllowed;
+    config.requestCachePolicy = NSURLRequestReloadIgnoringCacheData;
     config.discretionary = NO;
     session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
     

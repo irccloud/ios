@@ -31,6 +31,7 @@
     id<FilesTableViewDelegate> _delegate;
     UIView *_footerView;
     NSDictionary *_selectedFile;
+    NSURLSessionDataTask *_task;
 }
 @property id<FilesTableViewDelegate> delegate;
 @end

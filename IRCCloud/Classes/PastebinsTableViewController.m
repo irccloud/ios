@@ -217,7 +217,7 @@
     self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
 
     self->_footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
-    self->_footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     UIActivityIndicatorView *a = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
     a.center = self->_footerView.center;
     a.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
@@ -229,7 +229,7 @@
     self->_pages = 0;
     self->_pastes = nil;
     self->_canLoadMore = YES;
-    [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+    [self _loadMore];
 }
 
 -(void)editButtonPressed:(id)sender {
@@ -251,42 +251,43 @@
 }
 
 -(void)_loadMore {
-    NSDictionary *d = [[NetworkConnection sharedInstance] getPastebins:++_pages];
-    if([[d objectForKey:@"success"] boolValue]) {
-        CLS_LOG(@"Loaded pastebin list for page %i", _pages);
-        if(self->_pastes)
-            self->_pastes = [self->_pastes arrayByAddingObjectsFromArray:[d objectForKey:@"pastebins"]];
-        else
-            self->_pastes = [d objectForKey:@"pastebins"];
-        
-        self->_canLoadMore = self->_pastes.count < [[d objectForKey:@"total"] intValue];
-        [self setFooterView:self->_canLoadMore?_footerView:nil];
-        if(!_pastes.count) {
-            CLS_LOG(@"Pastebin list is empty");
+    [[NetworkConnection sharedInstance] getPastebins:++_pages handler:^(IRCCloudJSONObject *d) {
+        if([[d objectForKey:@"success"] boolValue]) {
+            CLS_LOG(@"Loaded pastebin list for page %i", self->_pages);
+            if(self->_pastes)
+                self->_pastes = [self->_pastes arrayByAddingObjectsFromArray:[d objectForKey:@"pastebins"]];
+            else
+                self->_pastes = [d objectForKey:@"pastebins"];
+            
+            self->_canLoadMore = self->_pastes.count < [[d objectForKey:@"total"] intValue];
+            [self setFooterView:self->_canLoadMore?self->_footerView:nil];
+            if(!self->_pastes.count) {
+                CLS_LOG(@"Pastebin list is empty");
+                UILabel *fail = [[UILabel alloc] init];
+                fail.text = @"\nYou haven't created any\ntext snippets yet.\n";
+                fail.numberOfLines = 3;
+                fail.textAlignment = NSTextAlignmentCenter;
+                fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+                fail.textColor = [UIColor messageTextColor];
+                [fail sizeToFit];
+                [self setFooterView:fail];
+            }
+        } else {
+            CLS_LOG(@"Failed to load pastebin list for page %i: %@", self->_pages, d);
+            self->_canLoadMore = NO;
             UILabel *fail = [[UILabel alloc] init];
-            fail.text = @"\nYou haven't created any\ntext snippets yet.\n";
-            fail.numberOfLines = 3;
+            fail.text = @"\nUnable to load snippet.\nPlease try again later.\n";
+            fail.numberOfLines = 4;
             fail.textAlignment = NSTextAlignmentCenter;
             fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
             fail.textColor = [UIColor messageTextColor];
             [fail sizeToFit];
             [self setFooterView:fail];
+            return;
         }
-    } else {
-        CLS_LOG(@"Failed to load pastebin list for page %i: %@", _pages, d);
-        self->_canLoadMore = NO;
-        UILabel *fail = [[UILabel alloc] init];
-        fail.text = @"\nUnable to load snippet.\nPlease try again later.\n";
-        fail.numberOfLines = 4;
-        fail.textAlignment = NSTextAlignmentCenter;
-        fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-        fail.textColor = [UIColor messageTextColor];
-        [fail sizeToFit];
-        [self setFooterView:fail];
-        return;
-    }
 
-    [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+        [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:NO];
+    }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -334,7 +335,7 @@
         
         if([[rows lastObject] row] >= self->_pastes.count - 5) {
             self->_canLoadMore = NO;
-            [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+            [self _loadMore];
         }
     }
 }
@@ -428,7 +429,7 @@
                 self->_pages = 0;
                 self->_pastes = nil;
                 self->_canLoadMore = YES;
-                [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+                [self _loadMore];
             }
         }];
         NSMutableArray *a = self->_pastes.mutableCopy;

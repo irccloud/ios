@@ -113,7 +113,7 @@
     self->_extensions = [[NSMutableDictionary alloc] init];
     
     self->_footerView = [[UIView alloc] initWithFrame:CGRectMake(0,0,64,64)];
-    self->_footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+    self->_footerView.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     UIActivityIndicatorView *a = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
     a.center = self->_footerView.center;
     a.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
@@ -124,7 +124,7 @@
     self->_pages = 0;
     self->_files = nil;
     self->_canLoadMore = YES;
-    [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+    [self _loadMore];
 }
 
 -(void)editButtonPressed:(id)sender {
@@ -141,42 +141,39 @@
 }
 
 -(void)_loadMore {
-    @synchronized (self) {
-        NSDictionary *d = [[NetworkConnection sharedInstance] getFiles:++_pages];
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if([[d objectForKey:@"success"] boolValue]) {
-                CLS_LOG(@"Loaded file list for page %i", self->_pages);
-                if(self->_files)
-                    self->_files = [self->_files arrayByAddingObjectsFromArray:[d objectForKey:@"files"]];
-                else
-                    self->_files = [d objectForKey:@"files"];
-                self->_canLoadMore = self->_files.count < [[d objectForKey:@"total"] intValue];
-                self.tableView.tableFooterView = self->_canLoadMore?self->_footerView:nil;
-                if(!self->_files.count) {
-                    CLS_LOG(@"File list is empty");
-                    UILabel *fail = [[UILabel alloc] init];
-                    fail.text = @"\nYou haven't uploaded any files yet.\n";
-                    fail.numberOfLines = 3;
-                    fail.textAlignment = NSTextAlignmentCenter;
-                    fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-                    [fail sizeToFit];
-                    self.tableView.tableFooterView = fail;
-                }
-            } else {
-                CLS_LOG(@"Failed to load file list for page %i: %@", self->_pages, d);
-                self->_canLoadMore = NO;
+    _task = [[NetworkConnection sharedInstance] getFiles:++_pages handler:^(IRCCloudJSONObject *d) {
+        if([[d objectForKey:@"success"] boolValue]) {
+            CLS_LOG(@"Loaded file list for page %i", self->_pages);
+            if(self->_files)
+                self->_files = [self->_files arrayByAddingObjectsFromArray:[d objectForKey:@"files"]];
+            else
+                self->_files = [d objectForKey:@"files"];
+            self->_canLoadMore = self->_files.count < [[d objectForKey:@"total"] intValue];
+            self.tableView.tableFooterView = self->_canLoadMore?self->_footerView:nil;
+            if(!self->_files.count) {
+                CLS_LOG(@"File list is empty");
                 UILabel *fail = [[UILabel alloc] init];
-                fail.text = @"\nUnable to load files.\nPlease try again later.\n";
-                fail.numberOfLines = 4;
+                fail.text = @"\nYou haven't uploaded any files yet.\n";
+                fail.numberOfLines = 3;
                 fail.textAlignment = NSTextAlignmentCenter;
                 fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
                 [fail sizeToFit];
                 self.tableView.tableFooterView = fail;
-                return;
             }
-            [self.tableView reloadData];
-        }];
-    }
+        } else {
+            CLS_LOG(@"Failed to load file list for page %i: %@", self->_pages, d);
+            self->_canLoadMore = NO;
+            UILabel *fail = [[UILabel alloc] init];
+            fail.text = @"\nUnable to load files.\nPlease try again later.\n";
+            fail.numberOfLines = 4;
+            fail.textAlignment = NSTextAlignmentCenter;
+            fail.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+            [fail sizeToFit];
+            self.tableView.tableFooterView = fail;
+            return;
+        }
+        [self.tableView reloadData];
+    }];
 }
 
 -(void)_refreshFileID:(NSString *)fileID {
@@ -217,7 +214,7 @@
         
         if([[rows lastObject] row] >= self->_files.count - 5) {
             self->_canLoadMore = NO;
-            [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+            [self _loadMore];
         }
     }
 }
@@ -294,7 +291,7 @@
                     self->_pages = 0;
                     self->_files = nil;
                     self->_canLoadMore = YES;
-                    [self performSelectorInBackground:@selector(_loadMore) withObject:nil];
+                    [self _loadMore];
                 }
             }];
             NSMutableArray *a = self->_files.mutableCopy;

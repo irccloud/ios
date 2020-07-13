@@ -44,9 +44,15 @@
         NSURLCache *httpCache = [[NSURLCache alloc] initWithMemoryCapacity:memoryCacheSize diskCapacity:diskCacheSize diskPath:@"httpCache"];
         [NSURLCache setSharedURLCache:httpCache];
         self->_cachePath = [sharedcontainer URLByAppendingPathComponent:@"imagecache"];
-        self->_session = [NSURLSession sharedSession];
-        self->_session.configuration.URLCache = httpCache;
-        self->_session.configuration.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
+
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+        config.timeoutIntervalForRequest = 30;
+        config.URLCache = httpCache;
+        config.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
+        if(@available(iOS 11, *)) {
+            config.waitsForConnectivity = NO;
+        }
+        self->_session = [NSURLSession sessionWithConfiguration:config delegate:nil delegateQueue:NSOperationQueue.mainQueue];
         self->_tasks = [[NSMutableDictionary alloc] init];
         self->_images = [[NSMutableDictionary alloc] init];
         self->_failures = [[NSMutableDictionary alloc] init];

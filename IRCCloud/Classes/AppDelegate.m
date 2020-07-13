@@ -813,7 +813,7 @@
 #endif
     config.HTTPCookieStorage = nil;
     config.URLCache = nil;
-    config.requestCachePolicy = NSURLCacheStorageNotAllowed;
+    config.requestCachePolicy = NSURLRequestReloadIgnoringCacheData;
     config.discretionary = NO;
     if([identifier hasPrefix:@"com.irccloud.logs."]) {
         LogExportsTableViewController *lvc;

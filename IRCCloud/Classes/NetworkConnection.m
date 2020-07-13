@@ -55,15 +55,14 @@ volatile BOOL __socketPaused = NO;
 @property FIRHTTPMetric *httpMetric;
 @end
 
-@interface OOBFetcher : NSObject<NSURLConnectionDelegate> {
+@interface OOBFetcher : NSObject<NSURLSessionDataDelegate> {
     SBJson5Parser *_parser;
     NSString *_url;
     BOOL _cancelled;
     BOOL _running;
-    NSURLConnection *_connection;
+    NSURLSessionDataTask *_task;
     int _bid;
     void (^_completionHandler)(BOOL);
-    FIRHTTPMetric *_metric;
 }
 @property (readonly) NSString *url;
 @property int bid;
@@ -91,14 +90,13 @@ volatile BOOL __socketPaused = NO;
         }];
         self->_cancelled = NO;
         self->_running = NO;
-        self->_metric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:self->_url] HTTPMethod:FIRHTTPMethodGET];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:self->_url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
         [request setValue:[NSString stringWithFormat:@"session=%@",[NetworkConnection sharedInstance].session] forHTTPHeaderField:@"Cookie"];
         
-        self->_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-        [self->_connection setDelegateQueue:[NetworkConnection sharedInstance].queue];
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.ephemeralSessionConfiguration delegate:self delegateQueue:[NetworkConnection sharedInstance].queue];
+        self->_task = [session dataTaskWithRequest:request];
     }
     return self;
 }
@@ -106,8 +104,7 @@ volatile BOOL __socketPaused = NO;
     CLS_LOG(@"Cancelled OOB fetcher for URL: %@", _url);
     self->_cancelled = YES;
     self->_running = NO;
-    [self->_connection cancel];
-    [self->_metric stop];
+    [self->_task cancel];
 }
 -(void)start {
     if(self->_cancelled || _running) {
@@ -115,10 +112,10 @@ volatile BOOL __socketPaused = NO;
         return;
     }
     
-    if(self->_connection) {
+    if(self->_task) {
+        CLS_LOG(@"Fetching backlog");
         self->_running = YES;
-        [self->_metric start];
-        [self->_connection start];
+        [self->_task resume];
         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogStartedNotification object:self];
     } else {
         CLS_LOG(@"Failed to create NSURLConnection");
@@ -127,63 +124,51 @@ volatile BOOL __socketPaused = NO;
             self->_completionHandler(NO);
     }
 }
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-    return nil;
-}
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    if(self->_cancelled) {
-        CLS_LOG(@"Request failed for cancelled OOB fetcher, ignoring");
-        return;
-    }
-	CLS_LOG(@"Request failed: %@", error);
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
-        if(self->_completionHandler)
-            self->_completionHandler(NO);
-    }];
-    self->_running = NO;
-    self->_cancelled = YES;
-    [self->_metric stop];
-}
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if(self->_cancelled) {
-        CLS_LOG(@"Connection finished loading for cancelled OOB fetcher, ignoring");
-        return;
-    }
-	CLS_LOG(@"Backlog download completed");
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if(!self->_cancelled) {
-            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
-            if(self->_completionHandler)
-                self->_completionHandler(YES);
+-(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    if(error) {
+        if(self->_cancelled) {
+            CLS_LOG(@"Request failed for cancelled OOB fetcher, ignoring");
+            return;
         }
-    }];
-    self->_running = NO;
-}
-- (NSURLRequest *)connection:(NSURLConnection *)connection willSendRequest:(NSURLRequest *)request redirectResponse:(NSURLResponse *)redirectResponse {
-    if(self->_cancelled)
-        return nil;
-	CLS_LOG(@"Fetching backlog");
-	return request;
-}
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
-    self->_metric.responseCode = response.statusCode;
-    self->_metric.responseContentType = response.MIMEType;
-    self->_metric.responsePayloadSize = (long)response.expectedContentLength;
-    [self->_metric stop];
-    if(!self->_cancelled && [response statusCode] != 200) {
-        CLS_LOG(@"HTTP status code: %li", (long)[response statusCode]);
-		CLS_LOG(@"HTTP headers: %@", [response allHeaderFields]);
+        CLS_LOG(@"Request failed: %@", error);
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
             if(self->_completionHandler)
                 self->_completionHandler(NO);
         }];
         self->_cancelled = YES;
-	}
+    } else {
+        if(self->_cancelled) {
+            CLS_LOG(@"Connection finished loading for cancelled OOB fetcher, ignoring");
+            return;
+        }
+        CLS_LOG(@"Backlog download completed");
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            if(!self->_cancelled) {
+                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+                if(self->_completionHandler)
+                    self->_completionHandler(YES);
+            }
+        }];
+    }
+    self->_running = NO;
 }
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    //NSLog(@"%@", [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding]);
+- (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler {
+    if(!self->_cancelled && ((NSHTTPURLResponse *)response).statusCode != 200) {
+        CLS_LOG(@"HTTP status code: %li", (long)((NSHTTPURLResponse *)response).statusCode);
+		CLS_LOG(@"HTTP headers: %@", [((NSHTTPURLResponse *)response) allHeaderFields]);
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogFailedNotification object:self];
+            if(self->_completionHandler)
+                self->_completionHandler(NO);
+        }];
+        self->_cancelled = YES;
+        completionHandler(NSURLSessionResponseCancel);
+    } else {
+        completionHandler(NSURLSessionResponseAllow);
+    }
+}
+-(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     if(!self->_cancelled) {
 #ifndef EXTENSION
         FIRTrace *trace;
@@ -257,6 +242,13 @@ volatile BOOL __socketPaused = NO;
     IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
 #endif
     if(self) {
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+        config.timeoutIntervalForRequest = 30;
+        if(@available(iOS 11, *)) {
+            config.waitsForConnectivity = NO;
+        }
+        _urlSession = [NSURLSession sessionWithConfiguration:config delegate:nil delegateQueue:NSOperationQueue.mainQueue];
+        
         [TrustKit initializeWithConfiguration:@{
                                                 kTSKSwizzleNetworkDelegates: @YES,
                                                 kTSKPinnedDomains : @{
@@ -1328,81 +1320,67 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _postRequest:@"/chat/auth-formtoken" args:@{}];
 }
 
--(NSData *)_get:(NSURL *)url {
-    NSData *data;
-    NSHTTPURLResponse *response = nil;
-    NSError *error = nil;
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    if(self.session.length > 1 && [url.scheme isEqualToString:@"https"] && [url.host isEqualToString:IRCCLOUD_HOST])
-        [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
-    
-    FIRHTTPMetric *metric = [[FIRHTTPMetric alloc] initWithURL:request.URL HTTPMethod:FIRHTTPMethodGET];
-    [metric start];
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    metric.responseCode = response.statusCode;
-    metric.responseContentType = response.MIMEType;
-    metric.responsePayloadSize = data.length;
-    [metric stop];
-    return data;
+-(NSURLSessionDataTask *)_get:(NSURL *)url handler:(IRCCloudAPIResultHandler)resultHandler {
+    if(![NSThread isMainThread]) {
+        NSLog(@"*** _get called on wrong thread");
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self _get:url handler:resultHandler];
+        }];
+        return nil;
+    } else {
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
+        [request setHTTPShouldHandleCookies:NO];
+        [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+        if(self.session.length > 1 && [url.scheme isEqualToString:@"https"] && [url.host isEqualToString:IRCCLOUD_HOST])
+            [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
+        
+        NSURLSessionDataTask * task = [_urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            if(resultHandler) {
+                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                if(dict)
+                    resultHandler([[IRCCloudJSONObject alloc] initWithDictionary:dict]);
+                else
+                    resultHandler(nil);
+            }
+        }];
+        [task resume];
+        return task;
+    }
 }
 
--(NSDictionary *)requestConfiguration {
-    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]]];
-    NSError *error = nil;
-    if(data)
-        self->_config = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+-(NSURLSessionDataTask *)requestConfigurationWithHandler:(IRCCloudAPIResultHandler)handler {
+    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] handler:^(IRCCloudJSONObject *object) {
+        if(object) {
+            self->_config = object.dictionary;
+        }
 #ifdef ENTERPRISE
-    if(![[self->_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
-        self->_globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [self->_config objectForKey:@"ios_app"]];
+        if(![[self->_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
+            self->_globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [self->_config objectForKey:@"ios_app"]];
 #endif
-    self.fileURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
-    self.pasteURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
-    self.avatarURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"avatar_uri_template"] error:nil];
-    self.avatarRedirectURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"avatar_redirect_uri_template"] error:nil];
-    return _config;
+        self.fileURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
+        self.pasteURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
+        self.avatarURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"avatar_uri_template"] error:nil];
+        self.avatarRedirectURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"avatar_redirect_uri_template"] error:nil];
+        
+        if(handler)
+            handler(object);
+    }];
 }
 
--(NSDictionary *)propertiesForFile:(NSString *)fileID {
-    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]]];
-    NSError *error = nil;
-    
-    if(data)
-        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    else
-        return nil;
+-(NSURLSessionDataTask *)propertiesForFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler {
+    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]] handler:handler];
 }
 
--(NSDictionary *)getFiles:(int)page {
-    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/files?page=%i", IRCCLOUD_HOST, page]]];
-    NSError *error = nil;
-    
-    if(data)
-        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    else
-        return nil;
+-(NSURLSessionDataTask *)getFiles:(int)page handler:(IRCCloudAPIResultHandler)handler {
+    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/files?page=%i", IRCCLOUD_HOST, page]] handler:handler];
 }
 
--(NSDictionary *)getPastebins:(int)page {
-    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/pastebins?page=%i", IRCCLOUD_HOST, page]]];
-    NSError *error = nil;
-    
-    if(data)
-        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    else
-        return nil;
+-(NSURLSessionDataTask *)getPastebins:(int)page handler:(IRCCloudAPIResultHandler)handler {
+    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/pastebins?page=%i", IRCCLOUD_HOST, page]] handler:handler];
 }
 
--(NSDictionary *)getLogExports {
-    NSData *data = [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/log-exports", IRCCLOUD_HOST]]];
-    NSError *error = nil;
-    
-    if(data)
-        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    else
-        return nil;
+-(NSURLSessionDataTask *)getLogExportsWithHandler:(IRCCloudAPIResultHandler)handler {
+    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/log-exports", IRCCLOUD_HOST]] handler:handler];
 }
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args handler:(IRCCloudAPIResultHandler)resultHandler {
@@ -1982,10 +1960,12 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         self->_idleInterval = 20;
         self->_reconnectTimestamp = -1;
         [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
-        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-        [self performSelectorInBackground:@selector(requestConfiguration) withObject:nil];
         [self.httpMetric setResponseCode:200];
         [self.httpMetric stop];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self _postConnectivityChange];
+            [self requestConfigurationWithHandler:nil];
+        }];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
     }

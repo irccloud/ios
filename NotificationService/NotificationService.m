@@ -63,8 +63,15 @@
             
             typeHint = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef _Nonnull)(type), NULL);
             
-            if(![NetworkConnection sharedInstance].config)
-                [NetworkConnection sharedInstance].config = [[NetworkConnection sharedInstance] requestConfiguration];
+            if(![NetworkConnection sharedInstance].config) {
+                [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *result) {
+                    if(result)
+                        [self didReceiveNotificationRequest:request withContentHandler:contentHandler];
+                    else
+                        self.contentHandler(self.bestAttemptContent);
+                }];
+                return;
+            }
             
             if([type hasPrefix:@"image/"])
                 attachment = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];

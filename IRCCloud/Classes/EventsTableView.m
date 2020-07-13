@@ -1238,21 +1238,16 @@ extern UIImage *__socketClosedBackgroundImage;
                         if(!backlog)
                             [self reloadForEvent:e1];
                     } else {
-                        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                            NSDictionary *properties = [self->_conn propertiesForFile:[entity objectForKey:@"id"]];
+                        [self->_conn propertiesForFile:[entity objectForKey:@"id"] handler:^(IRCCloudJSONObject *properties) {
                             if(properties) {
-                                @synchronized (self->_filePropsCache) {
-                                    [self->_filePropsCache setObject:properties forKey:[entity objectForKey:@"id"]];
+                                [self->_filePropsCache setObject:properties.dictionary forKey:[entity objectForKey:@"id"]];
+                                if(self->_buffer.bid == event.bid) {
+                                    Event *e1 = [self entity:event eid:entity_eid properties:properties.dictionary];
+                                    [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
+                                    [self reloadForEvent:e1];
                                 }
-                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                    if(self->_buffer.bid == event.bid) {
-                                        Event *e1 = [self entity:event eid:entity_eid properties:properties];
-                                        [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
-                                        [self reloadForEvent:e1];
-                                    }
-                                }];
                             }
-                        });
+                        }];
                     }
                 }
             }

@@ -156,9 +156,10 @@
             NSURL *url = [NSURL URLWithString:[self->_url stringByAppendingFormat:@"?mobile=ios&version=%@&theme=%@&own_paste=%@", [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [UIColor currentTheme], self->_ownPaste ? @"1" : @"0"]];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
             [request setHTTPShouldHandleCookies:NO];
-            [self->_webView loadRequest:request];
             
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [self->_webView loadRequest:request];
+
                 if(self->_ownPaste) {
                     [self->_toolbar setItems:@[[[UIBarButtonItem alloc] initWithTitle:@"Line Numbers" style:UIBarButtonItemStylePlain target:self action:@selector(_toggleLineNumbersSwitch)],
                                                [[UIBarButtonItem alloc] initWithCustomView:self->_lineNumbers],

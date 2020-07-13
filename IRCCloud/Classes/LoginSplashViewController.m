@@ -613,8 +613,7 @@
     [UIView commitAnimations];
     
     activity.hidden = NO;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
+    [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *result) {
         if(result) {
             IRCCLOUD_HOST = [result objectForKey:@"api_host"];
             [self _stripIRCCloudHost];
@@ -678,7 +677,7 @@
                 [UIView commitAnimations];
             }
         });
-    });
+    }];
 }
 
 -(IBAction)enterpriseLearnMorePressed:(id)sender {
@@ -714,12 +713,12 @@
     NSString *pass = password.text;
     NSString *realname = name.text;
     CGFloat nameAlpha = name.alpha;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    
+    [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *config) {
 #ifndef ENTERPRISE
         IRCCLOUD_HOST = @"www.irccloud.com";
 #endif
-        NSDictionary *result = [[NetworkConnection sharedInstance] requestConfiguration];
-        if(!result) {
+        if(!config) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [UIView beginAnimations:nil context:nil];
                 self->loginView.alpha = 1;
@@ -731,10 +730,10 @@
             });
             return;
         }
-        IRCCLOUD_HOST = [result objectForKey:@"api_host"];
+        IRCCLOUD_HOST = [config objectForKey:@"api_host"];
         [self _stripIRCCloudHost];
         
-        result = [[NetworkConnection sharedInstance] requestAuthToken];
+        NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
         if([[result objectForKey:@"success"] intValue] == 1) {
             if(nameAlpha)
                 result = [[NetworkConnection sharedInstance] signup:user password:pass realname:realname token:[result objectForKey:@"token"] impression:self->_impression?self->_impression:@""];
@@ -861,7 +860,7 @@
                 [self presentViewController:alert animated:YES completion:nil];
             });
         }
-    });
+    }];
 }
 
 -(IBAction)textFieldChanged:(id)sender {
