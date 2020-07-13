@@ -153,6 +153,11 @@
 #else
     host.hidden = YES;
 #endif
+    name.background = [UIImage imageNamed:@"login_top_input"];
+    username.background = [UIImage imageNamed:@"login_top_input"];
+    password.background = [UIImage imageNamed:@"login_bottom_input"];
+    host.background = [UIImage imageNamed:@"login_only_input"];
+
     [self transitionToSize:self.view.bounds.size];
 }
 
@@ -326,7 +331,7 @@
         username.background = [UIImage imageNamed:@"login_only_input"];
     else
         username.background = [UIImage imageNamed:@"login_top_input"];
-    
+
     if(sendAccessLink.alpha) {
         usernameYOffset.constant = 16 + 26;
     } else {
