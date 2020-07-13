@@ -28,8 +28,8 @@
 -(void)fileUploadWillUpload:(NSUInteger)bytes mimeType:(NSString *)mimeType;
 @end
 
-@interface FileUploader : NSObject<NSURLConnectionDelegate,NSURLConnectionDataDelegate,NSURLSessionDataDelegate,NSURLSessionDownloadDelegate> {
-    NSURLConnection *_connection;
+@interface FileUploader : NSObject<NSURLSessionDataDelegate,NSURLSessionDownloadDelegate> {
+    NSURLSessionTask *_task;
     NSMutableData *_response;
     NSObject<FileUploaderDelegate> *_delegate;
     NSObject<FileUploaderMetadataDelegate> *_metadatadelegate;

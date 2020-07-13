@@ -197,10 +197,12 @@
 #endif
     int size = [[d objectForKey:@"photoSize"] intValue];
     NSData *data = UIImageJPEGRepresentation((size != -1)?[self image:img scaledCopyOfSize:CGSizeMake(size,size)]:img, 0.8);
-    NSString *data_escaped = [[data base64EncodedString] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
+    NSString *data_escaped = [[data base64EncodedString] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"&+/?=[]();:^"].invertedSet];
     
 #ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
+    }];
 #endif
 #ifdef MASHAPE_KEY
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:@"https://imgur-apiv3.p.mashape.com/3/image"] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
@@ -219,67 +221,40 @@
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding]];
     
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"]) {
-        NSURLSession *session;
-        NSURLSessionConfiguration *config;
-        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+    NSURLSession *session;
+    NSURLSessionConfiguration *config;
+    config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
 #ifdef ENTERPRISE
-        config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+    config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else
-        config.sharedContainerIdentifier = @"group.com.irccloud.share";
+    config.sharedContainerIdentifier = @"group.com.irccloud.share";
 #endif
-        config.HTTPCookieStorage = nil;
-        config.URLCache = nil;
-        config.requestCachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
-        config.discretionary = NO;
-        session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-        self->_body = [[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding];
-        NSURLSessionTask *task = [session downloadTaskWithRequest:request];
+    config.HTTPCookieStorage = nil;
+    config.URLCache = nil;
+    config.requestCachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
+    config.discretionary = NO;
+    session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    self->_body = [[NSString stringWithFormat:@"image=%@", data_escaped] dataUsingEncoding:NSUTF8StringEncoding];
+    _task = [session downloadTaskWithRequest:request];
+    
+    if(session.configuration.identifier) {
+        NSMutableDictionary *tasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+        if(!tasks)
+            tasks = [[NSMutableDictionary alloc] init];
         
-        if(session.configuration.identifier) {
-            NSMutableDictionary *tasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
-            if(!tasks)
-                tasks = [[NSMutableDictionary alloc] init];
-            
-            if(self->_msg)
-                [tasks setObject:@{@"service":@"imgur", @"bid":@(self->_bid), @"msg":self->_msg} forKey:session.configuration.identifier];
-            else
-                [tasks setObject:@{@"service":@"imgur", @"bid":@(self->_bid)} forKey:session.configuration.identifier];
+        if(self->_msg)
+            [tasks setObject:@{@"service":@"imgur", @"bid":@(self->_bid), @"msg":self->_msg} forKey:session.configuration.identifier];
+        else
+            [tasks setObject:@{@"service":@"imgur", @"bid":@(self->_bid)} forKey:session.configuration.identifier];
 
-            [d setObject:tasks forKey:@"uploadtasks"];
-            [d synchronize];
-        }
-
-        [task resume];
-    } else {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            self->_connection = [NSURLConnection connectionWithRequest:request delegate:self];
-            [self->_connection start];
-        }];
+        [d setObject:tasks forKey:@"uploadtasks"];
+        [d synchronize];
     }
+
+    [_task resume];
 }
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-    return nil;
-}
-
--(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
-    if(self->_delegate)
-        [self->_delegate imageUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
-}
-
--(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [self->_response appendData:data];
-}
-
--(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-#ifndef EXTENSION
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-#endif
-    [self->_delegate imageUploadDidFail];
-}
-
--(void)connectionDidFinishLoading:(NSURLConnection *)connection {
+-(void)connectionDidFinishLoading {
 #ifdef EXTENSION
 #ifdef ENTERPRISE
     NSUserDefaults *defaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
@@ -305,13 +280,14 @@
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend {
-    [self connection:self->_connection didSendBodyData:(NSInteger)bytesSent totalBytesWritten:(NSInteger)totalBytesSent totalBytesExpectedToWrite:(NSInteger)_body.length];
+    if(self->_delegate)
+        [self->_delegate imageUploadProgress:(float)totalBytesSent / (float)_body.length];
 }
 
 - (void)URLSession:(NSURLSession *)session downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location {
     self->_response = [NSData dataWithContentsOfURL:location].mutableCopy;
     [[NSFileManager defaultManager] removeItemAtURL:location error:nil];
-    [self connectionDidFinishLoading:self->_connection];
+    [self connectionDidFinishLoading];
     NSUserDefaults *d;
 #ifdef ENTERPRISE
     d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
@@ -322,6 +298,13 @@
     [uploadtasks removeObjectForKey:session.configuration.identifier];
     [d setObject:uploadtasks forKey:@"uploadtasks"];
     [d synchronize];
+}
+
+-(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
+    if(!self->_response)
+        self->_response = data.mutableCopy;
+    else
+        [self->_response appendData:data];
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
@@ -359,8 +342,9 @@
                 [request setHTTPBody:self->_body];
                 
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    self->_connection = [NSURLConnection connectionWithRequest:request delegate:self];
-                    [self->_connection start];
+                    NSURLSession *session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration delegate:self delegateQueue:NSOperationQueue.mainQueue];
+                    self->_task = [session dataTaskWithRequest:request];
+                    [self->_task resume];
                     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
                 }];
                 return;

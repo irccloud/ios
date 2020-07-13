@@ -589,9 +589,6 @@
         [[NSUserDefaults standardUserDefaults] setBool:self->_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
         [[NSUserDefaults standardUserDefaults] setBool:self->_avatarImages.isOn forKey:@"avatarImages"];
         [[NSUserDefaults standardUserDefaults] setBool:!_hiddenMembers.isOn forKey:@"hiddenMembers"];
-#ifndef APPSTORE
-        [[NSUserDefaults standardUserDefaults] setBool:self->_backgroundUploads.isOn forKey:@"backgroundUploads"];
-#endif
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -845,9 +842,6 @@
     }
     [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":self->_saveToCameraRoll}];
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
-#ifndef APPSTORE
-    [photos addObject:@{@"title":@"Upload In The Background", @"accessory":self->_backgroundUploads}];
-#endif
 
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
     if(@available(iOS 10, *)) {
@@ -1012,7 +1006,6 @@
     [self->_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     self->_clearFormattingAfterSending = [[UISwitch alloc] init];
     self->_avatarImages = [[UISwitch alloc] init];
-    self->_backgroundUploads = [[UISwitch alloc] init];
     self->_colorizeMentions = [[UISwitch alloc] init];
     self->_hiddenMembers = [[UISwitch alloc] init];
     self->_muteNotifications = [[UISwitch alloc] init];
@@ -1275,9 +1268,6 @@
     self->_thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
     self->_clearFormattingAfterSending.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"];
     self->_avatarImages.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
-#ifndef APPSTORE
-    self->_backgroundUploads.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"];
-#endif
 }
 
 -(void)hideJoinPartToggled:(id)sender {

@@ -23,8 +23,8 @@
 -(void)imageUploadDidFinish:(NSDictionary *)response bid:(int)bid;
 @end
 
-@interface ImageUploader : NSObject<NSURLConnectionDelegate,NSURLConnectionDataDelegate,NSURLSessionDataDelegate,NSURLSessionDownloadDelegate> {
-    NSURLConnection *_connection;
+@interface ImageUploader : NSObject<NSURLSessionDataDelegate,NSURLSessionDownloadDelegate> {
+    NSURLSessionTask *_task;
     UIImage *_image;
     NSMutableData *_response;
     NSObject<ImageUploaderDelegate> *_delegate;

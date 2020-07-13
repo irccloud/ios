@@ -160,7 +160,7 @@
         [[NSFileManager defaultManager] removeItemAtURL:sharedcontainer error:nil];
     }
     
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"browser":[SFSafariViewController class]?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES), @"backgroundUploads":@(YES)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"browser":[SFSafariViewController class]?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES)}];
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
 
     if (@available(iOS 13, *)) {
@@ -724,14 +724,16 @@
         [self->_conn serialize];
         [NSThread sleepForTimeInterval:[UIApplication sharedApplication].backgroundTimeRemaining - 5];
         if(background_task == self->_background_task) {
-            self->_background_task = UIBackgroundTaskInvalid;
-            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-                CLS_LOG(@"Background task timed out, disconnecting websocket");
-                [[NetworkConnection sharedInstance] performSelectorOnMainThread:@selector(disconnect) withObject:nil waitUntilDone:NO];
-                [[NetworkConnection sharedInstance] serialize];
-                [NetworkConnection sync];
-            }
-            [application endBackgroundTask: background_task];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self->_background_task = UIBackgroundTaskInvalid;
+                if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
+                    CLS_LOG(@"Background task timed out, disconnecting websocket");
+                    [[NetworkConnection sharedInstance] disconnect];
+                    [[NetworkConnection sharedInstance] serialize];
+                    [NetworkConnection sync];
+                }
+                [application endBackgroundTask: background_task];
+            });
         }
     });
     if(self.window.rootViewController != self->_slideViewController && [ServersDataSource sharedInstance].count) {

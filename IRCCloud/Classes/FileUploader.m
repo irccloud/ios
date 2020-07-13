@@ -44,7 +44,7 @@
     self->_cancelled = YES;
     self->_bid = -1;
     self->_msg = self->_filename = self->_originalFilename = self->_mimeType = nil;
-    [self->_connection cancel];
+    [self->_task cancel];
     if(self->_delegate)
         [self->_delegate fileUploadWasCancelled];
 }
@@ -439,39 +439,28 @@
     
     if(self->_metadatadelegate)
         [self->_metadatadelegate fileUploadWillUpload:file.length mimeType:self->_mimeType];
-
-#ifndef APPSTORE
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"backgroundUploads"]) {
-#endif
-        NSURLSession *session;
-        NSURLSessionConfiguration *config;
-        config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
+    
+    NSURLSession *session;
+    NSURLSessionConfiguration *config;
+    config = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:[NSString stringWithFormat:@"com.irccloud.share.image.%li", time(NULL)]];
 #ifdef ENTERPRISE
-        config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
+    config.sharedContainerIdentifier = @"group.com.irccloud.enterprise.share";
 #else
-        config.sharedContainerIdentifier = @"group.com.irccloud.share";
+    config.sharedContainerIdentifier = @"group.com.irccloud.share";
 #endif
-        config.HTTPCookieStorage = nil;
-        config.URLCache = nil;
-        config.requestCachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
-        config.discretionary = NO;
-        session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
-        NSURLSessionTask *task = [session downloadTaskWithRequest:request];
-        
-        if(session.configuration.identifier) {
-            self->_backgroundID = session.configuration.identifier;
-            [self _updateBackgroundUploadMetadata];
-        }
-
-        [task resume];
-#ifndef APPSTORE
-    } else {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            self->_connection = [NSURLConnection connectionWithRequest:request delegate:self];
-            [self->_connection start];
-        }];
+    config.HTTPCookieStorage = nil;
+    config.URLCache = nil;
+    config.requestCachePolicy = NSURLRequestReloadIgnoringLocalAndRemoteCacheData;
+    config.discretionary = NO;
+    session = [NSURLSession sessionWithConfiguration:config delegate:self delegateQueue:[NSOperationQueue mainQueue]];
+    _task = [session downloadTaskWithRequest:request];
+    
+    if(session.configuration.identifier) {
+        self->_backgroundID = session.configuration.identifier;
+        [self _updateBackgroundUploadMetadata];
     }
-#endif
+
+    [_task resume];
 }
 
 -(void)_updateBackgroundUploadMetadata {
@@ -494,28 +483,7 @@
     [d synchronize];
 }
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-    return nil;
-}
-
--(void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
-    if(self->_delegate && !_cancelled)
-        [self->_delegate fileUploadProgress:(float)totalBytesWritten / (float)totalBytesExpectedToWrite];
-}
-
--(void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    [self->_response appendData:data];
-}
-
--(void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
-    CLS_LOG(@"Error: %@", error);
-    [self->_delegate fileUploadDidFail:error.localizedDescription];
-}
-
--(void)connectionDidFinishLoading:(NSURLConnection *)connection {
+-(void)connectionDidFinishLoading {
 #ifndef EXTENSION
     [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
 #endif
@@ -543,7 +511,9 @@
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didSendBodyData:(int64_t)bytesSent totalBytesSent:(int64_t)totalBytesSent totalBytesExpectedToSend:(int64_t)totalBytesExpectedToSend {
     CLS_LOG(@"Sent body data: %lli / %lli", totalBytesSent, totalBytesExpectedToSend);
-    [self connection:self->_connection didSendBodyData:(NSInteger)bytesSent totalBytesWritten:(NSInteger)totalBytesSent totalBytesExpectedToWrite:(NSInteger)_body.length];
+    _response = nil;
+    if(self->_delegate && !_cancelled)
+        [self->_delegate fileUploadProgress:(float)totalBytesSent / (float)_body.length];
 }
 
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task willPerformHTTPRedirection:(NSHTTPURLResponse *)response newRequest:(NSURLRequest *)request completionHandler:(void (^)(NSURLRequest * _Nullable))completionHandler {
@@ -555,7 +525,6 @@
     self->_response = [NSData dataWithContentsOfURL:location].mutableCopy;
     CLS_LOG(@"Did finish downloading to URL: %@", location);
     [[NSFileManager defaultManager] removeItemAtURL:location error:nil];
-    [self connectionDidFinishLoading:self->_connection];
     NSUserDefaults *d;
 #ifdef ENTERPRISE
     d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
@@ -568,17 +537,26 @@
     [d synchronize];
 }
 
+-(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
+    if(!self->_response)
+        self->_response = data.mutableCopy;
+    else
+        [self->_response appendData:data];
+}
+
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
-    NSUserDefaults *d;
+    if(session.configuration.identifier) {
+        NSUserDefaults *d;
 #ifdef ENTERPRISE
-    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-    d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+        d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-    NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
-    [uploadtasks removeObjectForKey:session.configuration.identifier];
-    [d setObject:uploadtasks forKey:@"uploadtasks"];
-    [d synchronize];
+        NSMutableDictionary *uploadtasks = [[d dictionaryForKey:@"uploadtasks"] mutableCopy];
+        [uploadtasks removeObjectForKey:session.configuration.identifier];
+        [d setObject:uploadtasks forKey:@"uploadtasks"];
+        [d synchronize];
+    }
 
     CLS_LOG(@"HTTP request completed with status code %i", (int)((NSHTTPURLResponse *)task.response).statusCode);
     
@@ -596,8 +574,9 @@
                 [request setHTTPBody:self->_body];
                 
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    self->_connection = [NSURLConnection connectionWithRequest:request delegate:self];
-                    [self->_connection start];
+                    NSURLSession *session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration delegate:self delegateQueue:NSOperationQueue.mainQueue];
+                    self->_task = [session dataTaskWithRequest:request];
+                    [self->_task resume];
                     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
                 }];
                 return;
@@ -609,6 +588,8 @@
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self->_delegate fileUploadDidFail:error.localizedDescription];
         }];
+    } else {
+        [self connectionDidFinishLoading];
     }
     [session finishTasksAndInvalidate];
 }

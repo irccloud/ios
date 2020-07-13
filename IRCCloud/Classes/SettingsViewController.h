@@ -69,7 +69,6 @@
     UISwitch *_inlineImages;
     UISwitch *_clearFormattingAfterSending;
     UISwitch *_avatarImages;
-    UISwitch *_backgroundUploads;
     UISwitch *_colorizeMentions;
     UISwitch *_hiddenMembers;
     UISwitch *_muteNotifications;
