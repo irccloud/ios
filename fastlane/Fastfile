@@ -49,6 +49,11 @@ platform :ios do
     )
   end
 
+  desc "Upload symbols to FirebaseCrashlytics"
+  lane :upload_symbols do |options|
+    sh "cd .. && pods/FirebaseCrashlytics/upload-symbols -gsp IRCCloud/GoogleService-Info.plist -p ios IRCCloud.app.dSYM.zip"
+  end
+
   desc "Build and push to iTunes Connect"
   lane :push do |options|
     if options[:enterprise]
@@ -100,7 +105,7 @@ platform :ios do
         skip_screenshots: true
     )
     
-    upload_symbols_to_crashlytics()
+    sh "cd .. && pods/FirebaseCrashlytics/upload-symbols -gsp IRCCloud/GoogleService-Info.plist -p ios IRCCloud.app.dSYM.zip"
   end
 
   desc "Print version"

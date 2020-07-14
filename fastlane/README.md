@@ -26,6 +26,11 @@ Check all certs and provisioning profiles from github
 fastlane ios apn
 ```
 Generate new push certs
+### ios upload_symbols
+```
+fastlane ios upload_symbols
+```
+Upload symbols to FirebaseCrashlytics
 ### ios push
 ```
 fastlane ios push
