@@ -2770,7 +2770,7 @@ extern UIImage *__socketClosedBackgroundImage;
                         if(![url hasPrefix:@"irc"]) {
                             url = [NSString stringWithFormat:@"irc://%i/%@", _server.cid, [url stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]];
                         }
-                        NSURL *u = [NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]];
+                        NSURL *u = [NSURL URLWithString:url];
                         if(u)
                             [cell.message addLinkToURL:u withRange:result.range];
                     }

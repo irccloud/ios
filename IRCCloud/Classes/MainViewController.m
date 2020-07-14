@@ -2825,9 +2825,7 @@ NSArray *_sortedChannels;
         Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
         if(s != nil) {
             match = YES;
-            CFStringRef path = CFURLCopyPath((CFURLRef)url);
-            NSString *channel = [[(__bridge NSString *)path stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]] substringFromIndex:1];
-            CFRelease(path);
+            NSString *channel = [[url.path stringByRemovingPercentEncoding] substringFromIndex:1];
             Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:channel server:s.cid];
             if([b.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:b.bid])
                 b = nil;
