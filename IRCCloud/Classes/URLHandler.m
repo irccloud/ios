@@ -500,7 +500,7 @@
                     name = [[dict objectForKey:@"id"] stringByAppendingString:extension];
                 
                 if([NetworkConnection sharedInstance].fileURITemplate && [dict objectForKey:@"id"] && name)
-                    result = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[dict objectForKey:@"id"], @"name":name} error:nil]];
+                    result = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[dict objectForKey:@"id"], @"name":[name stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet]} error:nil]];
             }
             
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{

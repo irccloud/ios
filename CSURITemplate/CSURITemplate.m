@@ -145,12 +145,12 @@ NSString *const CSURITemplateErrorScanLocationErrorKey = @"location";
 
 - (NSString *)csuri_stringEscapedForURI
 {
-    return [self stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"!* '();:@&=+$,/?%#[]"].invertedSet];
+    return [self stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLPathAllowedCharacterSet];
 }
 
 - (NSString *)csuri_stringEscapedForFragment
 {
-    return [self stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@" "].invertedSet];
+    return [self stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLFragmentAllowedCharacterSet];
 }
 
 - (NSString *)csuri_basicString
