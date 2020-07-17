@@ -19,7 +19,7 @@
 @synthesize activityTitle = _title;
 
 static NSString *encodeByAddingPercentEscapes(NSString *input) {
-    return [input stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"!*'();:@&=+$,/?%#[]"].invertedSet];
+    return [input stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"!*'();:@&=+$,/?%#[] "].invertedSet];
 }
 
 - (void)commonInit {

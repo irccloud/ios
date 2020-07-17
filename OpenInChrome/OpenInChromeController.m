@@ -40,7 +40,7 @@ static NSString * const kGoogleChromeHTTPSScheme = @"googlechromes:";
 static NSString * const kGoogleChromeCallbackScheme = @"googlechrome-x-callback:";
 
 static NSString *encodeByAddingPercentEscapes(NSString *input) {
-    return [input stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"!*'();:@&=+$,/?%#[]"].invertedSet];
+    return [input stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"!*'();:@&=+$,/?%#[] "].invertedSet];
 }
 
 @implementation OpenInChromeController
