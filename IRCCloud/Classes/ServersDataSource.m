@@ -337,7 +337,7 @@
         server.blocksDeletes = NO;
         server.blocksReplies = NO;
         server.blocksReactions = NO;
-        if([[server.isupport objectForKey:@"CLIENTTAGDENY"] isKindOfClass:[NSString class]]) {
+        /*if([[server.isupport objectForKey:@"CLIENTTAGDENY"] isKindOfClass:[NSString class]]) {
             NSArray *tags = [[server.isupport objectForKey:@""] componentsSeparatedByString:@","];
             for(NSString *tag in tags) {
                 if([tag isEqualToString:@"*"]) {
@@ -368,7 +368,7 @@
                 if([tag isEqualToString:@"-draft/react"])
                     server.blocksReactions = NO;
             }
-        }
+        }*/
     }
 }
 
