@@ -2850,6 +2850,12 @@ extern BOOL __compact;
 
 +(NSArray *)webURLs:(NSString *)string {
     NSMutableArray *matches = [[NSMutableArray alloc] init];
+    static NSMutableCharacterSet *urlSet;
+    if(!urlSet) {
+        urlSet = NSCharacterSet.URLQueryAllowedCharacterSet.mutableCopy;
+        [urlSet addCharactersInString:@"#^"];
+    }
+    
     if(string.length) {
         NSArray *results = [[self webURL] matchesInString:string.lowercaseString options:0 range:NSMakeRange(0, string.length)];
         NSPredicate *ipAddress = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"[0-9\\.]+"];
@@ -2920,7 +2926,7 @@ extern BOOL __compact;
                         scheme = @"http";
                 }
                 
-                url = [[NSString stringWithFormat:@"%@://%@%@%@", scheme, credentials, hostname, rest] stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
+                url = [[NSString stringWithFormat:@"%@://%@%@%@", scheme, credentials, hostname, rest] stringByAddingPercentEncodingWithAllowedCharacters:urlSet];
                 
                 if([ipAddress evaluateWithObject:url]) {
                     continue;
@@ -2945,7 +2951,7 @@ extern BOOL __compact;
             }
             
             if(url) {
-                url = [url stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
+                url = [url stringByAddingPercentEncodingWithAllowedCharacters:urlSet];
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
                 url = nil;
             }
