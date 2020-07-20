@@ -239,7 +239,10 @@
             }] resume];
         } else if([url.path hasPrefix:@"/wiki/"] && [url.absoluteString containsString:@"/File:"]) {
             NSString *title = [url.absoluteString substringFromIndex:[url.absoluteString rangeOfString:@"/File:"].location + 1];
-            NSURL *wikiurl = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@:%@%@", url.scheme, url.host, url.port,[[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", title] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
+            NSString *port = @"";
+            if(url.port)
+                port = [NSString stringWithFormat:@":%@", url.port];
+            NSURL *wikiurl = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@%@%@", url.scheme, url.host, port,[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", [title stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet]]]];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:wikiurl];
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
             [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -256,7 +259,7 @@
                                                 } forKey:url];
                         callback(YES, nil);
                     } else {
-                        NSLog(@"Invalid data from MediaWiki");
+                        NSLog(@"Invalid data from MediaWiki: %@", dict);
                         callback(NO,@"This image type is not supported");
                     }
                 }

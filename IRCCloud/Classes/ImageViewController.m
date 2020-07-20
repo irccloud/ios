@@ -188,27 +188,29 @@
 }
 
 -(void)fail:(NSString *)error {
-    [self->_progressView removeFromSuperview];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self->_progressView removeFromSuperview];
 
-    if(self->_previewing || self.view.window.rootViewController != self) {
-        NSLog(@"Not launching fallback URL as we're not the root view controller");
-        return;
-    }
-    
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"warnBeforeLaunchingBrowser"]) {
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Unable To Load Image" message:error preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Open in Browser" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _openInBrowser];
-        }]];
+        if(self->_previewing || self.view.window.rootViewController != self) {
+            NSLog(@"Not launching fallback URL as we're not the root view controller");
+            return;
+        }
         
-        [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {
-            [self doneButtonPressed:alert];
-        }]];
-        [self presentViewController:alert animated:YES completion:nil];
-        [self _showToolbar];
-    } else {
-        [self _openInBrowser];
-    }
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"warnBeforeLaunchingBrowser"]) {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Unable To Load Image" message:error preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Open in Browser" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                [self _openInBrowser];
+            }]];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *alert) {
+                [self doneButtonPressed:alert];
+            }]];
+            [self presentViewController:alert animated:YES completion:nil];
+            [self _showToolbar];
+        } else {
+            [self _openInBrowser];
+        }
+    }];
 }
 
 -(void)_openInBrowser {
