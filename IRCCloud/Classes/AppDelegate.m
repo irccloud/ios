@@ -762,10 +762,15 @@
         self->_conn.reconnectTimestamp = -1;
     self->_conn.failCount = 0;
     self->_conn.reachabilityValid = NO;
-    if(self->_conn.session.length && self->_conn.state != kIRCCloudStateConnected && self->_conn.state != kIRCCloudStateConnecting)
+    if(self->_conn.session.length && self->_conn.state != kIRCCloudStateConnected && self->_conn.state != kIRCCloudStateConnecting) {
+        CLS_LOG(@"Attempting to reconnect on app resume");
         [self->_conn connect:NO];
-    else if(self->_conn.notifier)
+    } else if(self->_conn.notifier) {
+        CLS_LOG(@"Clearing notifier flag");
         self->_conn.notifier = NO;
+    } else {
+        CLS_LOG(@"Not attempting to reconnect, session length: %i state: %i", self->_conn.session.length, self->_conn.state);
+    }
     
     if(self->_movedToBackground) {
         self->_movedToBackground = NO;
@@ -957,6 +962,8 @@
         [self applicationDidBecomeActive:[UIApplication sharedApplication]];
     
     [self setActiveScene:[scene window]];
+    
+    CLS_LOG(@"Active scene count: %i", _activeScenes.count);
 }
 
 -(void)removeScene:(id)scene {
@@ -964,6 +971,8 @@
 
     if(_activeScenes.count == 0)
         [self applicationDidEnterBackground:[UIApplication sharedApplication]];
+
+    CLS_LOG(@"Active scene count: %i", _activeScenes.count);
 }
 
 -(void)setActiveScene:(UIWindow *)window {
