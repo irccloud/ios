@@ -954,7 +954,7 @@
 
 -(void)addScene:(id)scene {
     if(!_activeScenes)
-        _activeScenes = [[NSMutableArray alloc] init];
+        _activeScenes = [[NSMutableSet alloc] init];
     
     [_activeScenes addObject:scene];
     

@@ -36,7 +36,7 @@
     __block UIBackgroundTaskIdentifier _background_task;
     void (^_fetchHandler)(UIBackgroundFetchResult);
     void (^_refreshHandler)(UIBackgroundFetchResult);
-    NSMutableArray *_activeScenes;
+    NSMutableSet *_activeScenes;
 }
 
 @property (strong, nonatomic) UIWindow *window;

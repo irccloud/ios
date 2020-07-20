@@ -2184,7 +2184,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                     }];
             }
         }
-        if(!backlog && _reconnectTimestamp != -1)
+        if(!backlog && _reconnectTimestamp != 0)
             [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:YES];
     }
 }
