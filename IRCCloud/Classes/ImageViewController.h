@@ -21,7 +21,7 @@
 #import "YYAnimatedImageView.h"
 #import "URLHandler.h"
 
-@interface ImageViewController : UIViewController<UIScrollViewDelegate,NSURLConnectionDataDelegate,UIPopoverPresentationControllerDelegate,UIGestureRecognizerDelegate> {
+@interface ImageViewController : UIViewController<UIScrollViewDelegate,NSURLSessionDataDelegate,UIPopoverPresentationControllerDelegate,UIGestureRecognizerDelegate> {
     IBOutlet YYAnimatedImageView *_imageView;
     IBOutlet UIScrollView *_scrollView;
     AVPlayerViewController *_movieController;
@@ -30,7 +30,7 @@
     NSURL *_url;
     NSTimer *_hideTimer;
     OpenInChromeController *_chrome;
-    NSURLConnection *_connection;
+    NSURLSessionDataTask *_imageTask;
     BOOL _previewing;
     UIPanGestureRecognizer *_panGesture;
     URLHandler *_urlHandler;

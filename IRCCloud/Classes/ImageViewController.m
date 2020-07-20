@@ -312,33 +312,31 @@
             self->_imageData = [[NSData alloc] initWithContentsOfFile:cacheFile].mutableCopy;
             [self _parseImageData:self->_imageData];
         } else {
-            NSURLRequest *request = [NSURLRequest requestWithURL:url];
-            self->_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-            
-            [self->_connection start];
+            NSURLSession *session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration delegate:self delegateQueue:NSOperationQueue.mainQueue];
+            self->_imageTask = [session dataTaskWithURL:url];
+            [self->_imageTask resume];
         }
     }];
 }
 
-- (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
-    return nil;
-}
-
-- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSHTTPURLResponse *)response {
+-(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveResponse:(NSURLResponse *)response completionHandler:(void (^)(NSURLSessionResponseDisposition))completionHandler {
     self->_bytesExpected = [response expectedContentLength];
     self->_imageData = [[NSMutableData alloc] initWithCapacity:(NSUInteger)(self->_bytesExpected + 32)]; // Just in case? Unsure if the extra 32 bytes are necessary
-    if(response.statusCode != 200) {
-        [self fail:[NSString stringWithFormat:@"HTTP error %ld: %@", (long)response.statusCode, [NSHTTPURLResponse localizedStringForStatusCode:response.statusCode]]];
+    if(((NSHTTPURLResponse *)response).statusCode != 200) {
+        [self fail:[NSString stringWithFormat:@"HTTP error %ld: %@", (long)((NSHTTPURLResponse *)response).statusCode, [NSHTTPURLResponse localizedStringForStatusCode:((NSHTTPURLResponse *)response).statusCode]]];
+        completionHandler(NSURLSessionResponseCancel);
         return;
     }
     if(response.MIMEType.length && ![response.MIMEType.lowercaseString hasPrefix:@"image/"] && ![response.MIMEType.lowercaseString isEqualToString:@"binary/octet-stream"]) {
-        [connection cancel];
         [self fail:[NSString stringWithFormat:@"Invalid MIME type: %@", response.MIMEType]];
+        completionHandler(NSURLSessionResponseCancel);
+        return;
     }
+    completionHandler(NSURLSessionResponseAllow);
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data {
-    NSInteger receivedDataLength = [data length];
+-(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
+    NSInteger receivedDataLength = data.length;
     self->_totalBytesReceived += receivedDataLength;
     [self->_imageData appendData:data];
 
@@ -349,24 +347,21 @@
     }
 }
 
-- (void)connection:(NSURLConnection *)connection didFailWithError:(NSError *)error {
-    if(connection == self->_connection) {
-        NSLog(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
-        [self fail:error.localizedDescription];
-        self->_connection = nil;
-    }
-}
-
-- (void)connectionDidFinishLoading:(NSURLConnection *)connection {
-    if(connection == self->_connection) {
-        if(self->_imageData) {
-            NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:connection.originalRequest.URL].path;
-            [self->_imageData writeToFile:cacheFile atomically:YES];
-            [self performSelectorInBackground:@selector(_parseImageData:) withObject:self->_imageData];
+-(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
+    if(task == self->_imageTask) {
+        if(error) {
+            NSLog(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
+            [self fail:error.localizedDescription];
         } else {
-            [self fail:@"No image data recieved"];
+            if(self->_imageData) {
+                NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:task.originalRequest.URL].path;
+                [self->_imageData writeToFile:cacheFile atomically:YES];
+                [self performSelectorInBackground:@selector(_parseImageData:) withObject:self->_imageData];
+            } else {
+                [self fail:@"No image data recieved"];
+            }
         }
-        self->_connection = nil;
+        self->_imageTask = nil;
     }
 }
 
@@ -502,8 +497,8 @@
                     frame.origin.y = ([recognizer translationInView:self.view].y > 0)?frame.size.height:-frame.size.height;
                     [self->_hideTimer invalidate];
                     self->_hideTimer = nil;
-                    [self->_connection cancel];
-                    self->_connection = nil;
+                    [self->_imageTask cancel];
+                    self->_imageTask = nil;
                     [UIView animateWithDuration:0.25 animations:^{
                         self->_scrollView.frame = frame;
                         self->_progressView.center = self->_scrollView.center;
@@ -577,8 +572,8 @@
 -(IBAction)doneButtonPressed:(id)sender {
     [self->_hideTimer invalidate];
     self->_hideTimer = nil;
-    [self->_connection cancel];
-    self->_connection = nil;
+    [self->_imageTask cancel];
+    self->_imageTask = nil;
     [((AppDelegate *)[UIApplication sharedApplication].delegate) setActiveScene:self.view.window];
     [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:YES];
 }
