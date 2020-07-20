@@ -247,24 +247,26 @@
 }
 
 -(void)_fetchVideo:(NSURL *)url {
-    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
-    self->_movieController = [[AVPlayerViewController alloc] init];
-    self->_movieController.player = [[AVPlayer alloc] initWithURL:url];
-    self->_movieController.showsPlaybackControls = NO;
-    self->_movieController.view.userInteractionEnabled = NO;
-    self->_movieController.view.frame = self->_scrollView.bounds;
-    self->_movieController.view.backgroundColor = [UIColor clearColor];
-    [self->_scrollView addSubview:self->_movieController.view];
-    self->_scrollView.userInteractionEnabled = NO;
-    [self->_scrollView removeGestureRecognizer:self->_panGesture];
-    [self.view addGestureRecognizer:self->_panGesture];
-    [self->_progressView removeFromSuperview];
-    [self->_movieController.player play];
-    [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
-        kFIRParameterContentType:@"Animation"
-    }];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryAmbient error:nil];
+        self->_movieController = [[AVPlayerViewController alloc] init];
+        self->_movieController.player = [[AVPlayer alloc] initWithURL:url];
+        self->_movieController.showsPlaybackControls = NO;
+        self->_movieController.view.userInteractionEnabled = NO;
+        self->_movieController.view.frame = self->_scrollView.bounds;
+        self->_movieController.view.backgroundColor = [UIColor clearColor];
+        [self->_scrollView addSubview:self->_movieController.view];
+        self->_scrollView.userInteractionEnabled = NO;
+        [self->_scrollView removeGestureRecognizer:self->_panGesture];
+        [self.view addGestureRecognizer:self->_panGesture];
+        [self->_progressView removeFromSuperview];
+        [self->_movieController.player play];
+        [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
+            kFIRParameterContentType:@"Animation"
+        }];
 
-    [self scrollViewDidZoom:self->_scrollView];
+        [self scrollViewDidZoom:self->_scrollView];
+    }];
 }
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
@@ -304,16 +306,18 @@
 }
 
 - (void)_fetchImage:(NSURL *)url {
-    NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:url].path;
-    if([[NSFileManager defaultManager] fileExistsAtPath:cacheFile]) {
-        self->_imageData = [[NSData alloc] initWithContentsOfFile:cacheFile].mutableCopy;
-        [self _parseImageData:self->_imageData];
-    } else {
-        NSURLRequest *request = [NSURLRequest requestWithURL:url];
-        self->_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
-        
-        [self->_connection start];
-    }
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        NSString *cacheFile = [[ImageCache sharedInstance] pathForURL:url].path;
+        if([[NSFileManager defaultManager] fileExistsAtPath:cacheFile]) {
+            self->_imageData = [[NSData alloc] initWithContentsOfFile:cacheFile].mutableCopy;
+            [self _parseImageData:self->_imageData];
+        } else {
+            NSURLRequest *request = [NSURLRequest requestWithURL:url];
+            self->_connection = [[NSURLConnection alloc] initWithRequest:request delegate:self startImmediately:NO];
+            
+            [self->_connection start];
+        }
+    }];
 }
 
 - (NSCachedURLResponse *)connection:(NSURLConnection *)connection willCacheResponse:(NSCachedURLResponse *)cachedResponse {
