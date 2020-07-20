@@ -341,7 +341,7 @@
             else
                 self.window.rootViewController = self.loginSplashViewController;
         } else if([url.host isEqualToString:@"referral"]) {
-            [self performSelectorInBackground:@selector(_sendImpression:) withObject:url];
+            [self _sendImpression:url];
         } else {
             return NO;
         }

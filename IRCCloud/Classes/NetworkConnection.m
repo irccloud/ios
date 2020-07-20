@@ -2433,7 +2433,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     self->_session = nil;
     [self disconnect];
     if(s)
-        [self performSelectorInBackground:@selector(_logout:) withObject:s];
+        [self _logout:s];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"path"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
