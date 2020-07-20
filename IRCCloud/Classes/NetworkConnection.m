@@ -2508,53 +2508,51 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         return _session;
     }
     
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"session"]) {
-        self.session = [[NSUserDefaults standardUserDefaults] stringForKey:@"session"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"session"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
-    
-    CFDataRef data = nil;
+    @synchronized (self) {
+        CFDataRef data = nil;
 #ifdef ENTERPRISE
-    OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.enterprise", kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
+        OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.enterprise", kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
 #else
-    OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
+        OSStatus err = SecItemCopyMatching((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, kCFBooleanTrue, kSecReturnData, nil], (CFTypeRef*)&data);
 #endif
-    if(!err) {
-        self->_keychainFailCount = 0;
-        self->_session = [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
-        if(self->_session.length <= 1) {
-            NSLog(@"Removing invalid session");
-            [self setSession:nil];
-        }
-        return _session;
-    } else {
-        self->_keychainFailCount++;
-        if(self->_keychainFailCount < 10 && err != errSecItemNotFound) {
-            CLS_LOG(@"Error fetching session: %i, trying again", (int)err);
-            return self.session;
-        } else {
-            if(err == errSecItemNotFound)
-                CLS_LOG(@"Session key not found");
-            else
-                CLS_LOG(@"Error fetching session: %i", (int)err);
+        if(!err) {
             self->_keychainFailCount = 0;
-            return nil;
+            self->_session = [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
+            if(self->_session.length <= 1) {
+                NSLog(@"Removing invalid session");
+                [self setSession:nil];
+            }
+            return _session;
+        } else {
+            self->_keychainFailCount++;
+            if(self->_keychainFailCount < 10 && err != errSecItemNotFound) {
+                CLS_LOG(@"Error fetching session: %i, trying again", (int)err);
+                return self.session;
+            } else {
+                if(err == errSecItemNotFound)
+                    CLS_LOG(@"Session key not found");
+                else
+                    CLS_LOG(@"Error fetching session: %i", (int)err);
+                self->_keychainFailCount = 0;
+                return nil;
+            }
         }
     }
 }
 
 -(void)setSession:(NSString *)session {
+    @synchronized (self) {
 #ifdef ENTERPRISE
-    SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.enterprise", kSecAttrService, nil]);
-    if(session)
-        SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.enterprise", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, (__bridge id)(kSecAttrAccessibleAlways), kSecAttrAccessible, nil], NULL);
+        SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.enterprise", kSecAttrService, nil]);
+        if(session)
+            SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.enterprise", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, (__bridge id)(kSecAttrAccessibleAlways), kSecAttrAccessible, nil], NULL);
 #else
-    SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, nil]);
-    if(session)
-        SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, (__bridge id)(kSecAttrAccessibleAlways), kSecAttrAccessible, nil], NULL);
+        SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, nil]);
+        if(session)
+            SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, (__bridge id)(kSecAttrAccessibleAlways), kSecAttrAccessible, nil], NULL);
 #endif
-    self->_session = session;
+        self->_session = session;
+    }
 }
 
 -(BOOL)notifier {

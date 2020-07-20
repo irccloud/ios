@@ -256,8 +256,6 @@
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
-            //Store the session in the keychain again to update the access policy
-            [NetworkConnection sharedInstance].session = session;
             self.window.backgroundColor = [UIColor textareaBackgroundColor];
             self.window.rootViewController = self.slideViewController;
         } else {
@@ -1022,8 +1020,6 @@
     if(self.window.rootViewController == self.splashViewController) {
         NSString *session = [NetworkConnection sharedInstance].session;
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
-            //Store the session in the keychain again to update the access policy
-            [NetworkConnection sharedInstance].session = session;
             self.window.backgroundColor = [UIColor textareaBackgroundColor];
             self.window.rootViewController = self.slideViewController;
         } else {
