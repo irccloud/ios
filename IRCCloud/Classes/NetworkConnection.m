@@ -1246,32 +1246,24 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self connect:self->_notifier];
 }
 
--(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token {
-    return [self _postRequest:@"/chat/login" args:@{@"email":email, @"password":password, @"token":token}];
+-(void)login:(NSString *)email password:(NSString *)password token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler {
+    [self _postRequest:@"/chat/login" args:@{@"email":email, @"password":password, @"token":token} handler:handler];
 }
 
--(NSDictionary *)login:(NSURL *)accessLink {
-	NSData *data;
-	NSURLResponse *response = nil;
-	NSError *error = nil;
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
+-(void)login:(NSURL *)accessLink handler:(IRCCloudAPIResultHandler)handler {
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:accessLink];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
     
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    if(data)
-        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    else
-        return nil;
+    [self _performDataTaskRequest:request handler:handler];
 }
 
--(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression {
-    return [self _postRequest:@"/chat/signup" args:@{@"realname":realname, @"email":email, @"password":password, @"token":token, @"ios_impression":impression}];
+-(void)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression handler:(IRCCloudAPIResultHandler)handler {
+    [self _postRequest:@"/chat/signup" args:@{@"realname":realname, @"email":email, @"password":password, @"token":token, @"ios_impression":impression} handler:handler];
 }
 
--(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token {
-    return [self _postRequest:@"/chat/request-access-link" args:@{@"email":email, @"mobile":@"1", @"token":token}];
+-(void)requestPassword:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler {
+    return [self _postRequest:@"/chat/request-access-link" args:@{@"email":email, @"mobile":@"1", @"token":token} handler:handler];
 }
 
 //From: http://stackoverflow.com/questions/1305225/best-way-to-serialize-a-nsdata-into-an-hexadeximal-string
@@ -1292,41 +1284,47 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [NSString stringWithString:hexString];
 }
 
--(NSDictionary *)registerAPNs:(NSData *)token {
-#if defined(DEBUG) || defined(EXTENSION)
-    return nil;
-#else
-    return [self _postRequest:@"/apn-register" args:@{@"device_id":[self dataToHex:token]}];
+-(void)registerAPNs:(NSData *)token handler:(IRCCloudAPIResultHandler)handler {
+#if !defined(DEBUG) && !defined(EXTENSION)
+    [self _postRequest:@"/apn-register" args:@{@"device_id":[self dataToHex:token]} handler:handler];
 #endif
 }
 
--(NSDictionary *)unregisterAPNs:(NSData *)token session:(NSString *)session {
-#ifdef EXTENSION
-    return nil;
-#else
-    return [self _postRequest:@"/apn-unregister" args:@{@"device_id":[self dataToHex:token], @"session":session}];
+-(void)unregisterAPNs:(NSData *)token session:(NSString *)session handler:(IRCCloudAPIResultHandler)handler {
+#ifndef EXTENSION
+    [self _postRequest:@"/apn-unregister" args:@{@"device_id":[self dataToHex:token], @"session":session} handler:handler];
 #endif
 }
 
--(NSDictionary *)impression:(NSString *)idfa referrer:(NSString *)referrer {
-#ifdef EXTENSION
-    return nil;
-#else
-    return [self _postRequest:@"/chat/ios-impressions" args:@{@"idfa":idfa, @"referrer":referrer}];
+-(void)impression:(NSString *)idfa referrer:(NSString *)referrer handler:(IRCCloudAPIResultHandler)handler {
+#ifndef EXTENSION
+    return [self _postRequest:@"/chat/ios-impressions" args:@{@"idfa":idfa, @"referrer":referrer} handler:handler];
 #endif
 }
 
--(NSDictionary *)requestAuthToken {
-    return [self _postRequest:@"/chat/auth-formtoken" args:@{}];
+-(void)requestAuthTokenWithHandler:(IRCCloudAPIResultHandler)handler {
+    [self _postRequest:@"/chat/auth-formtoken" args:@{} handler:handler];
 }
 
--(NSURLSessionDataTask *)_get:(NSURL *)url handler:(IRCCloudAPIResultHandler)resultHandler {
+-(void)_performDataTaskRequest:(NSURLRequest *)request handler:(IRCCloudAPIResultHandler)resultHandler {
+    NSURLSessionDataTask* task = [_urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if(resultHandler) {
+            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            if(dict)
+                resultHandler([[IRCCloudJSONObject alloc] initWithDictionary:dict]);
+            else
+                resultHandler(nil);
+        }
+    }];
+    [task resume];
+}
+
+-(void)_get:(NSURL *)url handler:(IRCCloudAPIResultHandler)resultHandler {
     if(![NSThread isMainThread]) {
         NSLog(@"*** _get called on wrong thread");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _get:url handler:resultHandler];
         }];
-        return nil;
     } else {
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPShouldHandleCookies:NO];
@@ -1334,22 +1332,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(self.session.length > 1 && [url.scheme isEqualToString:@"https"] && [url.host isEqualToString:IRCCLOUD_HOST])
             [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
         
-        NSURLSessionDataTask * task = [_urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            if(resultHandler) {
-                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-                if(dict)
-                    resultHandler([[IRCCloudJSONObject alloc] initWithDictionary:dict]);
-                else
-                    resultHandler(nil);
-            }
-        }];
-        [task resume];
-        return task;
+        [self _performDataTaskRequest:request handler:resultHandler];
     }
 }
 
--(NSURLSessionDataTask *)requestConfigurationWithHandler:(IRCCloudAPIResultHandler)handler {
-    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] handler:^(IRCCloudJSONObject *object) {
+-(void)requestConfigurationWithHandler:(IRCCloudAPIResultHandler)handler {
+    [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/config", IRCCLOUD_HOST]] handler:^(IRCCloudJSONObject *object) {
         if(object) {
             self->_config = object.dictionary;
         }
@@ -1367,20 +1355,20 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }];
 }
 
--(NSURLSessionDataTask *)propertiesForFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler {
-    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]] handler:handler];
+-(void)propertiesForFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler {
+    [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, fileID]] handler:handler];
 }
 
--(NSURLSessionDataTask *)getFiles:(int)page handler:(IRCCloudAPIResultHandler)handler {
-    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/files?page=%i", IRCCLOUD_HOST, page]] handler:handler];
+-(void)getFiles:(int)page handler:(IRCCloudAPIResultHandler)handler {
+    [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/files?page=%i", IRCCLOUD_HOST, page]] handler:handler];
 }
 
--(NSURLSessionDataTask *)getPastebins:(int)page handler:(IRCCloudAPIResultHandler)handler {
-    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/pastebins?page=%i", IRCCLOUD_HOST, page]] handler:handler];
+-(void)getPastebins:(int)page handler:(IRCCloudAPIResultHandler)handler {
+    [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/pastebins?page=%i", IRCCLOUD_HOST, page]] handler:handler];
 }
 
--(NSURLSessionDataTask *)getLogExportsWithHandler:(IRCCloudAPIResultHandler)handler {
-    return [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/log-exports", IRCCLOUD_HOST]] handler:handler];
+-(void)getLogExportsWithHandler:(IRCCloudAPIResultHandler)handler {
+    [self _get:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/log-exports", IRCCLOUD_HOST]] handler:handler];
 }
 
 -(int)_sendRequest:(NSString *)method args:(NSDictionary *)args handler:(IRCCloudAPIResultHandler)resultHandler {
@@ -1401,56 +1389,45 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
--(NSDictionary *)_postRequest:(NSString *)path args:(NSDictionary *)args {
-    NSMutableString *body = [[NSMutableString alloc] init];
-    
-    for (NSString *key in args.allKeys) {
-        if(body.length)
-            [body appendString:@"&"];
-        [body appendFormat:@"%@=%@",key,[[args objectForKey:key] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"\"#%<>[\\]^`{|}+"].invertedSet]];
+-(void)_postRequest:(NSString *)path args:(NSDictionary *)args handler:(IRCCloudAPIResultHandler)resultHandler {
+    if(![NSThread isMainThread]) {
+        NSLog(@"*** _postRequest called on wrong thread");
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self _postRequest:path args:args handler:resultHandler];
+        }];
+    } else {
+        NSMutableString *body = [[NSMutableString alloc] init];
+        
+        for (NSString *key in args.allKeys) {
+            if(body.length)
+                [body appendString:@"&"];
+            [body appendFormat:@"%@=%@",key,[[args objectForKey:key] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"\"#%<>[\\]^`{|}+"].invertedSet]];
+        }
+        
+        if(self.session.length > 1 && ![args objectForKey:@"session"])
+            [body appendFormat:@"&session=%@", self.session];
+        
+        NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, path]]];
+        [request setHTTPShouldHandleCookies:NO];
+        [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
+        if([args objectForKey:@"token"])
+            [request setValue:[args objectForKey:@"token"] forHTTPHeaderField:@"x-auth-formtoken"];
+        if([args objectForKey:@"session"])
+            [request setValue:[NSString stringWithFormat:@"session=%@",[args objectForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
+        else if(self.session.length > 1)
+            [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
+        [request setHTTPMethod:@"POST"];
+        [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
+
+        [self _performDataTaskRequest:request handler:resultHandler];
     }
-    
-    NSData *data;
-    NSHTTPURLResponse *response = nil;
-    NSError *error = nil;
-    if(self.session.length > 1 && ![args objectForKey:@"session"])
-        [body appendFormat:@"&session=%@", self.session];
-    
-    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, path]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
-    [request setHTTPShouldHandleCookies:NO];
-    [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-    if([args objectForKey:@"token"])
-        [request setValue:[args objectForKey:@"token"] forHTTPHeaderField:@"x-auth-formtoken"];
-    if([args objectForKey:@"session"])
-        [request setValue:[NSString stringWithFormat:@"session=%@",[args objectForKey:@"session"]] forHTTPHeaderField:@"Cookie"];
-    else if(self.session.length > 1)
-        [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
-    
-    FIRHTTPMetric *metric = [[FIRHTTPMetric alloc] initWithURL:request.URL HTTPMethod:FIRHTTPMethodPOST];
-    metric.requestPayloadSize = body.length;
-    data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
-    metric.responseCode = response.statusCode;
-    metric.responseContentType = response.MIMEType;
-    metric.responsePayloadSize = data.length;
-    [metric stop];
-    
-    if(error) {
-        CLS_LOG(@"HTTP request failed: %@ %@", error.localizedDescription, error.localizedFailureReason);
-    }
-    
-    if(data)
-        return [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-    else
-        return nil;
 }
 
--(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid {
+-(void)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     if(to)
-        return [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":to, @"cid":[@(cid) stringValue]}];
+        [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":to, @"cid":[@(cid) stringValue]} handler:resultHandler];
     else
-        return [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":@"*", @"cid":[@(cid) stringValue]}];
+        [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":@"*", @"cid":[@(cid) stringValue]} handler:resultHandler];
 }
 
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
@@ -1462,10 +1439,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":@"*"} handler:resultHandler];
 }
 
--(NSDictionary *)POSTreply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid {
+-(void)POSTreply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid handler:(IRCCloudAPIResultHandler)handler {
     if(!message)
         message = @"";
-    return [self _postRequest:@"/chat/reply" args:@{@"cid":[@(cid) stringValue], @"reply":message, @"to":to, @"msgid":msgid}];
+    [self _postRequest:@"/chat/reply" args:@{@"cid":[@(cid) stringValue], @"reply":message, @"to":to, @"msgid":msgid} handler:handler];
 }
 
 -(int)reply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid handler:(IRCCloudAPIResultHandler)resultHandler {
@@ -1498,7 +1475,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self heartbeat:selectedBuffer cids:@[@(cid)] bids:@[@(bid)] lastSeenEids:@[@(lastSeenEid)] handler:resultHandler];
 }
 
--(NSDictionary *)POSTheartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids {
+-(void)POSTheartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids handler:(IRCCloudAPIResultHandler)handler {
     @synchronized(self->_writer) {
         NSMutableDictionary *heartbeat = [[NSMutableDictionary alloc] init];
         for(int i = 0; i < cids.count; i++) {
@@ -1510,11 +1487,12 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             [d setObject:[lastSeenEids objectAtIndex:i] forKey:[NSString stringWithFormat:@"%@",[bids objectAtIndex:i]]];
         }
         NSString *seenEids = [self->_writer stringWithObject:heartbeat];
-        return [self _postRequest:@"/chat/heartbeat" args:@{@"selectedBuffer":[@(selectedBuffer) stringValue], @"seenEids":seenEids}];
+        [self _postRequest:@"/chat/heartbeat" args:@{@"selectedBuffer":[@(selectedBuffer) stringValue], @"seenEids":seenEids} handler:handler];
     }
 }
--(NSDictionary *)POSTheartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid {
-    return [self POSTheartbeat:selectedBuffer cids:@[@(cid)] bids:@[@(bid)] lastSeenEids:@[@(lastSeenEid)]];
+
+-(void)POSTheartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid handler:(IRCCloudAPIResultHandler)handler {
+    [self POSTheartbeat:selectedBuffer cids:@[@(cid)] bids:@[@(bid)] lastSeenEids:@[@(lastSeenEid)] handler:handler];
 }
 
 -(int)join:(NSString *)channel key:(NSString *)key cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
@@ -1688,17 +1666,17 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     return [self _sendRequest:@"reorder-connections" args:@{@"cids":cids} handler:resultHandler];
 }
 
--(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId cid:(int)cid {
+-(void)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId cid:(int)cid handler:(IRCCloudAPIResultHandler)handler {
     if(avatar) {
         if(cid) {
-            return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"cid":[NSString stringWithFormat:@"%i", cid]}];
+            [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"cid":[NSString stringWithFormat:@"%i", cid]} handler:handler];
         } else if(orgId == -1) {
-            return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"primary":@"1"}];
+            [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"primary":@"1"} handler:handler];
         } else {
-            return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"org":[NSString stringWithFormat:@"%i", orgId]}];
+            [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename, @"type":@"avatar", @"org":[NSString stringWithFormat:@"%i", orgId]} handler:handler];
         }
     } else {
-        return [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename}];
+        [self _postRequest:@"/chat/upload-finalise" args:@{@"id":uploadID, @"filename":filename, @"original_filename":originalFilename} handler:handler];
     }
 }
 
@@ -2435,9 +2413,11 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)_logout:(NSString *)session {
-    NSLog(@"Unregister result: %@", [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] session:session]);
+    [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] session:session handler:^(IRCCloudJSONObject *result) {
+        NSLog(@"Unregister result: %@", result);
+    }];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
-    [self _postRequest:@"/chat/logout" args:@{@"session":session}];
+    [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
 }
 
 -(void)logout {

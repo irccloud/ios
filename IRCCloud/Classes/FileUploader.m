@@ -29,7 +29,9 @@
     self->_msg = message;
     self->_filenameSet = YES;
     if(self->_finished && _id.length) {
-        [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename originalFilename:self->_originalFilename avatar:self->_avatar orgId:self->_orgId cid:self->_cid]];
+        [[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename originalFilename:self->_originalFilename avatar:self->_avatar orgId:self->_orgId cid:self->_cid handler:^(IRCCloudJSONObject *result) {
+            [self handleResult:result.dictionary];
+        }];
     } else {
         if(self->_backgroundID)
             [self _updateBackgroundUploadMetadata];
@@ -65,9 +67,9 @@
                 }
                 self->_msg = [self->_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
                 if(self->_msgid.length > 0)
-                    [[NetworkConnection sharedInstance] POSTreply:self->_msg to:b.name cid:b.cid msgid:self->_msgid];
+                    [[NetworkConnection sharedInstance] POSTreply:self->_msg to:b.name cid:b.cid msgid:self->_msgid handler:nil];
                 else
-                    [[NetworkConnection sharedInstance] POSTsay:self->_msg to:b.name cid:b.cid];
+                    [[NetworkConnection sharedInstance] POSTsay:self->_msg to:b.name cid:b.cid handler:nil];
                 [self->_delegate fileUploadDidFinish];
             }
         }
@@ -497,7 +499,9 @@
             self->_id = [d objectForKey:@"id"];
             self->_finished = YES;
             if(self->_filenameSet || _avatar) {
-                [self handleResult:[[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename?_filename:@"" originalFilename:self->_originalFilename?_originalFilename:@"" avatar:self->_avatar orgId:self->_orgId cid:self->_cid]];
+                [[NetworkConnection sharedInstance] finalizeUpload:self->_id filename:self->_filename?_filename:@"" originalFilename:self->_originalFilename?_originalFilename:@"" avatar:self->_avatar orgId:self->_orgId cid:self->_cid handler:^(IRCCloudJSONObject *result) {
+                    [self handleResult:result.dictionary];
+                }];
             }
         } else {
             CLS_LOG(@"Upload failed: %@", d);

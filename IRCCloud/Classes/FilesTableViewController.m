@@ -141,7 +141,7 @@
 }
 
 -(void)_loadMore {
-    _task = [[NetworkConnection sharedInstance] getFiles:++_pages handler:^(IRCCloudJSONObject *d) {
+    [[NetworkConnection sharedInstance] getFiles:++_pages handler:^(IRCCloudJSONObject *d) {
         if([[d objectForKey:@"success"] boolValue]) {
             CLS_LOG(@"Loaded file list for page %i", self->_pages);
             if(self->_files)

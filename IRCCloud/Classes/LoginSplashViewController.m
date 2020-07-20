@@ -247,8 +247,7 @@
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     [activity startAnimating];
     activity.hidden = NO;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [[NetworkConnection sharedInstance] login:self->_accessLink];
+    [[NetworkConnection sharedInstance] login:self->_accessLink handler:^(IRCCloudJSONObject *result) {
         self->_accessLink = nil;
         if([[result objectForKey:@"success"] intValue] == 1) {
             if([result objectForKey:@"websocket_host"])
@@ -281,15 +280,13 @@
             }];
 #endif
         } else {
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [UIView beginAnimations:nil context:nil];
-                self->loginView.alpha = 1;
-                self->loadingView.alpha = 0;
-                [UIView commitAnimations];
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:@"Invalid access link" preferredStyle:UIAlertControllerStyleAlert];
-                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
-                [self presentViewController:alert animated:YES completion:nil];
-            });
+            [UIView beginAnimations:nil context:nil];
+            self->loginView.alpha = 1;
+            self->loadingView.alpha = 0;
+            [UIView commitAnimations];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:@"Invalid access link" preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
 #ifndef ENTERPRISE
             [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
                 kFIRParameterMethod:@"access-link",
@@ -297,7 +294,7 @@
             }];
 #endif
         }
-    });
+    }];
 }
 
 -(void)viewDidAppear:(BOOL)animated {
@@ -474,6 +471,17 @@
     [self _updateFieldPositions];
 }
 
+-(void)_accessLinkRequestFailed {
+    [UIView beginAnimations:nil context:nil];
+    self->loginView.alpha = 1;
+    self->loadingView.alpha = 0;
+    [UIView commitAnimations];
+    [self->activity stopAnimating];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Request Failed" message:@"Unable to request an access link.  Please try again later." preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 -(IBAction)sendAccessLinkButtonPressed:(id)sender {
     [username resignFirstResponder];
     [UIView beginAnimations:nil context:nil];
@@ -484,13 +492,11 @@
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     [activity startAnimating];
     activity.hidden = NO;
-    NSString *user = username.text;
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
+    NSString *user = [username.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
+    [[NetworkConnection sharedInstance] requestAuthTokenWithHandler:^(IRCCloudJSONObject *result) {
         if([[result objectForKey:@"success"] intValue] == 1) {
-            result = [[NetworkConnection sharedInstance] requestPassword:user token:[result objectForKey:@"token"]];
-            if([[result objectForKey:@"success"] intValue] == 1) {
-                dispatch_async(dispatch_get_main_queue(), ^{
+            [[NetworkConnection sharedInstance] requestPassword:user token:[result objectForKey:@"token"] handler:^(IRCCloudJSONObject *result) {
+                if([[result objectForKey:@"success"] intValue] == 1) {
                     [UIView beginAnimations:nil context:nil];
                     self->loginView.alpha = 1;
                     self->loadingView.alpha = 0;
@@ -500,21 +506,14 @@
                     [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
                     [self presentViewController:alert animated:YES completion:nil];
                     [self loginHintPressed:nil];
-                });
-                return;
-            }
+                } else {
+                    [self _accessLinkRequestFailed];
+                }
+            }];
+        } else {
+            [self _accessLinkRequestFailed];
         }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [UIView beginAnimations:nil context:nil];
-            self->loginView.alpha = 1;
-            self->loadingView.alpha = 0;
-            [UIView commitAnimations];
-            [self->activity stopAnimating];
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Request Failed" message:@"Unable to request an access link.  Please try again later." preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
-            [self presentViewController:alert animated:YES completion:nil];
-        });
-    });
+    }];
 }
 
 -(IBAction)onePasswordButtonPressed:(id)sender {
@@ -714,9 +713,9 @@
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     [activity startAnimating];
     activity.hidden = NO;
-    NSString *user = username.text;
+    NSString *user = [username.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
     NSString *pass = password.text;
-    NSString *realname = name.text;
+    NSString *realname = [name.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
     CGFloat nameAlpha = name.alpha;
     
     [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *config) {
@@ -738,123 +737,121 @@
         IRCCLOUD_HOST = [config objectForKey:@"api_host"];
         [self _stripIRCCloudHost];
         
-        NSDictionary *result = [[NetworkConnection sharedInstance] requestAuthToken];
-        if([[result objectForKey:@"success"] intValue] == 1) {
-            if(nameAlpha)
-                result = [[NetworkConnection sharedInstance] signup:user password:pass realname:realname token:[result objectForKey:@"token"] impression:self->_impression?self->_impression:@""];
-            else
-                result = [[NetworkConnection sharedInstance] login:user password:pass token:[result objectForKey:@"token"]];
+        [[NetworkConnection sharedInstance] requestAuthTokenWithHandler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] intValue] == 1) {
-                if([result objectForKey:@"websocket_host"])
-                    IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
-                if([result objectForKey:@"websocket_path"])
-                    IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
-                [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
-                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
-                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-                [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
+                IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
+                    if([[result objectForKey:@"success"] intValue] == 1) {
+                        if([result objectForKey:@"websocket_host"])
+                            IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
+                        if([result objectForKey:@"websocket_path"])
+                            IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
+                        [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
+                        [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+                        [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+                        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
+                        [[NSUserDefaults standardUserDefaults] synchronize];
 #ifdef ENTERPRISE
-                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+                        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+                        NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-                [d setObject:IRCCLOUD_HOST forKey:@"host"];
-                [d setObject:IRCCLOUD_PATH forKey:@"path"];
-                [d synchronize];
+                        [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                        [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                        [d synchronize];
 #ifndef ENTERPRISE
-                if(nameAlpha) {
-                    [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                        kFIRParameterMethod:@"email",
-                        kFIRParameterSuccess:@(1)
-                    }];
-                } else {
-                    [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                        kFIRParameterMethod:@"email",
-                        kFIRParameterSuccess:@(1)
-                    }];
-                }
-                if(!self->_gotCredentialsFromPasswordManager) {
-                    SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
-                        if (error != NULL) {
-                            NSLog(@"Unable to save shared credentials: %@", error);
-                            return;
+                        if(nameAlpha) {
+                            [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
+                                kFIRParameterMethod:@"email",
+                                kFIRParameterSuccess:@(1)
+                            }];
+                        } else {
+                            [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                                kFIRParameterMethod:@"email",
+                                kFIRParameterSuccess:@(1)
+                            }];
                         }
-                    });
-                }
+                        if(!self->_gotCredentialsFromPasswordManager) {
+                            SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
+                                if (error != NULL) {
+                                    NSLog(@"Unable to save shared credentials: %@", error);
+                                    return;
+                                }
+                            });
+                        }
 #endif
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    self->loginHint.alpha = 0;
-                    self->signupHint.alpha = 0;
-                    self->enterpriseHint.alpha = 0;
-                    self->forgotPasswordLogin.alpha = 0;
-                    self->forgotPasswordSignup.alpha = 0;
-                    [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
-                });
-            } else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [UIView beginAnimations:nil context:nil];
-                    self->loginView.alpha = 1;
-                    self->loadingView.alpha = 0;
-                    [UIView commitAnimations];
-                    NSString *message = self->name.alpha?@"Invalid email address or password. Please try again.":@"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
-                    if([[result objectForKey:@"message"] isEqualToString:@"auth"]
-                       || [[result objectForKey:@"message"] isEqualToString:@"email"]
-                       || [[result objectForKey:@"message"] isEqualToString:@"password"]
-                       || [[result objectForKey:@"message"] isEqualToString:@"legacy_account"])
-                        message = @"Incorrect username or password.  Please try again.";
-                    if([[result objectForKey:@"message"] isEqualToString:@"realname"])
-                        message = @"Please enter a valid name and try again.";
-                    if([[result objectForKey:@"message"] isEqualToString:@"email_exists"])
-                        message = @"This email address is already in use, please sign in or try another.";
-                    if([[result objectForKey:@"message"] isEqualToString:@"rate_limited"])
-                        message = @"Rate limited, please try again in a few minutes.";
-                    if([[result objectForKey:@"message"] isEqualToString:@"password_error"])
-                        message = @"Invalid password, please try again.";
-                    if([[result objectForKey:@"message"] isEqualToString:@"banned"] || [[result objectForKey:@"message"] isEqualToString:@"ip_banned"])
-                        message = @"Signup server unavailable, please try again later.";
-                    if([[result objectForKey:@"message"] isEqualToString:@"bad_email"])
-                        message = @"No signups allowed from that domain.";
-                    if([[result objectForKey:@"message"] isEqualToString:@"tor_blocked"])
-                        message = @"No signups allowed from TOR exit nodes";
-                    if([[result objectForKey:@"message"] isEqualToString:@"signup_ip_blocked"])
-                        message = @"Your IP address has been blacklisted.";
-                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:self->name.alpha?@"Sign Up Failed":@"Login Failed" message:message preferredStyle:UIAlertControllerStyleAlert];
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
-                    [self presentViewController:alert animated:YES completion:nil];
-                });
+                        self->loginHint.alpha = 0;
+                        self->signupHint.alpha = 0;
+                        self->enterpriseHint.alpha = 0;
+                        self->forgotPasswordLogin.alpha = 0;
+                        self->forgotPasswordSignup.alpha = 0;
+                        [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
+                    } else {
+                        [UIView beginAnimations:nil context:nil];
+                        self->loginView.alpha = 1;
+                        self->loadingView.alpha = 0;
+                        [UIView commitAnimations];
+                        NSString *message = self->name.alpha?@"Invalid email address or password. Please try again.":@"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
+                        if([[result objectForKey:@"message"] isEqualToString:@"auth"]
+                           || [[result objectForKey:@"message"] isEqualToString:@"email"]
+                           || [[result objectForKey:@"message"] isEqualToString:@"password"]
+                           || [[result objectForKey:@"message"] isEqualToString:@"legacy_account"])
+                            message = @"Incorrect username or password.  Please try again.";
+                        if([[result objectForKey:@"message"] isEqualToString:@"realname"])
+                            message = @"Please enter a valid name and try again.";
+                        if([[result objectForKey:@"message"] isEqualToString:@"email_exists"])
+                            message = @"This email address is already in use, please sign in or try another.";
+                        if([[result objectForKey:@"message"] isEqualToString:@"rate_limited"])
+                            message = @"Rate limited, please try again in a few minutes.";
+                        if([[result objectForKey:@"message"] isEqualToString:@"password_error"])
+                            message = @"Invalid password, please try again.";
+                        if([[result objectForKey:@"message"] isEqualToString:@"banned"] || [[result objectForKey:@"message"] isEqualToString:@"ip_banned"])
+                            message = @"Signup server unavailable, please try again later.";
+                        if([[result objectForKey:@"message"] isEqualToString:@"bad_email"])
+                            message = @"No signups allowed from that domain.";
+                        if([[result objectForKey:@"message"] isEqualToString:@"tor_blocked"])
+                            message = @"No signups allowed from TOR exit nodes";
+                        if([[result objectForKey:@"message"] isEqualToString:@"signup_ip_blocked"])
+                            message = @"Your IP address has been blacklisted.";
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:self->name.alpha?@"Sign Up Failed":@"Login Failed" message:message preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
 #ifndef ENTERPRISE
-                if(nameAlpha) {
-                    if([result objectForKey:@"message"]) {
-                        [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                            kFIRParameterMethod:@"email",
-                            kFIRParameterSuccess:@(0),
-                            @"failure":[result objectForKey:@"message"]
-                        }];
-                    } else {
-                        [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                            kFIRParameterMethod:@"email",
-                            kFIRParameterSuccess:@(0)
-                        }];
-                    }
-                } else {
-                    if([result objectForKey:@"message"]) {
-                        [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                            kFIRParameterMethod:@"email",
-                            kFIRParameterSuccess:@(0),
-                            @"failure":[result objectForKey:@"message"]
-                        }];
-                    } else {
-                        [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                            kFIRParameterMethod:@"email",
-                            kFIRParameterSuccess:@(0)
-                        }];
-                    }
-                }
+                        if(nameAlpha) {
+                            if([result objectForKey:@"message"]) {
+                                [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
+                                    kFIRParameterMethod:@"email",
+                                    kFIRParameterSuccess:@(0),
+                                    @"failure":[result objectForKey:@"message"]
+                                }];
+                            } else {
+                                [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
+                                    kFIRParameterMethod:@"email",
+                                    kFIRParameterSuccess:@(0)
+                                }];
+                            }
+                        } else {
+                            if([result objectForKey:@"message"]) {
+                                [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                                    kFIRParameterMethod:@"email",
+                                    kFIRParameterSuccess:@(0),
+                                    @"failure":[result objectForKey:@"message"]
+                                }];
+                            } else {
+                                [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
+                                    kFIRParameterMethod:@"email",
+                                    kFIRParameterSuccess:@(0)
+                                }];
+                            }
+                        }
 #endif
-            }
-        } else {
-            dispatch_async(dispatch_get_main_queue(), ^{
+                    }
+                };
+                
+                if(nameAlpha)
+                    [[NetworkConnection sharedInstance] signup:user password:pass realname:realname token:[result objectForKey:@"token"] impression:self->_impression?self->_impression:@"" handler:handler];
+                else
+                    [[NetworkConnection sharedInstance] login:user password:pass token:[result objectForKey:@"token"] handler:handler];
+            } else {
                 [UIView beginAnimations:nil context:nil];
                 self->loginView.alpha = 1;
                 self->loadingView.alpha = 0;
@@ -863,8 +860,8 @@
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:message preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
                 [self presentViewController:alert animated:YES completion:nil];
-            });
-        }
+            }
+        }];
     }];
 }
 

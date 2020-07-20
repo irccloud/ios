@@ -2920,15 +2920,11 @@ extern BOOL __compact;
                         scheme = @"http";
                 }
                 
-                url = [NSString stringWithFormat:@"%@://%@%@%@", scheme, credentials, hostname, rest];
+                url = [[NSString stringWithFormat:@"%@://%@%@%@", scheme, credentials, hostname, rest] stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
                 
                 if([ipAddress evaluateWithObject:url]) {
                     continue;
                 }
-                
-                CFStringRef safe_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, (CFStringRef)@"%#/?.;+", (CFStringRef)@"^", kCFStringEncodingUTF8);
-                
-                url = [NSString stringWithString:(__bridge_transfer NSString *)safe_escaped];
                 
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:range URL:[NSURL URLWithString:url]]];
             }
@@ -2949,8 +2945,7 @@ extern BOOL __compact;
             }
             
             if(url) {
-                CFStringRef safe_escaped = CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)url, (CFStringRef)@"%#/?.;+", (CFStringRef)@"^", kCFStringEncodingUTF8);
-                url = [NSString stringWithString:(__bridge_transfer NSString *)safe_escaped];
+                url = [url stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet];
                 [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
                 url = nil;
             }

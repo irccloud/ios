@@ -363,6 +363,8 @@
                     int unread = 0;
                     int highlights = 0;
                     NSString *name = server.name;
+                    NSString *status = server.status;
+                    NSDictionary *fail_info = server.fail_info;
                     if(!name || name.length == 0)
                         name = server.hostname;
                     unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:buffer.bid lastSeenEid:buffer.last_seen_eid type:buffer.type];
@@ -378,8 +380,8 @@
                      @"unread":@(unread),
                      @"highlights":@(highlights),
                      @"archived":@0,
-                     @"status":server.status ? server.status : @"",
-                     @"fail_info":server.fail_info ? server.fail_info : @{},
+                     @"status":status ? status : @"",
+                     @"fail_info":fail_info ? fail_info : @{},
                      @"ssl":@(server.ssl),
                      @"slack":@(server.isSlack),
                      @"count":@(buffers.count)

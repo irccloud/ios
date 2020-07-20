@@ -252,24 +252,24 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(int)editMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to msg:(NSString *)msg handler:(IRCCloudAPIResultHandler)handler;
 
 //GET
--(NSURLSessionDataTask *)requestConfigurationWithHandler:(IRCCloudAPIResultHandler)handler;
--(NSURLSessionDataTask *)getFiles:(int)page handler:(IRCCloudAPIResultHandler)handler;
--(NSURLSessionDataTask *)getPastebins:(int)page handler:(IRCCloudAPIResultHandler)handler;
--(NSURLSessionDataTask *)propertiesForFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler;
--(NSURLSessionDataTask *)getLogExportsWithHandler:(IRCCloudAPIResultHandler)handler;
+-(void)requestConfigurationWithHandler:(IRCCloudAPIResultHandler)handler;
+-(void)getFiles:(int)page handler:(IRCCloudAPIResultHandler)handler;
+-(void)getPastebins:(int)page handler:(IRCCloudAPIResultHandler)handler;
+-(void)propertiesForFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler;
+-(void)getLogExportsWithHandler:(IRCCloudAPIResultHandler)handler;
 
 //POST
--(NSDictionary *)requestAuthToken;
--(NSDictionary *)login:(NSString *)email password:(NSString *)password token:(NSString *)token;
--(NSDictionary *)login:(NSURL *)accessLink;
--(NSDictionary *)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression;
--(NSDictionary *)impression:(NSString *)idfa referrer:(NSString *)referrer;
--(NSDictionary *)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid;
--(NSDictionary *)POSTreply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid;
--(NSDictionary *)POSTheartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid;
--(NSDictionary *)POSTheartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids;
--(NSDictionary *)registerAPNs:(NSData *)token;
--(NSDictionary *)unregisterAPNs:(NSData *)token session:(NSString *)session;
--(NSDictionary *)requestPassword:(NSString *)email token:(NSString *)token;
--(NSDictionary *)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId cid:(int)cid;
+-(void)requestAuthTokenWithHandler:(IRCCloudAPIResultHandler)handler;
+-(void)login:(NSString *)email password:(NSString *)password token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler;
+-(void)login:(NSURL *)accessLink handler:(IRCCloudAPIResultHandler)handler;
+-(void)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression handler:(IRCCloudAPIResultHandler)handler;
+-(void)impression:(NSString *)idfa referrer:(NSString *)referrer handler:(IRCCloudAPIResultHandler)handler;
+-(void)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
+-(void)POSTreply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid handler:(IRCCloudAPIResultHandler)handler;
+-(void)POSTheartbeat:(int)selectedBuffer cid:(int)cid bid:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid handler:(IRCCloudAPIResultHandler)handler;
+-(void)POSTheartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids handler:(IRCCloudAPIResultHandler)handler;
+-(void)registerAPNs:(NSData *)token handler:(IRCCloudAPIResultHandler)handler;
+-(void)unregisterAPNs:(NSData *)token session:(NSString *)session handler:(IRCCloudAPIResultHandler)handler;
+-(void)requestPassword:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler;
+-(void)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
 @end

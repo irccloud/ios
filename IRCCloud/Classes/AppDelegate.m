@@ -352,10 +352,11 @@
 }
 
 -(void)_sendImpression:(NSURL *)url {
-    NSDictionary *d = [[NetworkConnection sharedInstance] impression:[[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString] referrer:[url.absoluteString substringFromIndex:url.scheme.length + url.host.length + 4]];
-    if([[d objectForKey:@"success"] intValue]) {
-        self.loginSplashViewController.impression = [d objectForKey:@"id"];
-    }
+    [[NetworkConnection sharedInstance] impression:[[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString] referrer:[url.absoluteString substringFromIndex:url.scheme.length + url.host.length + 4] handler:^(IRCCloudJSONObject *result) {
+        if([[result objectForKey:@"success"] intValue]) {
+            self.loginSplashViewController.impression = [result objectForKey:@"id"];
+        }
+    }];
 }
     
 - (void)launchURL:(NSURL *)url {
@@ -374,17 +375,15 @@
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
     NSData *oldToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"];
     if(oldToken && ![devToken isEqualToData:oldToken]) {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            CLS_LOG(@"Unregistering old APNs token");
-            NSDictionary *result = [self->_conn unregisterAPNs:oldToken session:self->_conn.session];
+        CLS_LOG(@"Unregistering old APNs token");
+        [self->_conn unregisterAPNs:oldToken session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
             NSLog(@"Unregistration result: %@", result);
-        });
+        }];
     }
     [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSDictionary *result = [self->_conn registerAPNs:devToken];
+    [self->_conn registerAPNs:devToken handler:^(IRCCloudJSONObject *result) {
         NSLog(@"Registration result: %@", result);
-    });
+    }];
 }
 
 - (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err {
@@ -538,67 +537,70 @@
 }
 
 -(void)handleAction:(NSString *)identifier userInfo:(NSDictionary *)userInfo response:(NSString *)response completionHandler:(void (^)())completionHandler {
-    NSDictionary *result;
+    IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
+        if([[result objectForKey:@"success"] intValue] == 1) {
+            if([identifier isEqualToString:@"reply"]) {
+                AudioServicesPlaySystemSound(1001);
+            } else if([identifier isEqualToString:@"read"]) {
+                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+                if(b && b.last_seen_eid < [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue])
+                    b.last_seen_eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
+                [[NotificationsDataSource sharedInstance] removeNotificationsForBID:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] olderThan:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue]];
+                [[NotificationsDataSource sharedInstance] updateBadgeCount];
+            } else if([identifier isEqualToString:@"join"]) {
+                Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+                if(b) {
+                    [self.mainViewController bufferSelected:b.bid];
+                } else {
+                    self.mainViewController.cidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
+                    self.mainViewController.bufferToOpen = [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1];
+                }
+                [self showMainView:YES];
+            }
+        } else {
+            CLS_LOG(@"Failed: %@ %@", identifier, result);
+            UILocalNotification *alert = [[UILocalNotification alloc] init];
+            alert.fireDate = [NSDate date];
+            if([identifier isEqualToString:@"reply"]) {
+                Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+                if(b)
+                    b.draft = response;
+                alert.alertBody = [NSString stringWithFormat:@"Failed to send message to %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
+            } else if([identifier isEqualToString:@"join"]) {
+                alert.alertBody = [NSString stringWithFormat:@"Failed to join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]];
+            } else if([identifier isEqualToString:@"accept"]) {
+                alert.alertBody = [NSString stringWithFormat:@"Failed to add %@ to accept list", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
+            }
+            alert.soundName = @"a.caf";
+            alert.category = @"retry";
+            if(response)
+                alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":@{UIUserNotificationActionResponseTypedTextKey:response}, @"d":[userInfo objectForKey:@"d"]};
+            else
+                alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"d":[userInfo objectForKey:@"d"]};
+            [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+        }
+        
+        completionHandler();
+    };
     
     if([identifier isEqualToString:@"reply"]) {
-        result = [[NetworkConnection sharedInstance] POSTsay:response
-                                                          to:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-key"] hasSuffix:@"CH"]?2:0]
-                                                 cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+        [[NetworkConnection sharedInstance] POSTsay:response
+                                                 to:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-key"] hasSuffix:@"CH"]?2:0]
+                                                cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]
+                                            handler:handler];
     } else if([identifier isEqualToString:@"join"]) {
-        result = [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"/join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]]
-                                                  to:@""
-                                                 cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+        [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"/join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]]
+                                                 to:@""
+                                                cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]
+                                            handler:handler];
     } else if([identifier isEqualToString:@"accept"]) {
-        result = [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"/accept %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]]
-                                                  to:@""
-                                                 cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
+        [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"/accept %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]]
+                                                 to:@""
+                                                cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]
+                                            handler:handler];
     } else if([identifier isEqualToString:@"read"]) {
-        result = [[NetworkConnection sharedInstance] POSTheartbeat:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue] bid:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] lastSeenEid:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue]];
+        [[NetworkConnection sharedInstance] POSTheartbeat:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] cid:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue] bid:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] lastSeenEid:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue] handler:handler];
     }
-
-    if([[result objectForKey:@"success"] intValue] == 1) {
-        if([identifier isEqualToString:@"reply"]) {
-            AudioServicesPlaySystemSound(1001);
-        } else if([identifier isEqualToString:@"read"]) {
-            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
-            if(b && b.last_seen_eid < [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue])
-                b.last_seen_eid = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
-            [[NotificationsDataSource sharedInstance] removeNotificationsForBID:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue] olderThan:[[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue]];
-            [[NotificationsDataSource sharedInstance] updateBadgeCount];
-        } else if([identifier isEqualToString:@"join"]) {
-            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
-            if(b) {
-                [self.mainViewController bufferSelected:b.bid];
-            } else {
-                self.mainViewController.cidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
-                self.mainViewController.bufferToOpen = [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1];
-            }
-            [self showMainView:YES];
-        }
-    } else {
-        CLS_LOG(@"Failed: %@ %@", identifier, result);
-        UILocalNotification *alert = [[UILocalNotification alloc] init];
-        alert.fireDate = [NSDate date];
-        if([identifier isEqualToString:@"reply"]) {
-            Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
-            if(b)
-                b.draft = response;
-            alert.alertBody = [NSString stringWithFormat:@"Failed to send message to %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
-        } else if([identifier isEqualToString:@"join"]) {
-            alert.alertBody = [NSString stringWithFormat:@"Failed to join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]];
-        } else if([identifier isEqualToString:@"accept"]) {
-            alert.alertBody = [NSString stringWithFormat:@"Failed to add %@ to accept list", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
-        }
-        alert.soundName = @"a.caf";
-        alert.category = @"retry";
-        if(response)
-            alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":@{UIUserNotificationActionResponseTypedTextKey:response}, @"d":[userInfo objectForKey:@"d"]};
-        else
-            alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"d":[userInfo objectForKey:@"d"]};
-        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-    }
-    
-    completionHandler();
 }
 
 -(void)showLoginView {
@@ -855,56 +857,61 @@
         } else if([[r objectForKey:@"success"] intValue] == 1) {
             if([[dict objectForKey:@"service"] isEqualToString:@"irccloud"]) {
                 CLS_LOG(@"Finalizing IRCCloud upload");
-                NSDictionary *o = [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"] avatar:[[dict objectForKey:@"avatar"] boolValue] orgId:[[dict objectForKey:@"orgId"] intValue] cid:[[dict objectForKey:@"cid"] intValue]];
-                if([[r objectForKey:@"success"] intValue] == 1) {
-                    CLS_LOG(@"IRCCloud upload successful");
-                    Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
-                    if(b) {
-                        NSString *msg = [dict objectForKey:@"msg"];
-                        NSString *msgid = [dict objectForKey:@"msgid"];
-                        if(msg.length)
-                            msg = [msg stringByAppendingString:@" "];
-                        else
-                            msg = @"";
-                        msg = [msg stringByAppendingFormat:@"%@", [[o objectForKey:@"file"] objectForKey:@"url"]];
-                        
-                        if(msgid.length > 0)
-                            [[NetworkConnection sharedInstance] POSTreply:msg to:b.name cid:b.cid msgid:msgid];
-                        else
-                            [[NetworkConnection sharedInstance] POSTsay:msg to:b.name cid:b.cid];
-                        [self.mainViewController fileUploadDidFinish];
-                        AudioServicesPlaySystemSound(1001);
-                        if(imageUploadCompletionHandler)
-                            imageUploadCompletionHandler();
-                    }
-                } else {
-                    CLS_LOG(@"IRCCloud upload failed");
-                    [self.mainViewController fileUploadDidFail:[o objectForKey:@"message"]];
-                    [[NSNotificationCenter defaultCenter] removeObserver:self->_IRCEventObserver];
-                    UILocalNotification *alert = [[UILocalNotification alloc] init];
-                    alert.fireDate = [NSDate date];
-                    if([[o objectForKey:@"message"] isEqualToString:@"upload_limit_reached"]) {
-                        alert.alertBody = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
-                    } else if([[o objectForKey:@"message"] isEqualToString:@"upload_already_exists"]) {
-                        alert.alertBody = @"You’ve already uploaded this file";
-                    } else if([[o objectForKey:@"message"] isEqualToString:@"banned_content"]) {
-                        alert.alertBody = @"Banned content";
+                [[NetworkConnection sharedInstance] finalizeUpload:[r objectForKey:@"id"] filename:[dict objectForKey:@"filename"] originalFilename:[dict objectForKey:@"original_filename"] avatar:[[dict objectForKey:@"avatar"] boolValue] orgId:[[dict objectForKey:@"orgId"] intValue] cid:[[dict objectForKey:@"cid"] intValue] handler:^(IRCCloudJSONObject *o) {
+                    if([[o objectForKey:@"success"] intValue] == 1) {
+                        CLS_LOG(@"IRCCloud upload successful");
+                        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
+                        if(b) {
+                            NSString *msg = [dict objectForKey:@"msg"];
+                            NSString *msgid = [dict objectForKey:@"msgid"];
+                            if(msg.length)
+                                msg = [msg stringByAppendingString:@" "];
+                            else
+                                msg = @"";
+                            msg = [msg stringByAppendingFormat:@"%@", [[o objectForKey:@"file"] objectForKey:@"url"]];
+                            
+                            IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
+                                [self.mainViewController fileUploadDidFinish];
+                                AudioServicesPlaySystemSound(1001);
+                                if(self->imageUploadCompletionHandler)
+                                    self->imageUploadCompletionHandler();
+                            };
+                            
+                            if(msgid.length > 0)
+                                [[NetworkConnection sharedInstance] POSTreply:msg to:b.name cid:b.cid msgid:msgid handler:handler];
+                            else
+                                [[NetworkConnection sharedInstance] POSTsay:msg to:b.name cid:b.cid handler:handler];
+                        }
                     } else {
-                        alert.alertBody = @"Failed to upload file. Please try again shortly.";
+                        CLS_LOG(@"IRCCloud upload failed");
+                        [self.mainViewController fileUploadDidFail:[o objectForKey:@"message"]];
+                        [[NSNotificationCenter defaultCenter] removeObserver:self->_IRCEventObserver];
+                        UILocalNotification *alert = [[UILocalNotification alloc] init];
+                        alert.fireDate = [NSDate date];
+                        if([[o objectForKey:@"message"] isEqualToString:@"upload_limit_reached"]) {
+                            alert.alertBody = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
+                        } else if([[o objectForKey:@"message"] isEqualToString:@"upload_already_exists"]) {
+                            alert.alertBody = @"You’ve already uploaded this file";
+                        } else if([[o objectForKey:@"message"] isEqualToString:@"banned_content"]) {
+                            alert.alertBody = @"Banned content";
+                        } else {
+                            alert.alertBody = @"Failed to upload file. Please try again shortly.";
+                        }
+                        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                        if(self->imageUploadCompletionHandler)
+                            self->imageUploadCompletionHandler();
                     }
-                    [[UIApplication sharedApplication] scheduleLocalNotification:alert];
-                    if(imageUploadCompletionHandler)
-                        imageUploadCompletionHandler();
-                }
+                }];
             } else if([[dict objectForKey:@"service"] isEqualToString:@"imgur"]) {
                 NSString *link = [[[r objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
                 
                 if([dict objectForKey:@"msg"]) {
                     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
-                    [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid];
-                    AudioServicesPlaySystemSound(1001);
-                    if(imageUploadCompletionHandler)
-                        imageUploadCompletionHandler();
+                    [[NetworkConnection sharedInstance] POSTsay:[NSString stringWithFormat:@"%@ %@",[dict objectForKey:@"msg"],link] to:b.name cid:b.cid handler:^(IRCCloudJSONObject *result) {
+                        AudioServicesPlaySystemSound(1001);
+                        if(self->imageUploadCompletionHandler)
+                            self->imageUploadCompletionHandler();
+                    }];
                 } else {
                     if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
                         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[dict objectForKey:@"bid"] intValue]];
@@ -920,8 +927,8 @@
                         alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
                         [[UIApplication sharedApplication] scheduleLocalNotification:alert];
                     }
-                    if(imageUploadCompletionHandler)
-                        imageUploadCompletionHandler();
+                    if(self->imageUploadCompletionHandler)
+                        self->imageUploadCompletionHandler();
                 }
             }
         }
