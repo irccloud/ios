@@ -24,6 +24,20 @@
 @import Firebase;
 @import FirebasePerformance;
 
+void FirebaseLog(NSString *format, ...) {
+  if (!format) {
+    return;
+  }
+
+  va_list args;
+  va_start(args, format);
+  [[FIRCrashlytics crashlytics] logWithFormat:format arguments:args];
+  va_end(args);
+  va_start(args, format);
+  NSLog(@"%@", [[NSString alloc] initWithFormat:format arguments:args]);
+  va_end(args);
+}
+
 NSString *_userAgent = nil;
 NSString *kIRCCloudConnectivityNotification = @"com.irccloud.notification.connectivity";
 NSString *kIRCCloudEventNotification = @"com.irccloud.notification.event";
