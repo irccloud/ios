@@ -1038,6 +1038,7 @@
         if(session != nil && [session length] > 0 && IRCCLOUD_HOST.length > 0) {
             self.window.backgroundColor = [UIColor textareaBackgroundColor];
             self.window.rootViewController = self.slideViewController;
+            self.window.overrideUserInterfaceStyle = self.mainViewController.view.overrideUserInterfaceStyle;
         } else {
             self.window.rootViewController = self.loginSplashViewController;
         }
