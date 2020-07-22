@@ -2853,7 +2853,7 @@ extern BOOL __compact;
     static NSMutableCharacterSet *urlSet;
     if(!urlSet) {
         urlSet = NSCharacterSet.URLQueryAllowedCharacterSet.mutableCopy;
-        [urlSet addCharactersInString:@"#^"];
+        [urlSet addCharactersInString:@"#"];
     }
     
     if(string.length) {

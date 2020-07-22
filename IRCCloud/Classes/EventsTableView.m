@@ -321,13 +321,18 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (void)previewingContext:(id<UIViewControllerPreviewing>)previewingContext commitViewController:(UIViewController *)viewControllerToCommit {
+    AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    [appDelegate setActiveScene:self.view.window];
     MainViewController *mainViewController = [(AppDelegate *)([UIApplication sharedApplication].delegate) mainViewController];
     mainViewController.isShowingPreview = NO;
     if([viewControllerToCommit isKindOfClass:[ImageViewController class]]) {
-        AppDelegate *appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+        appDelegate.mainViewController.ignoreVisibilityChanges = YES;
         appDelegate.window.backgroundColor = [UIColor blackColor];
         appDelegate.window.rootViewController = viewControllerToCommit;
-        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:appDelegate.window.rootViewController.view];
+        [appDelegate.window addSubview:viewControllerToCommit.view];
+        appDelegate.slideViewController.view.frame = appDelegate.window.bounds;
+        [appDelegate.window insertSubview:appDelegate.slideViewController.view belowSubview:viewControllerToCommit.view];
+        appDelegate.mainViewController.ignoreVisibilityChanges = NO;
         [viewControllerToCommit didMoveToParentViewController:nil];
     } else if([viewControllerToCommit isKindOfClass:[YouTubeViewController class]]) {
         viewControllerToCommit.modalPresentationStyle = UIModalPresentationCustom;
