@@ -1323,11 +1323,16 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)_performDataTaskRequest:(NSURLRequest *)request handler:(IRCCloudAPIResultHandler)resultHandler {
     NSURLSessionDataTask* task = [_urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if(resultHandler) {
-            NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-            if(dict)
-                resultHandler([[IRCCloudJSONObject alloc] initWithDictionary:dict]);
-            else
+            if(!error && data) {
+                NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+                if(dict)
+                    resultHandler([[IRCCloudJSONObject alloc] initWithDictionary:dict]);
+                else
+                    resultHandler(nil);
+            } else {
+                CLS_LOG(@"Request to %@ failed with error: %@", request.URL, error);
                 resultHandler(nil);
+            }
         }
     }];
     [task resume];
