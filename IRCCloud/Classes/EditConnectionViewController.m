@@ -90,10 +90,11 @@ static NSString * const ServerHasSSLKey = @"ssl";
             self->_networks = networks;
         }
         
-        [self->_activityIndicator stopAnimating];
-        [self->_activityIndicator removeFromSuperview];
-        
-        [self.tableView reloadData];
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self->_activityIndicator stopAnimating];
+            [self->_activityIndicator removeFromSuperview];
+            [self.tableView reloadData];
+        }];
     }] resume];
 }
 
