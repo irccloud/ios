@@ -38,6 +38,8 @@
 #endif
 @import Firebase;
 
+extern NSURL *__logfile;
+
 #ifdef DEBUG
 @implementation NSURLRequest(CertificateHack)
 + (BOOL)allowsAnyHTTPSCertificateForHost:(NSString *)host {
@@ -90,18 +92,15 @@
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-#ifndef DEBUG
 #ifdef ENTERPRISE
     NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
 #else
     NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
 #endif
-    if(sharedcontainer && stderr != NULL) {
-        NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
-
-        freopen([logfile.path cStringUsingEncoding:NSASCIIStringEncoding],"w+",stderr);
+    if(sharedcontainer) {
+        __logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
+        [[NSFileManager defaultManager] removeItemAtURL:__logfile error:nil];
     }
-#endif
 #ifdef CRASHLYTICS_TOKEN
     if([FIROptions defaultOptions]) {
         [FIRApp configure];
@@ -377,12 +376,12 @@
     if(oldToken && ![devToken isEqualToData:oldToken]) {
         CLS_LOG(@"Unregistering old APNs token");
         [self->_conn unregisterAPNs:oldToken session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
-            NSLog(@"Unregistration result: %@", result);
+            CLS_LOG(@"Unregistration result: %@", result);
         }];
     }
     [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
     [self->_conn registerAPNs:devToken handler:^(IRCCloudJSONObject *result) {
-        NSLog(@"Registration result: %@", result);
+        CLS_LOG(@"Registration result: %@", result);
     }];
 }
 
@@ -686,7 +685,7 @@
         [logfile getResourceValue:&modificationDate forKey:NSURLContentModificationDateKey error:nil];
 
         if([yesterday compare:modificationDate] == NSOrderedDescending) {
-            freopen([logfile.path cStringUsingEncoding:NSASCIIStringEncoding],"w+",stderr);
+            [[NSFileManager defaultManager] removeItemAtURL:logfile error:nil];
         }
     }
 #endif

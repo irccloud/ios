@@ -249,14 +249,14 @@
 }
 
 -(void)purgeInvalidChannels {
-    NSLog(@"Cleaning up invalid channels");
+    CLS_LOG(@"Cleaning up invalid channels");
     NSArray *copy;
     @synchronized(self->_channels) {
         copy = self->_channels.copy;
     }
     for(Channel *channel in copy) {
         if(!channel.valid) {
-            NSLog(@"Removing invalid channel: %@", channel.name);
+            CLS_LOG(@"Removing invalid channel: %@", channel.name);
             [self->_channels removeObject:channel];
             [[UsersDataSource sharedInstance] removeUsersForBuffer:channel.bid];
         }

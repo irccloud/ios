@@ -104,7 +104,6 @@ static NSString *encodeByAddingPercentEscapes(NSString *input) {
             NSString *sourceName = encodeByAddingPercentEscapes(self.callbackSource);
             
             NSURL *activityURL = [NSURL URLWithString:[NSString stringWithFormat:@"googlechrome-x-callback://x-callback-url/open/?url=%@&x-success=%@&x-source=%@", openingURL, callbackURL, sourceName]];
-            NSLog(@"AURL: %@", activityURL);
             [[UIApplication sharedApplication] openURL:activityURL];
             success = YES;
         } else {

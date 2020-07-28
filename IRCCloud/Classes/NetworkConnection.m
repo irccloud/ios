@@ -24,18 +24,33 @@
 @import Firebase;
 @import FirebasePerformance;
 
-void FirebaseLog(NSString *format, ...) {
-  if (!format) {
-    return;
-  }
+NSURL *__logfile;
 
-  va_list args;
-  va_start(args, format);
-  [[FIRCrashlytics crashlytics] logWithFormat:format arguments:args];
-  va_end(args);
-  va_start(args, format);
-  NSLog(@"%@", [[NSString alloc] initWithFormat:format arguments:args]);
-  va_end(args);
+void FirebaseLog(NSString *format, ...) {
+    if (!format) {
+        return;
+    }
+
+    va_list args;
+    va_start(args, format);
+    [[FIRCrashlytics crashlytics] logWithFormat:format arguments:args];
+    va_end(args);
+    va_start(args, format);
+    NSString *s = [[NSString alloc] initWithFormat:format arguments:args];
+    va_end(args);
+
+    if(__logfile) {
+        NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:__logfile.path];
+        if(!fileHandle) {
+            [[NSFileManager defaultManager] createFileAtPath:__logfile.path contents:nil attributes:nil];
+            fileHandle = [NSFileHandle fileHandleForWritingAtPath:__logfile.path];
+        }
+        [fileHandle seekToEndOfFile];
+        [fileHandle writeData:[s dataUsingEncoding:NSUTF8StringEncoding]];
+        [fileHandle closeFile];
+    }
+
+    NSLog(@"%@", s);
 }
 
 NSString *_userAgent = nil;
@@ -1340,7 +1355,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_get:(NSURL *)url handler:(IRCCloudAPIResultHandler)resultHandler {
     if(![NSThread isMainThread]) {
-        NSLog(@"*** _get called on wrong thread");
+        CLS_LOG(@"*** _get called on wrong thread");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _get:url handler:resultHandler];
         }];
@@ -1410,7 +1425,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 
 -(void)_postRequest:(NSString *)path args:(NSDictionary *)args handler:(IRCCloudAPIResultHandler)resultHandler {
     if(![NSThread isMainThread]) {
-        NSLog(@"*** _postRequest called on wrong thread");
+        CLS_LOG(@"*** _postRequest called on wrong thread");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _postRequest:path args:args handler:resultHandler];
         }];
@@ -2091,7 +2106,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         if(backlog)
             self->_totalCount++;
         if([NSThread currentThread].isMainThread)
-            NSLog(@"WARNING: Parsing on main thread");
+            CLS_LOG(@"WARNING: Parsing on main thread");
         [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
         if(self->_accrued > 0) {
             [self performSelectorOnMainThread:@selector(_postLoadingProgress:) withObject:@(((float)_totalCount++ / (float)_accrued)) waitUntilDone:NO];
@@ -2293,7 +2308,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     self->_longestEventTime = 0;
     self->_longestEventType = nil;
     if(self->_awayOverride.count)
-        NSLog(@"Caught %lu self_back events", (unsigned long)_awayOverride.count);
+        CLS_LOG(@"Caught %lu self_back events", (unsigned long)_awayOverride.count);
     self->_currentBid = -1;
     self->_currentCount = 0;
     self->_totalCount = 0;
@@ -2433,7 +2448,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 
 -(void)_logout:(NSString *)session {
     [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] session:session handler:^(IRCCloudJSONObject *result) {
-        NSLog(@"Unregister result: %@", result);
+        CLS_LOG(@"Unregister result: %@", result);
     }];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
     [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
@@ -2518,7 +2533,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             self->_keychainFailCount = 0;
             self->_session = [[NSString alloc] initWithData:CFBridgingRelease(data) encoding:NSUTF8StringEncoding];
             if(self->_session.length <= 1) {
-                NSLog(@"Removing invalid session");
+                CLS_LOG(@"Removing invalid session");
                 [self setSession:nil];
             }
             return _session;

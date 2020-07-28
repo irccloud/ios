@@ -53,7 +53,7 @@
     
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            NSLog(@"Error renewing token. Error %li : %@", (long)error.code, error.userInfo);
+            CLS_LOG(@"Error renewing token. Error %li : %@", (long)error.code, error.userInfo);
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self->_delegate imageUploadDidFail];
             }];

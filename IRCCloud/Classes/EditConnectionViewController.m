@@ -69,7 +69,7 @@ static NSString * const ServerHasSSLKey = @"ssl";
     
     [[[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:NetworksListLink] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching remote networks list. Error %li : %@", (long)error.code, error.userInfo);
+            CLS_LOG(@"Error fetching remote networks list. Error %li : %@", (long)error.code, error.userInfo);
             
             self->_networks = @[];
         }

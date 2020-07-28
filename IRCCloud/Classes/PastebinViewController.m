@@ -148,7 +148,7 @@
 
         [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             if (error) {
-                NSLog(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
+                CLS_LOG(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
             } else {
                 NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                 self->_ownPaste = [[dict objectForKey:@"own_paste"] intValue] == 1;
@@ -228,7 +228,7 @@
 -(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     if(([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102) || ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled))
         return;
-    NSLog(@"Error: %@", error);
+    CLS_LOG(@"Error: %@", error);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
 }

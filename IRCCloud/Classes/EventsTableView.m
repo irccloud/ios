@@ -585,14 +585,14 @@ extern UIImage *__socketClosedBackgroundImage;
 - (void)backlogCompleted:(NSNotification *)notification {
     if(self->_buffer && [notification.object bid] == self->_buffer.bid) {
         if([[EventsDataSource sharedInstance] eventsForBuffer:self->_buffer.bid] == nil) {
-            NSLog(@"This buffer contains no events, switching to backlog failed header view");
+            CLS_LOG(@"This buffer contains no events, switching to backlog failed header view");
             self->_tableView.tableHeaderView = self->_backlogFailedView;
             return;
         }
         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Download complete.");
     }
     if(notification.object == nil || [notification.object bid] == -1 || (self->_buffer && [notification.object bid] == self->_buffer.bid && _requestingBacklog)) {
-        NSLog(@"Backlog loaded in current buffer, will find and remove the last seen EID marker");
+        CLS_LOG(@"Backlog loaded in current buffer, will find and remove the last seen EID marker");
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if(self->_buffer.scrolledUp) {
                 [self->_lock lock];
@@ -603,7 +603,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 for(Event *event in self->_data) {
                     if((event.rowType == ROW_LASTSEENEID && [[EventsDataSource sharedInstance] unreadStateForBuffer:self->_buffer.bid lastSeenEid:self->_buffer.last_seen_eid type:self->_buffer.type] == 0) || event.rowType == ROW_BACKLOG) {
                         if(toprow > row) {
-                            NSLog(@"Adjusting scroll offset");
+                            CLS_LOG(@"Adjusting scroll offset");
                             self->_buffer.savedScrollOffset -= 26;
                         }
                     }
@@ -613,14 +613,14 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self->_lock unlock];
                 for(Event *event in [[EventsDataSource sharedInstance] eventsForBuffer:self->_buffer.bid]) {
                     if(event.rowType == ROW_LASTSEENEID) {
-                        NSLog(@"removing the last seen EID marker");
+                        CLS_LOG(@"removing the last seen EID marker");
                         [[EventsDataSource sharedInstance] removeEvent:event.eid buffer:event.bid];
-                        NSLog(@"removed!");
+                        CLS_LOG(@"removed!");
                         break;
                     }
                 }
             }
-            NSLog(@"Rebuilding the message table");
+            CLS_LOG(@"Rebuilding the message table");
             [self refresh];
         }];
     }
@@ -1294,7 +1294,7 @@ extern UIImage *__socketClosedBackgroundImage;
                                                 [self reloadForEvent:e1];
                                             }
                                         } else {
-                                            NSLog(@"METADATA FAILED: %@: %@", result.URL, error);
+                                            CLS_LOG(@"METADATA FAILED: %@: %@", result.URL, error);
                                         }
                                     }
                                 }];
@@ -2204,7 +2204,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self scrollToBottom];
             }
         } @catch (NSException *e) {
-            NSLog(@"Unable to set scroll position: %@", e);
+            CLS_LOG(@"Unable to set scroll position: %@", e);
         }
         
         if(self->_data.count == 0 && _buffer.bid != -1 && _buffer.min_eid > 0 && _conn.state == kIRCCloudStateConnected && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _conn.ready && !_requestingBacklog) {
@@ -2259,7 +2259,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 [self loadMoreBacklogButtonPressed:nil];
             }
             
-            NSLog(@"Refresh finished in %f seconds", [start timeIntervalSinceNow] * -1.0);
+            CLS_LOG(@"Refresh finished in %f seconds", [start timeIntervalSinceNow] * -1.0);
         }];
     }
 }
@@ -2484,7 +2484,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 cell.thumbnail.image = nil;
                 cell.spinner.hidden = NO;
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    NSLog(@"Image dimensions were missing, reloading table");
+                    CLS_LOG(@"Image dimensions were missing, reloading table");
                     e.height = 0;
                     [self reloadForEvent:e];
                 }];
@@ -2659,7 +2659,7 @@ extern UIImage *__socketClosedBackgroundImage;
                     needsRefresh = [[ImageCache sharedInstance] ageOfCache:avatarURL] >= 600;
                 
                 if(needsRefresh) {
-                    NSLog(@"Avatar needs refresh: %@", avatarURL);
+                    CLS_LOG(@"Avatar needs refresh: %@", avatarURL);
                 }
                 
                 UIImage *image = [[ImageCache sharedInstance] imageForURL:avatarURL];
@@ -2782,7 +2782,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             }
             @catch (NSException *exception) {
-                NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+                CLS_LOG(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
             }
         }
         if(cell.nickname.text.length && e.realnameLinks.count) {
@@ -2804,7 +2804,7 @@ extern UIImage *__socketClosedBackgroundImage;
                 }
             }
             @catch (NSException *exception) {
-                NSLog(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
+                CLS_LOG(@"An exception occured while setting the links, the table is probably being reloaded: %@", exception);
             }
         }
     }

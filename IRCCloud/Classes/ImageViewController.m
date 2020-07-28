@@ -192,7 +192,7 @@
         [self->_progressView removeFromSuperview];
 
         if(self->_previewing || self.view.window.rootViewController != self) {
-            NSLog(@"Not launching fallback URL as we're not the root view controller");
+            CLS_LOG(@"Not launching fallback URL as we're not the root view controller");
             return;
         }
         
@@ -352,7 +352,7 @@
 -(void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     if(task == self->_imageTask) {
         if(error) {
-            NSLog(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
+            CLS_LOG(@"Couldn't download image. Error code %li: %@", (long)error.code, error.localizedDescription);
             [self fail:error.localizedDescription];
         } else {
             if(self->_imageData) {

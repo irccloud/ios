@@ -100,7 +100,7 @@
     NSArray *assetVideoTracks = [asset tracksWithMediaType:AVMediaTypeVideo];
     if (assetVideoTracks.count <= 0)
     {
-        NSLog(@"Error reading the transformed video track");
+        CLS_LOG(@"Error reading the transformed video track");
         return NO;
     }
 
@@ -134,15 +134,15 @@
         switch ([exportSession status])
         {
             case AVAssetExportSessionStatusCompleted:
-                NSLog(@"MP4 Successful!");
+                CLS_LOG(@"MP4 Successful!");
                 [self uploadFile:exportUrl];
                 break;
             case AVAssetExportSessionStatusFailed:
-                NSLog(@"Export failed: %@", [[exportSession error] localizedDescription]);
+                CLS_LOG(@"Export failed: %@", [[exportSession error] localizedDescription]);
                 [self->_delegate fileUploadDidFail:[[exportSession error] localizedDescription]];
                 break;
             case AVAssetExportSessionStatusCancelled:
-                NSLog(@"Export canceled");
+                CLS_LOG(@"Export canceled");
                 [self->_delegate fileUploadDidFail:@"Export cancelled"];
                 break;
             default:

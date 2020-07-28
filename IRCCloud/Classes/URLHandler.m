@@ -221,7 +221,7 @@
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
             [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
-                    NSLog(@"Error fetching cl.ly metadata. Error %li : %@", (long)error.code, error.userInfo);
+                    CLS_LOG(@"Error fetching cl.ly metadata. Error %li : %@", (long)error.code, error.userInfo);
                     callback(NO,error.localizedDescription);
                 } else {
                     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -232,7 +232,7 @@
                                                 } forKey:url];
                         callback(YES, nil);
                     } else {
-                        NSLog(@"Invalid type from cl.ly");
+                        CLS_LOG(@"Invalid type from cl.ly");
                         callback(NO,@"This image type is not supported");
                     }
                 }
@@ -247,7 +247,7 @@
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
             [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
-                    NSLog(@"Error fetching MediaWiki metadata. Error %li : %@", (long)error.code, error.userInfo);
+                    CLS_LOG(@"Error fetching MediaWiki metadata. Error %li : %@", (long)error.code, error.userInfo);
                     callback(NO,error.localizedDescription);
                 } else {
                     NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -259,7 +259,7 @@
                                                 } forKey:url];
                         callback(YES, nil);
                     } else {
-                        NSLog(@"Invalid data from MediaWiki: %@", dict);
+                        CLS_LOG(@"Invalid data from MediaWiki: %@", dict);
                         callback(NO,@"This image type is not supported");
                     }
                 }
@@ -275,7 +275,7 @@
     NSURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
+            CLS_LOG(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
         } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -303,7 +303,7 @@
                     [self _loadGiphy:[[dict objectForKey:@"url"] substringFromIndex:[[dict objectForKey:@"url"] rangeOfString:@"/gifs/"].location + 6] result:callback original_url:original_url];
                 }
             } else {
-                NSLog(@"Invalid type from oembed");
+                CLS_LOG(@"Invalid type from oembed");
                 callback(NO,@"This URL type is not supported");
             }
         }
@@ -316,7 +316,7 @@
     
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching giphy. Error %li : %@", (long)error.code, error.userInfo);
+            CLS_LOG(@"Error fetching giphy. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
         } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -434,7 +434,7 @@
     
     [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching xkcd. Error %li : %@", (long)error.code, error.userInfo);
+            CLS_LOG(@"Error fetching xkcd. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
         } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
@@ -488,7 +488,7 @@
         [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             NSURL *result = url;
             if (error) {
-                NSLog(@"Error fetching file metadata. Error %li : %@", (long)error.code, error.userInfo);
+                CLS_LOG(@"Error fetching file metadata. Error %li : %@", (long)error.code, error.userInfo);
             } else {
                 NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
                 

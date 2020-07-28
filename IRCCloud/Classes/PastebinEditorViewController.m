@@ -74,7 +74,7 @@
     
     [[[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
-            NSLog(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
+            CLS_LOG(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
         } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
             self->_text.text = [dict objectForKey:@"body"];

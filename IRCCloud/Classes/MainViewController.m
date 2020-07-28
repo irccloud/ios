@@ -1870,7 +1870,7 @@ NSArray *_sortedChannels;
     [UIColor setCurrentTraits:self.traitCollection];
     [UIColor setTheme];
     if(![self->_currentTheme isEqualToString:[UIColor currentTheme]]) {
-        NSLog(@"Switched from %@ to %@", self->_currentTheme, [UIColor currentTheme]);
+        CLS_LOG(@"Switched from %@ to %@", self->_currentTheme, [UIColor currentTheme]);
         [self applyTheme];
         if([ColorFormatter shouldClearFontCache]) {
             [ColorFormatter clearFontCache];
@@ -1994,9 +1994,9 @@ NSArray *_sortedChannels;
             [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:[NSSet setWithObjects:buffer_msg, buffer_me_msg, invite, callerid, retry, nil]]];
         }
 #ifdef DEBUG
-        NSLog(@"This is a debug build, skipping APNs registration");
+        CLS_LOG(@"This is a debug build, skipping APNs registration");
 #else
-        NSLog(@"APNs registration");
+        CLS_LOG(@"APNs registration");
         [[UIApplication sharedApplication] registerForRemoteNotifications];
 #endif
     }
@@ -3265,7 +3265,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)transitionToSize:(CGSize)size {
-    NSLog(@"Transitioning to size: %f, %f", size.width, size.height);
+    CLS_LOG(@"Transitioning to size: %f, %f", size.width, size.height);
     _ignoreInsetChanges = YES;
     CGPoint center = self.slidingViewController.view.center;
     if(self.slidingViewController.underLeftShowing)
@@ -4657,7 +4657,7 @@ NSArray *_sortedChannels;
 
 -(void)fileUploadWasCancelled {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        NSLog(@"File upload was cancelled");
+        CLS_LOG(@"File upload was cancelled");
         [self _hideConnectingView];
     }];
 }

@@ -264,7 +264,7 @@ UITraitCollection *__currentTraitCollection;
         }
     }
 
-    NSLog(@"Setting theme: %@", theme);
+    CLS_LOG(@"Setting theme: %@", theme);
     
     int i = 0;
     __mIRCColors_BG[i++] = [UIColor colorFromHexString:@"FFFFFF"]; //white

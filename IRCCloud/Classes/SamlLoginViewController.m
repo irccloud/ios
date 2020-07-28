@@ -57,7 +57,7 @@
 -(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
     if([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102)
         return;
-    NSLog(@"Error: %@", error);
+    CLS_LOG(@"Error: %@", error);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];

@@ -1094,7 +1094,7 @@
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
             break;
         default:
-            NSLog(@"Slow event: %i", event);
+            CLS_LOG(@"Slow event: %i", event);
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
             break;
     }

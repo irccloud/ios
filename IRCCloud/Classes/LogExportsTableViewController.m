@@ -583,7 +583,7 @@
                                 NSError *error;
                                 [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
                                 if(error)
-                                    NSLog(@"Error: %@", error);
+                                    CLS_LOG(@"Error: %@", error);
                                 [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
                                 [self->_downloadingURLs removeObjectForKey:url];
                                 [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
@@ -693,7 +693,7 @@
             [self->_fileSizes setObject:[NSString stringWithFormat:@"%.1f %cB", bytes / pow(1024, exp), [@"KMGTPE" characterAtIndex:exp-1]] forKey:downloadTask.originalRequest.URL.lastPathComponent];
         }
         if(error)
-            NSLog(@"Error: %@", error);
+            CLS_LOG(@"Error: %@", error);
     }];
     
     [self->_downloadingURLs removeObjectForKey:downloadTask.originalRequest.URL];

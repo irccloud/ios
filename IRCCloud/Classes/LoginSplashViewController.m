@@ -219,7 +219,7 @@
     if(username.text.length == 0 && !_gotCredentialsFromPasswordManager && !_accessLink) {
         SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
             if (error != NULL) {
-                NSLog(@"Unable to request shared web credentials: %@", error);
+                CLS_LOG(@"Unable to request shared web credentials: %@", error);
                 return;
             }
             
@@ -528,7 +528,7 @@
             [[OnePasswordExtension sharedExtension] findLoginForURLString:url forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
                 if (!loginDict) {
                     if (error.code != AppExtensionErrorCodeCancelledByUser) {
-                        NSLog(@"Error invoking 1Password App Extension for find login: %@", error);
+                        CLS_LOG(@"Error invoking 1Password App Extension for find login: %@", error);
                     }
                     return;
                 }
@@ -566,7 +566,7 @@
                 
                 if (!loginDict) {
                     if (error.code != AppExtensionErrorCodeCancelledByUser) {
-                        NSLog(@"Failed to use 1Password App Extension to save a new Login: %@", error);
+                        CLS_LOG(@"Failed to use 1Password App Extension to save a new Login: %@", error);
                     }
                     return;
                 }
@@ -773,7 +773,7 @@
                         if(!self->_gotCredentialsFromPasswordManager) {
                             SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
                                 if (error != NULL) {
-                                    NSLog(@"Unable to save shared credentials: %@", error);
+                                    CLS_LOG(@"Unable to save shared credentials: %@", error);
                                     return;
                                 }
                             });
