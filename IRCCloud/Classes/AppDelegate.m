@@ -96,7 +96,7 @@
 #else
     NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
 #endif
-    if(sharedcontainer) {
+    if(sharedcontainer && stderr != NULL) {
         NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
 
         freopen([logfile.path cStringUsingEncoding:NSASCIIStringEncoding],"w+",stderr);
