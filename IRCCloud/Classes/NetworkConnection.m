@@ -32,9 +32,11 @@ void FirebaseLog(NSString *format, ...) {
     }
 
     va_list args;
+#ifdef CRASHLYTICS_TOKEN
     va_start(args, format);
     [[FIRCrashlytics crashlytics] logWithFormat:format arguments:args];
     va_end(args);
+#endif
     va_start(args, format);
     NSString *s = [[NSString alloc] initWithFormat:format arguments:args];
     va_end(args);
@@ -340,6 +342,7 @@ volatile BOOL __socketPaused = NO;
     [__userInfoLock unlock];
     if(self.userInfo) {
         self->_config = [self.userInfo objectForKey:@"config"];
+        [self _configLoaded];
     }
     
     CLS_LOG(@"%@", _userAgent);
@@ -1375,18 +1378,23 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         if(object) {
             self->_config = object.dictionary;
         }
-#ifdef ENTERPRISE
-        if(![[self->_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
-            self->_globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [self->_config objectForKey:@"ios_app"]];
-#endif
-        self.fileURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"file_uri_template"] error:nil];
-        self.pasteURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"pastebin_uri_template"] error:nil];
-        self.avatarURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"avatar_uri_template"] error:nil];
-        self.avatarRedirectURITemplate = [CSURITemplate URITemplateWithString:[[NetworkConnection sharedInstance].config objectForKey:@"avatar_redirect_uri_template"] error:nil];
+        
+        [self _configLoaded];
         
         if(handler)
             handler(object);
     }];
+}
+
+-(void)_configLoaded {
+#ifdef ENTERPRISE
+    if(![[self->_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
+        self->_globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [self->_config objectForKey:@"ios_app"]];
+#endif
+    self.fileURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"file_uri_template"] error:nil];
+    self.pasteURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"pastebin_uri_template"] error:nil];
+    self.avatarURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"avatar_uri_template"] error:nil];
+    self.avatarRedirectURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"avatar_redirect_uri_template"] error:nil];
 }
 
 -(void)propertiesForFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler {

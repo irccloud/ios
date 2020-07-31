@@ -59,9 +59,6 @@
         
         if([request.content.userInfo objectForKey:@"f"]) {
             NSString *fileID = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:0];
-            NSString *type = [[request.content.userInfo objectForKey:@"f"] objectAtIndex:1];
-            
-            typeHint = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef _Nonnull)(type), NULL);
             
             if(![NetworkConnection sharedInstance].config) {
                 [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *result) {
@@ -73,10 +70,22 @@
                 return;
             }
             
-            if([type hasPrefix:@"image/"])
-                attachment = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID, @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];
-            else
-                attachment = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":fileID} error:nil]];
+            [[NetworkConnection sharedInstance] propertiesForFile:fileID handler:^(IRCCloudJSONObject *o) {
+                NSURL *attachment = nil;
+                NSString *typeHint = nil;
+                if(o) {
+                    NSString *type = [o objectForKey:@"mime_type"];
+                    typeHint = (__bridge_transfer NSString *)UTTypeCreatePreferredIdentifierForTag(kUTTagClassMIMEType, (__bridge CFStringRef _Nonnull)(type), NULL);
+                    
+                    if([type hasPrefix:@"image/"]) {
+                        attachment = [NSURL URLWithString:[[NetworkConnection sharedInstance].fileURITemplate relativeStringWithVariables:@{@"id":[o objectForKey:@"id"], @"modifiers":[NSString stringWithFormat:@"w%.f", ([UIScreen mainScreen].bounds.size.width/2) * [UIScreen mainScreen].scale]} error:nil]];
+                    } else {
+                        attachment = [NSURL URLWithString:[o objectForKey:@"url"]];
+                    }
+                }
+                [self attach:attachment typeHint:typeHint];
+            }];
+            return;
         } else if([d boolForKey:@"thirdPartyNotificationPreviews"]) {
             NSDictionary *extensions = @{@"png":(NSString *)kUTTypePNG,
                                          @"jpg":(NSString *)kUTTypeJPEG,
@@ -108,6 +117,10 @@
         }
     }
     
+    [self attach:attachment typeHint:typeHint];
+}
+
+- (void)attach:(NSURL *)attachment typeHint:(NSString *)typeHint {
     if(attachment) {
         if([[NSFileManager defaultManager] fileExistsAtPath:[[ImageCache sharedInstance] pathForURL:attachment].path]) {
             [self downloadComplete:attachment typeHint:typeHint];
