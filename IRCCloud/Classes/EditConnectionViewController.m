@@ -67,13 +67,12 @@ static NSString * const ServerHasSSLKey = @"ssl";
     [[NSURLCache sharedURLCache] removeAllCachedResponses];
 #endif
     
-    [[[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:NetworksListLink] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[[NetworkConnection sharedInstance].urlSession dataTaskWithURL:[NSURL URLWithString:NetworksListLink] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching remote networks list. Error %li : %@", (long)error.code, error.userInfo);
             
             self->_networks = @[];
-        }
-        else {
+        } else {
             NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
             NSMutableArray *networks = [[NSMutableArray alloc] initWithCapacity:[(NSArray *)dict[FetchedDataNetworksKey] count]];
             for (NSDictionary *network in dict[FetchedDataNetworksKey]) {

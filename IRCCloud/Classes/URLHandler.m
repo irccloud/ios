@@ -219,7 +219,7 @@
         } else if([url.host.lowercaseString isEqualToString:@"cl.ly"]) {
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
-            [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
                     CLS_LOG(@"Error fetching cl.ly metadata. Error %li : %@", (long)error.code, error.userInfo);
                     callback(NO,error.localizedDescription);
@@ -245,7 +245,7 @@
             NSURL *wikiurl = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@%@%@", url.scheme, url.host, port,[NSString stringWithFormat:@"/w/api.php?action=query&format=json&prop=imageinfo&iiprop=url&titles=%@", [title stringByAddingPercentEncodingWithAllowedCharacters:NSCharacterSet.URLQueryAllowedCharacterSet]]]];
             NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:wikiurl];
             [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
-            [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+            [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error) {
                     CLS_LOG(@"Error fetching MediaWiki metadata. Error %li : %@", (long)error.code, error.userInfo);
                     callback(NO,error.localizedDescription);
@@ -273,7 +273,7 @@
 -(void)_loadOembed:(NSString *)url result:(mediaURLResult)callback original_url:(NSURL *)original_url {
     NSURL *URL = [NSURL URLWithString:url];
     NSURLRequest *request = [NSMutableURLRequest requestWithURL:URL];
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching oembed. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
@@ -314,7 +314,7 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.giphy.com/v1/gifs/%@?api_key=dc6zaTOxFJmzC", gifID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching giphy. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
@@ -358,7 +358,7 @@
     [request setValue:[NSString stringWithFormat:@"Client-ID %@", @IMGUR_KEY] forHTTPHeaderField:@"Authorization"];
 #endif
     
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching imgur. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
@@ -432,7 +432,7 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@/info.0.json", original_url.absoluteString]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching xkcd. Error %li : %@", (long)error.code, error.userInfo);
             callback(NO,error.localizedDescription);
@@ -485,7 +485,7 @@
 
     if([_fileIDs objectForKey:url]) {
         NSURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/file/json/%@", IRCCLOUD_HOST, [_fileIDs objectForKey:url]]]];
-        [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             NSURL *result = url;
             if (error) {
                 CLS_LOG(@"Error fetching file metadata. Error %li : %@", (long)error.code, error.userInfo);
@@ -547,7 +547,7 @@
             return;
         } else if([url.path hasPrefix:@"/verify-email/"]) {
             CLS_LOG(@"Opening verify-email from handoff");
-            [[[NSURLSession sharedSession] dataTaskWithURL:url completionHandler:
+            [[[NetworkConnection sharedInstance].urlSession dataTaskWithURL:url completionHandler:
               ^(NSData *data, NSURLResponse *response, NSError *error) {
                   [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                       if([(NSHTTPURLResponse *)response statusCode] == 200) {

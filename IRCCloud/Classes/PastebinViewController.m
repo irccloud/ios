@@ -146,7 +146,7 @@
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:[NSString stringWithFormat:@"session=%@",NetworkConnection.sharedInstance.session] forHTTPHeaderField:@"Cookie"];
 
-        [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
             if (error) {
                 CLS_LOG(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
             } else {

@@ -72,7 +72,7 @@
 -(void)_fetchPaste {
     NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":self->_pasteID, @"type":@"json"} error:nil];
     
-    [[[NSURLSession sharedSession] dataTaskWithURL:[NSURL URLWithString:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[[NetworkConnection sharedInstance].urlSession dataTaskWithURL:[NSURL URLWithString:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
         } else {

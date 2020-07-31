@@ -184,6 +184,8 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 @property (readonly) NSOperationQueue *queue;
 @property CSURITemplate *fileURITemplate, *pasteURITemplate, *avatarURITemplate, *avatarRedirectURITemplate;
 @property SCNetworkReachabilityRef reachability;
+@property (readonly) NSURLSession *urlSession;
+
 
 +(NetworkConnection*)sharedInstance;
 +(void)sync;

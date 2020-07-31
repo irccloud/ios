@@ -16,6 +16,7 @@
 
 #import "ImageUploader.h"
 #import "NSData+Base64.h"
+#import "NetworkConnection.h"
 #import "config.h"
 
 @implementation ImageUploader
@@ -51,7 +52,7 @@
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[[NSString stringWithFormat:@"refresh_token=%@&client_id=%@&client_secret=%@&grant_type=refresh_token", [d objectForKey:@"imgur_refresh_token"], @IMGUR_KEY, @IMGUR_SECRET] dataUsingEncoding:NSUTF8StringEncoding]];
     
-    [[[NSURLSession sharedSession] dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+    [[[NetworkConnection sharedInstance].urlSession dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error renewing token. Error %li : %@", (long)error.code, error.userInfo);
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
