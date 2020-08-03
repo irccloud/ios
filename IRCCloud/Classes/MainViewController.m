@@ -1060,7 +1060,7 @@ NSArray *_sortedChannels;
         case kIRCEventBanList:
             o = notification.object;
             if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"b" param:@"bans" placeholder:@"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using `/ban`.\n" bid:self->_buffer.bid];
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"b" param:@"bans" placeholder:@"No bans in effect.\n\nYou can ban someone by tapping their nickname in the user list, long-pressing a message, or by using `/ban`.\n" cid: self->_buffer.cid bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"bans"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Bans for %@", [o objectForKey:@"channel"]];
@@ -1078,7 +1078,7 @@ NSArray *_sortedChannels;
         case kIRCEventQuietList:
             o = notification.object;
             if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"q" param:@"list" placeholder:@"Empty quiet list." bid:self->_buffer.bid];
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"q" param:@"list" placeholder:@"Empty quiet list." cid: self->_buffer.cid bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"list"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Quiet list for %@", [o objectForKey:@"channel"]];
@@ -1097,7 +1097,7 @@ NSArray *_sortedChannels;
         case kIRCEventInviteList:
             o = notification.object;
             if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"I" param:@"list" placeholder:@"Empty invite list." bid:self->_buffer.bid];
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"I" param:@"list" placeholder:@"Empty invite list." cid: self->_buffer.cid bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"list"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Invite list for %@", [o objectForKey:@"channel"]];
@@ -1115,7 +1115,7 @@ NSArray *_sortedChannels;
         case kIRCEventBanExceptionList:
             o = notification.object;
             if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"e" param:@"exceptions" placeholder:@"Empty exception list." bid:self->_buffer.bid];
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"e" param:@"exceptions" placeholder:@"Empty exception list." cid: self->_buffer.cid bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"exceptions"];
                 cmltv.navigationItem.title = [NSString stringWithFormat:@"Exception list for %@", [o objectForKey:@"channel"]];
@@ -1133,7 +1133,7 @@ NSArray *_sortedChannels;
         case kIRCEventChanFilterList:
             o = notification.object;
             if(o.cid == self->_buffer.cid && (![self.presentedViewController isKindOfClass:[UINavigationController class]] || ![((UINavigationController *)self.presentedViewController).topViewController isKindOfClass:[ChannelModeListTableViewController class]])) {
-                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"g" param:@"list" placeholder:@"No channel filter patterns." bid:self->_buffer.bid];
+                cmltv = [[ChannelModeListTableViewController alloc] initWithList:event mode:@"g" param:@"list" placeholder:@"No channel filter patterns." cid: self->_buffer.cid bid:self->_buffer.bid];
                 cmltv.event = o;
                 cmltv.data = [o objectForKey:@"list"];
                 cmltv.mask = @"pattern";

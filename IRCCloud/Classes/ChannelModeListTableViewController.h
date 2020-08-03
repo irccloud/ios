@@ -22,16 +22,18 @@
     NSArray *_data;
     IRCCloudJSONObject *_event;
     UIBarButtonItem *_addButton;
+    int _cid;
     int _bid;
     int _list;
     UILabel *_placeholder;
     NSString *_mode;
     NSString *_param;
     NSString *_mask;
+    BOOL _canChangeMode;
 }
 @property (strong, nonatomic) NSArray *data;
 @property (strong, nonatomic) IRCCloudJSONObject *event;
 @property NSString *mask;
 
--(id)initWithList:(int)list mode:(NSString *)mode param:(NSString *)param placeholder:(NSString *)placeholder bid:(int)bid;
+-(id)initWithList:(int)list mode:(NSString *)mode param:(NSString *)param placeholder:(NSString *)placeholder cid:(int)cid bid:(int)bid;
 @end

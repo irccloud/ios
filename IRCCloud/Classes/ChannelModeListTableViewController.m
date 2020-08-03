@@ -71,7 +71,7 @@
 
 @implementation ChannelModeListTableViewController
 
--(id)initWithList:(int)list mode:(NSString *)mode param:(NSString *)param placeholder:(NSString *)placeholder bid:(int)bid {
+-(id)initWithList:(int)list mode:(NSString *)mode param:(NSString *)param placeholder:(NSString *)placeholder cid:(int)cid bid:(int)bid {
     self = [super initWithStyle:UITableViewStylePlain];
     if (self) {
         self->_addButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAdd target:self action:@selector(addButtonPressed)];
@@ -83,10 +83,18 @@
         self->_placeholder.textAlignment = NSTextAlignmentCenter;
 
         self->_list = list;
+        self->_cid = cid;
         self->_bid = bid;
         self->_mode = mode;
         self->_param = param;
         self->_mask = @"mask";
+        
+        Server *s = [[ServersDataSource sharedInstance] getServer:cid];
+        if(s) {
+            User *u = [[UsersDataSource sharedInstance] getUser:s.nick cid:cid bid:bid];
+            if(u && ([u.mode containsString:s.MODE_OWNER] || [u.mode containsString:s.MODE_ADMIN] || [u.mode containsString:s.MODE_OP] || [u.mode containsString:s.MODE_HALFOP]))
+                self->_canChangeMode = YES;
+        }
     }
     return self;
 }
@@ -99,7 +107,8 @@
     [super viewDidLoad];
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
-    self.navigationItem.leftBarButtonItem = self->_addButton;
+    if(self->_canChangeMode)
+        self.navigationItem.leftBarButtonItem = self->_addButton;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
     self.tableView.backgroundColor = [[UITableViewCell appearance] backgroundColor];
 }
@@ -244,7 +253,7 @@
 }
 
 -(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath {
-    return YES;
+    return _canChangeMode;
 }
 
 -(void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath {
