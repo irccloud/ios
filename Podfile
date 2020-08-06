@@ -4,6 +4,7 @@ platform :ios, '9.0'
 pod 'Firebase/Crashlytics'
 pod 'Firebase/Analytics'
 pod 'Firebase/Performance'
+pod 'Firebase/Messaging'
 
 target 'IRCCloud' do
   # Comment the next line if you don't want to use dynamic frameworks

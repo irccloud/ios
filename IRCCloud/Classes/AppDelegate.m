@@ -373,15 +373,22 @@ extern NSURL *__logfile;
 
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
     NSData *oldToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"];
-    if(oldToken && ![devToken isEqualToData:oldToken]) {
-        CLS_LOG(@"Unregistering old APNs token");
-        [self->_conn unregisterAPNs:oldToken session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
-            CLS_LOG(@"Unregistration result: %@", result);
-        }];
-    }
-    [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
-    [self->_conn registerAPNs:devToken handler:^(IRCCloudJSONObject *result) {
-        CLS_LOG(@"Registration result: %@", result);
+    
+    [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
+        if (error != nil) {
+            NSLog(@"Error fetching remote instance ID: %@", error);
+        } else {
+            if(oldToken && ![devToken isEqualToData:oldToken]) {
+              CLS_LOG(@"Unregistering old APNs token");
+                [self->_conn unregisterAPNs:oldToken fcm:result.token session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
+                  CLS_LOG(@"Unregistration result: %@", result);
+              }];
+            }
+            [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
+            [self->_conn registerAPNs:devToken fcm:result.token handler:^(IRCCloudJSONObject *result) {
+              CLS_LOG(@"Registration result: %@", result);
+            }];
+        }
     }];
 }
 
@@ -394,6 +401,7 @@ extern NSURL *__logfile;
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
+    [[FIRMessaging messaging] appDidReceiveMessage:userInfo];
     if([userInfo objectForKey:@"view_logs"]) {
         LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
         lvc.buffer = self->_mainViewController.buffer;
@@ -420,6 +428,7 @@ extern NSURL *__logfile;
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
+    [[FIRMessaging messaging] appDidReceiveMessage:userInfo];
     if([userInfo objectForKey:@"d"]) {
         int cid = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
         int bid = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
@@ -480,6 +489,7 @@ extern NSURL *__logfile;
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    [[FIRMessaging messaging] appDidReceiveMessage:notification.request.content.userInfo];
     if([notification.request.content.userInfo objectForKey:@"d"]) {
         int bid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         NSTimeInterval eid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
@@ -498,6 +508,7 @@ extern NSURL *__logfile;
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
+    [[FIRMessaging messaging] appDidReceiveMessage:response.notification.request.content.userInfo];
     [UIColor setTheme];
     [self.mainViewController applyTheme];
     if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {

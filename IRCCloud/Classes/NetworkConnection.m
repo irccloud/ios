@@ -1316,15 +1316,15 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [NSString stringWithString:hexString];
 }
 
--(void)registerAPNs:(NSData *)token handler:(IRCCloudAPIResultHandler)handler {
+-(void)registerAPNs:(NSData *)token fcm:(NSString *)fcm handler:(IRCCloudAPIResultHandler)handler {
 #if !defined(DEBUG) && !defined(EXTENSION)
-    [self _postRequest:@"/apn-register" args:@{@"device_id":[self dataToHex:token]} handler:handler];
+    [self _postRequest:@"/apn-register" args:@{@"device_id":[self dataToHex:token], @"fcm_token":fcm} handler:handler];
 #endif
 }
 
--(void)unregisterAPNs:(NSData *)token session:(NSString *)session handler:(IRCCloudAPIResultHandler)handler {
+-(void)unregisterAPNs:(NSData *)token fcm:(NSString *)fcm session:(NSString *)session handler:(IRCCloudAPIResultHandler)handler {
 #ifndef EXTENSION
-    [self _postRequest:@"/apn-unregister" args:@{@"device_id":[self dataToHex:token], @"session":session} handler:handler];
+    [self _postRequest:@"/apn-unregister" args:@{@"device_id":[self dataToHex:token], @"fcm_token":fcm, @"session":session} handler:handler];
 #endif
 }
 
@@ -2455,11 +2455,22 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)_logout:(NSString *)session {
-    [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] session:session handler:^(IRCCloudJSONObject *result) {
-        CLS_LOG(@"Unregister result: %@", result);
+    [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
+        if (error != nil) {
+            NSLog(@"Error fetching remote instance ID: %@", error);
+        } else {
+            NSLog(@"Remote instance ID token: %@", result.token);
+            [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] fcm:result.token session:session handler:^(IRCCloudJSONObject *result) {
+                CLS_LOG(@"Unregister result: %@", result);
+            }];
+        }
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
+        [[FIRInstanceID instanceID] deleteIDWithHandler:^(NSError *error) {
+            if(error)
+                CLS_LOG(@"Unable to delete Firebase ID: %@", error);
+        }];
+        [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
     }];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
-    [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
 }
 
 -(void)logout {
