@@ -376,8 +376,9 @@ extern NSURL *__logfile;
     
     [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
         if (error != nil) {
-            NSLog(@"Error fetching remote instance ID: %@", error);
+            CLS_LOG(@"Error fetching remote instance ID: %@", error);
         } else {
+            //CLS_LOG(@"FCM Token: %@", result.token);
             if(oldToken && ![devToken isEqualToData:oldToken]) {
               CLS_LOG(@"Unregistering old APNs token");
                 [self->_conn unregisterAPNs:oldToken fcm:result.token session:self->_conn.session handler:^(IRCCloudJSONObject *result) {

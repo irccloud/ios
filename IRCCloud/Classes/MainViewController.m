@@ -5055,13 +5055,20 @@ NSArray *_sortedChannels;
         [self _joinAChannel];
     } else if([action isEqualToString:@"Whois"]) {
         if(self->_selectedUser && _selectedUser.nick.length > 0) {
-            if(self->_selectedUser.parted)
+            if(self->_selectedUser.parted) {
                 [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:nil cid:self->_buffer.cid handler:nil];
-            else
-                [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:self->_selectedUser.ircserver.length?_selectedUser.ircserver:self->_selectedUser.nick cid:self->_buffer.cid handler:nil];
+            } else {
+                NSString *ircserver = self->_selectedUser.ircserver;
+                if([ircserver isEqualToString:@"*"])
+                    ircserver = nil;
+                [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:ircserver.length?ircserver:self->_selectedUser.nick cid:self->_buffer.cid handler:nil];
+            }
         } else if([self->_buffer.type isEqualToString:@"conversation"]) {
             User *u = [[UsersDataSource sharedInstance] getUser:self->_buffer.name cid:self->_buffer.cid];
-            [[NetworkConnection sharedInstance] whois:self->_buffer.name server:u.ircserver.length?u.ircserver:nil cid:self->_buffer.cid handler:nil];
+            NSString *ircserver = u.ircserver;
+            if([ircserver isEqualToString:@"*"])
+                ircserver = nil;
+            [[NetworkConnection sharedInstance] whois:self->_buffer.name server:ircserver.length?ircserver:nil cid:self->_buffer.cid handler:nil];
         }
     } else if([action isEqualToString:@"Send Feedback"]) {
         CLS_LOG(@"Feedback Requested");
