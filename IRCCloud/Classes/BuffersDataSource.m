@@ -129,7 +129,7 @@ NSString *__DEFAULT_CHANTYPES__;
     if(self->_chantypes == nil || _chantypes == __DEFAULT_CHANTYPES__) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_cid];
         if(s) {
-            self->_chantypes = [s.isupport objectForKey:@"CHANTYPES"];
+            self->_chantypes = s.CHANTYPES;
             if(self->_chantypes == nil || _chantypes.length == 0)
                 self->_chantypes = __DEFAULT_CHANTYPES__;
         }
