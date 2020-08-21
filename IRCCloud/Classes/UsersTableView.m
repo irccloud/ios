@@ -200,11 +200,11 @@
         PREFIX = s.PREFIX;
     }
     if(!PREFIX || PREFIX.count == 0) {
-        PREFIX = @{s?s.MODE_OWNER:@"q":@"~",
-                   s?s.MODE_ADMIN:@"a":@"&",
-                   s?s.MODE_OP:@"o":@"@",
-                   s?s.MODE_HALFOP:@"h":@"%",
-                   s?s.MODE_VOICED:@"v":@"+"};
+        PREFIX = @{(s && s.MODE_OWNER)?s.MODE_OWNER:@"q":@"~",
+                   (s && s.MODE_ADMIN)?s.MODE_ADMIN:@"a":@"&",
+                   (s && s.MODE_OP)?s.MODE_OP:@"o":@"@",
+                   (s && s.MODE_HALFOP)?s.MODE_HALFOP:@"h":@"%",
+                   (s && s.MODE_VOICED)?s.MODE_VOICED:@"v":@"+"};
     }
     
     NSMutableArray *data = [[NSMutableArray alloc] init];
