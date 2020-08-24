@@ -5059,14 +5059,14 @@ NSArray *_sortedChannels;
                 [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:nil cid:self->_buffer.cid handler:nil];
             } else {
                 NSString *ircserver = self->_selectedUser.ircserver;
-                if([ircserver isEqualToString:@"*"])
+                if([ircserver rangeOfString:@"*"].location != NSNotFound)
                     ircserver = nil;
                 [[NetworkConnection sharedInstance] whois:self->_selectedUser.nick server:ircserver.length?ircserver:self->_selectedUser.nick cid:self->_buffer.cid handler:nil];
             }
         } else if([self->_buffer.type isEqualToString:@"conversation"]) {
             User *u = [[UsersDataSource sharedInstance] getUser:self->_buffer.name cid:self->_buffer.cid];
             NSString *ircserver = u.ircserver;
-            if([ircserver isEqualToString:@"*"])
+            if([ircserver rangeOfString:@"*"].location != NSNotFound)
                 ircserver = nil;
             [[NetworkConnection sharedInstance] whois:self->_buffer.name server:ircserver.length?ircserver:nil cid:self->_buffer.cid handler:nil];
         }
