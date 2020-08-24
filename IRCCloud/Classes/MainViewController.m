@@ -3416,7 +3416,11 @@ NSArray *_sortedChannels;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if(@available(iOS 11, *)) {
             CGFloat bottom = self->_kbSize.height ? (self->_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? self.slidingViewController.view.safeAreaInsets.bottom : self.slidingViewController.view.safeAreaInsets.bottom/2);
-            if(@available(iOS 13, *)) {
+            if(@available(iOS 14, *)) {
+                bottom += self.slidingViewController.view.safeAreaInsets.bottom;
+                self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
+                self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
+            } else if(@available(iOS 13, *)) {
             } else {
                 self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
                 self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
