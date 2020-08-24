@@ -273,7 +273,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
         frame.size.height = self.view.bounds.size.height - sbheight;
         if([UIApplication sharedApplication].statusBarFrame.size.height > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
           frame.size.height += 20;
-        if(self.view.safeAreaInsets.bottom) {
+        if([[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad && self.view.safeAreaInsets.bottom) {
           frame.size.height -= self.view.safeAreaInsets.bottom;
         }
         self.topView.frame = frame;
@@ -655,11 +655,6 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     frame.size.height = self.view.bounds.size.height - sbheight;
     if([UIApplication sharedApplication].statusBarFrame.size.height > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
         frame.size.height += 20;
-    if(@available(iOS 11, *)) {
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-            frame.size.height -= self.view.safeAreaInsets.bottom;
-        }
-    }
     self.underLeftView.frame = frame;
 }
 
@@ -711,11 +706,6 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     frame.size.height = self.view.bounds.size.height - sbheight;
     if([UIApplication sharedApplication].statusBarFrame.size.height > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
         frame.size.height += 20;
-    if(@available(iOS 11, *)) {
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
-            frame.size.height -= self.view.safeAreaInsets.bottom;
-        }
-    }
     self.underRightView.frame = frame;
 }
 

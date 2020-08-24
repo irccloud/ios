@@ -3415,9 +3415,12 @@ NSArray *_sortedChannels;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if(@available(iOS 11, *)) {
-            CGFloat bottom = self->_kbSize.height ? (self->_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) ? self.slidingViewController.view.safeAreaInsets.bottom : self.slidingViewController.view.safeAreaInsets.bottom/2);
-            self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
-            self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
+            CGFloat bottom = self->_kbSize.height ? (self->_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? self.slidingViewController.view.safeAreaInsets.bottom : self.slidingViewController.view.safeAreaInsets.bottom/2);
+            if(@available(iOS 13, *)) {
+            } else {
+                self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
+                self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
+            }
             self->_buffersView.tableView.contentInset = UIEdgeInsetsZero;
             if(self->_buffersView.tableView.adjustedContentInset.bottom > 0) { //Sometimes iOS 11 automatically adds the keyboard padding even though I told it not to
                 bottom -= self->_buffersView.tableView.adjustedContentInset.bottom;
