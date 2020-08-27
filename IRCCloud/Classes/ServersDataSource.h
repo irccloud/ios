@@ -71,6 +71,7 @@
 -(void)setIgnores:(NSArray *)ignores;
 -(BOOL)isSlack;
 -(NSString *)slackBaseURL;
+-(BOOL)clientTagDeny:(NSString *)tagName;
 @end
 
 @interface ServersDataSource : NSObject {

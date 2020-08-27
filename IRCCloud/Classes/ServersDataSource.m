@@ -136,6 +136,22 @@
         return [NSString stringWithFormat:@"https://%@", host];
     return nil;
 }
+
+-(BOOL)clientTagDeny:(NSString *)tagName {
+    if([[self->_isupport objectForKey:@"CLIENTTAGDENY"] isKindOfClass:[NSString class]]) {
+        BOOL denied = NO;
+        NSArray *tags = [[self->_isupport objectForKey:@""] componentsSeparatedByString:@","];
+        for(NSString *tag in tags) {
+            if([tag isEqualToString:@"*"] || [tag isEqualToString:tagName])
+                denied = YES;
+            if([tag isEqualToString:[NSString stringWithFormat:@"~%@", tagName]])
+                denied = NO;
+        }
+        return denied;
+    }
+    return NO;
+}
+
 @end
 
 @implementation ServersDataSource
@@ -332,43 +348,11 @@
             b.chantypes = server.CHANTYPES;
         }
         
-        server.blocksEdits = NO;
-        server.blocksTyping = NO;
-        server.blocksDeletes = NO;
-        server.blocksReplies = NO;
-        server.blocksReactions = NO;
-        /*if([[server.isupport objectForKey:@"CLIENTTAGDENY"] isKindOfClass:[NSString class]]) {
-            NSArray *tags = [[server.isupport objectForKey:@""] componentsSeparatedByString:@","];
-            for(NSString *tag in tags) {
-                if([tag isEqualToString:@"*"]) {
-                    server.blocksEdits = YES;
-                    server.blocksTyping = YES;
-                    server.blocksDeletes = YES;
-                    server.blocksReplies = YES;
-                    server.blocksReactions = YES;
-                }
-                if([tag isEqualToString:@"draft/edit"] || [tag isEqualToString:@"draft/edit-text"])
-                    server.blocksEdits = YES;
-                if([tag isEqualToString:@"typing"] || [tag isEqualToString:@"draft/typing"])
-                    server.blocksTyping = YES;
-                if([tag isEqualToString:@"draft/delete"])
-                    server.blocksDeletes = YES;
-                if([tag isEqualToString:@"draft/reply"])
-                    server.blocksReplies = YES;
-                if([tag isEqualToString:@"draft/reply"] || [tag isEqualToString:@"draft/react"])
-                    server.blocksReactions = YES;
-                if([tag isEqualToString:@"-draft/edit"] || [tag isEqualToString:@"-draft/edit-text"])
-                    server.blocksEdits = NO;
-                if([tag isEqualToString:@"-typing"] || [tag isEqualToString:@"-draft/typing"])
-                    server.blocksTyping = NO;
-                if([tag isEqualToString:@"-draft/delete"])
-                    server.blocksDeletes = NO;
-                if([tag isEqualToString:@"-draft/reply"])
-                    server.blocksReplies = NO;
-                if([tag isEqualToString:@"-draft/react"])
-                    server.blocksReactions = NO;
-            }
-        }*/
+        server.blocksTyping = [server clientTagDeny:@"typing"] && [server clientTagDeny:@"draft/typing"];
+        server.blocksReplies = [server clientTagDeny:@"draft/reply"];
+        server.blocksReactions = server.blocksReplies || [server clientTagDeny:@"draft/react"];
+        server.blocksEdits = [server clientTagDeny:@"draft/edit"] || [server clientTagDeny:@"draft/edit-text"];
+        server.blocksDeletes = [server clientTagDeny:@"draft/delete"];
     }
 }
 
