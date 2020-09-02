@@ -1,2 +1,6 @@
-• Fix an issue that could cause the incorrect avatar to appear briefly while sending a message
+• Collapsed join/part/quit lines now display the correct timestamp
+• Fixed thumbnail previews for IRCCloud uploads in notifications
+• Ban list no longer shows editing controls in channels without permission to modify the list
+• Fix /whois menu on networks with hidden servers
+• Improved iPad landscape layout on iOS 13
 • Stability improvements and minor fixes
