@@ -1,1 +1,1 @@
-MZGenre.SocialNetworking
+SOCIAL_NETWORKING
