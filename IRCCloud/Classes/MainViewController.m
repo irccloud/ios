@@ -2726,20 +2726,22 @@ NSArray *_sortedChannels;
 }
 
 -(void)showJoinPrompt:(NSString *)channel server:(Server *)s {
-    NSString *key = nil;
-    NSRange range = [channel rangeOfString:@","];
-    if(range.location != NSNotFound) {
-        key = [channel substringFromIndex:range.location + 1];
-        channel = [channel substringToIndex:range.location];
+    if(channel && server) {
+        NSString *key = nil;
+        NSRange range = [channel rangeOfString:@","];
+        if(range.location != NSNotFound) {
+            key = [channel substringFromIndex:range.location + 1];
+            channel = [channel substringToIndex:range.location];
+        }
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Join A Channel" message:[NSString stringWithFormat:@"Would you like to join the channel %@ on %@?", channel, s.name.length?s.name:s.hostname] preferredStyle:UIAlertControllerStyleAlert];
+        
+        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+            [[NetworkConnection sharedInstance] join:channel key:key cid:s.cid handler:nil];
+        }]];
+        
+        [self presentViewController:alert animated:YES completion:nil];
     }
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Join A Channel" message:[NSString stringWithFormat:@"Would you like to join the channel %@ on %@?", channel, s.name.length?s.name:s.hostname] preferredStyle:UIAlertControllerStyleAlert];
-    
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-    [alert addAction:[UIAlertAction actionWithTitle:@"Join" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-        [[NetworkConnection sharedInstance] join:channel key:key cid:s.cid handler:nil];
-    }]];
-    
-    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)launchURL:(NSURL *)url {
@@ -2771,37 +2773,39 @@ NSArray *_sortedChannels;
         if([type isEqualToString:@"channel"] || [type isEqualToString:@"messages"]) {
             NSString *name = [[url.pathComponents objectAtIndex:4] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]];
             
-            for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
-                NSString *serverHost = [s.hostname lowercaseString];
-                if([serverHost hasPrefix:@"irc."])
-                    serverHost = [serverHost substringFromIndex:4];
-                serverHost = [serverHost stringByReplacingOccurrencesOfString:@"_" withString:@"-"];
-                
-                NSString *serverName = [s.name lowercaseString];
-                serverName = [serverName stringByReplacingOccurrencesOfString:@"_" withString:@"-"];
+            if(name) {
+                for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
+                    NSString *serverHost = [s.hostname lowercaseString];
+                    if([serverHost hasPrefix:@"irc."])
+                        serverHost = [serverHost substringFromIndex:4];
+                    serverHost = [serverHost stringByReplacingOccurrencesOfString:@"_" withString:@"-"];
+                    
+                    NSString *serverName = [s.name lowercaseString];
+                    serverName = [serverName stringByReplacingOccurrencesOfString:@"_" withString:@"-"];
 
-                if([network isEqualToString:serverHost] || [network isEqualToString:serverName]) {
-                    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:s.cid]) {
-                        if(([type isEqualToString:@"channel"] && [b.type isEqualToString:@"channel"]) || ([type isEqualToString:@"messages"] && [b.type isEqualToString:@"conversation"])) {
-                            NSString *bufferName = b.name;
-                            
-                            if([b.type isEqualToString:@"channel"]) {
-                                if([bufferName hasPrefix:@"#"])
-                                    bufferName = [bufferName substringFromIndex:1];
-                                if(![bufferName isEqualToString:[b accessibilityValue]])
-                                    bufferName = b.name;
-                            }
-                            
-                            if([bufferName isEqualToString:name]) {
-                                [self bufferSelected:b.bid];
-                                return;
+                    if([network isEqualToString:serverHost] || [network isEqualToString:serverName]) {
+                        for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffersForServer:s.cid]) {
+                            if(([type isEqualToString:@"channel"] && [b.type isEqualToString:@"channel"]) || ([type isEqualToString:@"messages"] && [b.type isEqualToString:@"conversation"])) {
+                                NSString *bufferName = b.name;
+                                
+                                if([b.type isEqualToString:@"channel"]) {
+                                    if([bufferName hasPrefix:@"#"])
+                                        bufferName = [bufferName substringFromIndex:1];
+                                    if(![bufferName isEqualToString:[b accessibilityValue]])
+                                        bufferName = b.name;
+                                }
+                                
+                                if([bufferName isEqualToString:name]) {
+                                    [self bufferSelected:b.bid];
+                                    return;
+                                }
                             }
                         }
+                        if([type isEqualToString:@"channel"])
+                            [self showJoinPrompt:name server:s];
+                        else if([type isEqualToString:@"messages"])
+                            [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", name] to:nil cid:s.cid handler:nil];
                     }
-                    if([type isEqualToString:@"channel"])
-                        [self showJoinPrompt:name server:s];
-                    else if([type isEqualToString:@"messages"])
-                        [[NetworkConnection sharedInstance] say:[NSString stringWithFormat:@"/query %@", name] to:nil cid:s.cid handler:nil];
                 }
             }
         }
@@ -2833,7 +2837,7 @@ NSArray *_sortedChannels;
                 b = nil;
             if(b)
                 [self bufferSelected:b.bid];
-            else if(state == kIRCCloudStateConnected)
+            else if(channel && state == kIRCCloudStateConnected)
                 [self showJoinPrompt:channel server:s];
             else
                 match = NO;
@@ -2856,7 +2860,7 @@ NSArray *_sortedChannels;
                         b = nil;
                     if(b)
                         [self bufferSelected:b.bid];
-                    else if(state == kIRCCloudStateConnected)
+                    else if(channel && state == kIRCCloudStateConnected)
                         [self showJoinPrompt:channel server:s];
                     else
                         match = NO;
