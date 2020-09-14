@@ -2726,7 +2726,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)showJoinPrompt:(NSString *)channel server:(Server *)s {
-    if(channel && server) {
+    if(channel && s) {
         NSString *key = nil;
         NSRange range = [channel rangeOfString:@","];
         if(range.location != NSNotFound) {

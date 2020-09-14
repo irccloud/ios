@@ -1158,9 +1158,13 @@ volatile BOOL __socketPaused = NO;
                 Event *e = [[EventsDataSource sharedInstance] message:msgId buffer:object.bid];
                 if(e) {
                     if(object.eid >= e.lastEditEID) {
-                        if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class] && [[entities objectForKey:@"edit_text"] length]) {
+                        if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class]) {
                             e.msg = [entities objectForKey:@"edit_text"];
                             e.edited = YES;
+                            NSMutableDictionary *d = e.entities.mutableCopy;
+                            [d removeObjectForKey:@"mentions"];
+                            [d removeObjectForKey:@"mention_data"];
+                            e.entities = d;
                         }
                         NSMutableDictionary *d = e.entities.mutableCopy;
                         [d setValuesForKeysWithDictionary:entities];
