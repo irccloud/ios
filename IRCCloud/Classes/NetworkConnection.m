@@ -651,6 +651,7 @@ volatile BOOL __socketPaused = NO;
 #endif
                        [[FIRCrashlytics crashlytics] setUserID:[NSString stringWithFormat:@"uid%@",[self.userInfo objectForKey:@"id"]]];
                        CLS_LOG(@"Prefs: %@", [self prefs]);
+                       [self _serializeUserInfo];
                        [self postObject:object forEvent:kIRCEventUserInfo];
                    },
                    @"backlog_starts": ^(IRCCloudJSONObject *object, BOOL backlog) {
@@ -2376,17 +2377,8 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [self performSelectorInBackground:@selector(serialize) withObject:nil];
 }
 
--(void)serialize {
+-(void)_serializeUserInfo {
     [__serializeLock lock];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [self->_servers serialize];
-    [self->_buffers serialize];
-    [self->_channels serialize];
-    [self->_users serialize];
-    [self->_events serialize];
-    [self->_notifications serialize];
-#ifndef EXTENSION
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
     [__userInfoLock lock];
     NSMutableDictionary *stream = [self->_userInfo mutableCopy];
@@ -2402,6 +2394,21 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
     [__userInfoLock unlock];
     [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
+    [__serializeLock unlock];
+}
+
+-(void)serialize {
+    [__serializeLock lock];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    [self->_servers serialize];
+    [self->_buffers serialize];
+    [self->_channels serialize];
+    [self->_users serialize];
+    [self->_events serialize];
+    [self->_notifications serialize];
+#ifndef EXTENSION
+    [self _serializeUserInfo];
 #endif
     [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
 #ifdef ENTERPRISE
