@@ -44,10 +44,16 @@
     [self->_activity startAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
     self.view.backgroundColor = [UIColor blackColor];
-    self->_webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height)];
+
+    WKPreferences *prefs = [[WKPreferences alloc] init];
+    prefs.javaScriptEnabled = YES;
+    WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
+    config.preferences = prefs;
+    
+    self->_webView = [[WKWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height) configuration:config];
     self->_webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     self->_webView.backgroundColor = [UIColor blackColor];
-    self->_webView.delegate = self;
+    self->_webView.navigationDelegate = self;
 #ifdef IMGUR_KEY
     [self->_webView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.imgur.com/oauth2/authorize?client_id=%@&response_type=token", @IMGUR_KEY]]]];
 #endif
@@ -60,29 +66,27 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
--(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    if([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102)
-        return;
+-(void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     CLS_LOG(@"Error: %@", error);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
 }
 
--(void)webViewDidStartLoad:(UIWebView *)webView {
+-(void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     [self->_activity startAnimating];
 }
 
--(void)webViewDidFinishLoad:(UIWebView *)webView {
+-(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
 }
 
--(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+-(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     [self.view endEditing:YES];
-    if([request.URL.host isEqualToString:@"imgur.com"]) {
-        if([request.URL.fragment hasPrefix:@"access_token="]) {
-            for(NSString *param in [request.URL.fragment componentsSeparatedByString:@"&"]) {
+    if([navigationAction.request.URL.host isEqualToString:@"imgur.com"]) {
+        if([navigationAction.request.URL.fragment hasPrefix:@"access_token="]) {
+            for(NSString *param in [navigationAction.request.URL.fragment componentsSeparatedByString:@"&"]) {
                 NSArray *p = [param componentsSeparatedByString:@"="];
                 NSString *name = [p objectAtIndex:0];
                 NSString *value = [p objectAtIndex:1];
@@ -105,16 +109,19 @@
             [d synchronize];
             [self.navigationController popViewControllerAnimated:YES];
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            return NO;
-        } else if([request.URL.query isEqualToString:@"error=access_denied"]) {
+            decisionHandler(WKNavigationActionPolicyCancel);
+            return;
+        } else if([navigationAction.request.URL.query isEqualToString:@"error=access_denied"]) {
             [self.navigationController popViewControllerAnimated:YES];
             [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
-            return NO;
+            decisionHandler(WKNavigationActionPolicyCancel);
+            return;
         } else {
-            return YES;
+            decisionHandler(WKNavigationActionPolicyAllow);
+            return;
         }
     }
-    return YES;
+    decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 - (void)didReceiveMemoryWarning {

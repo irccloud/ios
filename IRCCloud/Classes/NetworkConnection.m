@@ -2466,6 +2466,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)_logout:(NSString *)session {
+#ifndef EXTENSION
     [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
         if (error != nil) {
             NSLog(@"Error fetching remote instance ID: %@", error);
@@ -2482,6 +2483,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         }];
         [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
     }];
+#endif
 }
 
 -(void)logout {

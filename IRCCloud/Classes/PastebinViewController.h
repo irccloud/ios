@@ -16,10 +16,11 @@
 
 
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 #import "OpenInChromeController.h"
 
-@interface PastebinViewController : UIViewController<UIPopoverPresentationControllerDelegate> {
-    IBOutlet UIWebView *_webView;
+@interface PastebinViewController : UIViewController<UIPopoverPresentationControllerDelegate,WKNavigationDelegate> {
+    IBOutlet WKWebView *_webView;
     IBOutlet UIToolbar *_toolbar;
     IBOutlet UIActivityIndicatorView *_activity;
     NSString *_url;

@@ -111,6 +111,7 @@
     self->_webView.opaque = NO;
     self->_webView.backgroundColor = [UIColor contentBackgroundColor];
     self->_webView.scrollView.scrollsToTop = YES;
+    self->_webView.navigationDelegate = self;
     
     self.view.backgroundColor = [UIColor contentBackgroundColor];
     
@@ -189,7 +190,7 @@
 
 -(void)_toggleLineNumbers {
     if(self->_lineNumbers.enabled)
-        [self->_webView stringByEvaluatingJavaScriptFromString:@"window.PASTEVIEW.doToggleLines()"];
+        [self->_webView evaluateJavaScript:@"window.PASTEVIEW.doToggleLines()" completionHandler:nil];
 }
 
 -(void)_toggleLineNumbersSwitch {
@@ -225,7 +226,7 @@
     [self presentViewController:activityController animated:YES completion:nil];
 }
 
--(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
+-(void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     if(([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102) || ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled))
         return;
     CLS_LOG(@"Error: %@", error);
@@ -233,21 +234,22 @@
     [self->_activity stopAnimating];
 }
 
--(void)webViewDidStartLoad:(UIWebView *)webView {
+-(void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 }
 
--(void)webViewDidFinishLoad:(UIWebView *)webView {
+-(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
--(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-    if([request.URL.scheme isEqualToString:@"hide-spinner"]) {
+-(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
+    if([navigationAction.request.URL.scheme isEqualToString:@"hide-spinner"]) {
         [self->_activity stopAnimating];
         self->_lineNumbers.enabled = YES;
-        return NO;
+        decisionHandler(WKNavigationActionPolicyCancel);
+    } else {
+        decisionHandler(WKNavigationActionPolicyAllow);
     }
-    return YES;
 }
 
 -(void)didReceiveMemoryWarning {

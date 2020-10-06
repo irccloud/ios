@@ -15,9 +15,10 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
-@interface ImgurLoginViewController : UIViewController<UIWebViewDelegate> {
-    UIWebView *_webView;
+@interface ImgurLoginViewController : UIViewController<WKNavigationDelegate> {
+    WKWebView *_webView;
     UIActivityIndicatorView *_activity;
 }
 @end

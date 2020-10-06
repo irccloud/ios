@@ -15,9 +15,10 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
+#import <WebKit/WebKit.h>
 
-@interface SamlLoginViewController : UIViewController<UIWebViewDelegate> {
-    UIWebView *_webView;
+@interface SamlLoginViewController : UIViewController<WKNavigationDelegate> {
+    WKWebView *_webView;
     UIActivityIndicatorView *_activity;
     NSURL *_url;
 }

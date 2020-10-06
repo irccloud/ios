@@ -41,9 +41,15 @@
     self->_activity.hidesWhenStopped = YES;
     [self->_activity startAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
-    self->_webView = [[UIWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height)];
+
+    WKPreferences *prefs = [[WKPreferences alloc] init];
+    prefs.javaScriptEnabled = YES;
+    WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
+    config.preferences = prefs;
+    
+    self->_webView = [[WKWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height) configuration:config];
     self->_webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
-    self->_webView.delegate = self;
+    self->_webView.navigationDelegate = self;
     [self->_webView loadRequest:[NSURLRequest requestWithURL:self->_url]];
     [self.view addSubview:self->_webView];
 }
@@ -54,58 +60,58 @@
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
--(void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error {
-    if([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102)
-        return;
+-(void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     CLS_LOG(@"Error: %@", error);
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 }
 
--(void)webViewDidStartLoad:(UIWebView *)webView {
+-(void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
     [self->_activity startAnimating];
 }
 
--(void)webViewDidFinishLoad:(UIWebView *)webView {
+-(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
     [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 }
 
--(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+-(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {
     [self.view endEditing:YES];
-    if([request.URL.host isEqualToString:IRCCLOUD_HOST] && [request.URL.path isEqualToString:@"/"]) {
-        NSArray *cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies];
-        if (cookies != nil && cookies.count > 0) {
-            for (NSHTTPCookie *cookie in cookies) {
-                if([cookie.name isEqualToString:@"session"]) {
-                    [NetworkConnection sharedInstance].session = cookie.value;
-                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
-                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-                    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
-                    [[NSUserDefaults standardUserDefaults] synchronize];
+    if([navigationAction.request.URL.host isEqualToString:IRCCLOUD_HOST] && [navigationAction.request.URL.path isEqualToString:@"/"]) {
+        [[WKWebsiteDataStore defaultDataStore].httpCookieStore getAllCookies:^(NSArray *cookies) {
+                    if (cookies != nil && cookies.count > 0) {
+                        for (NSHTTPCookie *cookie in cookies) {
+                            if([cookie.name isEqualToString:@"session"]) {
+                                [NetworkConnection sharedInstance].session = cookie.value;
+                                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+                                [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
+                                [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
+                                [[NSUserDefaults standardUserDefaults] synchronize];
 #ifdef ENTERPRISE
-                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
+                                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
-                    NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
+                                NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.share"];
 #endif
-                    [d setObject:IRCCLOUD_HOST forKey:@"host"];
-                    [d setObject:IRCCLOUD_PATH forKey:@"path"];
-                    [d synchronize];
-                    [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
-                        [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
-                    }];
-                }
-                [[NSHTTPCookieStorage sharedHTTPCookieStorage] deleteCookie:cookie];
-            }
-            [[NSUserDefaults standardUserDefaults] synchronize];
-        }
-        return NO;
+                                [d setObject:IRCCLOUD_HOST forKey:@"host"];
+                                [d setObject:IRCCLOUD_PATH forKey:@"path"];
+                                [d synchronize];
+                                [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
+                                    [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
+                                }];
+                            }
+                            [[WKWebsiteDataStore defaultDataStore].httpCookieStore deleteCookie:cookie completionHandler:nil];
+                        }
+                        [[NSUserDefaults standardUserDefaults] synchronize];
+                    }
+                    decisionHandler(WKNavigationActionPolicyCancel);
+        }];
+        return;
     }
-    return YES;
+    decisionHandler(WKNavigationActionPolicyAllow);
 }
 
 - (void)cancelButtonPressed:(id)sender {

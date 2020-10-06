@@ -4,13 +4,14 @@ platform :ios, '11.0'
 pod 'Firebase/Crashlytics'
 pod 'Firebase/Analytics'
 pod 'Firebase/Performance'
-pod 'Firebase/Messaging'
 
 target 'IRCCloud' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
 
   # Pods for IRCCloud
+  pod 'youtube-ios-player-helper'
+  pod 'Firebase/Messaging'
 
   target 'IRCCloudUnitTests' do
     inherit! :search_paths
@@ -24,6 +25,8 @@ target 'IRCCloud Enterprise' do
   use_frameworks!
 
   # Pods for IRCCloud Enterprise
+  pod 'youtube-ios-player-helper'
+  pod 'Firebase/Messaging'
 
 end
 
@@ -32,6 +35,8 @@ target 'IRCCloud FLEX' do
   use_frameworks!
 
   # Pods for IRCCloud FLEX
+  pod 'youtube-ios-player-helper'
+  pod 'Firebase/Messaging'
 
 end
 
@@ -70,7 +75,7 @@ end
 post_install do |pi|
     pi.pods_project.targets.each do |t|
         t.build_configurations.each do |config|
-            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '9.0'
+            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
         end
     end
 end

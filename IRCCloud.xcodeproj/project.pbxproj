@@ -569,10 +569,6 @@
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22BB94AA1D425A4F00BFB6F0 /* SamlLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */; };
 		22BB94AB1D425D3800BFB6F0 /* SamlLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */; };
-		22C0F1511B8F61D9001D109D /* YTPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C0F14E1B8F61D8001D109D /* YTPlayerView.m */; };
-		22C0F1521B8F61D9001D109D /* YTPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C0F14E1B8F61D8001D109D /* YTPlayerView.m */; };
-		22C0F1541B8F6829001D109D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 22C0F1531B8F6829001D109D /* Assets */; };
-		22C0F1551B8F6829001D109D /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 22C0F1531B8F6829001D109D /* Assets */; };
 		22C2075C1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
 		22C2075D1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
 		22C2E0581B0E2E4800387B4B /* PastebinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2E0561B0E2E4800387B4B /* PastebinViewController.m */; };
@@ -696,7 +692,6 @@
 		22D977FC215BC910005C2713 /* HighlightsCountView.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF2A016FA128B00DBE3C5 /* HighlightsCountView.m */; };
 		22D977FD215BC910005C2713 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		22D977FE215BC910005C2713 /* YYSpriteSheetImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 2238761A1F70035300943160 /* YYSpriteSheetImage.m */; };
-		22D977FF215BC910005C2713 /* YTPlayerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C0F14E1B8F61D8001D109D /* YTPlayerView.m */; };
 		22D97802215BC910005C2713 /* ChannelModeListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22AD75EC1718567D00141257 /* ChannelModeListTableViewController.m */; };
 		22D97805215BC910005C2713 /* SplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D268C51BF4F95200B682AE /* SplashViewController.m */; };
 		22D97806215BC910005C2713 /* IgnoresTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D4309F171C663A003C0684 /* IgnoresTableViewController.m */; };
@@ -774,7 +769,6 @@
 		22D97869215BC910005C2713 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
 		22D9786A215BC910005C2713 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
 		22D9786C215BC910005C2713 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
-		22D9786E215BC910005C2713 /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 22C0F1531B8F6829001D109D /* Assets */; };
 		22D9786F215BC910005C2713 /* Firefox.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12811C9B20DF00E7AE8D /* Firefox.png */; };
 		22D97870215BC910005C2713 /* Firefox@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12821C9B20DF00E7AE8D /* Firefox@2x.png */; };
 		22D97871215BC910005C2713 /* Firefox@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 22EE12831C9B20DF00E7AE8D /* Firefox@3x.png */; };
@@ -1425,9 +1419,6 @@
 		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ShareExtension Enterprise.entitlements"; sourceTree = SOURCE_ROOT; };
 		22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SamlLoginViewController.m; sourceTree = "<group>"; };
 		22BB94A91D425A4E00BFB6F0 /* SamlLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SamlLoginViewController.h; sourceTree = "<group>"; };
-		22C0F14D1B8F61D8001D109D /* YTPlayerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = YTPlayerView.h; path = YTPlayerView/YTPlayerView.h; sourceTree = SOURCE_ROOT; };
-		22C0F14E1B8F61D8001D109D /* YTPlayerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = YTPlayerView.m; path = YTPlayerView/YTPlayerView.m; sourceTree = SOURCE_ROOT; };
-		22C0F1531B8F6829001D109D /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Assets; path = YTPlayerView/Assets; sourceTree = SOURCE_ROOT; };
 		22C2075A1A19125700EDACA4 /* FileMetadataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMetadataViewController.h; sourceTree = "<group>"; };
 		22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileMetadataViewController.m; sourceTree = "<group>"; };
 		22C2E0551B0E2E4800387B4B /* PastebinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinViewController.h; sourceTree = "<group>"; };
@@ -2107,7 +2098,6 @@
 				229323D71E8945D700ADAA22 /* TrustKit */,
 				22EE12801C9B1DE000E7AE8D /* OpenInFirefoxClient */,
 				2236BD671BAA600900015753 /* FontAwesome.h */,
-				22C0F14B1B8F61AF001D109D /* YTPlayerView */,
 				22D649201B1E0719003BFD86 /* CSURITemplate */,
 				22C8CDE91B01372100F637D2 /* SSZipArchive */,
 				22A363AF19D0884D00500478 /* 1Password.xcassets */,
@@ -2456,16 +2446,6 @@
 			);
 			path = WebSocket;
 			sourceTree = SOURCE_ROOT;
-		};
-		22C0F14B1B8F61AF001D109D /* YTPlayerView */ = {
-			isa = PBXGroup;
-			children = (
-				22C0F1531B8F6829001D109D /* Assets */,
-				22C0F14D1B8F61D8001D109D /* YTPlayerView.h */,
-				22C0F14E1B8F61D8001D109D /* YTPlayerView.m */,
-			);
-			name = YTPlayerView;
-			sourceTree = "<group>";
 		};
 		22C8CDE91B01372100F637D2 /* SSZipArchive */ = {
 			isa = PBXGroup;
@@ -3260,7 +3240,6 @@
 				225D979A18AA995900065087 /* a.caf in Resources */,
 				221067271F28C3FB0075A18F /* Hack-Regular.ttf in Resources */,
 				225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */,
-				22C0F1551B8F6829001D109D /* Assets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3268,7 +3247,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22C0F1541B8F6829001D109D /* Assets in Resources */,
 				22EE12841C9B20DF00E7AE8D /* Firefox.png in Resources */,
 				22EE12861C9B20DF00E7AE8D /* Firefox@2x.png in Resources */,
 				22EE12881C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
@@ -3317,7 +3295,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				22D9786E215BC910005C2713 /* Assets in Resources */,
 				22D9786F215BC910005C2713 /* Firefox.png in Resources */,
 				22D97870215BC910005C2713 /* Firefox@2x.png in Resources */,
 				22D97871215BC910005C2713 /* Firefox@3x.png in Resources */,
@@ -3385,6 +3362,7 @@
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
+				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper/youtube_ios_player_helper.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -3394,6 +3372,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3435,6 +3414,7 @@
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
+				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper/youtube_ios_player_helper.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -3444,6 +3424,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3509,6 +3490,7 @@
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
+				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper/youtube_ios_player_helper.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -3518,6 +3500,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -3951,7 +3934,6 @@
 				225D976018AA995900065087 /* HighlightsCountView.m in Sources */,
 				225D976118AA995900065087 /* Ignore.m in Sources */,
 				223876261F70047E00943160 /* YYSpriteSheetImage.m in Sources */,
-				22C0F1521B8F61D9001D109D /* YTPlayerView.m in Sources */,
 				225D976218AA995900065087 /* ChannelModeListTableViewController.m in Sources */,
 				22D268C71BF4F95200B682AE /* SplashViewController.m in Sources */,
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
@@ -4076,7 +4058,6 @@
 				227FF2A116FA128B00DBE3C5 /* HighlightsCountView.m in Sources */,
 				2230F8E817162ACD007F7C98 /* Ignore.m in Sources */,
 				223876211F70047D00943160 /* YYSpriteSheetImage.m in Sources */,
-				22C0F1511B8F61D9001D109D /* YTPlayerView.m in Sources */,
 				22AD75ED1718567D00141257 /* ChannelModeListTableViewController.m in Sources */,
 				22D268C61BF4F95200B682AE /* SplashViewController.m in Sources */,
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
@@ -4255,7 +4236,6 @@
 				22D977FC215BC910005C2713 /* HighlightsCountView.m in Sources */,
 				22D977FD215BC910005C2713 /* Ignore.m in Sources */,
 				22D977FE215BC910005C2713 /* YYSpriteSheetImage.m in Sources */,
-				22D977FF215BC910005C2713 /* YTPlayerView.m in Sources */,
 				22D9794E215BC979005C2713 /* FLEXClassExplorerViewController.m in Sources */,
 				22D97960215BC979005C2713 /* FLEXExplorerToolbar.m in Sources */,
 				22D97802215BC910005C2713 /* ChannelModeListTableViewController.m in Sources */,
