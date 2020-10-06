@@ -2180,11 +2180,7 @@ extern BOOL __compact;
     @synchronized (self) {
         monoTimestampFont = [UIFont fontWithName:@"Hack" size:FONT_SIZE - 3];
         timestampFont = [UIFont systemFontOfSize:FONT_SIZE - 2];
-        if(@available(iOS 10, *)) {
-            arrowFont = nil;
-        } else {
-            arrowFont = [UIFont fontWithName:@"SourceSansPro-Regular" size:FONT_SIZE];
-        }
+        arrowFont = nil;
         awesomeFont = [UIFont fontWithName:@"FontAwesome" size:FONT_SIZE];
         Courier = [UIFont fontWithName:@"Hack" size:FONT_SIZE - 1];
         CourierBold = [UIFont fontWithName:@"Hack-Bold" size:FONT_SIZE - 1];

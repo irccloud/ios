@@ -49,9 +49,7 @@
         config.timeoutIntervalForRequest = 30;
         config.URLCache = httpCache;
         config.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
-        if(@available(iOS 11, *)) {
-            config.waitsForConnectivity = NO;
-        }
+        config.waitsForConnectivity = NO;
         self->_session = [NSURLSession sessionWithConfiguration:config delegate:nil delegateQueue:NSOperationQueue.mainQueue];
         self->_tasks = [[NSMutableDictionary alloc] init];
         self->_images = [[NSMutableDictionary alloc] init];

@@ -413,8 +413,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    if(@available(iOS 11, *))
-        self->_imageView.accessibilityIgnoresInvertColors = YES;
+    self->_imageView.accessibilityIgnoresInvertColors = YES;
 
     UITapGestureRecognizer *doubleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTap:)];
     [doubleTap setNumberOfTapsRequired:2];

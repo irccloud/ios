@@ -84,11 +84,9 @@
 #pragma mark - Table view data source
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
-    if(@available(iOS 11, *)) {
-        CGRect frame = self->_header.frame;
-        frame.origin.x = self.view.safeAreaInsets.left + 8;
-        self->_header.frame = frame;
-    }
+    CGRect frame = self->_header.frame;
+    frame.origin.x = self.view.safeAreaInsets.left + 8;
+    self->_header.frame = frame;
 
     return _header;
 }

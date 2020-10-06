@@ -326,11 +326,9 @@
 
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     if(section == 0) {
-        if(@available(iOS 11, *)) {
-            CGRect frame = self->_messageFooter.frame;
-            frame.origin.x = self.view.safeAreaInsets.left;
-            self->_messageFooter.frame = frame;
-        }
+        CGRect frame = self->_messageFooter.frame;
+        frame.origin.x = self.view.safeAreaInsets.left;
+        self->_messageFooter.frame = frame;
         return _messageFooter;
     }
     return nil;

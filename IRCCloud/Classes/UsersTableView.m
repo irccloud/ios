@@ -304,11 +304,9 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
     self.automaticallyAdjustsScrollViewInsets = NO;
-    if(@available(iOS 11, *)) {
-        self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-        self.tableView.insetsLayoutMarginsFromSafeArea = NO;
-        self.tableView.insetsContentViewsToSafeArea = NO;
-    }
+    self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    self.tableView.insetsLayoutMarginsFromSafeArea = NO;
+    self.tableView.insetsContentViewsToSafeArea = NO;
 
     UILongPressGestureRecognizer *lp = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(_longPress:)];
     lp.minimumPressDuration = 1.0;

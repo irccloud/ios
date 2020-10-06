@@ -513,9 +513,7 @@ NSArray *_sortedChannels;
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.navigationController.view];
     }
     
-    if (@available(iOS 11, *)) {
-        [self.view addInteraction:[[UIDropInteraction alloc] initWithDelegate:self]];
-    }
+    [self.view addInteraction:[[UIDropInteraction alloc] initWithDelegate:self]];
     
     _leftBorder = [[UIView alloc] init];
     _leftBorder.backgroundColor = [UIColor iPadBordersColor];
@@ -532,98 +530,92 @@ NSArray *_sortedChannels;
 }
 
 -(UIDropProposal *)dropInteraction:(UIDropInteraction *)interaction sessionDidUpdate:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
-    if (@available(iOS 11, *)) {
-        return [[UIDropProposal alloc] initWithDropOperation:UIDropOperationCopy];
-    } else {
-        return nil;
-    }
+    return [[UIDropProposal alloc] initWithDropOperation:UIDropOperationCopy];
 }
 
 -(void)dropInteraction:(UIDropInteraction *)interaction performDrop:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
-    if (@available(iOS 11, *)) {
-        NSItemProvider *i = session.items.firstObject.itemProvider;
-        
-        FileUploader *u = [[FileUploader alloc] init];
-        u.delegate = self;
-        u.bid = self->_buffer.bid;
-        u.msgid = self->_msgid;
-        NSString *UTI = i.registeredTypeIdentifiers.lastObject;
-        u.originalFilename = i.suggestedName;
-        if(![u.originalFilename containsString:@"."] && ![UTI hasPrefix:@"dyn."]) {
-            u.originalFilename = [u.originalFilename stringByAppendingPathExtension:[UTI componentsSeparatedByString:@"."].lastObject];
-        }
-        u.mimeType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef _Nonnull)(UTI), kUTTagClassMIMEType);
-        FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
-        u.metadatadelegate = fvc;
-        [i loadPreviewImageWithOptions:nil completionHandler:^(UIImage *preview, NSError *error) {
-            if(preview) {
-                [fvc setImage:preview];
-            } else if([i canLoadObjectOfClass:UIImage.class]) {
-                [i loadObjectOfClass:UIImage.class completionHandler:^(UIImage *item, NSError *error) {
-                    if(item) {
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [fvc setImage:item];
-                        }];
-                    }
-                }];
-            }
-        }];
-        
-        id imageHandler = ^(UIImage *item, NSError *error) {
-            if(item) {
-                if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
-                    CLS_LOG(@"Uploading dropped image to IRCCloud");
-                    [u uploadImage:item];
-                } else {
-                    CLS_LOG(@"Uploading dropped image to imgur");
-                    ImageUploader *img = [[ImageUploader alloc] init];
-                    img.delegate = self;
-                    img.bid = self->_buffer.bid;
-                    [img upload:item];
-                }
-            } else {
-                CLS_LOG(@"Unable to handle dropped image: %@", error);
-            }
-        };
-        
-        if([i hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
-            if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
-            } else {
-                [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
-                    if(url) {
-                        CLS_LOG(@"Uploading dropped file to IRCCloud");
-                        [i hasItemConformingToTypeIdentifier:@"public.movie"]?[u uploadVideo:url]:[u uploadFile:url];
-                    } else {
-                        CLS_LOG(@"Unable to handle dropped file: %@", error);
-                    }
-                }];
-            }
-        } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
-            [i loadInPlaceFileRepresentationForTypeIdentifier:@"public.movie" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
-                if(url) {
-                    CLS_LOG(@"Uploading dropped movie to IRCCloud");
-                    [u uploadVideo:url];
-                } else {
-                    CLS_LOG(@"Unable to handle dropped movie: %@", error);
+    NSItemProvider *i = session.items.firstObject.itemProvider;
+    
+    FileUploader *u = [[FileUploader alloc] init];
+    u.delegate = self;
+    u.bid = self->_buffer.bid;
+    u.msgid = self->_msgid;
+    NSString *UTI = i.registeredTypeIdentifiers.lastObject;
+    u.originalFilename = i.suggestedName;
+    if(![u.originalFilename containsString:@"."] && ![UTI hasPrefix:@"dyn."]) {
+        u.originalFilename = [u.originalFilename stringByAppendingPathExtension:[UTI componentsSeparatedByString:@"."].lastObject];
+    }
+    u.mimeType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef _Nonnull)(UTI), kUTTagClassMIMEType);
+    FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+    u.metadatadelegate = fvc;
+    [i loadPreviewImageWithOptions:nil completionHandler:^(UIImage *preview, NSError *error) {
+        if(preview) {
+            [fvc setImage:preview];
+        } else if([i canLoadObjectOfClass:UIImage.class]) {
+            [i loadObjectOfClass:UIImage.class completionHandler:^(UIImage *item, NSError *error) {
+                if(item) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [fvc setImage:item];
+                    }];
                 }
             }];
-        } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
-            [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
         }
-        
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                else
-                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                [self presentViewController:nc animated:YES completion:nil];
+    }];
+    
+    id imageHandler = ^(UIImage *item, NSError *error) {
+        if(item) {
+            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
+                CLS_LOG(@"Uploading dropped image to IRCCloud");
+                [u uploadImage:item];
+            } else {
+                CLS_LOG(@"Uploading dropped image to imgur");
+                ImageUploader *img = [[ImageUploader alloc] init];
+                img.delegate = self;
+                img.bid = self->_buffer.bid;
+                [img upload:item];
+            }
+        } else {
+            CLS_LOG(@"Unable to handle dropped image: %@", error);
+        }
+    };
+    
+    if([i hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
+        if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
+            [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
+        } else {
+            [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
+                if(url) {
+                    CLS_LOG(@"Uploading dropped file to IRCCloud");
+                    [i hasItemConformingToTypeIdentifier:@"public.movie"]?[u uploadVideo:url]:[u uploadFile:url];
+                } else {
+                    CLS_LOG(@"Unable to handle dropped file: %@", error);
+                }
+            }];
+        }
+    } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
+        [i loadInPlaceFileRepresentationForTypeIdentifier:@"public.movie" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
+            if(url) {
+                CLS_LOG(@"Uploading dropped movie to IRCCloud");
+                [u uploadVideo:url];
+            } else {
+                CLS_LOG(@"Unable to handle dropped movie: %@", error);
             }
         }];
+    } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
+        [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
     }
+    
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            [self presentViewController:nc animated:YES completion:nil];
+        }
+    }];
 }
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
@@ -1489,11 +1481,6 @@ NSArray *_sortedChannels;
                             muted = YES;
                     }
                     if((e.isHighlight || [b.type isEqualToString:@"conversation"]) && !muted) {
-                        if([[[[UIDevice currentDevice].systemVersion componentsSeparatedByString:@"."] objectAtIndex:0] intValue] < 10 && [[NSUserDefaults standardUserDefaults] boolForKey:@"notificationSound"] && [UIApplication sharedApplication].applicationState == UIApplicationStateActive && _lastNotificationTime < [NSDate date].timeIntervalSince1970 - 10) {
-                            self->_lastNotificationTime = [NSDate date].timeIntervalSince1970;
-                            AudioServicesPlaySystemSound(alertSound);
-                            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-                        }
                         self->_menuBtn.tintColor = [UIColor redColor];
                         self->_menuBtn.accessibilityValue = @"Unread highlights";
                     } else if(self->_menuBtn.accessibilityValue == nil) {
@@ -1806,9 +1793,7 @@ NSArray *_sortedChannels;
     
     CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
     height = [UIScreen mainScreen].bounds.size.height - origin.y;
-    if(@available(iOS 11, *)) {
-        height -= self.slidingViewController.view.safeAreaInsets.bottom / 2;
-    }
+    height -= self.slidingViewController.view.safeAreaInsets.bottom / 2;
     if(height != self->_kbSize.height) {
         self->_kbSize = size;
         self->_kbSize.height = height;
@@ -1933,65 +1918,13 @@ NSArray *_sortedChannels;
                 if(!granted)
                     CLS_LOG(@"Notification permission denied: %@", error);
             }];
-        } else if(@available(iOS 10, *)) {
+        } else {
             UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
             
             [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
                 if(!granted)
                     CLS_LOG(@"Notification permission denied: %@", error);
             }];
-        } else {
-            UIMutableUserNotificationAction *replyAction = [[UIMutableUserNotificationAction alloc] init];
-            replyAction.identifier = @"reply";
-            replyAction.title = @"Reply";
-            replyAction.activationMode = UIUserNotificationActivationModeBackground;
-            replyAction.authenticationRequired = YES;
-            replyAction.behavior = UIUserNotificationActionBehaviorTextInput;
-            
-            UIMutableUserNotificationAction *joinAction = [[UIMutableUserNotificationAction alloc] init];
-            joinAction.identifier = @"join";
-            joinAction.title = @"Join";
-            joinAction.activationMode = UIUserNotificationActivationModeForeground;
-            joinAction.authenticationRequired = YES;
-            
-            UIMutableUserNotificationAction *acceptAction = [[UIMutableUserNotificationAction alloc] init];
-            acceptAction.identifier = @"accept";
-            acceptAction.title = @"Accept";
-            acceptAction.activationMode = UIUserNotificationActivationModeBackground;
-            acceptAction.authenticationRequired = YES;
-            
-            UIMutableUserNotificationAction *retryAction = [[UIMutableUserNotificationAction alloc] init];
-            retryAction.identifier = @"retry";
-            retryAction.title = @"Try Again";
-            retryAction.activationMode = UIUserNotificationActivationModeBackground;
-            retryAction.authenticationRequired = YES;
-            
-            UIMutableUserNotificationCategory *buffer_msg = [[UIMutableUserNotificationCategory alloc] init];
-            buffer_msg.identifier = @"buffer_msg";
-            [buffer_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextDefault];
-            [buffer_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextMinimal];
-            
-            UIMutableUserNotificationCategory *buffer_me_msg = [[UIMutableUserNotificationCategory alloc] init];
-            buffer_me_msg.identifier = @"buffer_me_msg";
-            [buffer_me_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextDefault];
-            [buffer_me_msg setActions:@[replyAction] forContext:UIUserNotificationActionContextMinimal];
-            
-            UIMutableUserNotificationCategory *invite = [[UIMutableUserNotificationCategory alloc] init];
-            invite.identifier = @"channel_invite";
-            [invite setActions:@[joinAction] forContext:UIUserNotificationActionContextDefault];
-            [invite setActions:@[joinAction] forContext:UIUserNotificationActionContextMinimal];
-
-            UIMutableUserNotificationCategory *callerid = [[UIMutableUserNotificationCategory alloc] init];
-            callerid.identifier = @"callerid";
-            [callerid setActions:@[acceptAction] forContext:UIUserNotificationActionContextDefault];
-            [callerid setActions:@[acceptAction] forContext:UIUserNotificationActionContextMinimal];
-            
-            UIMutableUserNotificationCategory *retry = [[UIMutableUserNotificationCategory alloc] init];
-            callerid.identifier = @"retry";
-            [callerid setActions:@[retryAction] forContext:UIUserNotificationActionContextDefault];
-            [callerid setActions:@[retryAction] forContext:UIUserNotificationActionContextMinimal];
-            
-            [[UIApplication sharedApplication] registerUserNotificationSettings:[UIUserNotificationSettings settingsForTypes:(UIUserNotificationTypeBadge | UIUserNotificationTypeSound | UIUserNotificationTypeAlert) categories:[NSSet setWithObjects:buffer_msg, buffer_me_msg, invite, callerid, retry, nil]]];
         }
 #ifdef DEBUG
         CLS_LOG(@"This is a debug build, skipping APNs registration");
@@ -2538,9 +2471,7 @@ NSArray *_sortedChannels;
     self->_message.animateHeightChange = NO;
     if(self->_message.text.length > 0) {
         CGFloat c = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
-        if(@available(iOS 11, *)) {
-            c -= self.slidingViewController.view.safeAreaInsets.right;
-        }
+        c -= self.slidingViewController.view.safeAreaInsets.right;
         if(self->_messageWidthConstraint.constant != c)
             self->_messageWidthConstraint.constant = c;
         [self.view layoutIfNeeded];
@@ -2550,9 +2481,7 @@ NSArray *_sortedChannels;
         self->_settingsBtn.alpha = 0;
     } else {
         self->_messageWidthConstraint.constant = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
-        if(@available(iOS 11, *)) {
-            self->_messageWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
-        }
+        self->_messageWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
         [self.view layoutIfNeeded];
         self->_sendBtn.enabled = NO;
         self->_sendBtn.alpha = 0;
@@ -2565,14 +2494,12 @@ NSArray *_sortedChannels;
     self->_message.animateHeightChange = YES;
     self->_messageHeightConstraint.constant = self->_message.frame.size.height;
     self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
-    if(@available(iOS 11, *)) {
-        CGRect frame = self->_settingsBtn.frame;
-        frame.origin.x = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
-        self->_settingsBtn.frame = frame;
-        frame = self->_sendBtn.frame;
-        frame.origin.x = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.safeAreaInsets.right;
-        self->_sendBtn.frame = frame;
-    }
+    CGRect frame = self->_settingsBtn.frame;
+    frame.origin.x = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
+    self->_settingsBtn.frame = frame;
+    frame = self->_sendBtn.frame;
+    frame.origin.x = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.safeAreaInsets.right;
+    self->_sendBtn.frame = frame;
     [self _updateEventsInsets];
     [self.view layoutIfNeeded];
 }
@@ -3208,19 +3135,15 @@ NSArray *_sortedChannels;
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
-    if(@available(iOS 11, *)) {
-        if(self.slidingViewController.view.safeAreaInsets.bottom) {
-            return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeRight;
-        }
+    if(self.slidingViewController.view.safeAreaInsets.bottom) {
+        return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeRight;
     }
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
 -(void)statusBarFrameWillChange:(NSNotification *)n {
-    if(@available(iOS 11, *)) {
-        if(self.slidingViewController.view.safeAreaInsets.bottom)
-            return;
-    }
+    if(self.slidingViewController.view.safeAreaInsets.bottom)
+        return;
     CGRect newFrame = [[n.userInfo objectForKey:UIApplicationStatusBarFrameUserInfoKey] CGRectValue];
     if(newFrame.size.width > 0 && newFrame.size.width == [UIApplication sharedApplication].statusBarFrame.size.width) {
         [UIView animateWithDuration:0.25f animations:^{
@@ -3232,15 +3155,11 @@ NSArray *_sortedChannels;
 -(void)updateLayout {
     BOOL scrolledUp = _buffer.scrolledUp;
     [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
-    if(@available(iOS 11, *)) {
-        [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
-        if(self.slidingViewController.view.safeAreaInsets.bottom)
-            [self updateLayout:0];
-        else
-            [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
-    } else {
+    [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
+    if(self.slidingViewController.view.safeAreaInsets.bottom)
+        [self updateLayout:0];
+    else
         [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
-    }
     CGPoint contentOffset = _eventsView.tableView.contentOffset;
     [self.slidingViewController adjustLayout];
     [self.slidingViewController.view layoutIfNeeded];
@@ -3287,10 +3206,8 @@ NSArray *_sortedChannels;
         self->_borders.hidden = NO;
         self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
         self->_eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
-        if(@available(iOS 11, *)) {
-            self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
-            self->_eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
-        }
+        self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
+        self->_eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
@@ -3306,13 +3223,8 @@ NSArray *_sortedChannels;
         self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
         self->_borders.hidden = YES;
-        if(@available(iOS 11, *)) {
-            self->_eventsViewWidthConstraint.constant = size.width + self.slidingViewController.view.safeAreaInsets.left;
-            self->_eventsViewOffsetXConstraint.constant = self.slidingViewController.view.safeAreaInsets.left / 2;
-        } else {
-            self->_eventsViewWidthConstraint.constant = size.width;
-            self->_eventsViewOffsetXConstraint.constant = 0;
-        }
+        self->_eventsViewWidthConstraint.constant = size.width + self.slidingViewController.view.safeAreaInsets.left;
+        self->_eventsViewOffsetXConstraint.constant = self.slidingViewController.view.safeAreaInsets.left / 2;
         if(!self.slidingViewController.underLeftViewController)
             self.slidingViewController.underLeftViewController = self->_buffersView;
         if(!self.navigationItem.leftBarButtonItem)
@@ -3327,12 +3239,10 @@ NSArray *_sortedChannels;
         self->_topicLabel.alpha = (size.width > size.height)?0:1;
     }
     self->_topicWidthConstraint.constant = frame.size.width = size.width - 128;
-    if(@available(iOS 11, *)) {
-        frame.size.width -= self.slidingViewController.view.safeAreaInsets.left;
-        frame.size.width -= self.slidingViewController.view.safeAreaInsets.right;
-        self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.left;
-        self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
-    }
+    frame.size.width -= self.slidingViewController.view.safeAreaInsets.left;
+    frame.size.width -= self.slidingViewController.view.safeAreaInsets.right;
+    self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.left;
+    self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && (size.width > size.height))
         frame.size.width -= self->_buffersView.tableView.frame.size.width;
     self->_connectingView.frame = self->_titleView.frame = frame;
@@ -3398,11 +3308,9 @@ NSArray *_sortedChannels;
     if(_ignoreInsetChanges)
         return;
     self->_bottomBarOffsetConstraint.constant = self->_kbSize.height;
-    if(@available(iOS 11, *)) {
-        if(self.slidingViewController.view.safeAreaInsets.bottom) {
-            if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
-                self->_bottomBarOffsetConstraint.constant -= self.slidingViewController.view.safeAreaInsets.bottom/2;
-        }
+    if(self.slidingViewController.view.safeAreaInsets.bottom) {
+        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
+            self->_bottomBarOffsetConstraint.constant -= self.slidingViewController.view.safeAreaInsets.bottom/2;
     }
     CGFloat height = self->_bottomBarHeightConstraint.constant + _kbSize.height;
     CGFloat top = 0;
@@ -3412,33 +3320,26 @@ NSArray *_sortedChannels;
         top += self->_eventsView.topUnreadView.frame.size.height;
     if(!_serverStatusBar.hidden)
         height += self->_serverStatusBar.bounds.size.height;
-    if(@available(iOS 11, *)) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-            height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
-    }
+    if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+        height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if(@available(iOS 11, *)) {
-            CGFloat bottom = self->_kbSize.height ? (self->_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? self.slidingViewController.view.safeAreaInsets.bottom : self.slidingViewController.view.safeAreaInsets.bottom/2);
-            if(@available(iOS 14, *)) {
-                bottom += self.slidingViewController.view.safeAreaInsets.bottom;
-                self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
-                self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
-            } else if(@available(iOS 13, *)) {
-            } else {
-                self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
-                self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
-            }
-            self->_buffersView.tableView.contentInset = UIEdgeInsetsZero;
-            if(self->_buffersView.tableView.adjustedContentInset.bottom > 0) { //Sometimes iOS 11 automatically adds the keyboard padding even though I told it not to
-                bottom -= self->_buffersView.tableView.adjustedContentInset.bottom;
-            }
-            self->_buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
-            self->_usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
+        CGFloat bottom = self->_kbSize.height ? (self->_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom/2) : (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) ? self.slidingViewController.view.safeAreaInsets.bottom : self.slidingViewController.view.safeAreaInsets.bottom/2);
+        if(@available(iOS 14, *)) {
+            bottom += self.slidingViewController.view.safeAreaInsets.bottom;
+            self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
+            self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
+        } else if(@available(iOS 13, *)) {
         } else {
-            self->_buffersView.tableView.scrollIndicatorInsets = self->_buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,self->_kbSize.height,0);
-            self->_usersView.tableView.scrollIndicatorInsets = self->_usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,self->_kbSize.height,0);
+            self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
+            self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
         }
+        self->_buffersView.tableView.contentInset = UIEdgeInsetsZero;
+        if(self->_buffersView.tableView.adjustedContentInset.bottom > 0) { //Sometimes iOS 11 automatically adds the keyboard padding even though I told it not to
+            bottom -= self->_buffersView.tableView.adjustedContentInset.bottom;
+        }
+        self->_buffersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
+        self->_usersView.tableView.contentInset = UIEdgeInsetsMake(0,0,bottom,0);
     }];
 
     if(!_isShowingPreview && (self->_eventsView.tableView.contentInset.top != top || _eventsView.tableView.contentInset.bottom != height)) {
@@ -3542,10 +3443,8 @@ NSArray *_sortedChannels;
                 }
                 self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
                 self->_eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
-                if(@available(iOS 11, *)) {
-                    self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
-                    self->_eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
-                }
+                self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
+                self->_eventsViewOffsetXConstraint.constant += self.slidingViewController.view.safeAreaInsets.right / 2;
                 if(self.slidingViewController.underRightViewController) {
                     self->_eventsViewWidthConstraint.constant++;
                     self->_eventsViewOffsetXConstraint.constant++;

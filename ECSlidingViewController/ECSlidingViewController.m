@@ -645,10 +645,8 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
     if(sbheight > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
         sbheight -= 20;
-    if(@available(iOS 11, *)) {
-        if(self.view.safeAreaInsets.bottom) {
-            sbheight = self.view.safeAreaInsets.top;
-        }
+    if(self.view.safeAreaInsets.bottom) {
+        sbheight = self.view.safeAreaInsets.top;
     }
     CGRect frame = self.underLeftView.frame;
     frame.origin.y = sbheight;
@@ -696,10 +694,8 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
     if(sbheight > 20)
         sbheight -= 20;
-    if(@available(iOS 11, *)) {
-        if(self.view.safeAreaInsets.bottom) {
-            sbheight = self.view.safeAreaInsets.top;
-        }
+    if(self.view.safeAreaInsets.bottom) {
+        sbheight = self.view.safeAreaInsets.top;
     }
     CGRect frame = self.underRightView.frame;
     frame.origin.y = sbheight;

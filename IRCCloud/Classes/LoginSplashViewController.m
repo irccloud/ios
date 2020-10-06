@@ -355,10 +355,8 @@
         self.view.window.backgroundColor = [UIColor colorWithRed:11.0/255.0 green:46.0/255.0 blue:96.0/255.0 alpha:1];
         loginViewYOffset.constant = 160;
         loadingViewYOffset.constant = 120;
-        if(@available(iOS 11, *)) {
-            loginViewYOffset.constant += self.view.safeAreaInsets.top;
-            loadingViewYOffset.constant += self.view.safeAreaInsets.top;
-        }
+        loginViewYOffset.constant += self.view.safeAreaInsets.top;
+        loadingViewYOffset.constant += self.view.safeAreaInsets.top;
     }
     
     [self _updateFieldPositions];

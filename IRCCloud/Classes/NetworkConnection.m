@@ -275,9 +275,7 @@ volatile BOOL __socketPaused = NO;
     if(self) {
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
         config.timeoutIntervalForRequest = 30;
-        if(@available(iOS 11, *)) {
-            config.waitsForConnectivity = NO;
-        }
+        config.waitsForConnectivity = NO;
         _urlSession = [NSURLSession sessionWithConfiguration:config delegate:nil delegateQueue:NSOperationQueue.mainQueue];
         
         [TrustKit initializeWithConfiguration:@{

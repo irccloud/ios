@@ -617,11 +617,9 @@
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
     self.automaticallyAdjustsScrollViewInsets = NO;
-    if(@available(iOS 11, *)) {
-        self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
-        self.tableView.insetsLayoutMarginsFromSafeArea = NO;
-        self.tableView.insetsContentViewsToSafeArea = NO;
-    }
+    self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    self.tableView.insetsLayoutMarginsFromSafeArea = NO;
+    self.tableView.insetsContentViewsToSafeArea = NO;
 
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     self->_boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
@@ -1150,8 +1148,7 @@
         cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
         cell.icon.font = self->_awesomeFont;
 #ifndef EXTENSION
-        if(@available(iOS 11, *))
-            cell.borderInset = self.slidingViewController.view.safeAreaInsets.left;
+        cell.borderInset = self.slidingViewController.view.safeAreaInsets.left;
 #endif
         if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
             if([[row objectForKey:@"archived"] intValue])

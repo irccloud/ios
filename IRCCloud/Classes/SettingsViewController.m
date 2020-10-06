@@ -428,11 +428,7 @@
     
     UIView *v = [self->_themePreviews objectAtIndex:indexPath.row];
     [v removeFromSuperview];
-    if(@available(iOS 11, *)) {
-        v.frame = CGRectMake(self.view.safeAreaInsets.left?-12:8,cell.contentView.frame.size.height / 2 - 12,24,24);
-    } else {
-        v.frame = CGRectMake(8,cell.contentView.frame.size.height / 2 - 12,24,24);
-    }
+    v.frame = CGRectMake(self.view.safeAreaInsets.left?-12:8,cell.contentView.frame.size.height / 2 - 12,24,24);
     v.layer.cornerRadius = v.frame.size.width / 2;
     [cell.contentView addSubview:v];
     
@@ -844,13 +840,9 @@
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
 
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
-    if(@available(iOS 10, *)) {
-        [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":self->_defaultSound}];
-        [notifications addObject:@{@"title":@"Preview Uploaded Files", @"accessory":self->_notificationPreviews}];
-        [notifications addObject:@{@"title":@"Preview External URLs", @"accessory":self->_thirdPartyNotificationPreviews}];
-    } else {
-        [notifications addObject:@{@"title":@"Background Alert Sounds", @"accessory":self->_notificationSound}];
-    }
+    [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":self->_defaultSound}];
+    [notifications addObject:@{@"title":@"Preview Uploaded Files", @"accessory":self->_notificationPreviews}];
+    [notifications addObject:@{@"title":@"Preview External URLs", @"accessory":self->_thirdPartyNotificationPreviews}];
     [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":self->_notifyAll}];
     [notifications addObject:@{@"title":@"Show Unread Indicators", @"accessory":self->_showUnread}];
     [notifications addObject:@{@"title":@"Mark As Read Automatically", @"accessory":self->_markAsRead}];

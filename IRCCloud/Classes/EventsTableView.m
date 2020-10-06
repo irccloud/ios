@@ -190,8 +190,7 @@ extern UIImage *__socketClosedBackgroundImage;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    if(@available(iOS 11, *))
-        self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
+    self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
 
     self->_rowCache = [[NSMutableDictionary alloc] init];
     
@@ -1378,10 +1377,8 @@ extern UIImage *__socketClosedBackgroundImage;
         self->_topHighlightsCountView.hidden = YES;
         self->_topUnreadLabelXOffsetConstraint.constant = 0;
     }
-    if(@available(iOS 11, *)) {
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone]) {
-            self->_topUnreadDismissXOffsetConstraint.constant = -self.slidingViewController.view.safeAreaInsets.left;
-        }
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone]) {
+        self->_topUnreadDismissXOffsetConstraint.constant = -self.slidingViewController.view.safeAreaInsets.left;
     }
     if(self->_lastSeenEidPos == 0 && firstRow < _data.count) {
         int seconds;
@@ -1751,14 +1748,10 @@ extern UIImage *__socketClosedBackgroundImage;
         [self->_reloadTimer invalidate];
         self->_urlHandler.window = self->_tableView.window;
 
-        if(@available(iOS 11, *)) {
-            if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
-                self->_stickyAvatarXOffsetConstraint.constant = 20;
-            } else {
-                self->_stickyAvatarXOffsetConstraint.constant = 20 + self.slidingViewController.view.safeAreaInsets.left;
-            }
-        } else {
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
             self->_stickyAvatarXOffsetConstraint.constant = 20;
+        } else {
+            self->_stickyAvatarXOffsetConstraint.constant = 20 + self.slidingViewController.view.safeAreaInsets.left;
         }
 
         __24hrPref = NO;

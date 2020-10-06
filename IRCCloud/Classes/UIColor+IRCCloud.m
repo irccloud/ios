@@ -1188,9 +1188,7 @@ UITraitCollection *__currentTraitCollection;
         CGContextSetLineCap(context, kCGLineCapSquare);
         CGContextSetStrokeColorWithColor(context, [self bufferBorderColor].CGColor);
         float borderWidth = 6.0;
-        if(@available(iOS 11, *)) {
-            borderWidth += __safeInsets.left;
-        }
+        borderWidth += __safeInsets.left;
         CGContextSetLineWidth(context, borderWidth);
         CGContextMoveToPoint(context, borderWidth / 2, 0.0);
         CGContextAddLineToPoint(context, borderWidth / 2, 16.0);
