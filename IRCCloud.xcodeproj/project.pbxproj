@@ -231,6 +231,9 @@
 		2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
 		2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
+		22374409252C9D3C0085D41C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22374408252C9D3C0085D41C /* WebKit.framework */; };
+		2237440A252C9D4B0085D41C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22374408252C9D3C0085D41C /* WebKit.framework */; };
+		2237440B252C9D580085D41C /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22374408252C9D3C0085D41C /* WebKit.framework */; };
 		2237E13D16E1214A00CA188F /* ColorFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 2237E13C16E1214A00CA188F /* ColorFormatter.m */; };
 		2238761D1F70047D00943160 /* YYAnimatedImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223876121F70035300943160 /* YYAnimatedImageView.m */; };
 		2238761E1F70047D00943160 /* YYFrameImage.m in Sources */ = {isa = PBXBuildFile; fileRef = 223876141F70035300943160 /* YYFrameImage.m */; };
@@ -1234,6 +1237,7 @@
 		2236F64516DD138B007BE535 /* UsersDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersDataSource.m; sourceTree = "<group>"; };
 		2236F64816DD30E0007BE535 /* UsersTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UsersTableView.h; sourceTree = "<group>"; };
 		2236F64916DD30E3007BE535 /* UsersTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UsersTableView.m; sourceTree = "<group>"; };
+		22374408252C9D3C0085D41C /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		2237E13B16E1214A00CA188F /* ColorFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ColorFormatter.h; sourceTree = "<group>"; };
 		2237E13C16E1214A00CA188F /* ColorFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ColorFormatter.m; sourceTree = "<group>"; };
 		223876111F70035300943160 /* YYAnimatedImageView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = YYAnimatedImageView.h; sourceTree = "<group>"; };
@@ -1778,6 +1782,7 @@
 				225D977D18AA995900065087 /* MobileCoreServices.framework in Frameworks */,
 				225D977E18AA995900065087 /* libz.dylib in Frameworks */,
 				227DA8A01CF381D90041B1BF /* CoreTelephony.framework in Frameworks */,
+				2237440A252C9D4B0085D41C /* WebKit.framework in Frameworks */,
 				225D977F18AA995900065087 /* CoreText.framework in Frameworks */,
 				225D978018AA995900065087 /* libicucore.dylib in Frameworks */,
 				22C8CD721B01289900F637D2 /* libc++.dylib in Frameworks */,
@@ -1814,6 +1819,7 @@
 				2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */,
 				2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */,
 				227DA8A11CF381DA0041B1BF /* CoreTelephony.framework in Frameworks */,
+				22374409252C9D3C0085D41C /* WebKit.framework in Frameworks */,
 				228A05D716D3DFDA0029769C /* CoreText.framework in Frameworks */,
 				22C8CD711B01289900F637D2 /* libc++.dylib in Frameworks */,
 				228A05CF16D3DD540029769C /* libicucore.dylib in Frameworks */,
@@ -1857,6 +1863,7 @@
 				22D97860215BC910005C2713 /* MobileCoreServices.framework in Frameworks */,
 				22D97861215BC910005C2713 /* libz.dylib in Frameworks */,
 				22D97862215BC910005C2713 /* CoreTelephony.framework in Frameworks */,
+				2237440B252C9D580085D41C /* WebKit.framework in Frameworks */,
 				22D97863215BC910005C2713 /* CoreText.framework in Frameworks */,
 				22D97865215BC910005C2713 /* libc++.dylib in Frameworks */,
 				22D97866215BC910005C2713 /* libicucore.dylib in Frameworks */,
@@ -2020,6 +2027,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22374408252C9D3C0085D41C /* WebKit.framework */,
 				2238761C1F70038A00943160 /* WebP.framework */,
 				1A61413D1E6EDF30004B6025 /* AdSupport.framework */,
 				1A61413E1E6EDF30004B6025 /* AVFoundation.framework */,
@@ -5046,7 +5054,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
 				INFOPLIST_PREPROCESS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -5094,7 +5102,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
 				INFOPLIST_PREPROCESS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
@@ -5539,7 +5547,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
 				INFOPLIST_PREPROCESS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-DNS_BLOCK_ASSERTIONS=1",
