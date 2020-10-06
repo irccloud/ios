@@ -31,7 +31,6 @@
 		1A61414A1E6EDF30004B6025 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141401E6EDF30004B6025 /* CoreGraphics.framework */; };
 		1A61414B1E6EDF30004B6025 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141411E6EDF30004B6025 /* CoreText.framework */; };
 		1A61414C1E6EDF30004B6025 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141421E6EDF30004B6025 /* Foundation.framework */; };
-		1A61414D1E6EDF30004B6025 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141431E6EDF30004B6025 /* MobileCoreServices.framework */; };
 		1A61414E1E6EDF30004B6025 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141441E6EDF30004B6025 /* Security.framework */; };
 		1A61414F1E6EDF30004B6025 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141451E6EDF30004B6025 /* SystemConfiguration.framework */; };
 		1A6141501E6EDF30004B6025 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A6141461E6EDF30004B6025 /* UIKit.framework */; };
@@ -52,7 +51,6 @@
 		22103500197EFC0500AB414F /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
 		22103501197EFC0500AB414F /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
 		22103502197EFC0500AB414F /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
-		22103503197EFC0500AB414F /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		22103504197EFC0500AB414F /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
 		22103505197EFC0500AB414F /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		22103506197EFC0500AB414F /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
@@ -125,7 +123,6 @@
 		221D4BC91E23F5EC00D403E6 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057316D3DABA0029769C /* CoreGraphics.framework */; };
 		221D4BCA1E23F5EC00D403E6 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
 		221D4BCB1E23F5EC00D403E6 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
-		221D4BCC1E23F5EC00D403E6 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		221D4BCD1E23F5EC00D403E6 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
 		221D4BCE1E23F5EC00D403E6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		221D4BCF1E23F5EC00D403E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
@@ -206,7 +203,6 @@
 		222C80F01E4A112F00A243E7 /* SBJson5StreamWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80C41E4A0BB600A243E7 /* SBJson5StreamWriter.m */; };
 		222C80F11E4A112F00A243E7 /* SBJson5StreamWriterState.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80C61E4A0BB600A243E7 /* SBJson5StreamWriterState.m */; };
 		222C80F21E4A112F00A243E7 /* SBJson5Writer.m in Sources */ = {isa = PBXBuildFile; fileRef = 222C80C81E4A0BB600A243E7 /* SBJson5Writer.m */; };
-		2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		2230F8E817162ACD007F7C98 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
 		223154FD1F26245800BDE367 /* LogExportsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223154FC1F26245800BDE367 /* LogExportsTableViewController.m */; };
 		223154FE1F26245800BDE367 /* LogExportsTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 223154FC1F26245800BDE367 /* LogExportsTableViewController.m */; };
@@ -302,6 +298,13 @@
 		225173E81DB13A5500D63405 /* SourceSansPro-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 225173E21DB13A5500D63405 /* SourceSansPro-Semibold.otf */; };
 		2252EE5B1F4485C000307010 /* MessageTypeTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 2252EE5A1F4485C000307010 /* MessageTypeTests.m */; };
 		2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
+		225BEDC3252CB27F0050A8CC /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 225BEDC2252CB27F0050A8CC /* CoreServices.framework */; };
+		225BEDC4252CB29A0050A8CC /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 225BEDC2252CB27F0050A8CC /* CoreServices.framework */; };
+		225BEDC5252CB29F0050A8CC /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 225BEDC2252CB27F0050A8CC /* CoreServices.framework */; };
+		225BEDC6252CB2A00050A8CC /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 225BEDC2252CB27F0050A8CC /* CoreServices.framework */; };
+		225BEDC7252CB2A20050A8CC /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 225BEDC2252CB27F0050A8CC /* CoreServices.framework */; };
+		225BEDC8252CB2A30050A8CC /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 225BEDC2252CB27F0050A8CC /* CoreServices.framework */; };
+		225BEDC9252CB2A30050A8CC /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 225BEDC2252CB27F0050A8CC /* CoreServices.framework */; };
 		225D973818AA995900065087 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A057B16D3DABA0029769C /* main.m */; };
 		225D973918AA995900065087 /* ServerReorderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22462B5118906B03009EF986 /* ServerReorderViewController.m */; };
 		225D973A18AA995900065087 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05AF16D3DB7B0029769C /* AppDelegate.m */; };
@@ -357,7 +360,6 @@
 		225D977A18AA995900065087 /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
 		225D977B18AA995900065087 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		225D977C18AA995900065087 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
-		225D977D18AA995900065087 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		225D977E18AA995900065087 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
 		225D977F18AA995900065087 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
 		225D978018AA995900065087 /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
@@ -758,7 +760,6 @@
 		22D9785D215BC910005C2713 /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
 		22D9785E215BC910005C2713 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		22D9785F215BC910005C2713 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
-		22D97860215BC910005C2713 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		22D97861215BC910005C2713 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
 		22D97862215BC910005C2713 /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 227DA89D1CF381B60041B1BF /* CoreTelephony.framework */; };
 		22D97863215BC910005C2713 /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
@@ -914,7 +915,6 @@
 		22DB25271982DF2B0008728E /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2223C6B51768F4500032544B /* ImageIO.framework */; };
 		22DB25281982DF2B0008728E /* libicucore.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CD16D3DD310029769C /* libicucore.dylib */; };
 		22DB25291982DF2B0008728E /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 2248DF3816EE375D0086BB42 /* libz.dylib */; };
-		22DB252A1982DF2B0008728E /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2230F8E41715E61F007F7C98 /* MobileCoreServices.framework */; };
 		22DB252B1982DF2B0008728E /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
 		22DB252C1982DF2B0008728E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		22DB252D1982DF2B0008728E /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
@@ -1282,6 +1282,7 @@
 		2252EE5A1F4485C000307010 /* MessageTypeTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MessageTypeTests.m; sourceTree = "<group>"; };
 		2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ChannelListTableViewController.m; sourceTree = "<group>"; };
 		2253BA261770CDC500CCA77F /* ChannelListTableViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ChannelListTableViewController.h; sourceTree = "<group>"; };
+		225BEDC2252CB27F0050A8CC /* CoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreServices.framework; path = System/Library/Frameworks/CoreServices.framework; sourceTree = SDKROOT; };
 		225D979F18AA995900065087 /* IRCEnterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCEnterprise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
 		225EC2BA2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EventsTableCell_ReplyCount.xib; sourceTree = "<group>"; };
@@ -1684,6 +1685,7 @@
 				221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */,
 				221034FB197EFC0500AB414F /* AudioToolbox.framework in Frameworks */,
 				22C8CD731B01289900F637D2 /* libc++.dylib in Frameworks */,
+				225BEDC5252CB29F0050A8CC /* CoreServices.framework in Frameworks */,
 				221034FC197EFC0500AB414F /* CFNetwork.framework in Frameworks */,
 				221034FD197EFC0500AB414F /* CoreGraphics.framework in Frameworks */,
 				221034FE197EFC0500AB414F /* CoreText.framework in Frameworks */,
@@ -1691,7 +1693,6 @@
 				22103500197EFC0500AB414F /* ImageIO.framework in Frameworks */,
 				22103501197EFC0500AB414F /* libicucore.dylib in Frameworks */,
 				22103502197EFC0500AB414F /* libz.dylib in Frameworks */,
-				22103503197EFC0500AB414F /* MobileCoreServices.framework in Frameworks */,
 				22103504197EFC0500AB414F /* Security.framework in Frameworks */,
 				227DA89F1CF381D70041B1BF /* CoreTelephony.framework in Frameworks */,
 				22103505197EFC0500AB414F /* SystemConfiguration.framework in Frameworks */,
@@ -1714,10 +1715,10 @@
 				221D4BC91E23F5EC00D403E6 /* CoreGraphics.framework in Frameworks */,
 				221D4BCA1E23F5EC00D403E6 /* CoreText.framework in Frameworks */,
 				221D4BCB1E23F5EC00D403E6 /* Foundation.framework in Frameworks */,
-				221D4BCC1E23F5EC00D403E6 /* MobileCoreServices.framework in Frameworks */,
 				221D4BCD1E23F5EC00D403E6 /* Security.framework in Frameworks */,
 				221D4BCE1E23F5EC00D403E6 /* SystemConfiguration.framework in Frameworks */,
 				2238763F1F70062200943160 /* WebP.framework in Frameworks */,
+				225BEDC7252CB2A20050A8CC /* CoreServices.framework in Frameworks */,
 				0F42FE271B3105DA25634264 /* Pods_NotificationService.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1733,10 +1734,10 @@
 				1A61414A1E6EDF30004B6025 /* CoreGraphics.framework in Frameworks */,
 				1A61414B1E6EDF30004B6025 /* CoreText.framework in Frameworks */,
 				1A61414C1E6EDF30004B6025 /* Foundation.framework in Frameworks */,
-				1A61414D1E6EDF30004B6025 /* MobileCoreServices.framework in Frameworks */,
 				1A61414E1E6EDF30004B6025 /* Security.framework in Frameworks */,
 				1A61414F1E6EDF30004B6025 /* SystemConfiguration.framework in Frameworks */,
 				223876401F70062200943160 /* WebP.framework in Frameworks */,
+				225BEDC8252CB2A30050A8CC /* CoreServices.framework in Frameworks */,
 				6E7E72678F14B4CFF5CBC70D /* Pods_NotificationService_Enterprise.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1770,7 +1771,6 @@
 				225D977A18AA995900065087 /* Twitter.framework in Frameworks */,
 				225D977B18AA995900065087 /* SystemConfiguration.framework in Frameworks */,
 				225D977C18AA995900065087 /* ImageIO.framework in Frameworks */,
-				225D977D18AA995900065087 /* MobileCoreServices.framework in Frameworks */,
 				225D977E18AA995900065087 /* libz.dylib in Frameworks */,
 				227DA8A01CF381D90041B1BF /* CoreTelephony.framework in Frameworks */,
 				2237440A252C9D4B0085D41C /* WebKit.framework in Frameworks */,
@@ -1783,6 +1783,7 @@
 				225D978418AA995900065087 /* Foundation.framework in Frameworks */,
 				225D978518AA995900065087 /* CoreGraphics.framework in Frameworks */,
 				2D09C24E152C6127A7F56DAF /* Pods_IRCCloud_Enterprise.framework in Frameworks */,
+				225BEDC4252CB29A0050A8CC /* CoreServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1803,11 +1804,11 @@
 				1A5703481A74145400D58225 /* AdSupport.framework in Frameworks */,
 				22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */,
 				2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */,
+				225BEDC3252CB27F0050A8CC /* CoreServices.framework in Frameworks */,
 				2283323017944E2B00ED22EA /* AudioToolbox.framework in Frameworks */,
 				22501740178340AB00066E71 /* Twitter.framework in Frameworks */,
 				22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */,
 				2223C6B61768F4500032544B /* ImageIO.framework in Frameworks */,
-				2230F8E51715E61F007F7C98 /* MobileCoreServices.framework in Frameworks */,
 				2248DF3916EE375D0086BB42 /* libz.dylib in Frameworks */,
 				227DA8A11CF381DA0041B1BF /* CoreTelephony.framework in Frameworks */,
 				22374409252C9D3C0085D41C /* WebKit.framework in Frameworks */,
@@ -1851,7 +1852,6 @@
 				22D9785D215BC910005C2713 /* Twitter.framework in Frameworks */,
 				22D9785E215BC910005C2713 /* SystemConfiguration.framework in Frameworks */,
 				22D9785F215BC910005C2713 /* ImageIO.framework in Frameworks */,
-				22D97860215BC910005C2713 /* MobileCoreServices.framework in Frameworks */,
 				22D97861215BC910005C2713 /* libz.dylib in Frameworks */,
 				22D97862215BC910005C2713 /* CoreTelephony.framework in Frameworks */,
 				2237440B252C9D580085D41C /* WebKit.framework in Frameworks */,
@@ -1864,6 +1864,7 @@
 				22D9786A215BC910005C2713 /* Foundation.framework in Frameworks */,
 				22D9786C215BC910005C2713 /* CoreGraphics.framework in Frameworks */,
 				C58D83E3C5E424EB09908129 /* Pods_IRCCloud_FLEX.framework in Frameworks */,
+				225BEDC9252CB2A30050A8CC /* CoreServices.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1885,11 +1886,11 @@
 				22DB25271982DF2B0008728E /* ImageIO.framework in Frameworks */,
 				22DB25281982DF2B0008728E /* libicucore.dylib in Frameworks */,
 				22DB25291982DF2B0008728E /* libz.dylib in Frameworks */,
-				22DB252A1982DF2B0008728E /* MobileCoreServices.framework in Frameworks */,
 				22DB252B1982DF2B0008728E /* Security.framework in Frameworks */,
 				22DB252C1982DF2B0008728E /* SystemConfiguration.framework in Frameworks */,
 				22DB252D1982DF2B0008728E /* Twitter.framework in Frameworks */,
 				22DB252E1982DF2B0008728E /* UIKit.framework in Frameworks */,
+				225BEDC6252CB2A00050A8CC /* CoreServices.framework in Frameworks */,
 				0548CFDE1ED36F21D59A23D2 /* Pods_ShareExtension_Enterprise.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2018,6 +2019,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				225BEDC2252CB27F0050A8CC /* CoreServices.framework */,
 				22374408252C9D3C0085D41C /* WebKit.framework */,
 				2238761C1F70038A00943160 /* WebP.framework */,
 				1A61413D1E6EDF30004B6025 /* AdSupport.framework */,
@@ -4644,7 +4646,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = NotificationService/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
@@ -4679,7 +4680,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = NotificationService/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
@@ -4717,7 +4717,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = NotificationService/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
@@ -4755,7 +4754,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "$(SRCROOT)/NotificationService/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = YES;
 				OTHER_CFLAGS = "-DEXTENSION";
@@ -4790,7 +4788,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "$(SRCROOT)/NotificationService/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (
@@ -4828,7 +4825,6 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "$(SRCROOT)/NotificationService/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = (

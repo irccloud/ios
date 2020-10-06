@@ -386,37 +386,6 @@ extern NSURL *__logfile;
     CLS_LOG(@"Error in APNs registration. Error: %@", err);
 }
 
--(void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
-    [self application:application didReceiveRemoteNotification:[notification.userInfo objectForKey:@"userInfo"]];
-}
-
-- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo {
-    [[FIRMessaging messaging] appDidReceiveMessage:userInfo];
-    if([userInfo objectForKey:@"view_logs"]) {
-        LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        lvc.buffer = self->_mainViewController.buffer;
-        lvc.server = [[ServersDataSource sharedInstance] getServer:self->_mainViewController.buffer.cid];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
-        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self showMainView:YES];
-        [self->_mainViewController presentViewController:nc animated:YES completion:nil];
-    } else {
-        if([userInfo objectForKey:@"d"]) {
-            self.mainViewController.bidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
-            self.mainViewController.eidToOpen = [[[userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
-            CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
-            [UIColor setTheme];
-            [self.mainViewController applyTheme];
-            [self.mainViewController bufferSelected:[[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
-            [self showMainView:YES];
-        }
-    }
-}
-
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
     [[FIRMessaging messaging] appDidReceiveMessage:userInfo];
     if([userInfo objectForKey:@"d"]) {
@@ -504,7 +473,29 @@ extern NSURL *__logfile;
     if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:((UNTextInputNotificationResponse *)response).userText completionHandler:completionHandler];
     } else if([response.actionIdentifier isEqualToString:UNNotificationDefaultActionIdentifier]) {
-        [self application:[UIApplication sharedApplication] didReceiveRemoteNotification:response.notification.request.content.userInfo];
+        if([response.notification.request.content.userInfo objectForKey:@"view_logs"]) {
+            LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            lvc.buffer = self->_mainViewController.buffer;
+            lvc.server = [[ServersDataSource sharedInstance] getServer:self->_mainViewController.buffer.cid];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            else
+                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+            [self showMainView:YES];
+            [self->_mainViewController presentViewController:nc animated:YES completion:nil];
+        } else {
+            if([response.notification.request.content.userInfo objectForKey:@"d"]) {
+                self.mainViewController.bidToOpen = [[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
+                self.mainViewController.eidToOpen = [[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
+                CLS_LOG(@"Opening BID from notification: %i", self.mainViewController.bidToOpen);
+                [UIColor setTheme];
+                [self.mainViewController applyTheme];
+                [self.mainViewController bufferSelected:[[[response.notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue]];
+                [self showMainView:YES];
+            }
+        }
         completionHandler();
     } else {
         [self handleAction:response.actionIdentifier userInfo:response.notification.request.content.userInfo response:nil completionHandler:completionHandler];
@@ -526,14 +517,6 @@ extern NSURL *__logfile;
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self.mainViewController presentViewController:nc animated:NO completion:nil];
     }];
-}
-
--(void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forLocalNotification:(UILocalNotification *)notification withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)(void))completionHandler {
-    [self handleAction:[notification.userInfo objectForKey:@"identifier"] userInfo:[notification.userInfo objectForKey:@"userInfo"] response:[[notification.userInfo objectForKey:@"responseInfo"] objectForKey:UIUserNotificationActionResponseTypedTextKey] completionHandler:completionHandler];
-}
-
-- (void)application:(UIApplication *)application handleActionWithIdentifier:(NSString *)identifier forRemoteNotification:(NSDictionary *)userInfo withResponseInfo:(NSDictionary *)responseInfo completionHandler:(void (^)(void))completionHandler {
-    [self handleAction:identifier userInfo:userInfo response:[responseInfo objectForKey:UIUserNotificationActionResponseTypedTextKey] completionHandler:completionHandler];
 }
 
 -(void)handleAction:(NSString *)identifier userInfo:(NSDictionary *)userInfo response:(NSString *)response completionHandler:(void (^)())completionHandler {
@@ -559,25 +542,23 @@ extern NSURL *__logfile;
             }
         } else {
             CLS_LOG(@"Failed: %@ %@", identifier, result);
-            UILocalNotification *alert = [[UILocalNotification alloc] init];
-            alert.fireDate = [NSDate date];
+            NSString *alertBody = @"";
             if([identifier isEqualToString:@"reply"]) {
                 Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:[[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0] server:[[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue]];
                 if(b)
                     b.draft = response;
-                alert.alertBody = [NSString stringWithFormat:@"Failed to send message to %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
+                alertBody = [NSString stringWithFormat:@"Failed to send message to %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
             } else if([identifier isEqualToString:@"join"]) {
-                alert.alertBody = [NSString stringWithFormat:@"Failed to join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]];
+                alertBody = [NSString stringWithFormat:@"Failed to join %@", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:1]];
             } else if([identifier isEqualToString:@"accept"]) {
-                alert.alertBody = [NSString stringWithFormat:@"Failed to add %@ to accept list", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
+                alertBody = [NSString stringWithFormat:@"Failed to add %@ to accept list", [[[[userInfo objectForKey:@"aps"] objectForKey:@"alert"] objectForKey:@"loc-args"] objectAtIndex:0]];
             }
-            alert.soundName = @"a.caf";
-            alert.category = @"retry";
+            NSDictionary *ui;
             if(response)
-                alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":@{UIUserNotificationActionResponseTypedTextKey:response}, @"d":[userInfo objectForKey:@"d"]};
+                ui = @{@"identifier":identifier, @"userInfo":userInfo, @"responseInfo":@{UIUserNotificationActionResponseTypedTextKey:response}, @"d":[userInfo objectForKey:@"d"]};
             else
-                alert.userInfo = @{@"identifier":identifier, @"userInfo":userInfo, @"d":[userInfo objectForKey:@"d"]};
-            [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                ui = @{@"identifier":identifier, @"userInfo":userInfo, @"d":[userInfo objectForKey:@"d"]};
+            [[NotificationsDataSource sharedInstance] alert:alertBody title:nil category:@"retry" userInfo:ui];
         }
         
         completionHandler();
@@ -887,18 +868,17 @@ extern NSURL *__logfile;
                         CLS_LOG(@"IRCCloud upload failed");
                         [self.mainViewController fileUploadDidFail:[o objectForKey:@"message"]];
                         [[NSNotificationCenter defaultCenter] removeObserver:self->_IRCEventObserver];
-                        UILocalNotification *alert = [[UILocalNotification alloc] init];
-                        alert.fireDate = [NSDate date];
+                        NSString *alertBody;
                         if([[o objectForKey:@"message"] isEqualToString:@"upload_limit_reached"]) {
-                            alert.alertBody = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
+                            alertBody = @"Sorry, you can’t upload more than 100 MB of files.  Delete some uploads and try again.";
                         } else if([[o objectForKey:@"message"] isEqualToString:@"upload_already_exists"]) {
-                            alert.alertBody = @"You’ve already uploaded this file";
+                            alertBody = @"You’ve already uploaded this file";
                         } else if([[o objectForKey:@"message"] isEqualToString:@"banned_content"]) {
-                            alert.alertBody = @"Banned content";
+                            alertBody = @"Banned content";
                         } else {
-                            alert.alertBody = @"Failed to upload file. Please try again shortly.";
+                            alertBody = @"Failed to upload file. Please try again shortly.";
                         }
-                        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                        [[NotificationsDataSource sharedInstance] alert:alertBody title:nil category:nil userInfo:nil];
                         if(self->imageUploadCompletionHandler)
                             self->imageUploadCompletionHandler();
                     }
@@ -922,11 +902,7 @@ extern NSURL *__logfile;
                             else
                                 b.draft = link;
                         }
-                        UILocalNotification *alert = [[UILocalNotification alloc] init];
-                        alert.fireDate = [NSDate date];
-                        alert.alertBody = @"Your image has been uploaded and is ready to send";
-                        alert.userInfo = @{@"d":@[@(b.cid), @(b.bid), @(-1)]};
-                        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+                        [[NotificationsDataSource sharedInstance] alert:@"Your image has been uploaded and is ready to send" title:nil category:nil userInfo:@{@"d":@[@(b.cid), @(b.bid), @(-1)]}];
                     }
                     if(self->imageUploadCompletionHandler)
                         self->imageUploadCompletionHandler();
@@ -939,11 +915,7 @@ extern NSURL *__logfile;
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error {
     if(error) {
         CLS_LOG(@"Download error: %@", error);
-        UILocalNotification *alert = [[UILocalNotification alloc] init];
-        alert.fireDate = [NSDate date];
-        alert.alertBody = @"Unable to share image. Please try again shortly.";
-        alert.soundName = @"a.caf";
-        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
+        [[NotificationsDataSource sharedInstance] alert:@"Unable to share image. Please try again shortly." title:nil category:nil userInfo:nil];
     }
     [session finishTasksAndInvalidate];
 }

@@ -651,19 +651,11 @@
     [self->_downloadingURLs removeObjectForKey:task.originalRequest.URL.absoluteString];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self.tableView reloadData];
-        UILocalNotification *alert = [[UILocalNotification alloc] init];
-        alert.fireDate = [NSDate date];
-        alert.soundName = @"a.caf";
         if(error) {
-            alert.alertTitle = @"Download Failed";
-            alert.alertBody = [NSString stringWithFormat:@"Unable to download logs: %@", error.description];
+            [[NotificationsDataSource sharedInstance] alert:[NSString stringWithFormat:@"Unable to download logs: %@", error.description] title:@"Download Failed" category:nil userInfo:nil];
         } else {
-            alert.alertTitle = @"Download Complete";
-            alert.alertBody = @"Logs are now available";
-            alert.category = @"view_logs";
-            alert.userInfo = @{@"view_logs":@(YES)};
+            [[NotificationsDataSource sharedInstance] alert:@"Logs are now available" title:@"Download Complete" category:@"view_logs" userInfo:@{@"view_logs":@(YES)}];
         }
-        [[UIApplication sharedApplication] scheduleLocalNotification:alert];
         if(self.completionHandler)
             self.completionHandler();
     }];

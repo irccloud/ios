@@ -27,4 +27,5 @@
 -(void)removeNotificationsForBID:(int)bid olderThan:(NSTimeInterval)eid;
 -(void)updateBadgeCount;
 -(id)getNotification:(NSTimeInterval)eid bid:(int)bid;
+-(void)alert:(NSString *)alertBody title:(NSString *)title category:(NSString *)category userInfo:(NSDictionary *)userInfo;
 @end

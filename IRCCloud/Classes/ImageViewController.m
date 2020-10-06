@@ -81,7 +81,7 @@
                  else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_url])
                      return;
                  else
-                     [[UIApplication sharedApplication] openURL:self->_url];
+                     [[UIApplication sharedApplication] openURL:self->_url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
              }]
              ];
 }
@@ -244,7 +244,7 @@
             }];
         }];
     } else {
-        [[UIApplication sharedApplication] openURL:self->_url];
+        [[UIApplication sharedApplication] openURL:self->_url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
     }
 }
 
@@ -273,7 +273,7 @@
 
 - (void)playerItemDidReachEnd:(NSNotification *)notification {
     AVPlayerItem *p = [notification object];
-    [p seekToTime:kCMTimeZero];
+    [p seekToTime:kCMTimeZero completionHandler:nil];
 }
 
 -(void)load {

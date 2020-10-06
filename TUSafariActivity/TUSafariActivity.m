@@ -71,7 +71,12 @@
 
 - (void)performActivity
 {
-	BOOL completed = [[UIApplication sharedApplication] openURL:_URL];
+    BOOL completed = NO;
+    
+    if([[UIApplication sharedApplication] canOpenURL:_URL]) {
+        [[UIApplication sharedApplication] openURL:_URL options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
+        completed = YES;
+    }
 	
 	[self activityDidFinish:completed];
 }

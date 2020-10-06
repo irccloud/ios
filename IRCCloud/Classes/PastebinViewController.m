@@ -75,7 +75,7 @@
                                   else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:url])
                                       return;
                                   else
-                                      [[UIApplication sharedApplication] openURL:url];
+                                      [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
                               }]
                               ];
 }
@@ -99,7 +99,6 @@
     self->_chrome = [[OpenInChromeController alloc] init];
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
-    self.automaticallyAdjustsScrollViewInsets = NO;
 
     self->_lineNumbers = [[UISwitch alloc] initWithFrame:CGRectZero];
     self->_lineNumbers.on = YES;
@@ -111,6 +110,7 @@
     self->_webView.opaque = NO;
     self->_webView.backgroundColor = [UIColor contentBackgroundColor];
     self->_webView.scrollView.scrollsToTop = YES;
+    self->_webView.scrollView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     self->_webView.navigationDelegate = self;
     
     self.view.backgroundColor = [UIColor contentBackgroundColor];

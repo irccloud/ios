@@ -47,7 +47,12 @@ static NSString *encodeByAddingPercentEscapes(NSString *string) {
     NSURL *firefoxURL = [NSURL URLWithString: firefoxURLString];
 
     // Open the URL with Firefox.
-    return [[UIApplication sharedApplication] openURL:firefoxURL];
+    if([[UIApplication sharedApplication] canOpenURL:firefoxURL]) {
+        [[UIApplication sharedApplication] openURL:firefoxURL options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
+        return YES;
+    } else {
+        return NO;
+    }
 }
 
 @end

@@ -59,7 +59,7 @@
         else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_url])
             return;
         else
-            [[UIApplication sharedApplication] openURL:self->_url];
+            [[UIApplication sharedApplication] openURL:self->_url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
     }]
 ];
     

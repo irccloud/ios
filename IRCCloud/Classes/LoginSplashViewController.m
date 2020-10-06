@@ -588,7 +588,7 @@
 
 -(IBAction)TOSHintPressed:(id)sender {
 #ifndef EXTENSION
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.irccloud.com/terms"]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.irccloud.com/terms"] options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
 #endif
 }
 
@@ -683,8 +683,11 @@
 }
 
 -(IBAction)enterpriseLearnMorePressed:(id)sender {
-    if(![[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"irccloud://"]])
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"itms://itunes.apple.com/app/irccloud/id672699103"]];
+    if([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:@"irccloud://"]]) {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"irccloud://"] options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
+    } else {
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"itms://itunes.apple.com/app/irccloud/id672699103"] options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
+    }
 }
 
 -(IBAction)hideKeyboard:(id)sender {

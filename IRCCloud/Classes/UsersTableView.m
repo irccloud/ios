@@ -303,7 +303,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
-    self.automaticallyAdjustsScrollViewInsets = NO;
     self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     self.tableView.insetsLayoutMarginsFromSafeArea = NO;
     self.tableView.insetsContentViewsToSafeArea = NO;
@@ -352,9 +351,9 @@
     [super viewDidAppear:animated];
     if([FIROptions defaultOptions]) {
         if(animated && self.parentViewController)
-            [FIRAnalytics setScreenName:NSStringFromClass(self.parentViewController.class) screenClass:nil];
+            [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.parentViewController.class)}];
         else
-            [FIRAnalytics setScreenName:NSStringFromClass(self.class) screenClass:nil];
+            [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
     }
 }
 

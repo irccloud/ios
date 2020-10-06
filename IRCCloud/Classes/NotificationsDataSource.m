@@ -75,10 +75,22 @@
 #endif
 }
 
+-(void)alert:(NSString *)alertBody title:(NSString *)title category:(NSString *)category userInfo:(NSDictionary *)userInfo {
+    UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
+    content.title = title?title:@"IRCCloud";
+    content.body = alertBody;
+    content.userInfo = userInfo;
+    content.categoryIdentifier = category;
+    content.sound = [UNNotificationSound soundNamed:@"a.caf"];
+    
+    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:[@([NSDate date].timeIntervalSince1970) stringValue] content:content trigger:nil];
+    [[UNUserNotificationCenter currentNotificationCenter] addNotificationRequest:request withCompletionHandler:nil];
+}
+
+
 -(void)removeNotificationsForBID:(int)bid olderThan:(NSTimeInterval)eid {
 #ifndef EXTENSION
     @synchronized(self->_notifications) {
-        NSArray *ns = [NSArray arrayWithArray:[self->_notifications objectForKey:@(bid)]];
         if(![[self->_notifications objectForKey:@(bid)] count])
             [self->_notifications removeObjectForKey:@(bid)];
     }

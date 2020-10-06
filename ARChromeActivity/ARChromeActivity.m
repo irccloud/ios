@@ -104,7 +104,7 @@ static NSString *encodeByAddingPercentEscapes(NSString *input) {
             NSString *sourceName = encodeByAddingPercentEscapes(self.callbackSource);
             
             NSURL *activityURL = [NSURL URLWithString:[NSString stringWithFormat:@"googlechrome-x-callback://x-callback-url/open/?url=%@&x-success=%@&x-source=%@", openingURL, callbackURL, sourceName]];
-            [[UIApplication sharedApplication] openURL:activityURL];
+            [[UIApplication sharedApplication] openURL:activityURL options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
             success = YES;
         } else {
             
@@ -124,7 +124,7 @@ static NSString *encodeByAddingPercentEscapes(NSString *input) {
                 NSString *chromeURLString = [chromeScheme stringByAppendingString:urlNoScheme];
                 NSURL *chromeURL = [NSURL URLWithString:chromeURLString];
                 
-                [[UIApplication sharedApplication] openURL:chromeURL];
+                [[UIApplication sharedApplication] openURL:chromeURL options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
                 success = YES;
             }
         }

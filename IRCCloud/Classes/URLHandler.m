@@ -595,7 +595,7 @@
             [mainViewController launchURL:url];
             return;
         } else {
-            [[UIApplication sharedApplication] openURL:url];
+            [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
             return;
         }
     }
@@ -648,7 +648,9 @@
     } else if([url.scheme hasPrefix:@"irc"]) {
         [mainViewController launchURL:[NSURL URLWithString:[url.absoluteString stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
     } else if([url.scheme isEqualToString:@"spotify"]) {
-        if(![[UIApplication sharedApplication] openURL:url])
+        if([[UIApplication sharedApplication] canOpenURL:url])
+            [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
+        else
             [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://open.spotify.com/%@",[[url.absoluteString substringFromIndex:8] stringByReplacingOccurrencesOfString:@":" withString:@"/"]]]];
     } else if([url.scheme isEqualToString:@"facetime"]) {
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"facetime-prompt%@",[url.absoluteString substringFromIndex:8]]]];
@@ -668,7 +670,7 @@
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
     } else if([url.host.lowercaseString isEqualToString:@"maps.apple.com"]) {
-        [[UIApplication sharedApplication] openURL:url];
+        [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
     } else {
         [self openWebpage:url];
     }
@@ -718,7 +720,7 @@
             [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
         }];
     } else {
-        [[UIApplication sharedApplication] openURL:url];
+        [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
     }
 #endif
 }
