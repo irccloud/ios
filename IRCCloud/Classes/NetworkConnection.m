@@ -2406,7 +2406,9 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [self->_events serialize];
     [self->_notifications serialize];
 #ifndef EXTENSION
+    [__serializeLock unlock];
     [self _serializeUserInfo];
+    [__serializeLock lock];
 #endif
     [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
 #ifdef ENTERPRISE
@@ -2468,7 +2470,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
         if (error != nil) {
             NSLog(@"Error fetching remote instance ID: %@", error);
-        } else {
+        } else if([[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]) {
             NSLog(@"Remote instance ID token: %@", result.token);
             [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] fcm:result.token session:session handler:^(IRCCloudJSONObject *result) {
                 CLS_LOG(@"Unregister result: %@", result);
@@ -2479,6 +2481,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             if(error)
                 CLS_LOG(@"Unable to delete Firebase ID: %@", error);
         }];
+        IRCCLOUD_HOST = @"www.irccloud.com";
         [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
     }];
 #endif
