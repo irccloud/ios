@@ -49,6 +49,7 @@ void FirebaseLog(NSString *format, ...) {
         }
         [fileHandle seekToEndOfFile];
         [fileHandle writeData:[s dataUsingEncoding:NSUTF8StringEncoding]];
+        [fileHandle writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
         [fileHandle closeFile];
     }
 
