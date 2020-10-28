@@ -1968,9 +1968,7 @@ extern BOOL __compact;
                 @"shock":@"😱",
                 @"atom":@"⚛️",
                 @"<3":@"❤️",
-                @"&lt;3":@"❤️",
                 @"</3":@"💔",
-                @"&lt;&#x2f;3":@"💔",
                 @"simple_smile":@"🙂",
                 @":)":@"🙂",
                 @":-)":@"🙂",
@@ -1983,8 +1981,6 @@ extern BOOL __compact;
                 @"(":@"😞",
                 @":'(":@"😢",
                 @"'(":@"😢",
-                @":&#x27;(":@"😢",
-                @"&#x27;(":@"😢",
                 @":_(":@"😭",
                 @"_(":@"😭",
                 @"loudly_crying_face":@"😭",
@@ -2053,7 +2049,8 @@ extern BOOL __compact;
                 @"trash":@"🗑️",
                 @"garbage":@"🗑️",
                 @"bin":@"🗑️",
-                @"wastepaper_basket":@"🗑️",            };
+                @"wastepaper_basket":@"🗑️"
+            };
         
         static NSRegularExpression *_pattern;
         if(!_pattern) {
