@@ -166,6 +166,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
     NSMutableArray *_pendingEdits;
     id _httpMetric;
     NSURLSession *_urlSession;
+    NSTimer *_serializeTimer;
 }
 @property (readonly) NSDictionary *parserMap;
 @property (readonly) kIRCCloudState state;

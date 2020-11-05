@@ -25,6 +25,7 @@
 @import FirebasePerformance;
 
 NSURL *__logfile;
+NSOperationQueue *__logQueue;
 
 void FirebaseLog(NSString *format, ...) {
     if (!format) {
@@ -41,19 +42,21 @@ void FirebaseLog(NSString *format, ...) {
     NSString *s = [[NSString alloc] initWithFormat:format arguments:args];
     va_end(args);
 
-    if(__logfile) {
-        NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:__logfile.path];
-        if(!fileHandle) {
-            [[NSFileManager defaultManager] createFileAtPath:__logfile.path contents:nil attributes:nil];
-            fileHandle = [NSFileHandle fileHandleForWritingAtPath:__logfile.path];
+    [__logQueue addOperationWithBlock:^{
+        if(__logfile) {
+            NSFileHandle *fileHandle = [NSFileHandle fileHandleForWritingAtPath:__logfile.path];
+            if(!fileHandle) {
+                [[NSFileManager defaultManager] createFileAtPath:__logfile.path contents:nil attributes:nil];
+                fileHandle = [NSFileHandle fileHandleForWritingAtPath:__logfile.path];
+            }
+            [fileHandle seekToEndOfFile];
+            [fileHandle writeData:[s dataUsingEncoding:NSUTF8StringEncoding]];
+            [fileHandle writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
+            [fileHandle closeFile];
         }
-        [fileHandle seekToEndOfFile];
-        [fileHandle writeData:[s dataUsingEncoding:NSUTF8StringEncoding]];
-        [fileHandle writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
-        [fileHandle closeFile];
-    }
 
-    NSLog(@"%@", s);
+        NSLog(@"%@", s);
+    }];
 }
 
 NSString *_userAgent = nil;
@@ -175,13 +178,13 @@ volatile BOOL __socketPaused = NO;
             return;
         }
         CLS_LOG(@"Backlog download completed");
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            if(!self->_cancelled) {
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+        if(!self->_cancelled) {
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudBacklogCompletedNotification object:self];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 if(self->_completionHandler)
                     self->_completionHandler(YES);
-            }
-        }];
+            }];
+        }
     }
     self->_running = NO;
 }
@@ -295,6 +298,8 @@ volatile BOOL __socketPaused = NO;
                                                         }}];
     __serializeLock = [[NSLock alloc] init];
     __userInfoLock = [[NSLock alloc] init];
+    __logQueue = [[NSOperationQueue alloc] init];
+    [__logQueue setMaxConcurrentOperationCount:1];
     self->_queue = [[NSOperationQueue alloc] init];
     self->_servers = [ServersDataSource sharedInstance];
     self->_buffers = [BuffersDataSource sharedInstance];
@@ -2373,7 +2378,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     if([self->_servers count]) {
         [self performSelectorOnMainThread:@selector(_scheduleTimedoutBuffers) withObject:nil waitUntilDone:YES];
     }
-    [self performSelectorInBackground:@selector(serialize) withObject:nil];
+    [self _serializeSoon];
 }
 
 -(void)_serializeUserInfo {
@@ -2394,6 +2399,15 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [__userInfoLock unlock];
     [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
     [__serializeLock unlock];
+}
+
+-(void)_serializeSoon {
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        if(self->_serializeTimer)
+            [self->_serializeTimer invalidate];
+        
+        self->_serializeTimer = [NSTimer timerWithTimeInterval:0.1 target:self selector:@selector(serialize) userInfo:nil repeats:NO];
+    }];
 }
 
 -(void)serialize {
@@ -2421,6 +2435,8 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] forKey:@"fontSize"];
     [d synchronize];
     [NetworkConnection sync];
+    [_serializeTimer invalidate];
+    _serializeTimer = nil;
     [__serializeLock unlock];
 }
 
@@ -2446,24 +2462,26 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)_scheduleTimedoutBuffers {
-    for(Buffer *buffer in [self->_buffers getBuffers]) {
-        if(buffer.timeout > 0) {
-            if([buffer.type isEqualToString:@"channel"] && buffer.timeout == 0) {
-                if(![self->_channels channelForBuffer:buffer.bid])
-                    continue;
+    [self->_queue addOperationWithBlock:^{
+        for(Buffer *buffer in [self->_buffers getBuffers]) {
+            if(buffer.timeout > 0) {
+                if([buffer.type isEqualToString:@"channel"] && buffer.timeout == 0) {
+                    if(![self->_channels channelForBuffer:buffer.bid])
+                        continue;
+                }
+                CLS_LOG(@"Requesting backlog for buffer: %@", buffer.name);
+                [self requestBacklogForBuffer:buffer.bid server:buffer.cid completion:nil];
             }
-            CLS_LOG(@"Requesting backlog for buffer: %@", buffer.name);
-            [self requestBacklogForBuffer:buffer.bid server:buffer.cid completion:nil];
         }
-    }
-    if(self->_oobQueue.count > 0) {
-        [self->_queue addOperationWithBlock:^{
-            if(self->_oobQueue.count > 0 && ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid > 0) {
-                CLS_LOG(@"Starting fetcher for timed-out bid%i", ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid);
-                [(OOBFetcher *)[self->_oobQueue objectAtIndex:0] start];
-            }
-        }];
-    }
+        if(self->_oobQueue.count > 0) {
+            [self->_queue addOperationWithBlock:^{
+                if(self->_oobQueue.count > 0 && ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid > 0) {
+                    CLS_LOG(@"Starting fetcher for timed-out bid%i", ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid);
+                    [(OOBFetcher *)[self->_oobQueue objectAtIndex:0] start];
+                }
+            }];
+        }
+    }];
 }
 
 -(void)_logout:(NSString *)session {

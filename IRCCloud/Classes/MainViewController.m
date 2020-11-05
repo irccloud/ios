@@ -1732,6 +1732,8 @@ NSArray *_sortedChannels;
 }
 
 -(void)backlogCompleted:(NSNotification *)notification {
+    if(self->_buffer && [notification.object bid] != -1 && [notification.object bid] != self->_buffer.bid)
+        return;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         if([notification.object bid] == -1) {
           [self _themeChanged];
