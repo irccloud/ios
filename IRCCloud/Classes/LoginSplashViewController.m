@@ -721,7 +721,7 @@
     
     [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *config) {
 #ifndef ENTERPRISE
-        IRCCLOUD_HOST = @"www.irccloud.com";
+        IRCCLOUD_HOST = @"api.irccloud.com";
 #endif
         if(!config) {
             dispatch_async(dispatch_get_main_queue(), ^{

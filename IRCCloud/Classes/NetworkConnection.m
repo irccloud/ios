@@ -2500,7 +2500,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             if(error)
                 CLS_LOG(@"Unable to delete Firebase ID: %@", error);
         }];
-        IRCCLOUD_HOST = @"www.irccloud.com";
+        IRCCLOUD_HOST = @"api.irccloud.com";
         [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
     }];
 #endif
