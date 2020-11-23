@@ -1938,9 +1938,9 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 
                 [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
                 self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
-                WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
+                WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", [result objectForKey:@"socket_host"]] protocols:nil
                                                                                  tlsSettings:[@{
-                                                                                 (NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
+                                                                                 (NSString *)kCFStreamSSLPeerName: [result objectForKey:@"socket_host"],
                                                                                  (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1)
                                                                                                 } mutableCopy]
                                                                                      headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
