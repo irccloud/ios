@@ -250,8 +250,6 @@
     [[NetworkConnection sharedInstance] login:self->_accessLink handler:^(IRCCloudJSONObject *result) {
         self->_accessLink = nil;
         if([[result objectForKey:@"success"] intValue] == 1) {
-            if([result objectForKey:@"websocket_host"])
-                IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
             if([result objectForKey:@"websocket_path"])
                 IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
             [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
@@ -721,7 +719,7 @@
     
     [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *config) {
 #ifndef ENTERPRISE
-        IRCCLOUD_HOST = @"api.irccloud.com";
+        IRCCLOUD_HOST = @"www.irccloud.com";
 #endif
         if(!config) {
             dispatch_async(dispatch_get_main_queue(), ^{

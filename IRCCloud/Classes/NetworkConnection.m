@@ -73,7 +73,7 @@ NSString *IRCCLOUD_HOST = @BRAND_HOST
 #elif defined(ENTERPRISE)
 NSString *IRCCLOUD_HOST = @"";
 #else
-NSString *IRCCLOUD_HOST = @"api.irccloud.com";
+NSString *IRCCLOUD_HOST = @"www.irccloud.com";
 #endif
 NSString *IRCCLOUD_PATH = @"/";
 
@@ -1400,10 +1400,21 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if(![[self->_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
         self->_globalMsg = [NSString stringWithFormat:@"Some features, such as push notifications, may not work as expected. Please download the standard IRCCloud app from the App Store: %@", [self->_config objectForKey:@"ios_app"]];
 #endif
-    self.fileURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"file_uri_template"] error:nil];
-    self.pasteURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"pastebin_uri_template"] error:nil];
-    self.avatarURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"avatar_uri_template"] error:nil];
-    self.avatarRedirectURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"avatar_redirect_uri_template"] error:nil];
+    
+    if(self->_config) {
+        self.fileURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"file_uri_template"] error:nil];
+        self.pasteURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"pastebin_uri_template"] error:nil];
+        self.avatarURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"avatar_uri_template"] error:nil];
+        self.avatarRedirectURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"avatar_redirect_uri_template"] error:nil];
+        
+        IRCCLOUD_HOST = [self->_config objectForKey:@"api_host"];
+        if([IRCCLOUD_HOST hasPrefix:@"http://"])
+            IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:7];
+        if([IRCCLOUD_HOST hasPrefix:@"https://"])
+            IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
+        if([IRCCLOUD_HOST hasSuffix:@"/"])
+            IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
+    }
 }
 
 -(void)propertiesForFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler {
@@ -1876,64 +1887,72 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             self->_streamId = nil;
             self->_highestEID = 0;
         }
-        NSString *url = [NSString stringWithFormat:@"wss://%@%@",IRCCLOUD_HOST,IRCCLOUD_PATH];
-        if(self->_highestEID > 0 && _streamId.length) {
-            url = [url stringByAppendingFormat:@"?since_id=%.0lf&stream_id=%@", _highestEID, _streamId];
-        }
-        if(notifier) {
-            if([url rangeOfString:@"?"].location == NSNotFound)
-                url = [url stringByAppendingFormat:@"?notifier=1"];
-            else
-                url = [url stringByAppendingFormat:@"&notifier=1"];
-        }
-        if([url rangeOfString:@"?"].location == NSNotFound)
-            url = [url stringByAppendingFormat:@"?exclude_archives=1"];
-        else
-            url = [url stringByAppendingFormat:@"&exclude_archives=1"];
+        
+        [self requestConfigurationWithHandler:^(IRCCloudJSONObject *result) {
+            if(result) {
+                NSString *url = [NSString stringWithFormat:@"wss://%@%@",[result objectForKey:@"socket_host"],IRCCLOUD_PATH];
+                if(self->_highestEID > 0 && self->_streamId.length) {
+                    url = [url stringByAppendingFormat:@"?since_id=%.0lf&stream_id=%@", self->_highestEID, self->_streamId];
+                }
+                if(notifier) {
+                    if([url rangeOfString:@"?"].location == NSNotFound)
+                        url = [url stringByAppendingFormat:@"?notifier=1"];
+                    else
+                        url = [url stringByAppendingFormat:@"&notifier=1"];
+                }
+                if([url rangeOfString:@"?"].location == NSNotFound)
+                    url = [url stringByAppendingFormat:@"?exclude_archives=1"];
+                else
+                    url = [url stringByAppendingFormat:@"&exclude_archives=1"];
 
-        SCNetworkReachabilityFlags flags;
-        BOOL success = SCNetworkReachabilityGetFlags(self->_reachability, &flags);
-        if(success && flags & kSCNetworkReachabilityFlagsIsWWAN) {
-            CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
-            int limit = 50;
-            if([telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyGPRS] || [telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyEdge]) {
-                limit = 25;
-            } else if ([telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyLTE]) {
-                limit = 100;
+                SCNetworkReachabilityFlags flags;
+                BOOL success = SCNetworkReachabilityGetFlags(self->_reachability, &flags);
+                if(success && flags & kSCNetworkReachabilityFlagsIsWWAN) {
+                    CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
+                    int limit = 50;
+                    if([telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyGPRS] || [telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyEdge]) {
+                        limit = 25;
+                    } else if ([telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyLTE]) {
+                        limit = 100;
+                    }
+                    if([url rangeOfString:@"?"].location == NSNotFound)
+                        url = [url stringByAppendingFormat:@"?limit=%i", limit];
+                    else
+                        url = [url stringByAppendingFormat:@"&limit=%i", limit];
+                }
+                
+                CLS_LOG(@"Connecting: %@", url);
+                self->_notifier = notifier;
+                self->_state = kIRCCloudStateConnecting;
+                self->_idleInterval = 20;
+                self->_accrued = 0;
+                self->_currentCount = 0;
+                self->_totalCount = 0;
+                self->_reconnectTimestamp = -1;
+                self->_resuming = NO;
+                self->_ready = NO;
+                self->_firstEID = 0;
+                __socketPaused = NO;
+                self->_lastReqId = 1;
+                [self->_resultHandlers removeAllObjects];
+                
+                [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+                self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
+                WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
+                                                                                 tlsSettings:[@{
+                                                                                 (NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
+                                                                                 (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1)
+                                                                                                } mutableCopy]
+                                                                                     headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
+                                                                           verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
+                self->_socket = [WebSocket webSocketWithConfig:config delegate:self];
+                [self.httpMetric start];
+                [self->_socket open];
+            } else {
+                CLS_LOG(@"Unable to load configuration");
+                [self fail];
             }
-            if([url rangeOfString:@"?"].location == NSNotFound)
-                url = [url stringByAppendingFormat:@"?limit=%i", limit];
-            else
-                url = [url stringByAppendingFormat:@"&limit=%i", limit];
-        }
-        
-        CLS_LOG(@"Connecting: %@", url);
-        self->_notifier = notifier;
-        self->_state = kIRCCloudStateConnecting;
-        self->_idleInterval = 20;
-        self->_accrued = 0;
-        self->_currentCount = 0;
-        self->_totalCount = 0;
-        self->_reconnectTimestamp = -1;
-        self->_resuming = NO;
-        self->_ready = NO;
-        self->_firstEID = 0;
-        __socketPaused = NO;
-        self->_lastReqId = 1;
-        [self->_resultHandlers removeAllObjects];
-        
-        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-        self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
-        WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", IRCCLOUD_HOST] protocols:nil
-                                                                         tlsSettings:[@{
-                                                                         (NSString *)kCFStreamSSLPeerName: IRCCLOUD_HOST,
-                                                                         (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1)
-                                                                                        } mutableCopy]
-                                                                             headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
-                                                                   verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
-        self->_socket = [WebSocket webSocketWithConfig:config delegate:self];
-        [self.httpMetric start];
-        [self->_socket open];
+        }];
     }
 }
 
@@ -1993,7 +2012,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         [self.httpMetric stop];
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _postConnectivityChange];
-            [self requestConfigurationWithHandler:nil];
         }];
     } else {
         CLS_LOG(@"Socket connected, but it wasn't the active socket");
@@ -2191,8 +2209,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                     if([[object objectForKey:@"_reqid"] intValue] == 0)
                         [self logout];
                 } else if([[object objectForKey:@"message"] isEqualToString:@"set_shard"]) {
-                    if([object objectForKey:@"websocket_host"])
-                        IRCCLOUD_HOST = [object objectForKey:@"websocket_host"];
                     if([object objectForKey:@"websocket_path"])
                         IRCCLOUD_PATH = [object objectForKey:@"websocket_path"];
                     [self setSession:[object objectForKey:@"cookie"]];
@@ -2500,7 +2516,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             if(error)
                 CLS_LOG(@"Unable to delete Firebase ID: %@", error);
         }];
-        IRCCLOUD_HOST = @"api.irccloud.com";
+        IRCCLOUD_HOST = @"www.irccloud.com";
         [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
     }];
 #endif
