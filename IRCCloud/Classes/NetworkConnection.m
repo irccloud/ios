@@ -1891,6 +1891,22 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             self->_highestEID = 0;
         }
         
+        self->_notifier = notifier;
+        self->_state = kIRCCloudStateConnecting;
+        self->_idleInterval = 20;
+        self->_accrued = 0;
+        self->_currentCount = 0;
+        self->_totalCount = 0;
+        self->_reconnectTimestamp = -1;
+        self->_resuming = NO;
+        self->_ready = NO;
+        self->_firstEID = 0;
+        __socketPaused = NO;
+        self->_lastReqId = 1;
+        [self->_resultHandlers removeAllObjects];
+        
+        [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
+        
         [self requestConfigurationWithHandler:^(IRCCloudJSONObject *result) {
             if(result) {
                 NSString *url = [NSString stringWithFormat:@"wss://%@%@",[result objectForKey:@"socket_host"],IRCCLOUD_PATH];
@@ -1925,21 +1941,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 }
                 
                 CLS_LOG(@"Connecting: %@", url);
-                self->_notifier = notifier;
-                self->_state = kIRCCloudStateConnecting;
-                self->_idleInterval = 20;
-                self->_accrued = 0;
-                self->_currentCount = 0;
-                self->_totalCount = 0;
-                self->_reconnectTimestamp = -1;
-                self->_resuming = NO;
-                self->_ready = NO;
-                self->_firstEID = 0;
-                __socketPaused = NO;
-                self->_lastReqId = 1;
-                [self->_resultHandlers removeAllObjects];
-                
-                [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
                 self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
                 WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", [result objectForKey:@"socket_host"]] protocols:nil
                                                                                  tlsSettings:[@{
