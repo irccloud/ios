@@ -1414,6 +1414,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
         if([IRCCLOUD_HOST hasSuffix:@"/"])
             IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
+        
+        [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     }
 }
 
@@ -2212,7 +2215,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                     if([object objectForKey:@"websocket_path"])
                         IRCCLOUD_PATH = [object objectForKey:@"websocket_path"];
                     [self setSession:[object objectForKey:@"cookie"]];
-                    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
                     [[NSUserDefaults standardUserDefaults] synchronize];
 #ifdef ENTERPRISE
