@@ -311,6 +311,7 @@
 }
 
 -(void)_loadGiphy:(NSString *)gifID result:(mediaURLResult)callback original_url:(NSURL *)original_url {
+    //Request metadata using the Giphy public beta API key from https://giphy.api-docs.io/1.0/welcome/access-and-api-keys
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://api.giphy.com/v1/gifs/%@?api_key=dc6zaTOxFJmzC", gifID]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     
