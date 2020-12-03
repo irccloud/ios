@@ -2310,6 +2310,7 @@ extern BOOL __compact;
         [mentions setObject:new_mention forKey:key];
     }
 }
+
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset mentionData:(NSDictionary *)mentionData {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, mono = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
@@ -2346,8 +2347,14 @@ extern BOOL __compact;
         for(NSUInteger i = 0; i < text.length; i++) {
             NSRange r = [text rangeOfComposedCharacterSequenceAtIndex:i];
             if(r.length > 1) {
-                [self _offsetMentions:mentions start:i offset:-1];
-                i++;
+                //iOS uses UTF-16 internally, if the combined character length differs between the two encodings then we need to adjust our offsets by 1 byte
+                NSString *c = [text substringWithRange:r];
+                NSData *utf8 = [c dataUsingEncoding:NSUTF8StringEncoding];
+                NSData *utf16 = [c dataUsingEncoding:NSUTF16StringEncoding];
+                if(utf8.length != utf16.length) {
+                    [self _offsetMentions:mentions start:i offset:-1];
+                    i++;
+                }
             }
         }
         
