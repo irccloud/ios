@@ -729,6 +729,9 @@
                 [UIView commitAnimations];
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Communication Error" message:@"Unable to fetch configuration. Please try again shortly." preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    [[NetworkConnection sharedInstance] sendFeedbackReport:self];
+                }]];
                 [self presentViewController:alert animated:YES completion:nil];
             });
             return;
@@ -785,6 +788,7 @@
                         self->forgotPasswordSignup.alpha = 0;
                         [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
                     } else {
+                        CLS_LOG(@"Failure: %@", result);
                         [UIView beginAnimations:nil context:nil];
                         self->loginView.alpha = 1;
                         self->loadingView.alpha = 0;
@@ -813,6 +817,9 @@
                             message = @"Your IP address has been blacklisted.";
                         UIAlertController *alert = [UIAlertController alertControllerWithTitle:self->name.alpha?@"Sign Up Failed":@"Login Failed" message:message preferredStyle:UIAlertControllerStyleAlert];
                         [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                            [[NetworkConnection sharedInstance] sendFeedbackReport:self];
+                        }]];
                         [self presentViewController:alert animated:YES completion:nil];
 #ifndef ENTERPRISE
                         if(nameAlpha) {
@@ -851,6 +858,7 @@
                 else
                     [[NetworkConnection sharedInstance] login:user password:pass token:[result objectForKey:@"token"] handler:handler];
             } else {
+                CLS_LOG(@"Failure: %@", result);
                 [UIView beginAnimations:nil context:nil];
                 self->loginView.alpha = 1;
                 self->loadingView.alpha = 0;
@@ -858,6 +866,9 @@
                 NSString *message = @"Unable to communicate with the IRCCloud servers.  Please try again shortly.";
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:message preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
+                    [[NetworkConnection sharedInstance] sendFeedbackReport:self];
+                }]];
                 [self presentViewController:alert animated:YES completion:nil];
             }
         }];
@@ -887,4 +898,7 @@
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskPortrait:UIInterfaceOrientationMaskAll;
 }
 
+-(void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 @end

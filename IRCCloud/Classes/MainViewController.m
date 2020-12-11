@@ -4976,63 +4976,7 @@ NSArray *_sortedChannels;
             [[NetworkConnection sharedInstance] whois:self->_buffer.name server:ircserver.length?ircserver:nil cid:self->_buffer.cid handler:nil];
         }
     } else if([action isEqualToString:@"Send Feedback"]) {
-        CLS_LOG(@"Feedback Requested");
-        NSString *version = [NSString stringWithFormat:@"%@ (%@)",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]];
-        NSMutableString *report = [[NSMutableString alloc] initWithFormat:
-@"Briefly describe the issue below:\n\
-\n\
-\n\
-\n\
-==========\n\
-UID: %@\n\
-App Version: %@\n\
-OS Version: %@\n\
-Device type: %@\n\
-Network type: %@\n",
-                                   [[NetworkConnection sharedInstance].userInfo objectForKey:@"id"],version,[UIDevice currentDevice].systemVersion,[UIDevice currentDevice].model,[NetworkConnection sharedInstance].isWifi ? @"Wi-Fi" : @"Mobile"];
-        [report appendString:@"==========\nPrefs:\n"];
-        [report appendFormat:@"%@\n", [[NetworkConnection sharedInstance] prefs]];
-        [report appendString:@"==========\nNSUserDefaults:\n"];
-        NSMutableDictionary *d = [NSUserDefaults standardUserDefaults].dictionaryRepresentation.mutableCopy;
-        [d removeObjectForKey:@"logs_cache"];
-        [d removeObjectForKey:@"AppleITunesStoreItemKinds"];
-        [report appendFormat:@"%@\n", d];
-
-#ifdef ENTERPRISE
-        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
-#else
-        NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.share"];
-#endif
-        if(sharedcontainer) {
-            fflush(stderr);
-            NSURL *logfile = [[[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0] URLByAppendingPathComponent:@"log.txt"];
-            
-            [report appendString:@"==========\nConsole log:\n"];
-            [report appendFormat:@"%@\n", [NSString stringWithContentsOfURL:logfile encoding:NSUTF8StringEncoding error:nil]];
-        }
-        
-        if(report.length) {
-            MFMailComposeViewController *mfmc = [MFMailComposeViewController canSendMail] ? [[MFMailComposeViewController alloc] init] : nil;
-            if(mfmc) {
-                mfmc.mailComposeDelegate = self;
-                [mfmc setToRecipients:@[@"team@irccloud.com"]];
-                [mfmc setSubject:@"IRCCloud for iOS"];
-                [mfmc setMessageBody:report isHTML:NO];
-                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
-                else
-                    mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                [self presentViewController:mfmc animated:YES completion:nil];
-            } else {
-                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Unavailable" message:@"Email is not configured on this device.  Please copy the report to the clipboard and send it to team@irccloud.com." preferredStyle:UIAlertControllerStyleAlert];
-                [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
-                [alert addAction:[UIAlertAction actionWithTitle:@"Copy to Clipboard" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
-                    UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                    [pb setValue:report forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
-                }]];
-                [self presentViewController:alert animated:YES completion:nil];
-            }
-        }
+        [[NetworkConnection sharedInstance] sendFeedbackReport:self];
     }
     
     if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)

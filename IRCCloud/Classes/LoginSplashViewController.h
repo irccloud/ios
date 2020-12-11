@@ -16,8 +16,9 @@
 
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MFMailComposeViewController.h>
 
-@interface LoginSplashViewController : UIViewController<UITextFieldDelegate, UIGestureRecognizerDelegate> {
+@interface LoginSplashViewController : UIViewController<UITextFieldDelegate, UIGestureRecognizerDelegate, MFMailComposeViewControllerDelegate> {
     IBOutlet UIImageView *logo;
     IBOutlet UILabel *IRC;
     IBOutlet UILabel *Cloud;
