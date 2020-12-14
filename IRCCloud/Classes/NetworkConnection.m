@@ -76,7 +76,7 @@ NSString *IRCCLOUD_HOST = @BRAND_HOST
 #elif defined(ENTERPRISE)
 NSString *IRCCLOUD_HOST = @"";
 #else
-NSString *IRCCLOUD_HOST = @"www.irccloud.com";
+NSString *IRCCLOUD_HOST = @"api.irccloud.com";
 #endif
 NSString *IRCCLOUD_PATH = @"/";
 
@@ -2525,7 +2525,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             if(error)
                 CLS_LOG(@"Unable to delete Firebase ID: %@", error);
         }];
-        IRCCLOUD_HOST = @"www.irccloud.com";
+        IRCCLOUD_HOST = @"api.irccloud.com";
         [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
     }];
 #endif

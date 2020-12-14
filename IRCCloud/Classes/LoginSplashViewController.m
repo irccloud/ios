@@ -717,10 +717,10 @@
     NSString *realname = [name.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
     CGFloat nameAlpha = name.alpha;
     
-    [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *config) {
 #ifndef ENTERPRISE
-        IRCCLOUD_HOST = @"www.irccloud.com";
+    IRCCLOUD_HOST = @"api.irccloud.com";
 #endif
+    [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *config) {
         if(!config) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 [UIView beginAnimations:nil context:nil];
