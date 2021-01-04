@@ -1472,7 +1472,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         for (NSString *key in args.allKeys) {
             if(body.length)
                 [body appendString:@"&"];
-            [body appendFormat:@"%@=%@",key,[[args objectForKey:key] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"\"#%<>[\\]^`{|}+"].invertedSet]];
+            [body appendFormat:@"%@=%@",key,[[args objectForKey:key] stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet characterSetWithCharactersInString:@"\"#%<>[\\]^`{|}+&"].invertedSet]];
         }
         
         if(self.session.length > 1 && ![args objectForKey:@"session"])
