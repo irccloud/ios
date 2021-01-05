@@ -579,26 +579,6 @@
 		22C8CD721B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
 		22C8CD731B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
 		22C8CD741B01289900F637D2 /* libc++.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8CD701B01289900F637D2 /* libc++.dylib */; };
-		22C8CDF61B01372100F637D2 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEC1B01372100F637D2 /* ioapi.c */; };
-		22C8CDF71B01372100F637D2 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEC1B01372100F637D2 /* ioapi.c */; };
-		22C8CDF81B01372100F637D2 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEC1B01372100F637D2 /* ioapi.c */; };
-		22C8CDF91B01372100F637D2 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEC1B01372100F637D2 /* ioapi.c */; };
-		22C8CDFA1B01372100F637D2 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEE1B01372100F637D2 /* mztools.c */; };
-		22C8CDFB1B01372100F637D2 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEE1B01372100F637D2 /* mztools.c */; };
-		22C8CDFC1B01372100F637D2 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEE1B01372100F637D2 /* mztools.c */; };
-		22C8CDFD1B01372100F637D2 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEE1B01372100F637D2 /* mztools.c */; };
-		22C8CDFE1B01372100F637D2 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF01B01372100F637D2 /* unzip.c */; };
-		22C8CDFF1B01372100F637D2 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF01B01372100F637D2 /* unzip.c */; };
-		22C8CE001B01372100F637D2 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF01B01372100F637D2 /* unzip.c */; };
-		22C8CE011B01372100F637D2 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF01B01372100F637D2 /* unzip.c */; };
-		22C8CE021B01372100F637D2 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF21B01372100F637D2 /* zip.c */; };
-		22C8CE031B01372100F637D2 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF21B01372100F637D2 /* zip.c */; };
-		22C8CE041B01372100F637D2 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF21B01372100F637D2 /* zip.c */; };
-		22C8CE051B01372100F637D2 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF21B01372100F637D2 /* zip.c */; };
-		22C8CE061B01372100F637D2 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF51B01372100F637D2 /* SSZipArchive.m */; };
-		22C8CE071B01372100F637D2 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF51B01372100F637D2 /* SSZipArchive.m */; };
-		22C8CE081B01372100F637D2 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF51B01372100F637D2 /* SSZipArchive.m */; };
-		22C8CE091B01372100F637D2 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF51B01372100F637D2 /* SSZipArchive.m */; };
 		22C8DCF11A80154200199371 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1A5703471A74145400D58225 /* AdSupport.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C8DCF31A801A4500199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		22C8DCF41A801A6300199371 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22C8DCF21A801A4500199371 /* CloudKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
@@ -672,16 +652,13 @@
 		22D977DC215BC910005C2713 /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FE1E8945D700ADAA22 /* TSKReportsRateLimiter.m */; };
 		22D977DD215BC910005C2713 /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323D91E8945D700ADAA22 /* configuration_utils.m */; };
 		22D977DF215BC910005C2713 /* public_key_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323F31E8945D700ADAA22 /* public_key_utils.m */; };
-		22D977E1215BC910005C2713 /* unzip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF01B01372100F637D2 /* unzip.c */; };
 		22D977E2215BC910005C2713 /* UIColor+IRCCloud.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F63B16DBF3CB007BE535 /* UIColor+IRCCloud.m */; };
-		22D977E3215BC910005C2713 /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF21B01372100F637D2 /* zip.c */; };
 		22D977E4215BC910005C2713 /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
 		22D977E5215BC910005C2713 /* UsersTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64916DD30E3007BE535 /* UsersTableView.m */; };
 		22D977E7215BC910005C2713 /* trie_search.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E51E8945D700ADAA22 /* trie_search.c */; };
 		22D977E8215BC910005C2713 /* init_registry_tables.c in Sources */ = {isa = PBXBuildFile; fileRef = 229323E01E8945D700ADAA22 /* init_registry_tables.c */; };
 		22D977E9215BC910005C2713 /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
 		22D977EB215BC910005C2713 /* YYImageCoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 223876181F70035300943160 /* YYImageCoder.m */; };
-		22D977ED215BC910005C2713 /* SSZipArchive.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDF51B01372100F637D2 /* SSZipArchive.m */; };
 		22D977EF215BC910005C2713 /* EventsTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 223DA90B16DFC626006FF808 /* EventsTableView.m */; };
 		22D977F0215BC910005C2713 /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324001E8945D700ADAA22 /* vendor_identifier.m */; };
 		22D977F2215BC910005C2713 /* RSSwizzle.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323EC1E8945D700ADAA22 /* RSSwizzle.m */; };
@@ -718,8 +695,6 @@
 		22D97824215BC910005C2713 /* UIImage+ImageWithUIView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B15CFA17301BAF0075EBA7 /* UIImage+ImageWithUIView.m */; };
 		22D97825215BC910005C2713 /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
 		22D97826215BC910005C2713 /* ChannelInfoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2212AF87175F82F900D08C7F /* ChannelInfoViewController.m */; };
-		22D97827215BC910005C2713 /* ioapi.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEC1B01372100F637D2 /* ioapi.c */; };
-		22D97829215BC910005C2713 /* mztools.c in Sources */ = {isa = PBXBuildFile; fileRef = 22C8CDEE1B01372100F637D2 /* mztools.c */; };
 		22D9782C215BC910005C2713 /* ImageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2223C6A81768D7150032544B /* ImageViewController.m */; };
 		22D9782E215BC910005C2713 /* ChannelListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2253BA241770CD7100CCA77F /* ChannelListTableViewController.m */; };
 		22D9782F215BC910005C2713 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 227FF8221772063F00394114 /* SettingsViewController.m */; };
@@ -1425,17 +1400,6 @@
 		22C2E0551B0E2E4800387B4B /* PastebinViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastebinViewController.h; sourceTree = "<group>"; };
 		22C2E0561B0E2E4800387B4B /* PastebinViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastebinViewController.m; sourceTree = "<group>"; };
 		22C8CD701B01289900F637D2 /* libc++.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libc++.dylib"; path = "usr/lib/libc++.dylib"; sourceTree = SDKROOT; };
-		22C8CDEB1B01372100F637D2 /* crypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = crypt.h; sourceTree = "<group>"; };
-		22C8CDEC1B01372100F637D2 /* ioapi.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = ioapi.c; sourceTree = "<group>"; };
-		22C8CDED1B01372100F637D2 /* ioapi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ioapi.h; sourceTree = "<group>"; };
-		22C8CDEE1B01372100F637D2 /* mztools.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mztools.c; sourceTree = "<group>"; };
-		22C8CDEF1B01372100F637D2 /* mztools.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mztools.h; sourceTree = "<group>"; };
-		22C8CDF01B01372100F637D2 /* unzip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = unzip.c; sourceTree = "<group>"; };
-		22C8CDF11B01372100F637D2 /* unzip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unzip.h; sourceTree = "<group>"; };
-		22C8CDF21B01372100F637D2 /* zip.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = zip.c; sourceTree = "<group>"; };
-		22C8CDF31B01372100F637D2 /* zip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = zip.h; sourceTree = "<group>"; };
-		22C8CDF41B01372100F637D2 /* SSZipArchive.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SSZipArchive.h; sourceTree = "<group>"; };
-		22C8CDF51B01372100F637D2 /* SSZipArchive.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SSZipArchive.m; sourceTree = "<group>"; };
 		22C8DCF21A801A4500199371 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		22CE2ADC1D2AA65A001397C0 /* UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		22CE2AE01D2AA662001397C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -2101,7 +2065,6 @@
 				22EE12801C9B1DE000E7AE8D /* OpenInFirefoxClient */,
 				2236BD671BAA600900015753 /* FontAwesome.h */,
 				22D649201B1E0719003BFD86 /* CSURITemplate */,
-				22C8CDE91B01372100F637D2 /* SSZipArchive */,
 				22A363AF19D0884D00500478 /* 1Password.xcassets */,
 				22A363B019D0884D00500478 /* OnePasswordExtension.h */,
 				22A363B119D0884D00500478 /* OnePasswordExtension.m */,
@@ -2448,32 +2411,6 @@
 			);
 			path = WebSocket;
 			sourceTree = SOURCE_ROOT;
-		};
-		22C8CDE91B01372100F637D2 /* SSZipArchive */ = {
-			isa = PBXGroup;
-			children = (
-				22C8CDEA1B01372100F637D2 /* minizip */,
-				22C8CDF41B01372100F637D2 /* SSZipArchive.h */,
-				22C8CDF51B01372100F637D2 /* SSZipArchive.m */,
-			);
-			path = SSZipArchive;
-			sourceTree = SOURCE_ROOT;
-		};
-		22C8CDEA1B01372100F637D2 /* minizip */ = {
-			isa = PBXGroup;
-			children = (
-				22C8CDEB1B01372100F637D2 /* crypt.h */,
-				22C8CDEC1B01372100F637D2 /* ioapi.c */,
-				22C8CDED1B01372100F637D2 /* ioapi.h */,
-				22C8CDEE1B01372100F637D2 /* mztools.c */,
-				22C8CDEF1B01372100F637D2 /* mztools.h */,
-				22C8CDF01B01372100F637D2 /* unzip.c */,
-				22C8CDF11B01372100F637D2 /* unzip.h */,
-				22C8CDF21B01372100F637D2 /* zip.c */,
-				22C8CDF31B01372100F637D2 /* zip.h */,
-			);
-			path = minizip;
-			sourceTree = "<group>";
 		};
 		22CE2ADD1D2AA660001397C0 /* UITests */ = {
 			isa = PBXGroup;
@@ -3363,6 +3300,7 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities-framework/GoogleUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/SSZipArchive-framework/SSZipArchive.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
 				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper/youtube_ios_player_helper.framework",
 			);
@@ -3373,6 +3311,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSZipArchive.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper.framework",
 			);
@@ -3415,6 +3354,7 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities-framework/GoogleUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/SSZipArchive-framework/SSZipArchive.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
 				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper/youtube_ios_player_helper.framework",
 			);
@@ -3425,6 +3365,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSZipArchive.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper.framework",
 			);
@@ -3491,6 +3432,7 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleUtilities-framework/GoogleUtilities.framework",
 				"${BUILT_PRODUCTS_DIR}/PromisesObjC-framework/FBLPromises.framework",
 				"${BUILT_PRODUCTS_DIR}/Protobuf-framework/Protobuf.framework",
+				"${BUILT_PRODUCTS_DIR}/SSZipArchive-framework/SSZipArchive.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb-framework/nanopb.framework",
 				"${BUILT_PRODUCTS_DIR}/youtube-ios-player-helper/youtube_ios_player_helper.framework",
 			);
@@ -3501,6 +3443,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleUtilities.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBLPromises.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SSZipArchive.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/youtube_ios_player_helper.framework",
 			);
@@ -3686,7 +3629,6 @@
 				222C80D71E4A111700A243E7 /* SBJson5Parser.m in Sources */,
 				22103509197EFC6200AB414F /* ChannelsDataSource.m in Sources */,
 				229324671E8945D700ADAA22 /* vendor_identifier.m in Sources */,
-				22C8CDF81B01372100F637D2 /* ioapi.c in Sources */,
 				2210350A197EFC6200AB414F /* EventsDataSource.m in Sources */,
 				2210350B197EFC6200AB414F /* ImageUploader.m in Sources */,
 				2210350C197EFC6200AB414F /* IRCCloudJSONObject.m in Sources */,
@@ -3699,13 +3641,11 @@
 				229324791E8945D700ADAA22 /* TrustKit.m in Sources */,
 				223876281F70047F00943160 /* YYFrameImage.m in Sources */,
 				229324431E8945D700ADAA22 /* public_key_utils.m in Sources */,
-				22C8CE001B01372100F637D2 /* unzip.c in Sources */,
 				2210350F197EFC6200AB414F /* UsersDataSource.m in Sources */,
 				22B203701B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				22D649261B1E0719003BFD86 /* CSURITemplate.m in Sources */,
 				22D46C691A13A9A900B142F7 /* FileUploader.m in Sources */,
 				2238762B1F70047F00943160 /* YYSpriteSheetImage.m in Sources */,
-				22C8CDFC1B01372100F637D2 /* mztools.c in Sources */,
 				2293245B1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				222C80DF1E4A112300A243E7 /* SBJson5StreamParserState.m in Sources */,
 				2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */,
@@ -3721,12 +3661,10 @@
 				22103523197EFC6200AB414F /* WebSocketConnectConfig.m in Sources */,
 				229324551E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				22103524197EFC6200AB414F /* WebSocketFragment.m in Sources */,
-				22C8CE081B01372100F637D2 /* SSZipArchive.m in Sources */,
 				2293246D1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */,
 				229324731E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				229324251E8945D700ADAA22 /* trie_search.c in Sources */,
 				2293240D1E8945D700ADAA22 /* configuration_utils.m in Sources */,
-				22C8CE041B01372100F637D2 /* zip.c in Sources */,
 				223876291F70047F00943160 /* YYImage.m in Sources */,
 				22103525197EFC6200AB414F /* WebSocketMessage.m in Sources */,
 				221034ED197EFBAF00AB414F /* ShareViewController.m in Sources */,
@@ -3914,16 +3852,13 @@
 				229324601E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				2293240C1E8945D700ADAA22 /* configuration_utils.m in Sources */,
 				229324421E8945D700ADAA22 /* public_key_utils.m in Sources */,
-				22C8CDFF1B01372100F637D2 /* unzip.c in Sources */,
 				225D975918AA995900065087 /* UIColor+IRCCloud.m in Sources */,
-				22C8CE031B01372100F637D2 /* zip.c in Sources */,
 				225D975A18AA995900065087 /* UsersDataSource.m in Sources */,
 				225D975B18AA995900065087 /* UsersTableView.m in Sources */,
 				229324241E8945D700ADAA22 /* trie_search.c in Sources */,
 				229324181E8945D700ADAA22 /* init_registry_tables.c in Sources */,
 				225D975C18AA995900065087 /* EventsDataSource.m in Sources */,
 				223876251F70047E00943160 /* YYImageCoder.m in Sources */,
-				22C8CE071B01372100F637D2 /* SSZipArchive.m in Sources */,
 				225D975D18AA995900065087 /* EventsTableView.m in Sources */,
 				229324661E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				229324301E8945D700ADAA22 /* RSSwizzle.m in Sources */,
@@ -3960,8 +3895,6 @@
 				225D976818AA995900065087 /* UIImage+ImageWithUIView.m in Sources */,
 				225D976918AA995900065087 /* OpenInChromeController.m in Sources */,
 				225D976A18AA995900065087 /* ChannelInfoViewController.m in Sources */,
-				22C8CDF71B01372100F637D2 /* ioapi.c in Sources */,
-				22C8CDFB1B01372100F637D2 /* mztools.c in Sources */,
 				225D976B18AA995900065087 /* ImageViewController.m in Sources */,
 				225D976D18AA995900065087 /* ChannelListTableViewController.m in Sources */,
 				225D976E18AA995900065087 /* SettingsViewController.m in Sources */,
@@ -4038,16 +3971,13 @@
 				2293245F1E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				2293240B1E8945D700ADAA22 /* configuration_utils.m in Sources */,
 				229324411E8945D700ADAA22 /* public_key_utils.m in Sources */,
-				22C8CDFE1B01372100F637D2 /* unzip.c in Sources */,
 				2236F63C16DBF3CC007BE535 /* UIColor+IRCCloud.m in Sources */,
-				22C8CE021B01372100F637D2 /* zip.c in Sources */,
 				2236F64616DD138C007BE535 /* UsersDataSource.m in Sources */,
 				2236F64A16DD30E5007BE535 /* UsersTableView.m in Sources */,
 				229324231E8945D700ADAA22 /* trie_search.c in Sources */,
 				229324171E8945D700ADAA22 /* init_registry_tables.c in Sources */,
 				22F9EE1C16DE6F21004615C0 /* EventsDataSource.m in Sources */,
 				223876201F70047D00943160 /* YYImageCoder.m in Sources */,
-				22C8CE061B01372100F637D2 /* SSZipArchive.m in Sources */,
 				223DA90C16DFC626006FF808 /* EventsTableView.m in Sources */,
 				229324651E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				2293242F1E8945D700ADAA22 /* RSSwizzle.m in Sources */,
@@ -4084,8 +4014,6 @@
 				22B15CFD17301BAF0075EBA7 /* UIImage+ImageWithUIView.m in Sources */,
 				2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */,
 				2212AF88175F82F900D08C7F /* ChannelInfoViewController.m in Sources */,
-				22C8CDF61B01372100F637D2 /* ioapi.c in Sources */,
-				22C8CDFA1B01372100F637D2 /* mztools.c in Sources */,
 				2223C6AA1768D7150032544B /* ImageViewController.m in Sources */,
 				2253BA251770CD7200CCA77F /* ChannelListTableViewController.m in Sources */,
 				227FF8231772063F00394114 /* SettingsViewController.m in Sources */,
@@ -4208,9 +4136,7 @@
 				22D97986215BC979005C2713 /* FLEXTableContentCell.m in Sources */,
 				22D977DF215BC910005C2713 /* public_key_utils.m in Sources */,
 				22D97963215BC979005C2713 /* FLEXDefaultEditorViewController.m in Sources */,
-				22D977E1215BC910005C2713 /* unzip.c in Sources */,
 				22D977E2215BC910005C2713 /* UIColor+IRCCloud.m in Sources */,
-				22D977E3215BC910005C2713 /* zip.c in Sources */,
 				22D977E4215BC910005C2713 /* UsersDataSource.m in Sources */,
 				22D977E5215BC910005C2713 /* UsersTableView.m in Sources */,
 				22D9796B215BC979005C2713 /* FLEXArgumentInputSwitchView.m in Sources */,
@@ -4220,7 +4146,6 @@
 				22D97966215BC979005C2713 /* FLEXFieldEditorViewController.m in Sources */,
 				22D977EB215BC910005C2713 /* YYImageCoder.m in Sources */,
 				22D97976215BC979005C2713 /* FLEXWindow.m in Sources */,
-				22D977ED215BC910005C2713 /* SSZipArchive.m in Sources */,
 				22D97975215BC979005C2713 /* FLEXExplorerViewController.m in Sources */,
 				22D977EF215BC910005C2713 /* EventsTableView.m in Sources */,
 				22D977F0215BC910005C2713 /* vendor_identifier.m in Sources */,
@@ -4277,9 +4202,7 @@
 				22D97824215BC910005C2713 /* UIImage+ImageWithUIView.m in Sources */,
 				22D97825215BC910005C2713 /* OpenInChromeController.m in Sources */,
 				22D97826215BC910005C2713 /* ChannelInfoViewController.m in Sources */,
-				22D97827215BC910005C2713 /* ioapi.c in Sources */,
 				22D97970215BC979005C2713 /* FLEXArgumentInputFontsPickerView.m in Sources */,
-				22D97829215BC910005C2713 /* mztools.c in Sources */,
 				22D9796E215BC979005C2713 /* FLEXArgumentInputFontView.m in Sources */,
 				22D97984215BC979005C2713 /* FLEXTableColumnHeader.m in Sources */,
 				22D9782C215BC910005C2713 /* ImageViewController.m in Sources */,
@@ -4339,7 +4262,6 @@
 				222C80D81E4A111800A243E7 /* SBJson5Parser.m in Sources */,
 				22DB25011982DF2B0008728E /* ChannelsDataSource.m in Sources */,
 				229324681E8945D700ADAA22 /* vendor_identifier.m in Sources */,
-				22C8CDF91B01372100F637D2 /* ioapi.c in Sources */,
 				22DB25021982DF2B0008728E /* EventsDataSource.m in Sources */,
 				22DB25031982DF2B0008728E /* ImageUploader.m in Sources */,
 				22DB25041982DF2B0008728E /* IRCCloudJSONObject.m in Sources */,
@@ -4352,13 +4274,11 @@
 				2293247A1E8945D700ADAA22 /* TrustKit.m in Sources */,
 				2238762D1F70047F00943160 /* YYFrameImage.m in Sources */,
 				229324441E8945D700ADAA22 /* public_key_utils.m in Sources */,
-				22C8CE011B01372100F637D2 /* unzip.c in Sources */,
 				22DB25071982DF2B0008728E /* UsersDataSource.m in Sources */,
 				22B203711B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				22D649271B1E0719003BFD86 /* CSURITemplate.m in Sources */,
 				22D46C6A1A13A9A900B142F7 /* FileUploader.m in Sources */,
 				223876301F70047F00943160 /* YYSpriteSheetImage.m in Sources */,
-				22C8CDFD1B01372100F637D2 /* mztools.c in Sources */,
 				2293245C1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				222C80E01E4A112300A243E7 /* SBJson5StreamParserState.m in Sources */,
 				22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */,
@@ -4374,12 +4294,10 @@
 				22DB251B1982DF2B0008728E /* WebSocketConnectConfig.m in Sources */,
 				229324561E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
 				22DB251C1982DF2B0008728E /* WebSocketFragment.m in Sources */,
-				22C8CE091B01372100F637D2 /* SSZipArchive.m in Sources */,
 				2293246E1E8945D700ADAA22 /* TSKNSURLConnectionDelegateProxy.m in Sources */,
 				229324741E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				229324261E8945D700ADAA22 /* trie_search.c in Sources */,
 				2293240E1E8945D700ADAA22 /* configuration_utils.m in Sources */,
-				22C8CE051B01372100F637D2 /* zip.c in Sources */,
 				2238762E1F70047F00943160 /* YYImage.m in Sources */,
 				22DB251D1982DF2B0008728E /* WebSocketMessage.m in Sources */,
 				22DB251E1982DF2B0008728E /* ShareViewController.m in Sources */,
