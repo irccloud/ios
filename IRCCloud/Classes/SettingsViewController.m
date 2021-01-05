@@ -710,12 +710,18 @@
                         
                         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                             textField.placeholder = @"Current Password";
+                            if (@available(iOS 12.0, *)) {
+                                textField.textContentType = UITextContentTypePassword;
+                            }
                             textField.secureTextEntry = YES;
                             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                         }];
                         
                         [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
                             textField.placeholder = @"New Password";
+                            if (@available(iOS 12.0, *)) {
+                                textField.textContentType = UITextContentTypeNewPassword;
+                            }
                             textField.secureTextEntry = YES;
                             textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
                         }];
