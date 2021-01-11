@@ -150,13 +150,10 @@ platform :ios do
   desc "Upload metadata"
   lane :metadata do |options|
     fastlane_require 'json'
-    review_info = JSON.parse(File.read('review_info.json'))
-    review_info['notes'] = File.read('metadata/review_notes.txt')
 
     if options[:enterprise]
         metadata_path = "./fastlane/metadata-enterprise"
         app_identifier = "com.irccloud.enterprise"
-        review_info['notes'] = File.read('metadata-enterprise/review_notes.txt')
     else
         metadata_path = "./fastlane/metadata"
         app_identifier = "com.irccloud.IRCCloud"
@@ -171,7 +168,6 @@ platform :ios do
         skip_binary_upload: true,
         skip_screenshots: skip_screenshots,
         metadata_path: metadata_path,
-        app_review_information: review_info,
         automatic_release: true
     )
   end
