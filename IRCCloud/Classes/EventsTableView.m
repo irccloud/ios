@@ -2297,13 +2297,17 @@ extern UIImage *__socketClosedBackgroundImage;
             e.isQuoted = NO;
         }
         NSString *formattedMsg = e.formattedMsg;
-        if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
-            formattedMsg = [NSString stringWithFormat:@"\u2001\u2005%@",formattedMsg];
+        NSString *formattedPrefix = e.formattedPrefix;
+        if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0)) {
+            if(formattedPrefix.length)
+                formattedPrefix = [NSString stringWithFormat:@"\u2001\u2005%@",formattedPrefix];
+            else
+                formattedMsg = [NSString stringWithFormat:@"\u2001\u2005%@",formattedMsg];
+        }
 
         e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:self->_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:e.mentionOffset + (formattedMsg.length - e.formattedMsg.length) mentionData:[e.entities objectForKey:@"mention_data"] stripColors:__noColor];
         
-        if(e.formattedPrefix.length) {
-            NSString *formattedPrefix = e.formattedPrefix;
+        if(formattedPrefix.length) {
             if(![formattedPrefix hasSuffix:@" "])
                 formattedPrefix = [formattedPrefix stringByAppendingString:@" "];
             NSMutableAttributedString *prefix = [ColorFormatter format:formattedPrefix defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil].mutableCopy;
