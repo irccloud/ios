@@ -928,6 +928,7 @@ extern UIImage *__socketClosedBackgroundImage;
             event.groupMsg = msg;
             event.formattedMsg = nil;
             event.formatted = nil;
+            event.formattedPrefix = nil;
             event.linkify = NO;
             self->_lastCollapsedEid = event.eid;
             if(([self->_buffer.type isEqualToString:@"console"] && ![type isEqualToString:@"socket_closed"] && ![type isEqualToString:@"connecting_failed"] && ![type isEqualToString:@"connecting_cancelled"]) || [event.type isEqualToString:@"you_parted_channel"]) {
@@ -943,6 +944,7 @@ extern UIImage *__socketClosedBackgroundImage;
             self->_currentCollapsedEid = -1;
             self->_lastCollapsedEid = -1;
             event.mentionOffset = 0;
+            event.formattedPrefix = nil;
             [self->_collapsedEvents clear];
             
             if(!event.formatted.length || !event.formattedMsg.length) {
