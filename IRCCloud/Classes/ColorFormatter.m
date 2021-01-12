@@ -2312,6 +2312,10 @@ extern BOOL __compact;
 }
 
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset mentionData:(NSDictionary *)mentionData {
+    return [self format:input defaultColor:color mono:monospace linkify:linkify server:server links:links largeEmoji:largeEmoji mentions:m colorizeMentions:colorizeMentions mentionOffset:mentionOffset mentionData:mentionData stripColors:NO];
+}
+
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)monospace linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)m colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset mentionData:(NSDictionary *)mentionData stripColors:(BOOL)stripColors {
     int bold = -1, italics = -1, underline = -1, fg = -1, bg = -1, mono = -1, strike = -1;
     UIColor *fgColor = nil, *bgColor = nil, *oldFgColor = nil, *oldBgColor = nil;
     id font, boldFont, italicFont, boldItalicFont;
@@ -2561,7 +2565,7 @@ extern BOOL __compact;
                             fgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
                             fg_color = -1;
                         }
-                        if(fg != -1) {
+                        if(fg != -1 && !stripColors) {
                             if(oldFgColor)
                                 [attributes addObject:@{
                                                         NSForegroundColorAttributeName:oldFgColor,
@@ -2601,7 +2605,7 @@ extern BOOL __compact;
                             bgColor = [UIColor colorFromHexString:[text substringWithRange:NSMakeRange(i, count)]];
                         }
                         if(bg != -1) {
-                            if(oldBgColor)
+                            if(oldBgColor && !stripColors)
                                 [attributes addObject:@{
                                                         NSBackgroundColorAttributeName:oldBgColor,
                                                         @"start":@(bg),
@@ -2617,7 +2621,7 @@ extern BOOL __compact;
                 if(fg_color != -1)
                     fgColor = [UIColor mIRCColor:fg_color background:bgColor != nil];
                 if(fg != -1 && fgColor == nil) {
-                    if(oldFgColor)
+                    if(oldFgColor && !stripColors)
                         [attributes addObject:@{
                                                 NSForegroundColorAttributeName:oldFgColor,
                                                 @"start":@(fg),
@@ -2626,7 +2630,7 @@ extern BOOL __compact;
                     fg = -1;
                 }
                 if(bg != -1 && bgColor == nil) {
-                    if(oldBgColor)
+                    if(oldBgColor && !stripColors)
                         [attributes addObject:@{
                                                 NSBackgroundColorAttributeName:oldBgColor,
                                                 @"start":@(bg),
@@ -2637,22 +2641,22 @@ extern BOOL __compact;
                 i--;
                 continue;
             case CLEAR:
-                if(fg != -1) {
+                if(fg != -1 && !stripColors) {
                     [attributes addObject:@{
                      NSForegroundColorAttributeName:fgColor,
                      @"start":@(fg),
                      @"length":@(i - fg)
                      }];
-                    fg = -1;
                 }
-                if(bg != -1) {
+                fg = -1;
+                if(bg != -1 && !stripColors) {
                     [attributes addObject:@{
                      NSBackgroundColorAttributeName:bgColor,
                      @"start":@(bg),
                      @"length":@(i - bg)
                      }];
-                    bg = -1;
                 }
+                bg = -1;
                 if(mono != -1) {
                     [self setFont:Courier start:mono length:(i - mono) attributes:attributes];
                 }

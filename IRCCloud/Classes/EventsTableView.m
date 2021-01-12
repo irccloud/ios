@@ -807,7 +807,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if([type hasPrefix:@"you_"]) {
             type = [type substringFromIndex:4];
         }
-        NSString *eventmsg = __noColor ? event.msg.stripIRCColors : event.msg;
+        NSString *eventmsg = event.msg;
 
         if([type isEqualToString:@"joined_channel"] || [type isEqualToString:@"parted_channel"] || [type isEqualToString:@"nickchange"] || [type isEqualToString:@"quit"] || [type isEqualToString:@"user_channel_mode"]|| [type isEqualToString:@"socket_closed"] || [type isEqualToString:@"connecting_failed"] || [type isEqualToString:@"connecting_cancelled"]) {
             self->_collapsedEvents.showChan = ![self->_buffer.type isEqualToString:@"channel"];
@@ -947,11 +947,9 @@ extern UIImage *__socketClosedBackgroundImage;
             
             if(!event.formatted.length || !event.formattedMsg.length) {
                 if((__chatOneLinePref || ![event isMessage]) && [event.from length] && event.rowType != ROW_THUMBNAIL && event.rowType != ROW_FILE) {
-                    event.formattedMsg = [NSString stringWithFormat:@"%@ %@", [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43" displayName:event.from], eventmsg];
-                    event.mentionOffset = event.formattedMsg.length - eventmsg.length;
-                } else {
-                    event.formattedMsg = eventmsg;
+                    event.formattedPrefix = [NSString stringWithFormat:@"%@", [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors defaultColor:[UIColor isDarkTheme]?@"ffffff":@"142b43" displayName:event.from]];
                 }
+                event.formattedMsg = eventmsg;
             }
         }
         
@@ -977,9 +975,9 @@ extern UIImage *__socketClosedBackgroundImage;
                 NSString *msg = eventmsg;
                 if(!__disableCodeSpanPref)
                     msg = [msg insertCodeSpans];
-                event.formattedMsg = [NSString stringWithFormat:@"— %c%@ %@", ITALICS, [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.nick], msg];
+                event.formattedPrefix = [NSString stringWithFormat:@"— %c%@", ITALICS, [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.nick]];
+                event.formattedMsg = msg;
                 event.rowType = ROW_ME_MESSAGE;
-                event.mentionOffset = event.formattedMsg.length - eventmsg.length;
             } else if([type isEqualToString:@"notice"] || [type isEqualToString:@"buffer_msg"]) {
                 event.isCodeBlock = NO;
                 if(event.rowType == ROW_FAILED)
@@ -990,21 +988,19 @@ extern UIImage *__socketClosedBackgroundImage;
                     event.color = [UIColor messageTextColor];
                 Server *s = [[ServersDataSource sharedInstance] getServer:event.cid];
                 if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OPER]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO displayName:nil],BOLD];
+                    event.formattedPrefix = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Opers" mode:s.MODE_OPER colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OWNER]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Owners" mode:s.MODE_OWNER colorize:NO displayName:nil],BOLD];
+                    event.formattedPrefix = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Owners" mode:s.MODE_OWNER colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_ADMIN]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Admins" mode:s.MODE_ADMIN colorize:NO displayName:nil],BOLD];
+                    event.formattedPrefix = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Admins" mode:s.MODE_ADMIN colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_OP]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Ops" mode:s.MODE_OP colorize:NO displayName:nil],BOLD];
+                    event.formattedPrefix = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Ops" mode:s.MODE_OP colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_HALFOP]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Half Ops" mode:s.MODE_HALFOP colorize:NO displayName:nil],BOLD];
+                    event.formattedPrefix = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Half Ops" mode:s.MODE_HALFOP colorize:NO displayName:nil],BOLD];
                 else if([event.targetMode isEqualToString:[s.PREFIX objectForKey:s.MODE_VOICED]])
-                    event.formattedMsg = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Voiced" mode:s.MODE_VOICED colorize:NO displayName:nil],BOLD];
+                    event.formattedPrefix = [NSString stringWithFormat:@"%c%@%c ",BOLD,[self->_collapsedEvents formatNick:@"Voiced" mode:s.MODE_VOICED colorize:NO displayName:nil],BOLD];
                 else
-                    event.formattedMsg = @"";
-                
-                event.mentionOffset = event.formattedMsg.length;
+                    event.formattedPrefix = @"";
                 
                 if(event.edited)
                     eventmsg = [eventmsg stringByAppendingFormat:@" %c%@(edited)%c", COLOR_RGB, [UIColor collapsedRowTextColor].toHexString, COLOR_RGB];
@@ -1104,15 +1100,12 @@ extern UIImage *__socketClosedBackgroundImage;
                     eventmsg = [eventmsg insertCodeSpans];
                 if([type isEqualToString:@"notice"]) {
                     if([self->_buffer.type isEqualToString:@"console"] && event.toChan && event.chan.length) {
-                        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.chan, BOLD, eventmsg];
+                        event.formattedPrefix = [event.formattedPrefix stringByAppendingFormat:@"%c%@%c:", BOLD, event.chan, BOLD];
                     } else if([self->_buffer.type isEqualToString:@"console"] && event.isSelf && event.nick.length) {
-                        event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%c%@%c: %@", BOLD, event.nick, BOLD, eventmsg];
-                    } else {
-                        event.formattedMsg = [event.formattedMsg stringByAppendingString:eventmsg];
+                        event.formattedPrefix = [event.formattedPrefix stringByAppendingFormat:@"%c%@%c:", BOLD, event.nick, BOLD];
                     }
-                } else if(eventmsg) {
-                    event.formattedMsg = [event.formattedMsg stringByAppendingString:eventmsg];
                 }
+                event.formattedMsg = eventmsg;
                 if(event.from.length && __chatOneLinePref && event.rowType != ROW_THUMBNAIL && event.rowType != ROW_FILE) {
                     if(!__disableQuotePref && event.formattedMsg.length > 0 && [event.formattedMsg isBlockQuote]) {
                         Event *e1 = event.copy;
@@ -1123,31 +1116,29 @@ extern UIImage *__socketClosedBackgroundImage;
                         [self _addItem:e1 eid:e1.eid];
                         event.formattedMsg = [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from];
                     } else {
-                        NSString *formattedMsg = event.formattedMsg;
-                        NSInteger mentionOffset = event.mentionOffset;
-                        NSInteger oldLength = formattedMsg.length;
-                        formattedMsg = [NSString stringWithFormat:@"%@ %@", [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from], formattedMsg];
-                        mentionOffset += formattedMsg.length - oldLength;
-                        event.formattedMsg = formattedMsg;
-                        event.mentionOffset = mentionOffset;
+                        NSString *formattedPrefix = event.formattedPrefix;
+                        formattedPrefix = [NSString stringWithFormat:@"%@ %@", [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from], formattedPrefix];
+                        event.formattedPrefix = formattedPrefix;
                     }
                 }
             } else if([type isEqualToString:@"kicked_channel"]) {
-                event.formattedMsg = [NSString stringWithFormat:@"%c%@← ", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString];
+                event.formattedPrefix = [NSString stringWithFormat:@"%c%@← ", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString];
                 if([event.type hasPrefix:@"you_"])
-                    event.formattedMsg = [event.formattedMsg stringByAppendingString:@"You"];
+                    event.formattedPrefix = [event.formattedPrefix stringByAppendingString:@"You"];
                 else
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@"%@%c", event.oldNick, CLEAR];
+                    event.formattedPrefix = [event.formattedPrefix stringByAppendingFormat:@"%@%c", event.oldNick, CLEAR];
                 if([event.type hasPrefix:@"you_"])
-                    event.formattedMsg = [event.formattedMsg stringByAppendingString:@" were"];
+                    event.formattedPrefix = [event.formattedPrefix stringByAppendingString:@" were"];
                 else
-                    event.formattedMsg = [event.formattedMsg stringByAppendingString:@" was"];
+                    event.formattedPrefix = [event.formattedPrefix stringByAppendingString:@" was"];
                 if(event.hostmask && event.hostmask.length)
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by %@", [self->_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil]];
+                    event.formattedPrefix = [event.formattedPrefix stringByAppendingFormat:@" kicked by %@", [self->_collapsedEvents formatNick:event.nick mode:event.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil]];
                 else
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@" kicked by the server %c%@%@%c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, event.nick, CLEAR];
+                    event.formattedPrefix = [event.formattedPrefix stringByAppendingFormat:@" kicked by the server %c%@%@%c", COLOR_RGB, [UIColor collapsedRowNickColor].toHexString, event.nick, CLEAR];
                 if(event.msg.length > 0 && ![event.msg isEqualToString:event.nick])
-                    event.formattedMsg = [event.formattedMsg stringByAppendingFormat:@": %@", eventmsg];
+                    event.formattedMsg = [NSString stringWithFormat:@": %@", eventmsg];
+                else
+                    event.formattedMsg = @"";
             } else if([type isEqualToString:@"channel_mode_list_change"]) {
                 if(event.from.length == 0) {
                     if(event.nick.length)
@@ -2309,7 +2300,16 @@ extern UIImage *__socketClosedBackgroundImage;
         if(e.rowType == ROW_FAILED || (e.groupEid < 0 && (e.from.length || e.rowType == ROW_ME_MESSAGE) && !__avatarsOffPref && (__chatOneLinePref || e.rowType == ROW_ME_MESSAGE) && e.rowType != ROW_THUMBNAIL && e.rowType != ROW_FILE && e.parent == 0))
             formattedMsg = [NSString stringWithFormat:@"\u2001\u2005%@",formattedMsg];
 
-        e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:self->_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:e.mentionOffset + (formattedMsg.length - e.formattedMsg.length) mentionData:[e.entities objectForKey:@"mention_data"]];
+        e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:self->_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:e.mentionOffset + (formattedMsg.length - e.formattedMsg.length) mentionData:[e.entities objectForKey:@"mention_data"] stripColors:__noColor];
+        
+        if(e.formattedPrefix.length) {
+            NSString *formattedPrefix = e.formattedPrefix;
+            if(![formattedPrefix hasSuffix:@" "])
+                formattedPrefix = [formattedPrefix stringByAppendingString:@" "];
+            NSMutableAttributedString *prefix = [ColorFormatter format:formattedPrefix defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil].mutableCopy;
+            [prefix appendAttributedString:e.formatted];
+            e.formatted = prefix;
+        }
 
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
             NSMutableArray *mutableLinks = links.mutableCopy;

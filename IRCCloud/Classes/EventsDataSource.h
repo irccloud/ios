@@ -51,6 +51,7 @@
     NSString *_server;
     NSString *_diff;
     NSString *_formattedMsg;
+    NSString *_formattedPrefix;
     NSString *_accessibilityLabel;
     NSString *_accessibilityValue;
     NSAttributedString *_formatted;
@@ -108,7 +109,7 @@
 }
 @property (nonatomic, assign) int cid, bid, rowType, reqId, childEventCount, replyCount;
 @property (nonatomic, assign) NSTimeInterval eid, groupEid, serverTime, parent, lastEditEID;
-@property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick, *msgid;
+@property (nonatomic, copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick, *msgid, *formattedPrefix;
 @property (nonatomic, assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock, hasReply, isReply, edited, collapsed;
 @property (nonatomic, copy) NSDictionary *ops,*entities;
 @property (nonatomic, strong) UIColor *color, *bgColor;

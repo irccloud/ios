@@ -38,6 +38,7 @@
 +(NSRegularExpression*)ircChannelRegexForServer:(Server *)s;
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links;
 +(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)mentions colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset mentionData:(NSDictionary *)mentionData;
++(NSAttributedString *)format:(NSString *)input defaultColor:(UIColor *)color mono:(BOOL)mono linkify:(BOOL)linkify server:(Server *)server links:(NSArray **)links largeEmoji:(BOOL)largeEmoji mentions:(NSDictionary *)mentions colorizeMentions:(BOOL)colorizeMentions mentionOffset:(NSInteger)mentionOffset mentionData:(NSDictionary *)mentionData stripColors:(BOOL)stripColors;
 +(BOOL)shouldClearFontCache;
 +(void)clearFontCache;
 +(void)loadFonts;
