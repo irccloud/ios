@@ -88,7 +88,10 @@
 -(Event *)copy {
     BOOL pending = self->_pending;
     self->_pending = NO;
-    Event *e = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:self]];
+    NSError *error = nil;
+    Event *e = [NSKeyedUnarchiver unarchivedObjectOfClass:Event.class fromData:[NSKeyedArchiver archivedDataWithRootObject:self requiringSecureCoding:YES error:nil] error:&error];
+    if(error)
+        CLS_LOG(@"Error: %@", error);
     self->_pending = e.pending = pending;
     return e;
 }
@@ -140,7 +143,7 @@
         else if(self->_rowType == ROW_LASTSEENEID)
             self->_bgColor = [UIColor contentBackgroundColor];
         else
-            decodeObjectOfClass(NSString.class, self->_bgColor);
+            decodeObjectOfClass(UIColor.class, self->_bgColor);
         
         if(self->_pending) {
             self->_height = 0;
