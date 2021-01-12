@@ -24,6 +24,11 @@
 NSString *__DEFAULT_CHANTYPES__;
 
 @implementation Buffer
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
     @synchronized (self) {
         int joinedLeft = 1, joinedRight = 1;
@@ -144,19 +149,19 @@ NSString *__DEFAULT_CHANTYPES__;
         decodeInt(self->_cid);
         decodeDouble(self->_min_eid);
         decodeDouble(self->_last_seen_eid);
-        decodeObject(self->_name);
-        decodeObject(self->_type);
+        decodeObjectOfClass(NSString.class, self->_name);
+        decodeObjectOfClass(NSString.class, self->_type);
         decodeInt(self->_archived);
         decodeInt(self->_deferred);
-        decodeObject(self->_away_msg);
+        decodeObjectOfClass(NSString.class, self->_away_msg);
         decodeBool(self->_valid);
-        decodeObject(self->_draft);
-        decodeObject(self->_chantypes);
+        decodeObjectOfClass(NSString.class, self->_draft);
+        decodeObjectOfClass(NSString.class, self->_chantypes);
         decodeBool(self->_scrolledUp);
         decodeDouble(self->_scrolledUpFrom);
         decodeFloat(self->_savedScrollOffset);
-        decodeObject(self->_lastBuffer);
-        decodeObject(self->_nextBuffer);
+        decodeObjectOfClass(Buffer.class, self->_lastBuffer);
+        decodeObjectOfClass(Buffer.class, self->_nextBuffer);
     }
     return self;
 }
@@ -205,8 +210,12 @@ NSString *__DEFAULT_CHANTYPES__;
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"buffers"];
             
             @try {
-                self->_buffers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                NSError* error = nil;
+                self->_buffers = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSDictionary.class, Buffer.class]] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+                if(error)
+                    @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {
+                CLS_LOG(@"Exception: %@", e);
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
                 [[ServersDataSource sharedInstance] clear];
@@ -232,7 +241,10 @@ NSString *__DEFAULT_CHANTYPES__;
     
     @synchronized(self) {
         @try {
-            [NSKeyedArchiver archiveRootObject:buffers toFile:cacheFile];
+            NSError* error = nil;
+            [[NSKeyedArchiver archivedDataWithRootObject:buffers requiringSecureCoding:YES error:&error] writeToFile:cacheFile atomically:YES];
+            if(error)
+                CLS_LOG(@"Error archiving: %@", error);
             [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
         }
         @catch (NSException *exception) {

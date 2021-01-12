@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Buffer : NSObject<NSCoding> {
+@interface Buffer : NSObject<NSSecureCoding> {
     int _bid;
     int _cid;
     NSTimeInterval _min_eid;

@@ -21,6 +21,10 @@
 #import "EventsDataSource.h"
 
 @implementation Server
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 -(id)init {
     self = [super init];
     if(self) {
@@ -83,33 +87,33 @@
     self = [super init];
     if(self) {
         decodeInt(self->_cid);
-        decodeObject(self->_name);
-        decodeObject(self->_hostname);
+        decodeObjectOfClass(NSString.class, self->_name);
+        decodeObjectOfClass(NSString.class, self->_hostname);
         decodeInt(self->_port);
-        decodeObject(self->_nick);
-        decodeObject(self->_status);
+        decodeObjectOfClass(NSString.class, self->_nick);
+        decodeObjectOfClass(NSString.class, self->_status);
         decodeInt(self->_ssl);
-        decodeObject(self->_realname);
-        decodeObject(self->_join_commands);
-        decodeObject(self->_fail_info);
-        decodeObject(self->_away);
-        decodeObject(self->_usermask);
-        decodeObject(self->_mode);
-        decodeObject(self->_isupport);
+        decodeObjectOfClass(NSString.class, self->_realname);
+        decodeObjectOfClass(NSString.class, self->_join_commands);
+        decodeObjectOfClass(NSDictionary.class, self->_fail_info);
+        decodeObjectOfClass(NSString.class, self->_away);
+        decodeObjectOfClass(NSString.class, self->_usermask);
+        decodeObjectOfClass(NSString.class, self->_mode);
+        decodeObjectOfClass(NSDictionary.class, self->_isupport);
         self->_isupport = self->_isupport.mutableCopy;
-        decodeObject(self->_ignores);
-        decodeObject(self->_CHANTYPES);
-        decodeObject(self->_PREFIX);
+        decodeObjectOfClass(NSArray.class, self->_ignores);
+        decodeObjectOfClass(NSString.class, self->_CHANTYPES);
+        decodeObjectOfClass(NSDictionary.class, self->_PREFIX);
         decodeInt(self->_order);
-        decodeObject(self->_MODE_OPER);
-        decodeObject(self->_MODE_OWNER);
-        decodeObject(self->_MODE_ADMIN);
-        decodeObject(self->_MODE_OP);
-        decodeObject(self->_MODE_HALFOP);
-        decodeObject(self->_MODE_VOICED);
-        decodeObject(self->_ircserver);
+        decodeObjectOfClass(NSString.class, self->_MODE_OPER);
+        decodeObjectOfClass(NSString.class, self->_MODE_OWNER);
+        decodeObjectOfClass(NSString.class, self->_MODE_ADMIN);
+        decodeObjectOfClass(NSString.class, self->_MODE_OP);
+        decodeObjectOfClass(NSString.class, self->_MODE_HALFOP);
+        decodeObjectOfClass(NSString.class, self->_MODE_VOICED);
+        decodeObjectOfClass(NSString.class, self->_ircserver);
         decodeInt(self->_orgId);
-        decodeObject(self->_avatar);
+        decodeObjectOfClass(NSString.class, self->_avatar);
         decodeInt(self->_avatars_supported);
         self->_ignore = [[Ignore alloc] init];
         [self->_ignore setIgnores:self->_ignores];
@@ -177,8 +181,12 @@
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"servers"];
             
             @try {
-                self->_servers = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                NSError* error = nil;
+                self->_servers = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSArray.class, Server.class]] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+                if(error)
+                    @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {
+                CLS_LOG(@"Exception: %@", e);
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
                 [[BuffersDataSource sharedInstance] clear];
@@ -203,7 +211,10 @@
     
     @synchronized(self) {
         @try {
-            [NSKeyedArchiver archiveRootObject:servers toFile:cacheFile];
+            NSError* error = nil;
+            [[NSKeyedArchiver archivedDataWithRootObject:servers requiringSecureCoding:YES error:&error] writeToFile:cacheFile atomically:YES];
+            if(error)
+                CLS_LOG(@"Error archiving: %@", error);
             [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
         }
         @catch (NSException *exception) {

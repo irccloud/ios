@@ -22,6 +22,11 @@
 #import "EventsDataSource.h"
 
 @implementation Channel
+
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
 -(void)addMode:(NSString *)mode param:(NSString *)param {
     [self removeMode:mode];
     if([mode isEqualToString:@"k"])
@@ -60,15 +65,15 @@
     if(self) {
         decodeInt(self->_cid);
         decodeInt(self->_bid);
-        decodeObject(self->_name);
-        decodeObject(self->_topic_text);
+        decodeObjectOfClass(NSString.class, self->_name);
+        decodeObjectOfClass(NSString.class, self->_topic_text);
         decodeDouble(self->_topic_time);
-        decodeObject(self->_topic_author);
-        decodeObject(self->_type);
-        decodeObject(self->_modes);
-        decodeObject(self->_mode);
+        decodeObjectOfClass(NSString.class, self->_topic_author);
+        decodeObjectOfClass(NSString.class, self->_type);
+        decodeObjectOfClass(NSMutableArray.class, self->_modes);
+        decodeObjectOfClass(NSString.class, self->_mode);
         decodeDouble(self->_timestamp);
-        decodeObject(self->_url);
+        decodeObjectOfClass(NSString.class, self->_url);
         decodeBool(self->_valid);
         decodeBool(self->_key);
     }
@@ -114,8 +119,12 @@
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"channels"];
             
             @try {
-                self->_channels = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                NSError* error = nil;
+                self->_channels = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSArray.class, Channel.class]] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+                if(error)
+                    @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {
+                CLS_LOG(@"Exception: %@", e);
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
                 [[ServersDataSource sharedInstance] clear];
@@ -140,7 +149,10 @@
     
     @synchronized(self) {
         @try {
-            [NSKeyedArchiver archiveRootObject:channels toFile:cacheFile];
+            NSError* error = nil;
+            [[NSKeyedArchiver archivedDataWithRootObject:channels requiringSecureCoding:YES error:&error] writeToFile:cacheFile atomically:YES];
+            if(error)
+                CLS_LOG(@"Error archiving: %@", error);
             [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
         }
         @catch (NSException *exception) {

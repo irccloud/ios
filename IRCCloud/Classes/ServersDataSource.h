@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 #import "Ignore.h"
 
-@interface Server : NSObject<NSCoding> {
+@interface Server : NSObject<NSSecureCoding> {
     int _cid;
     NSString *_name;
     NSString *_hostname;

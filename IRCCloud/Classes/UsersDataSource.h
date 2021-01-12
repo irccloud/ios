@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface User : NSObject<NSCoding> {
+@interface User : NSObject<NSSecureCoding> {
     int _cid;
     int _bid;
     NSString *_nick;

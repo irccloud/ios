@@ -27,6 +27,9 @@
 #import "ImageCache.h"
 
 @implementation Event
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
 -(NSComparisonResult)compare:(Event *)aEvent {
     if(aEvent.pending && !_pending)
         return NSOrderedAscending;
@@ -95,40 +98,40 @@
         decodeInt(self->_cid);
         decodeInt(self->_bid);
         decodeDouble(self->_eid);
-        decodeObject(self->_type);
-        decodeObject(self->_msg);
-        decodeObject(self->_hostmask);
-        decodeObject(self->_from);
-        decodeObject(self->_fromMode);
-        decodeObject(self->_nick);
-        decodeObject(self->_oldNick);
-        decodeObject(self->_server);
-        decodeObject(self->_diff);
-        decodeObject(self->_realname);
+        decodeObjectOfClass(NSString.class, self->_type);
+        decodeObjectOfClass(NSString.class, self->_msg);
+        decodeObjectOfClass(NSString.class, self->_hostmask);
+        decodeObjectOfClass(NSString.class, self->_from);
+        decodeObjectOfClass(NSString.class, self->_fromMode);
+        decodeObjectOfClass(NSString.class, self->_nick);
+        decodeObjectOfClass(NSString.class, self->_oldNick);
+        decodeObjectOfClass(NSString.class, self->_server);
+        decodeObjectOfClass(NSString.class, self->_diff);
+        decodeObjectOfClass(NSString.class, self->_realname);
         decodeBool(self->_isHighlight);
         decodeBool(self->_isSelf);
         decodeBool(self->_toChan);
         decodeBool(self->_toBuffer);
-        decodeObject(self->_color);
-        decodeObject(self->_ops);
+        decodeObjectOfClass(UIColor.class, self->_color);
+        decodeObjectOfClass(NSDictionary.class, self->_ops);
         decodeInt(self->_rowType);
         decodeBool(self->_linkify);
-        decodeObject(self->_targetMode);
+        decodeObjectOfClass(NSString.class, self->_targetMode);
         decodeInt(self->_reqid);
         decodeBool(self->_pending);
         decodeBool(self->_monospace);
-        decodeObject(self->_to);
-        decodeObject(self->_command);
-        decodeObject(self->_day);
-        decodeObject(self->_ignoreMask);
-        decodeObject(self->_chan);
-        decodeObject(self->_entities);
+        decodeObjectOfClass(NSString.class, self->_to);
+        decodeObjectOfClass(NSString.class, self->_command);
+        decodeObjectOfClass(NSString.class, self->_day);
+        decodeObjectOfClass(NSString.class, self->_ignoreMask);
+        decodeObjectOfClass(NSString.class, self->_chan);
+        decodeObjectOfClass(NSString.class, self->_entities);
         decodeFloat(self->_timestampPosition);
         decodeDouble(self->_serverTime);
-        decodeObject(self->_avatar);
-        decodeObject(self->_avatarURL);
-        decodeObject(self->_fromNick);
-        decodeObject(self->_msgid);
+        decodeObjectOfClass(NSString.class, self->_avatar);
+        decodeObjectOfClass(NSString.class, self->_avatarURL);
+        decodeObjectOfClass(NSString.class, self->_fromNick);
+        decodeObjectOfClass(NSString.class, self->_msgid);
         decodeBool(self->_edited);
         decodeDouble(self->_lastEditEID);
 
@@ -137,7 +140,7 @@
         else if(self->_rowType == ROW_LASTSEENEID)
             self->_bgColor = [UIColor contentBackgroundColor];
         else
-            decodeObject(self->_bgColor);
+            decodeObjectOfClass(NSString.class, self->_bgColor);
         
         if(self->_pending) {
             self->_height = 0;
@@ -339,8 +342,12 @@
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"events"];
             
             @try {
-                self->_events = [[NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile] mutableCopy];
+                NSError* error = nil;
+                self->_events = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSDictionary.class, NSArray.class, Event.class]] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+                if(error)
+                    @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {
+                CLS_LOG(@"Exception: %@", e);
                 [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
                 [[ServersDataSource sharedInstance] clear];
@@ -1018,7 +1025,10 @@
     
     @synchronized(self) {
         @try {
-            [NSKeyedArchiver archiveRootObject:events toFile:cacheFile];
+            NSError* error = nil;
+            [[NSKeyedArchiver archivedDataWithRootObject:events requiringSecureCoding:YES error:&error] writeToFile:cacheFile atomically:YES];
+            if(error)
+                CLS_LOG(@"Error archiving: %@", error);
             [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
         }
         @catch (NSException *exception) {

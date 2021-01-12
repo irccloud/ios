@@ -169,7 +169,10 @@
     [[NetworkConnection sharedInstance] getLogExportsWithHandler:^(IRCCloudJSONObject *result) {
         NSMutableDictionary *logs = result.dictionary.mutableCopy;
         [logs removeObjectForKey:@"timezones"];
-        [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:logs] forKey:@"logs_cache"];
+        NSError *error = nil;
+        [[NSUserDefaults standardUserDefaults] setObject:[NSKeyedArchiver archivedDataWithRootObject:logs requiringSecureCoding:YES error:&error] forKey:@"logs_cache"];
+        if(error)
+            CLS_LOG(@"Error: %@", error);
         
         [self refresh:logs];
     }];
@@ -180,8 +183,12 @@
     [super viewWillAppear:animated];
     self->_iCloudLogs.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"])
-        [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]) {
+        NSError *error = nil;
+        [self refresh:[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSDictionary.class, NSArray.class, NSNull.class]] fromData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"] error:&error]];
+        if(error)
+            CLS_LOG(@"Error: %@", error);
+    }
     [self refresh];
 }
 

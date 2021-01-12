@@ -17,7 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
-@interface Channel : NSObject<NSCoding> {
+@interface Channel : NSObject<NSSecureCoding> {
     int _cid;
     int _bid;
     NSString *_name;

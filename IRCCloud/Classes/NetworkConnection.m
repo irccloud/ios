@@ -345,7 +345,10 @@ volatile BOOL __socketPaused = NO;
     
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
     [__userInfoLock lock];
-    self->_userInfo = [NSKeyedUnarchiver unarchiveObjectWithFile:cacheFile];
+    NSError* error = nil;
+    self->_userInfo = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSDictionary.class, NSMutableArray.class, NSNull.class]] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+    if(error)
+        CLS_LOG(@"Error: %@", error);
     [__userInfoLock unlock];
     if(self.userInfo) {
         self->_config = [self.userInfo objectForKey:@"config"];
@@ -2420,7 +2423,12 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     else
         [stream removeObjectForKey:@"config"];
     [stream setObject:@(self->_highestEID) forKey:@"highestEID"];
-    [NSKeyedArchiver archiveRootObject:stream toFile:cacheFile];
+    
+    NSError* error = nil;
+    [[NSKeyedArchiver archivedDataWithRootObject:stream requiringSecureCoding:YES error:&error] writeToFile:cacheFile atomically:YES];
+    if(error)
+        CLS_LOG(@"Error archiving: %@", error);
+
     [__userInfoLock unlock];
     [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
     [__serializeLock unlock];

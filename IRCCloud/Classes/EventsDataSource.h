@@ -35,7 +35,7 @@
 #define TYPE_FILE @"__file__"
 #define TYPE_REPLY_COUNT @"__reply_count__"
 
-@interface Event : NSObject<NSCoding> {
+@interface Event : NSObject<NSSecureCoding> {
     int _cid;
     int _bid;
     NSTimeInterval _eid;
