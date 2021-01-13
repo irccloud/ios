@@ -2243,8 +2243,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                         ((IRCCloudAPIResultHandler)[self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])(object);
                     }];
                 } else if(backlog) {
-                    [self disconnect];
-                    [self fail];
+                    [self _backlogFailed:nil];
                 }
             } else if([object objectForKey:@"success"]) {
                 if([self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])
@@ -2482,8 +2481,9 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     self->_awayOverride = nil;
     self->_reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
-    [self->_oobQueue removeObject:notification.object];
-    if([(OOBFetcher *)notification.object bid] > 0) {
+    if(notification)
+        [self->_oobQueue removeObject:notification.object];
+    if(notification && [(OOBFetcher *)notification.object bid] > 0) {
         CLS_LOG(@"Backlog download failed, rescheduling timed out buffers");
         [self _scheduleTimedoutBuffers];
     } else {
