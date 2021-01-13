@@ -2310,11 +2310,35 @@ extern UIImage *__socketClosedBackgroundImage;
         e.formatted = [ColorFormatter format:formattedMsg defaultColor:e.color mono:__monospacePref || e.monospace linkify:e.linkify server:self->_server links:&links largeEmoji:e.isEmojiOnly mentions:[e.entities objectForKey:@"mentions"] colorizeMentions:__colorizeMentionsPref mentionOffset:e.mentionOffset + (formattedMsg.length - e.formattedMsg.length) mentionData:[e.entities objectForKey:@"mention_data"] stripColors:__noColor];
         
         if(formattedPrefix.length) {
+            NSUInteger linksOffset = 0;
             if(![formattedPrefix hasSuffix:@" "])
                 formattedPrefix = [formattedPrefix stringByAppendingString:@" "];
             NSMutableAttributedString *prefix = [ColorFormatter format:formattedPrefix defaultColor:e.color mono:__monospacePref || e.monospace linkify:NO server:nil links:nil].mutableCopy;
+            linksOffset = prefix.length;
             [prefix appendAttributedString:e.formatted];
             e.formatted = prefix;
+            
+            if(linksOffset > 0 && links.count > 0) {
+                NSMutableArray *mutableLinks = links.mutableCopy;
+                for(int i = 0; i < mutableLinks.count; i++) {
+                    NSTextCheckingResult *r = [mutableLinks objectAtIndex:i];
+                    if(r.resultType == NSTextCheckingTypeLink) {
+                        r = [NSTextCheckingResult linkCheckingResultWithRange:NSMakeRange(r.range.location + linksOffset, r.range.length) URL:r.URL];
+                        [mutableLinks setObject:r atIndexedSubscript:i];
+                    } else if(r.resultType == NSTextCheckingTypeRegularExpression) {
+                        NSRangePointer ranges = malloc(r.numberOfRanges * sizeof(NSRange));
+                        for(int j = 0; j < r.numberOfRanges; j++) {
+                            NSRange range = [r rangeAtIndex:j];
+                            range.location += linksOffset;
+                            ranges[j] = range;
+                        }
+                        r = [NSTextCheckingResult regularExpressionCheckingResultWithRanges:ranges count:r.numberOfRanges regularExpression:r.regularExpression];
+                        [mutableLinks setObject:r atIndexedSubscript:i];
+                        free(ranges);
+                    }
+                }
+                links = mutableLinks;
+            }
         }
 
         if([e.entities objectForKey:@"files"] || [e.entities objectForKey:@"pastes"]) {
