@@ -2236,11 +2236,15 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                     [d setObject:IRCCLOUD_PATH forKey:@"path"];
                     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
                     [d synchronize];
+                    [self disconnect];
                     [self connect:NO];
                 } else if([self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])]) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         ((IRCCloudAPIResultHandler)[self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])(object);
                     }];
+                } else if(backlog) {
+                    [self disconnect];
+                    [self fail];
                 }
             } else if([object objectForKey:@"success"]) {
                 if([self->_resultHandlers objectForKey:@([[object objectForKey:@"_reqid"] intValue])])
