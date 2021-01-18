@@ -978,7 +978,8 @@ extern UIImage *__socketClosedBackgroundImage;
                 if(!__disableCodeSpanPref)
                     msg = [msg insertCodeSpans];
                 event.formattedPrefix = [NSString stringWithFormat:@"— %c%@", ITALICS, [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.nick]];
-                event.formattedMsg = msg;
+                event.formattedMsg = [NSString stringWithFormat:@"%c%@",ITALICS,msg];
+                event.mentionOffset++;
                 event.rowType = ROW_ME_MESSAGE;
             } else if([type isEqualToString:@"notice"] || [type isEqualToString:@"buffer_msg"]) {
                 event.isCodeBlock = NO;
