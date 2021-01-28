@@ -518,7 +518,7 @@ extern NSURL *__logfile;
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            nc.modalPresentationStyle = UIModalPresentationPageSheet;
         else
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self.mainViewController presentViewController:nc animated:NO completion:nil];

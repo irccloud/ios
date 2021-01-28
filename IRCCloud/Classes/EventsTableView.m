@@ -224,7 +224,9 @@ extern UIImage *__socketClosedBackgroundImage;
     lp.cancelsTouchesInView = YES;
     lp.delegate = self;
     [self->_tableView addGestureRecognizer:lp];
-    [self->_tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
+    if (@available(iOS 13.0, *)) {
+        [self->_tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
+    }
     self->_topUnreadView.backgroundColor = [UIColor chatterBarColor];
     self->_bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
     [self->_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)  resizingMode:UIImageResizingModeStretch] forState:UIControlStateNormal];
@@ -417,7 +419,7 @@ extern UIImage *__socketClosedBackgroundImage;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                nc.modalPresentationStyle = UIModalPresentationPageSheet;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             
@@ -3348,7 +3350,7 @@ extern UIImage *__socketClosedBackgroundImage;
 }
 
 - (UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction
-                        configurationForMenuAtLocation:(CGPoint)location {
+                        configurationForMenuAtLocation:(CGPoint)location API_AVAILABLE(ios(13.0)) {
     [self _showLongPressMenu:location];
     return nil;
 }

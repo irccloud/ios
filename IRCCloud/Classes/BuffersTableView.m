@@ -634,7 +634,9 @@
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
     
-    [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
+    if (@available(iOS 13.0, *)) {
+        [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
+    }
     
 #ifndef EXTENSION
     if(!_delegate) {
@@ -1563,7 +1565,7 @@
 }
 
 - (UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction
-                        configurationForMenuAtLocation:(CGPoint)location {
+                        configurationForMenuAtLocation:(CGPoint)location API_AVAILABLE(ios(13.0)) {
     [self _showLongPressMenu:location];
     return nil;
 }

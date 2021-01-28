@@ -311,7 +311,10 @@
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
-    [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
+    
+    if (@available(iOS 13.0, *)) {
+        [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
+    }
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor = [UIColor usersDrawerBackgroundColor];
@@ -517,7 +520,7 @@
 }
 
 - (UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction
-                        configurationForMenuAtLocation:(CGPoint)location {
+                        configurationForMenuAtLocation:(CGPoint)location API_AVAILABLE(ios(13.0)) {
     [self _showLongPressMenu:location];
     return nil;
 }

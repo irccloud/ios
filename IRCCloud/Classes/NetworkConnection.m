@@ -2772,7 +2772,7 @@ Network type: %@\n",
             [mfmc setSubject:@"IRCCloud for iOS"];
             [mfmc setMessageBody:report isHTML:NO];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                mfmc.modalPresentationStyle = UIModalPresentationFormSheet;
+                mfmc.modalPresentationStyle = UIModalPresentationPageSheet;
             else
                 mfmc.modalPresentationStyle = UIModalPresentationCurrentContext;
             [delegate presentViewController:mfmc animated:YES completion:nil];

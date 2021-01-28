@@ -794,7 +794,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:wvc];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 
@@ -1061,7 +1061,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1080,7 +1080,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1098,7 +1098,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1116,7 +1116,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1135,7 +1135,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:cmltv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1152,7 +1152,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ctv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1170,7 +1170,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:citv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1187,7 +1187,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:wtv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1204,7 +1204,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1221,7 +1221,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1237,7 +1237,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1254,7 +1254,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1316,7 +1316,7 @@ NSArray *_sortedChannels;
                     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
                     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                        nc.modalPresentationStyle = UIModalPresentationPageSheet;
                     else
                         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                     if(self.presentedViewController)
@@ -1334,7 +1334,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ntv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1351,7 +1351,7 @@ NSArray *_sortedChannels;
                 UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:smtv];
                 [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                 if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                    nc.modalPresentationStyle = UIModalPresentationPageSheet;
                 else
                     nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                 if(self.presentedViewController)
@@ -1372,7 +1372,7 @@ NSArray *_sortedChannels;
                     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:tv];
                     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                        nc.modalPresentationStyle = UIModalPresentationPageSheet;
                     else
                         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                     if(self.presentedViewController)
@@ -2070,7 +2070,7 @@ NSArray *_sortedChannels;
                     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
                     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                        nc.modalPresentationStyle = UIModalPresentationPageSheet;
                     else
                         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                     [self presentViewController:nc animated:YES completion:nil];
@@ -2167,7 +2167,7 @@ NSArray *_sortedChannels;
                         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
                         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
                         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                            nc.modalPresentationStyle = UIModalPresentationPageSheet;
                         else
                             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
                         if(self.presentedViewController)
@@ -3892,7 +3892,7 @@ NSArray *_sortedChannels;
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        nc.modalPresentationStyle = UIModalPresentationPageSheet;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
@@ -3938,7 +3938,7 @@ NSArray *_sortedChannels;
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        nc.modalPresentationStyle = UIModalPresentationPageSheet;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     [self presentViewController:nc animated:YES completion:nil];
@@ -4299,7 +4299,7 @@ NSArray *_sortedChannels;
             UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:c];
             [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
             if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
+                nc.modalPresentationStyle = UIModalPresentationPageSheet;
             else
                 nc.modalPresentationStyle = UIModalPresentationCurrentContext;
             [self presentViewController:nc animated:YES completion:nil];
@@ -4622,7 +4622,7 @@ NSArray *_sortedChannels;
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            nc.modalPresentationStyle = UIModalPresentationPageSheet;
         else
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         if(self.presentedViewController)
@@ -4674,7 +4674,7 @@ NSArray *_sortedChannels;
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            nc.modalPresentationStyle = UIModalPresentationPageSheet;
         else
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         if(self.presentedViewController)
@@ -4688,7 +4688,7 @@ NSArray *_sortedChannels;
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ptv];
     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        nc.modalPresentationStyle = UIModalPresentationPageSheet;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
@@ -4702,7 +4702,7 @@ NSArray *_sortedChannels;
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fcv];
     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        nc.modalPresentationStyle = UIModalPresentationPageSheet;
     else
         nc.modalPresentationStyle = UIModalPresentationCurrentContext;
     if(self.presentedViewController)
@@ -4899,7 +4899,7 @@ NSArray *_sortedChannels;
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:itv];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            nc.modalPresentationStyle = UIModalPresentationPageSheet;
         else
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:nc animated:YES completion:nil];
@@ -4915,7 +4915,7 @@ NSArray *_sortedChannels;
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            nc.modalPresentationStyle = UIModalPresentationPageSheet;
         else
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:nc animated:YES completion:nil];
@@ -4946,7 +4946,7 @@ NSArray *_sortedChannels;
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+            nc.modalPresentationStyle = UIModalPresentationPageSheet;
         else
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:nc animated:YES completion:nil];
