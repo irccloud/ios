@@ -16,7 +16,7 @@ void FirebaseLog(NSString *format, ...);
 #endif
 
 #define OBJC_STRINGIFY(x) @#x
-#define encodeObject(x) [aCoder encodeObject:x forKey:OBJC_STRINGIFY(x)]
+#define encodeObject(x) [aCoder encodeObject:([x isKindOfClass:NSNull.class])?nil:x forKey:OBJC_STRINGIFY(x)]
 #define encodeInt(x) [aCoder encodeInt:x forKey:OBJC_STRINGIFY(x)]
 #define encodeDouble(x) [aCoder encodeDouble:x forKey:OBJC_STRINGIFY(x)]
 #define encodeFloat(x) [aCoder encodeFloat:x forKey:OBJC_STRINGIFY(x)]
