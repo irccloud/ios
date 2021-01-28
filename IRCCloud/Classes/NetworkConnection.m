@@ -1381,7 +1381,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url];
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:_userAgent forHTTPHeaderField:@"User-Agent"];
-        if(self.session.length > 1 && [url.scheme isEqualToString:@"https"] && [url.host isEqualToString:IRCCLOUD_HOST])
+        if(self.session.length > 1 && [url.scheme isEqualToString:@"https"] && ([url.host isEqualToString:IRCCLOUD_HOST] || [url.host hasSuffix:@".irccloud.com"]))
             [request setValue:[NSString stringWithFormat:@"session=%@",self.session] forHTTPHeaderField:@"Cookie"];
         
         [self _performDataTaskRequest:request handler:resultHandler];

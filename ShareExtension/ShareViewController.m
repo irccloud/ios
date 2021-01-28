@@ -127,7 +127,9 @@
     };
     [UIColor setTheme:@"dawn"];
     if (@available(iOS 13, *)) {
-        [UIColor setTheme:[UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark?@"midnight":@"dawn"];
+        NSString *theme = [UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark?@"midnight":@"dawn";
+        [UIColor setTheme:theme];
+        self.view.window.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle = [theme isEqualToString:@"dawn"]?UIUserInterfaceStyleLight:UIUserInterfaceStyleDark;
     } else {
         [UIColor setTheme:@"dawn"];
     }
