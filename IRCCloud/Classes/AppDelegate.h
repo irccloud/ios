@@ -55,12 +55,15 @@
 -(void)addScene:(id)scene;
 -(void)removeScene:(id)scene;
 -(void)setActiveScene:(UIWindow *)window;
+-(UIScene *)sceneForWindow:(UIWindow *)window;
 @end
 
 @interface SceneDelegate : NSObject <UIWindowSceneDelegate> {
     AppDelegate *_appDelegate;
+    UIScene *_scene;
 }
 @property (strong, nonatomic) UIWindow *window;
+@property (strong, nonatomic) UIScene *scene;
 
 @property (strong, nonatomic) LoginSplashViewController *loginSplashViewController;
 @property (strong, nonatomic) MainViewController *mainViewController;

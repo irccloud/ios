@@ -2560,11 +2560,13 @@ NSArray *_sortedChannels;
 }
 
 -(void)_updateTitleArea {
+    UIScene *scene = [(AppDelegate *)[UIApplication sharedApplication].delegate sceneForWindow:self.view.window];
+    scene.title = @"IRCCloud";
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
     self->_lock.hidden = YES;
     self->_titleLabel.textColor = [UIColor navBarHeadingColor];
     self->_topicLabel.textColor = [UIColor navBarSubheadingColor];
     if([self->_buffer.type isEqualToString:@"console"]) {
-        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         if(s.name.length)
             self->_titleLabel.text = s.name;
         else
@@ -2583,6 +2585,8 @@ NSArray *_sortedChannels;
         else
             self->_lock.text = FA_GLOBE;
         self->_lock.textColor = [UIColor navBarHeadingColor];
+        if(s)
+            scene.title = [NSString stringWithFormat:@"%@", s.name.length?s.name:s.hostname];
     } else {
         self.navigationItem.title = self->_titleLabel.text = self->_buffer.displayName;
         self->_titleLabel.font = [UIFont boldSystemFontOfSize:20];
@@ -2635,6 +2639,8 @@ NSArray *_sortedChannels;
                 }
             }
         }
+        if(s && _buffer)
+            scene.title = [NSString stringWithFormat:@"%@ | %@", _buffer.displayName, s.name.length?s.name:s.hostname];
     }
     if(self->_msgid) {
         self->_topicLabel.text = self->_titleLabel.text;

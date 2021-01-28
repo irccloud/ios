@@ -963,6 +963,15 @@ extern NSURL *__logfile;
         }
     }
 }
+
+-(UIScene *)sceneForWindow:(UIWindow *)window {
+    for(SceneDelegate *d in _activeScenes) {
+        if(d.window == window) {
+            return d.scene;
+        }
+    }
+    return nil;
+}
 @end
 
 @implementation SceneDelegate
@@ -982,6 +991,7 @@ extern NSURL *__logfile;
     [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
     self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     self.slideViewController.view.accessibilityIgnoresInvertColors = YES;
+    self.scene = scene;
 }
 
 -(void)sceneDidEnterBackground:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
