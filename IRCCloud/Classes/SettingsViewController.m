@@ -829,8 +829,10 @@
         [device addObject:@{@"title":@"Always show channel members", @"accessory":self->_hiddenMembers}];
     }
     [device addObject:@{@"title":@"Ask To Post A Snippet", @"accessory":self->_pastebin}];
+#if !TARGET_OS_MACCATALYST
     [device addObject:@{@"title":@"Open Images in Browser", @"accessory":self->_imageViewer}];
     [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":self->_videoViewer}];
+#endif
     [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":self->_browserWarning}];
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];

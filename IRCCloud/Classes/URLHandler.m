@@ -657,6 +657,7 @@
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"facetime-prompt%@",[url.absoluteString substringFromIndex:8]]]];
     } else if([url.scheme isEqualToString:@"tel"]) {
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"telprompt%@",[url.absoluteString substringFromIndex:3]]]];
+#if !TARGET_OS_MACCATALYST
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"] && [[self class] isImageURL:url]) {
         [self showImage:url];
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && ([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"])) {
@@ -672,6 +673,7 @@
 #endif
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
+#endif
     } else if([url.host.lowercaseString isEqualToString:@"maps.apple.com"]) {
         [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
     } else {
