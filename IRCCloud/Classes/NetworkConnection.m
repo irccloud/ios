@@ -1890,14 +1890,16 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
             }
         }
         
-        if(self->_oobQueue.count) {
-            CLS_LOG(@"Cancelling pending OOB requests");
-            for(OOBFetcher *fetcher in _oobQueue) {
-                [fetcher cancel];
+        @synchronized (self->_oobQueue) {
+            if(self->_oobQueue.count) {
+                CLS_LOG(@"Cancelling pending OOB requests");
+                for(OOBFetcher *fetcher in _oobQueue) {
+                    [fetcher cancel];
+                }
+                [self->_oobQueue removeAllObjects];
+                self->_streamId = nil;
+                self->_highestEID = 0;
             }
-            [self->_oobQueue removeAllObjects];
-            self->_streamId = nil;
-            self->_highestEID = 0;
         }
         
         self->_notifier = notifier;
@@ -1970,10 +1972,12 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)cancelPendingBacklogRequests {
-    for(OOBFetcher *fetcher in _oobQueue.copy) {
-        if(fetcher.bid > 0) {
-            [fetcher cancel];
-            [self->_oobQueue removeObject:fetcher];
+    @synchronized (self->_oobQueue) {
+        for(OOBFetcher *fetcher in _oobQueue.copy) {
+            if(fetcher.bid > 0) {
+                [fetcher cancel];
+                [self->_oobQueue removeObject:fetcher];
+            }
         }
     }
 }
@@ -1985,13 +1989,15 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         self->_reachability = nil;
         self->_reachabilityValid = NO;
     }
-    if(self->_oobQueue.count) {
-        for(OOBFetcher *fetcher in _oobQueue) {
-            [fetcher cancel];
+    @synchronized (self->_oobQueue) {
+        if(self->_oobQueue.count) {
+            for(OOBFetcher *fetcher in _oobQueue) {
+                [fetcher cancel];
+            }
+            [self->_oobQueue removeAllObjects];
+            self->_streamId = nil;
+            self->_highestEID = 0;
         }
-        [self->_oobQueue removeAllObjects];
-        self->_streamId = nil;
-        self->_highestEID = 0;
     }
     self->_reconnectTimestamp = 0;
     [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
@@ -2403,7 +2409,9 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         __socketPaused = NO;
     }
     CLS_LOG(@"I downloaded %i events", _totalCount);
-    [self->_oobQueue removeObject:fetcher];
+    @synchronized (self->_oobQueue) {
+        [self->_oobQueue removeObject:fetcher];
+    }
     [self->_notifications updateBadgeCount];
     [self _processPendingEdits:NO];
     if([self->_servers count]) {
@@ -2481,8 +2489,11 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     self->_awayOverride = nil;
     self->_reconnectTimestamp = [[NSDate date] timeIntervalSince1970] + _idleInterval;
     [self performSelectorOnMainThread:@selector(scheduleIdleTimer) withObject:nil waitUntilDone:NO];
-    if(notification)
-        [self->_oobQueue removeObject:notification.object];
+    if(notification) {
+        @synchronized (self->_oobQueue) {
+            [self->_oobQueue removeObject:notification.object];
+        }
+    }
     if(notification && [(OOBFetcher *)notification.object bid] > 0) {
         CLS_LOG(@"Backlog download failed, rescheduling timed out buffers");
         [self _scheduleTimedoutBuffers];
@@ -2510,13 +2521,15 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 [self requestBacklogForBuffer:buffer.bid server:buffer.cid completion:nil];
             }
         }
-        if(self->_oobQueue.count > 0) {
-            [self->_queue addOperationWithBlock:^{
-                if(self->_oobQueue.count > 0 && ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid > 0) {
-                    CLS_LOG(@"Starting fetcher for timed-out bid%i", ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid);
-                    [(OOBFetcher *)[self->_oobQueue objectAtIndex:0] start];
-                }
-            }];
+        @synchronized (self->_oobQueue) {
+            if(self->_oobQueue.count > 0) {
+                [self->_queue addOperationWithBlock:^{
+                    if(self->_oobQueue.count > 0 && ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid > 0) {
+                        CLS_LOG(@"Starting fetcher for timed-out bid%i", ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid);
+                        [(OOBFetcher *)[self->_oobQueue objectAtIndex:0] start];
+                    }
+                }];
+            }
         }
     }];
 }
