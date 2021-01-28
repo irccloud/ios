@@ -214,12 +214,14 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+#if !TARGET_OS_MACCATALYST
     if([FIROptions defaultOptions]) {
         if(animated && self.parentViewController)
             [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.parentViewController.class)}];
         else
             [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
     }
+#endif
 }
 
 - (NSMutableDictionary *)_addBuffer:(Buffer *)buffer data:(NSMutableArray *)data prefs:(NSDictionary *)prefs server:(Server *)server collapsed:(NSDictionary *)collapsed unread:(int)unread highlights:(int)highlights firstUnreadPosition:(NSInteger *)firstUnreadPosition lastUnreadPosition:(NSInteger *)lastUnreadPosition firstHighlightPosition:(NSInteger *)firstHighlightPosition lastHighlightPosition:(NSInteger *)lastHighlightPosition {
@@ -631,6 +633,8 @@
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
+    
+    [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
     
 #ifndef EXTENSION
     if(!_delegate) {
@@ -1539,19 +1543,29 @@
     }
 }
 
+-(void)_showLongPressMenu:(CGPoint)location {
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:location];
+    if(indexPath) {
+        if(indexPath.row < _data.count) {
+            int type = [[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue];
+            if(type == TYPE_SERVER || type == TYPE_CHANNEL || type == TYPE_CONVERSATION)
+                [self->_delegate bufferLongPressed:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
+        }
+    }
+}
+
 -(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
     @synchronized(self->_data) {
         if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-            NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
-            if(indexPath) {
-                if(indexPath.row < _data.count) {
-                    int type = [[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue];
-                    if(type == TYPE_SERVER || type == TYPE_CHANNEL || type == TYPE_CONVERSATION)
-                        [self->_delegate bufferLongPressed:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
-                }
-            }
+            [self _showLongPressMenu:[gestureRecognizer locationInView:self.tableView]];
         }
     }
+}
+
+- (UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction
+                        configurationForMenuAtLocation:(CGPoint)location {
+    [self _showLongPressMenu:location];
+    return nil;
 }
 
 -(void)next {

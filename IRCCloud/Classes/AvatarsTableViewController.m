@@ -14,7 +14,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#if !TARGET_OS_MACCATALYST
 #import <AssetsLibrary/AssetsLibrary.h>
+#endif
 #import "AvatarsTableViewController.h"
 #import "YYAnimatedImageView.h"
 #import "ImageCache.h"
@@ -166,6 +168,7 @@
             }
             
             if(refURL) {
+#if !TARGET_OS_MACCATALYST
                 CLS_LOG(@"Loading metadata from asset library");
                 ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
                     ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
@@ -197,6 +200,7 @@
                         [u uploadFile:mediaURL];
                     }
                 }];
+#endif
             } else {
                 CLS_LOG(@"no asset library URL, uploading image data instead");
                 if(img) {

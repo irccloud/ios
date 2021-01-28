@@ -23,7 +23,7 @@
 -(void)dismissKeyboard;
 @end
 
-@interface UsersTableView : UITableViewController<UIGestureRecognizerDelegate> {
+@interface UsersTableView : UITableViewController<UIGestureRecognizerDelegate,UIContextMenuInteractionDelegate> {
     NSArray *_data;
     NSMutableArray *_sectionTitles;
     NSMutableArray *_sectionIndexes;

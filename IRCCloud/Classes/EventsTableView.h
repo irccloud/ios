@@ -30,7 +30,7 @@
 -(void)showJoinPrompt:(NSString *)channel server:(Server *)s;
 @end
 
-@interface EventsTableView : UIViewController<LinkLabelDelegate,UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate,UITableViewDataSource,UITableViewDelegate> {
+@interface EventsTableView : UIViewController<LinkLabelDelegate,UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate,UITableViewDataSource,UITableViewDelegate,UIContextMenuInteractionDelegate> {
     IBOutlet UITableView *_tableView;
     IBOutlet UIView *_headerView;
     IBOutlet UIView *_backlogFailedView;

@@ -224,6 +224,7 @@ extern UIImage *__socketClosedBackgroundImage;
     lp.cancelsTouchesInView = YES;
     lp.delegate = self;
     [self->_tableView addGestureRecognizer:lp];
+    [self->_tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
     self->_topUnreadView.backgroundColor = [UIColor chatterBarColor];
     self->_bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
     [self->_backlogFailedButton setBackgroundImage:[[UIImage imageNamed:@"sendbg_active"] resizableImageWithCapInsets:UIEdgeInsetsMake(14, 14, 14, 14)  resizingMode:UIImageResizingModeStretch] forState:UIControlStateNormal];
@@ -2024,8 +2025,10 @@ extern UIImage *__socketClosedBackgroundImage;
         
         FIRTrace *trace;
 #ifdef CRASHLYTICS_TOKEN
+#if !TARGET_OS_MACCATALYST
         if([FIROptions defaultOptions])
             trace = [FIRPerformance startTraceWithName:@"loadBacklog"];
+#endif
 #endif
         UIFont *f = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
@@ -3307,36 +3310,49 @@ extern UIImage *__socketClosedBackgroundImage;
     [self _reloadData];
 }
 
--(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-    if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-        NSIndexPath *indexPath = [self->_tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self->_tableView]];
-        if(indexPath) {
-            if(indexPath.row < _data.count) {
-                Event *e = [self->_data objectAtIndex:indexPath.row];
-                EventsTableCell *c = (EventsTableCell *)[self->_tableView cellForRowAtIndexPath:indexPath];
-                NSURL *url;
-                if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE)
-                    url = [e.entities objectForKey:@"id"]?[NSURL URLWithString:[e.entities objectForKey:@"url"]]:[e.entities objectForKey:@"url"];
-                else
-                    url = [c.message linkAtPoint:[gestureRecognizer locationInView:c.message]].URL;
-                if(url) {
-                    if([url.scheme hasPrefix:@"irc"] && [url.host intValue] > 0 && url.path && url.path.length > 1) {
-                        Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
-                        if(s != nil) {
-                            if(s.ssl > 0)
-                                url = [NSURL URLWithString:[NSString stringWithFormat:@"ircs://%@%@", s.hostname, [url.path stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
-                            else
-                                url = [NSURL URLWithString:[NSString stringWithFormat:@"irc://%@%@", s.hostname, [url.path stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
-                        }
-                    } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
-                        url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@%@", [url.scheme substringFromIndex:15], url.host, url.path]];
+-(void)_showLongPressMenu:(CGPoint)location {
+    NSIndexPath *indexPath = [self->_tableView indexPathForRowAtPoint:location];
+    if(indexPath) {
+        if(indexPath.row < _data.count) {
+            Event *e = [self->_data objectAtIndex:indexPath.row];
+            EventsTableCell *c = (EventsTableCell *)[self->_tableView cellForRowAtIndexPath:indexPath];
+            NSURL *url;
+            if(e.rowType == ROW_THUMBNAIL || e.rowType == ROW_FILE)
+                url = [e.entities objectForKey:@"id"]?[NSURL URLWithString:[e.entities objectForKey:@"url"]]:[e.entities objectForKey:@"url"];
+            else
+                url = [c.message linkAtPoint:[self->_tableView convertPoint:location toView:c.message]].URL;
+            if(url) {
+                if([url.scheme hasPrefix:@"irc"] && [url.host intValue] > 0 && url.path && url.path.length > 1) {
+                    Server *s = [[ServersDataSource sharedInstance] getServer:[url.host intValue]];
+                    if(s != nil) {
+                        if(s.ssl > 0)
+                            url = [NSURL URLWithString:[NSString stringWithFormat:@"ircs://%@%@", s.hostname, [url.path stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
+                        else
+                            url = [NSURL URLWithString:[NSString stringWithFormat:@"irc://%@%@", s.hostname, [url.path stringByReplacingOccurrencesOfString:@"#" withString:@"%23"]]];
                     }
+                } else if([url.scheme hasPrefix:@"irccloud-paste-"]) {
+                    url = [NSURL URLWithString:[NSString stringWithFormat:@"%@://%@%@", [url.scheme substringFromIndex:15], url.host, url.path]];
                 }
-                [self->_delegate rowLongPressed:[self->_data objectAtIndex:indexPath.row] rect:[self->_tableView rectForRowAtIndexPath:indexPath] link:url.absoluteString];
             }
+            [self->_delegate rowLongPressed:[self->_data objectAtIndex:indexPath.row] rect:[self->_tableView rectForRowAtIndexPath:indexPath] link:url.absoluteString];
         }
     }
 }
+
+-(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    @synchronized(self->_data) {
+        if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+            [self _showLongPressMenu:[gestureRecognizer locationInView:self->_tableView]];
+        }
+    }
+}
+
+- (UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction
+                        configurationForMenuAtLocation:(CGPoint)location {
+    [self _showLongPressMenu:location];
+    return nil;
+}
+
 
 -(NSString *)YUNoHeartbeat {
     if(!_ready)

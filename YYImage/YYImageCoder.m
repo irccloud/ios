@@ -34,7 +34,7 @@
 #import <zlib.h>
 
 
-
+#if !TARGET_OS_MACCATALYST
 #ifndef YYIMAGE_WEBP_ENABLED
 #if __has_include(<WebP/decode.h>) && __has_include(<WebP/encode.h>) && \
     __has_include(<WebP/demux.h>)  && __has_include(<WebP/mux.h>)
@@ -54,7 +54,9 @@
 #define YYIMAGE_WEBP_ENABLED 0
 #endif
 #endif
-
+#else
+#define YYIMAGE_WEBP_ENABLED 0
+#endif
 
 
 

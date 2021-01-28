@@ -15,7 +15,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+#if !TARGET_OS_MACCATALYST
 #import <AssetsLibrary/AssetsLibrary.h>
+#endif
 #import <MobileCoreServices/UTCoreTypes.h>
 #import <MobileCoreServices/UTType.h>
 #import <UserNotifications/UserNotifications.h>
@@ -1999,8 +2001,10 @@ NSArray *_sortedChannels;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
+#if !TARGET_OS_MACCATALYST
     if([FIROptions defaultOptions])
         [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
+#endif
 }
 
 - (void)didReceiveMemoryWarning {
@@ -3202,7 +3206,11 @@ NSArray *_sortedChannels;
 
     self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
     
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height && size.width == [UIScreen mainScreen].bounds.size.width && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height
+#if !TARGET_OS_MACCATALYST
+       && size.width == [UIScreen mainScreen].bounds.size.width
+#endif
+       && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
         self->_borders.hidden = NO;
         self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
         self->_eventsViewOffsetXConstraint.constant = [[UIDevice currentDevice] isBigPhone]?90:110;
@@ -3404,7 +3412,11 @@ NSArray *_sortedChannels;
             self.slidingViewController.underRightViewController = nil;
         }
     } else {
-        if(self.view.bounds.size.width > self.view.bounds.size.height && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"]) {
+        if(self.view.bounds.size.width > self.view.bounds.size.height
+#if !TARGET_OS_MACCATALYST
+           && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width
+#endif
+           && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"]) {
             if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone] && !self->_msgid) {
                 self.navigationItem.rightBarButtonItem = nil;
                 if(self.slidingViewController.underRightViewController) {
@@ -4382,6 +4394,7 @@ NSArray *_sortedChannels;
             }
             
             if(refURL) {
+#if !TARGET_OS_MACCATALYST
                 CLS_LOG(@"Loading metadata from asset library");
                 ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
                     ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
@@ -4433,6 +4446,7 @@ NSArray *_sortedChannels;
                     }
                     [fvc viewWillAppear:NO];
                 }];
+#endif
             } else if([info objectForKey:@"gifData"]) {
                 CLS_LOG(@"Uploading GIF from Pasteboard");
                 [u uploadFile:[NSString stringWithFormat:@"%li.GIF", time(NULL)] UTI:@"image/gif" data:[info objectForKey:@"gifData"]];

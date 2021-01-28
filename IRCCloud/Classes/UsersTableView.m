@@ -311,6 +311,7 @@
     lp.minimumPressDuration = 1.0;
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
+    [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
 
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor = [UIColor usersDrawerBackgroundColor];
@@ -349,12 +350,14 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
+#if !TARGET_OS_MACCATALYST
     if([FIROptions defaultOptions]) {
         if(animated && self.parentViewController)
             [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.parentViewController.class)}];
         else
             [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
     }
+#endif
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
@@ -494,17 +497,29 @@
         [self->_delegate userSelected:[[self->_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
 }
 
--(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
-    if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
-        NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:[gestureRecognizer locationInView:self.tableView]];
-        if(indexPath) {
-            if(indexPath.row < _data.count) {
-                NSUInteger idx = [[self->_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
-                if([[[self->_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
-                    [self->_delegate userSelected:[[self->_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
-            }
+-(void)_showLongPressMenu:(CGPoint)location {
+    NSIndexPath *indexPath = [self.tableView indexPathForRowAtPoint:location];
+    if(indexPath) {
+        if(indexPath.row < _data.count) {
+            NSUInteger idx = [[self->_sectionIndexes objectAtIndex:indexPath.section] intValue] + indexPath.row;
+            if([[[self->_data objectAtIndex:idx] objectForKey:@"type"] intValue] == TYPE_USER)
+                [self->_delegate userSelected:[[self->_data objectAtIndex:idx] objectForKey:@"text"] rect:[self.tableView rectForRowAtIndexPath:indexPath]];
         }
     }
+}
+
+-(void)_longPress:(UILongPressGestureRecognizer *)gestureRecognizer {
+    @synchronized(self->_data) {
+        if(gestureRecognizer.state == UIGestureRecognizerStateBegan) {
+            [self _showLongPressMenu:[gestureRecognizer locationInView:self.tableView]];
+        }
+    }
+}
+
+- (UIContextMenuConfiguration *)contextMenuInteraction:(UIContextMenuInteraction *)interaction
+                        configurationForMenuAtLocation:(CGPoint)location {
+    [self _showLongPressMenu:location];
+    return nil;
 }
 
 @end

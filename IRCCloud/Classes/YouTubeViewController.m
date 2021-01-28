@@ -189,9 +189,11 @@
     [self->_activity startAnimating];
     [self.view addSubview:self->_activity];
     
+#if !TARGET_OS_MACCATALYST
     [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
         kFIRParameterContentType:@"Youtube"
     }];
+#endif
 }
 
 -(void)_YTWrapperTapped {

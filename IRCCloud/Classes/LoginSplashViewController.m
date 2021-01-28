@@ -216,24 +216,26 @@
 }
 
 -(void)_promptForSWC {
-    if(username.text.length == 0 && !_gotCredentialsFromPasswordManager && !_accessLink) {
-        SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
-            if (error != NULL) {
-                CLS_LOG(@"Unable to request shared web credentials: %@", error);
-                return;
-            }
-            
-            if (CFArrayGetCount(credentials) > 0) {
-                self->_gotCredentialsFromPasswordManager = YES;
-                NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self->username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
-                    [self->password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
-                    [self loginHintPressed:nil];
-                    [self loginButtonPressed:nil];
-                }];
-            }
-        });
+    if (@available(macCatalyst 14.0, *)) {
+        if(username.text.length == 0 && !_gotCredentialsFromPasswordManager && !_accessLink) {
+            SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
+                if (error != NULL) {
+                    CLS_LOG(@"Unable to request shared web credentials: %@", error);
+                    return;
+                }
+                
+                if (CFArrayGetCount(credentials) > 0) {
+                    self->_gotCredentialsFromPasswordManager = YES;
+                    NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [self->username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
+                        [self->password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
+                        [self loginHintPressed:nil];
+                        [self loginButtonPressed:nil];
+                    }];
+                }
+            });
+        }
     }
 }
 
@@ -272,10 +274,12 @@
             self->forgotPasswordSignup.alpha = 0;
             [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
 #ifndef ENTERPRISE
+#if !TARGET_OS_MACCATALYST
             [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
                 kFIRParameterMethod:@"access-link",
                 kFIRParameterSuccess:@(1)
             }];
+#endif
 #endif
         } else {
             [UIView beginAnimations:nil context:nil];
@@ -286,10 +290,12 @@
             [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
             [self presentViewController:alert animated:YES completion:nil];
 #ifndef ENTERPRISE
+#if !TARGET_OS_MACCATALYST
             [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
                 kFIRParameterMethod:@"access-link",
                 kFIRParameterSuccess:@(0)
             }];
+#endif
 #endif
         }
     }];
@@ -761,6 +767,7 @@
                         [d setObject:IRCCLOUD_PATH forKey:@"path"];
                         [d synchronize];
 #ifndef ENTERPRISE
+#if !TARGET_OS_MACCATALYST
                         if(nameAlpha) {
                             [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
                                 kFIRParameterMethod:@"email",
@@ -772,13 +779,16 @@
                                 kFIRParameterSuccess:@(1)
                             }];
                         }
+#endif
                         if(!self->_gotCredentialsFromPasswordManager) {
-                            SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
-                                if (error != NULL) {
-                                    CLS_LOG(@"Unable to save shared credentials: %@", error);
-                                    return;
-                                }
-                            });
+                            if (@available(macCatalyst 14.0, *)) {
+                                SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
+                                    if (error != NULL) {
+                                        CLS_LOG(@"Unable to save shared credentials: %@", error);
+                                        return;
+                                    }
+                                });
+                            }
                         }
 #endif
                         self->loginHint.alpha = 0;
@@ -822,6 +832,7 @@
                         }]];
                         [self presentViewController:alert animated:YES completion:nil];
 #ifndef ENTERPRISE
+#if !TARGET_OS_MACCATALYST
                         if(nameAlpha) {
                             if([result objectForKey:@"message"]) {
                                 [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
@@ -849,6 +860,7 @@
                                 }];
                             }
                         }
+#endif
 #endif
                     }
                 };

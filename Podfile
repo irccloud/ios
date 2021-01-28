@@ -73,10 +73,36 @@ target 'ShareExtension Enterprise' do
 
 end
 
-post_install do |pi|
-    pi.pods_project.targets.each do |t|
-        t.build_configurations.each do |config|
-            config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+post_install do |installer|
+  installer.pods_project.targets.each do |t|
+      t.build_configurations.each do |config|
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+      end
+  end
+
+    installer.pods_project.targets.each do |target|
+        
+        # handle non catalyst libs
+        libs = ["FirebaseAnalytics", "FIRAnalyticsConnector", "FirebasePerformance", "GoogleAppMeasurement"]
+        
+        target.build_configurations.each do |config|
+            xcconfig_path = config.base_configuration_reference.real_path
+            xcconfig = File.read(xcconfig_path)
+            values = ""
+            
+            libs.each { |lib|
+                if xcconfig["-framework \"#{lib}\""]
+                    puts "Found '#{lib}' on target '#{target.name}'"
+                    xcconfig.sub!(" -framework \"#{lib}\"", '')
+                    values += " -framework \"#{lib}\""
+                end
+            }
+            
+            if values.length > 0
+                puts "Preparing '#{target.name}' for Catalyst\n\n"
+                new_xcconfig = xcconfig + 'OTHER_LDFLAGS[sdk=iphone*] = $(inherited)' + values
+                File.open(xcconfig_path, "w") { |file| file << new_xcconfig }
+            end
         end
     end
 end

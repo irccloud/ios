@@ -88,10 +88,12 @@ NSLock *__serializeLock = nil;
 NSLock *__userInfoLock = nil;
 volatile BOOL __socketPaused = NO;
 
+#if !TARGET_OS_MACCATALYST
 @interface NetworkConnection (Firebase) {
 }
 @property FIRHTTPMetric *httpMetric;
 @end
+#endif
 
 @interface OOBFetcher : NSObject<NSURLSessionDataDelegate> {
     SBJson5Parser *_parser;
@@ -209,13 +211,17 @@ volatile BOOL __socketPaused = NO;
 -(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     if(!self->_cancelled) {
 #ifndef EXTENSION
+#if !TARGET_OS_MACCATALYST
         FIRTrace *trace;
         if([FIROptions defaultOptions])
             trace = [FIRPerformance startTraceWithName:@"parseOOB"];
 #endif
+#endif
         [self->_parser parse:data];
 #ifndef EXTENSION
+#if !TARGET_OS_MACCATALYST
         [trace stop];
+#endif
 #endif
     } else {
         CLS_LOG(@"Ignoring data for cancelled OOB fetcher");
@@ -1952,7 +1958,9 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 }
                 
                 CLS_LOG(@"Connecting: %@", url);
+#if !TARGET_OS_MACCATALYST
                 self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
+#endif
                 WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", [result objectForKey:@"socket_host"]] protocols:nil
                                                                                  tlsSettings:[@{
                                                                                  (NSString *)kCFStreamSSLPeerName: [result objectForKey:@"socket_host"],
@@ -1961,7 +1969,9 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                                                                                      headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
                                                                            verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
                 self->_socket = [WebSocket webSocketWithConfig:config delegate:self];
+#if !TARGET_OS_MACCATALYST
                 [self.httpMetric start];
+#endif
                 [self->_socket open];
             } else {
                 CLS_LOG(@"Unable to load configuration");
@@ -2027,8 +2037,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         self->_idleInterval = 20;
         self->_reconnectTimestamp = -1;
         [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
+#if !TARGET_OS_MACCATALYST
         [self.httpMetric setResponseCode:200];
         [self.httpMetric stop];
+#endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _postConnectivityChange];
         }];
@@ -2610,7 +2622,9 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         }
     }
     [[ImageCache sharedInstance] purge];
+#if !TARGET_OS_MACCATALYST
     [FIRAnalytics resetAnalyticsData];
+#endif
 #endif
     [self cancelIdleTimer];
 }
@@ -2705,12 +2719,14 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
   
 }
 
+#if !TARGET_OS_MACCATALYST
 -(FIRHTTPMetric *)httpMetric {
     return self->_httpMetric;
 }
 -(void)setHttpMetric:(FIRHTTPMetric *)metric {
     self->_httpMetric = metric;
 }
+#endif
 
 -(void)sendFeedbackReport:(UIViewController *)delegate {
     CLS_LOG(@"Feedback Requested");
