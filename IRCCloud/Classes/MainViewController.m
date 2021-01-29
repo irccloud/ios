@@ -3213,7 +3213,9 @@ NSArray *_sortedChannels;
     self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height
-#if !TARGET_OS_MACCATALYST
+#if TARGET_OS_MACCATALYST
+       - 78
+#else
        && size.width == [UIScreen mainScreen].bounds.size.width
 #endif
        && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
@@ -4911,6 +4913,9 @@ NSArray *_sortedChannels;
     } else if([action isEqualToString:@"Edit Connection"]) {
         [self _editConnection];
     } else if([action isEqualToString:@"Settings"]) {
+#if TARGET_OS_MACCATALYST
+        [[UIApplication sharedApplication] requestSceneSessionActivation:nil userActivity:[[NSUserActivity alloc] initWithActivityType:@"com.IRCCloud.settings"] options:nil errorHandler:nil];
+#else
         SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
         [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
@@ -4919,6 +4924,7 @@ NSArray *_sortedChannels;
         else
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:nc animated:YES completion:nil];
+#endif
     } else if([action isEqualToString:@"Display Options"]) {
         DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
         dvc.buffer = self->_buffer;

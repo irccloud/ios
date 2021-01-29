@@ -964,7 +964,7 @@ extern NSURL *__logfile;
     }
 }
 
--(UIScene *)sceneForWindow:(UIWindow *)window {
+-(UIScene *)sceneForWindow:(UIWindow *)window API_AVAILABLE(ios(13.0)){
     for(SceneDelegate *d in _activeScenes) {
         if(d.window == window) {
             return d.scene;
@@ -972,11 +972,32 @@ extern NSURL *__logfile;
     }
     return nil;
 }
+
+-(void)closeWindow:(UIWindow *)window {
+    for(UISceneSession *session in [UIApplication sharedApplication].openSessions) {
+        if([session.scene.delegate isKindOfClass:SceneDelegate.class] && ((SceneDelegate *)session.scene.delegate).window == window) {
+            [UIApplication.sharedApplication requestSceneSessionDestruction:session options:nil errorHandler:nil];
+            break;
+        }
+    }
+}
 @end
 
 @implementation SceneDelegate
 -(void)scene:(UIScene *)scene willConnectToSession:(UISceneSession *)session options:(UISceneConnectionOptions *)connectionOptions API_AVAILABLE(ios(13.0)) {
     _appDelegate = (AppDelegate *)[UIApplication sharedApplication].delegate;
+    self.scene = scene;
+
+    for(NSUserActivity *a in connectionOptions.userActivities) {
+        if([a.activityType isEqualToString:@"com.IRCCloud.settings"]) {
+            SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+            self.window.rootViewController = nc;
+            ((UIWindowScene *)scene).sizeRestrictions.maximumSize = ((UIWindowScene *)scene).sizeRestrictions.minimumSize;
+            return;
+        }
+    }
     
     self.splashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"SplashViewController"];
     self.splashViewController.view.accessibilityIgnoresInvertColors = YES;
@@ -991,7 +1012,6 @@ extern NSURL *__logfile;
     [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
     self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     self.slideViewController.view.accessibilityIgnoresInvertColors = YES;
-    self.scene = scene;
 }
 
 -(void)sceneDidEnterBackground:(UIScene *)scene API_AVAILABLE(ios(13.0)) {

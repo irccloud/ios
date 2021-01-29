@@ -611,6 +611,9 @@
         [[AvatarsDataSource sharedInstance] clear];
         
         [((AppDelegate *)[UIApplication sharedApplication].delegate).mainViewController viewWillAppear:YES];
+//#if TARGET_OS_MACCATALYST
+        //[(AppDelegate *)UIApplication.sharedApplication.delegate closeWindow:self.view.window];
+//#endif
     }
 }
 
@@ -635,12 +638,16 @@
     [[EventsDataSource sharedInstance] clearFormattingCache];
     [[AvatarsDataSource sharedInstance] clear];
     [[EventsDataSource sharedInstance] reformat];
+//#if TARGET_OS_MACCATALYST
+//    [(AppDelegate *)UIApplication.sharedApplication.delegate closeWindow:self.view.window];
+//#else
     UIView *v = self.navigationController.view.superview;
     [self.navigationController.view removeFromSuperview];
     [v addSubview: self.navigationController.view];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.view.backgroundColor = [UIColor navBarColor];
     [self dismissViewControllerAnimated:YES completion:nil];
+//#endif
 }
 
 -(void)viewWillAppear:(BOOL)animated {

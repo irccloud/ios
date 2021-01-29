@@ -56,6 +56,7 @@
 -(void)removeScene:(id)scene;
 -(void)setActiveScene:(UIWindow *)window;
 -(UIScene *)sceneForWindow:(UIWindow *)window;
+-(void)closeWindow:(UIWindow *)window;
 @end
 
 @interface SceneDelegate : NSObject <UIWindowSceneDelegate> {
