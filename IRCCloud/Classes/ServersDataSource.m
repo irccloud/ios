@@ -144,7 +144,7 @@
 -(BOOL)clientTagDeny:(NSString *)tagName {
     if([[self->_isupport objectForKey:@"CLIENTTAGDENY"] isKindOfClass:[NSString class]]) {
         BOOL denied = NO;
-        NSArray *tags = [[self->_isupport objectForKey:@""] componentsSeparatedByString:@","];
+        NSArray *tags = [[self->_isupport objectForKey:@"CLIENTTAGDENY"] componentsSeparatedByString:@","];
         for(NSString *tag in tags) {
             if([tag isEqualToString:@"*"] || [tag isEqualToString:tagName])
                 denied = YES;
