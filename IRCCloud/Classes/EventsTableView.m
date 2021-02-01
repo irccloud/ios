@@ -225,7 +225,7 @@ extern UIImage *__socketClosedBackgroundImage;
     lp.delegate = self;
     [self->_tableView addGestureRecognizer:lp];
 
-#if !TARGET_OS_MACCATALYST
+#if TARGET_OS_MACCATALYST
     if (@available(iOS 13.0, *)) {
         [self->_tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
     }
