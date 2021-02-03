@@ -1159,7 +1159,6 @@
 		2223C6A71768D7150032544B /* ImageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageViewController.h; sourceTree = "<group>"; };
 		2223C6A81768D7150032544B /* ImageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageViewController.m; sourceTree = "<group>"; };
 		2223C6B51768F4500032544B /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
-		222AA74725C351EF00E678DE /* IRCCloud copy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "IRCCloud copy-Info.plist"; path = "/Users/sam/Projects/irccloud-ios/IRCCloud copy-Info.plist"; sourceTree = "<absolute>"; };
 		222C80B41E48ABB200A243E7 /* ImageCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageCache.h; sourceTree = "<group>"; };
 		222C80B51E48ABB200A243E7 /* ImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageCache.m; sourceTree = "<group>"; };
 		222C80BA1E4A0BB600A243E7 /* SBJson5.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJson5.h; sourceTree = "<group>"; };
@@ -1962,7 +1961,6 @@
 				228A056E16D3DABA0029769C /* Frameworks */,
 				228A056D16D3DABA0029769C /* Products */,
 				7CF0BE4739CE6912111DBBD1 /* Pods */,
-				222AA74725C351EF00E678DE /* IRCCloud copy-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};

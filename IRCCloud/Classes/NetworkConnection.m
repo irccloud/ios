@@ -589,7 +589,7 @@ volatile BOOL __socketPaused = NO;
                        CLS_LOG(@"oob_include, invalidating BIDs");
                        [self->_buffers invalidate];
                        [self->_channels invalidate];
-                       [self fetchOOB:[NSString stringWithFormat:@"https://%@%@", IRCCLOUD_HOST, [object objectForKey:@"url"]]];
+                       [self fetchOOB:[NSString stringWithFormat:@"%@%@", [object objectForKey:@"api_host"], [object objectForKey:@"url"]]];
                    },
                    @"oob_timeout": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        CLS_LOG(@"OOB timed out");
@@ -631,22 +631,18 @@ volatile BOOL __socketPaused = NO;
                        if([p objectForKey:@"time-left"]) {
                            if(![[NSUserDefaults standardUserDefaults] objectForKey:@"time-left"])
                                [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"time-left"] forKey:@"time-left"];
-                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
                        }
                        if([p objectForKey:@"avatars-off"]) {
                            if(![[NSUserDefaults standardUserDefaults] objectForKey:@"avatars-off"])
                                [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"avatars-off"] forKey:@"avatars-off"];
-                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
                        }
                        if([p objectForKey:@"chat-oneline"]) {
                            if(![[NSUserDefaults standardUserDefaults] objectForKey:@"chat-oneline"])
                                [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"chat-oneline"] forKey:@"chat-oneline"];
-                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
                        }
                        if([p objectForKey:@"chat-norealname"]) {
                            if(![[NSUserDefaults standardUserDefaults] objectForKey:@"chat-norealname"])
                                [[NSUserDefaults standardUserDefaults] setObject:[p objectForKey:@"chat-norealname"] forKey:@"chat-norealname"];
-                           [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
                        }
                        if([[p objectForKey:@"labs"] objectForKey:@"avatars"]) {
                            if(![[NSUserDefaults standardUserDefaults] objectForKey:@"avatarImages"])
@@ -1408,6 +1404,21 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }];
 }
 
+-(void)updateAPIHost:(NSString *)host {
+    IRCCLOUD_HOST = host;
+    if([IRCCLOUD_HOST hasPrefix:@"http://"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:7];
+    if([IRCCLOUD_HOST hasPrefix:@"https://"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
+    if([IRCCLOUD_HOST hasSuffix:@"/"])
+        IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
+    
+    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+
+    CLS_LOG(@"API Host: %@", IRCCLOUD_HOST);
+}
+
 -(void)_configLoaded {
 #ifdef ENTERPRISE
     if(![[self->_config objectForKey:@"enterprise"] isKindOfClass:[NSDictionary class]])
@@ -1419,20 +1430,9 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
         self.pasteURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"pastebin_uri_template"] error:nil];
         self.avatarURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"avatar_uri_template"] error:nil];
         self.avatarRedirectURITemplate = [CSURITemplate URITemplateWithString:[self->_config objectForKey:@"avatar_redirect_uri_template"] error:nil];
-        
-        IRCCLOUD_HOST = [self->_config objectForKey:@"api_host"];
-        if([IRCCLOUD_HOST hasPrefix:@"http://"])
-            IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:7];
-        if([IRCCLOUD_HOST hasPrefix:@"https://"])
-            IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
-        if([IRCCLOUD_HOST hasSuffix:@"/"])
-            IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
-        
-        [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
+
+        [self updateAPIHost:[self->_config objectForKey:@"api_host"]];
     }
-    
-    CLS_LOG(@"API Host: %@", IRCCLOUD_HOST);
 }
 
 -(void)propertiesForFile:(NSString *)fileID handler:(IRCCloudAPIResultHandler)handler {
@@ -2242,6 +2242,8 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 } else if([[object objectForKey:@"message"] isEqualToString:@"set_shard"]) {
                     if([object objectForKey:@"websocket_path"])
                         IRCCLOUD_PATH = [object objectForKey:@"websocket_path"];
+                    if([object objectForKey:@"api_host"])
+                        [self updateAPIHost:[object objectForKey:@"api_host"]];
                     [self setSession:[object objectForKey:@"cookie"]];
                     [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
                     [[NSUserDefaults standardUserDefaults] synchronize];

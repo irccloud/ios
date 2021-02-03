@@ -255,10 +255,10 @@
             if([result objectForKey:@"websocket_path"])
                 IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
             [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
-            [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
             [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
             [[NSUserDefaults standardUserDefaults] synchronize];
+            if([result objectForKey:@"api_host"])
+                [[NetworkConnection sharedInstance] updateAPIHost:[result objectForKey:@"api_host"]];
 #ifdef ENTERPRISE
             NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else
@@ -742,22 +742,19 @@
             });
             return;
         }
-        IRCCLOUD_HOST = [config objectForKey:@"api_host"];
-        [self _stripIRCCloudHost];
+        [[NetworkConnection sharedInstance] updateAPIHost:[config objectForKey:@"api_host"]];
         
         [[NetworkConnection sharedInstance] requestAuthTokenWithHandler:^(IRCCloudJSONObject *result) {
             if([[result objectForKey:@"success"] intValue] == 1) {
                 IRCCloudAPIResultHandler handler = ^(IRCCloudJSONObject *result) {
                     if([[result objectForKey:@"success"] intValue] == 1) {
-                        if([result objectForKey:@"websocket_host"])
-                            IRCCLOUD_HOST = [result objectForKey:@"websocket_host"];
                         if([result objectForKey:@"websocket_path"])
                             IRCCLOUD_PATH = [result objectForKey:@"websocket_path"];
                         [NetworkConnection sharedInstance].session = [result objectForKey:@"session"];
-                        [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
                         [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_PATH forKey:@"path"];
-                        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"greeting_3.0"];
                         [[NSUserDefaults standardUserDefaults] synchronize];
+                        if([result objectForKey:@"api_host"])
+                            [[NetworkConnection sharedInstance] updateAPIHost:[result objectForKey:@"api_host"]];
 #ifdef ENTERPRISE
                         NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
 #else

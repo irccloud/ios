@@ -209,6 +209,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(void)setLastSelectedBID:(int)bid;
 -(void)parse:(NSDictionary *)object backlog:(BOOL)backlog;
 -(void)sendFeedbackReport:(UIViewController *)delegate;
+-(void)updateAPIHost:(NSString *)host;
 
 //WebSocket
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
