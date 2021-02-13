@@ -35,7 +35,7 @@
 - (void)fetchServerList;
 @end
 
-static NSString * const NetworksListLink = @"http://irccloud.com/static/networks.json";
+static NSString * const NetworksListLink = @"https://www.irccloud.com/static/networks.json";
 static NSString * const FetchedDataNetworksKey = @"networks";
 static NSString * const NetworkNameKey = @"name";
 static NSString * const NetworkServersKey = @"servers";
