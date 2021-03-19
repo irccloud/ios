@@ -25,7 +25,9 @@
 #import "TrustKit.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 @import Firebase;
+#ifndef EXTENSION
 @import FirebasePerformance;
+#endif
 
 NSURL *__logfile;
 NSOperationQueue *__logQueue;
@@ -88,11 +90,13 @@ NSLock *__serializeLock = nil;
 NSLock *__userInfoLock = nil;
 volatile BOOL __socketPaused = NO;
 
+#ifndef EXTENSION
 #if !TARGET_OS_MACCATALYST
 @interface NetworkConnection (Firebase) {
 }
 @property FIRHTTPMetric *httpMetric;
 @end
+#endif
 #endif
 
 @interface OOBFetcher : NSObject<NSURLSessionDataDelegate> {
@@ -1958,8 +1962,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 }
                 
                 CLS_LOG(@"Connecting: %@", url);
+#ifndef EXTENSION
 #if !TARGET_OS_MACCATALYST
                 self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
+#endif
 #endif
                 WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", [result objectForKey:@"socket_host"]] protocols:nil
                                                                                  tlsSettings:[@{
@@ -1969,8 +1975,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                                                                                      headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
                                                                            verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
                 self->_socket = [WebSocket webSocketWithConfig:config delegate:self];
+#ifndef EXTENSION
 #if !TARGET_OS_MACCATALYST
                 [self.httpMetric start];
+#endif
 #endif
                 [self->_socket open];
             } else {
@@ -2037,9 +2045,11 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         self->_idleInterval = 20;
         self->_reconnectTimestamp = -1;
         [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
+#ifndef EXTENSION
 #if !TARGET_OS_MACCATALYST
         [self.httpMetric setResponseCode:200];
         [self.httpMetric stop];
+#endif
 #endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _postConnectivityChange];
@@ -2721,6 +2731,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
   
 }
 
+#ifndef EXTENSION
 #if !TARGET_OS_MACCATALYST
 -(FIRHTTPMetric *)httpMetric {
     return self->_httpMetric;
@@ -2728,6 +2739,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 -(void)setHttpMetric:(FIRHTTPMetric *)metric {
     self->_httpMetric = metric;
 }
+#endif
 #endif
 
 -(void)sendFeedbackReport:(UIViewController *)delegate {

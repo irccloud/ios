@@ -1,9 +1,17 @@
 # Uncomment the next line to define a global platform for your project
 platform :ios, '11.0'
 
+pod 'GoogleUtilities/AppDelegateSwizzler'
+pod 'GoogleUtilities/Environment'
+pod 'GoogleUtilities/ISASwizzler'
+pod 'GoogleUtilities/Logger'
+pod 'GoogleUtilities/MethodSwizzler'
+pod 'GoogleUtilities/NSData+zlib'
+pod 'GoogleUtilities/Network'
+pod 'GoogleUtilities/Reachability'
+pod 'GoogleUtilities/UserDefaults'
 pod 'Firebase/Crashlytics'
 pod 'Firebase/Analytics'
-pod 'Firebase/Performance'
 pod 'SSZipArchive'
 
 target 'IRCCloud' do
@@ -13,6 +21,7 @@ target 'IRCCloud' do
   # Pods for IRCCloud
   pod 'youtube-ios-player-helper'
   pod 'Firebase/Messaging'
+  pod 'Firebase/Performance'
 
   target 'IRCCloudUnitTests' do
     inherit! :search_paths
@@ -28,6 +37,7 @@ target 'IRCCloud Enterprise' do
   # Pods for IRCCloud Enterprise
   pod 'youtube-ios-player-helper'
   pod 'Firebase/Messaging'
+  pod 'Firebase/Performance'
 
 end
 
@@ -38,6 +48,7 @@ target 'IRCCloud FLEX' do
   # Pods for IRCCloud FLEX
   pod 'youtube-ios-player-helper'
   pod 'Firebase/Messaging'
+  pod 'Firebase/Performance'
 
 end
 
@@ -80,29 +91,29 @@ post_install do |installer|
       end
   end
 
-    installer.pods_project.targets.each do |target|
-        
+#    installer.pods_project.targets.each do |target|
+#        
         # handle non catalyst libs
-        libs = ["FirebaseAnalytics", "FIRAnalyticsConnector", "FirebasePerformance", "GoogleAppMeasurement"]
+#        libs = ["FirebaseAnalytics", "FIRAnalyticsConnector", "FirebasePerformance", "GoogleAppMeasurement"]
         
-        target.build_configurations.each do |config|
-            xcconfig_path = config.base_configuration_reference.real_path
-            xcconfig = File.read(xcconfig_path)
-            values = ""
+#        target.build_configurations.each do |config|
+#            xcconfig_path = config.base_configuration_reference.real_path
+#            xcconfig = File.read(xcconfig_path)
+#            values = ""
             
-            libs.each { |lib|
-                if xcconfig["-framework \"#{lib}\""]
-                    puts "Found '#{lib}' on target '#{target.name}'"
-                    xcconfig.sub!(" -framework \"#{lib}\"", '')
-                    values += " -framework \"#{lib}\""
-                end
-            }
+#            libs.each { |lib|
+#                if xcconfig["-framework \"#{lib}\""]
+#                    puts "Found '#{lib}' on target '#{target.name}'"
+#                    xcconfig.sub!(" -framework \"#{lib}\"", '')
+#                    values += " -framework \"#{lib}\""
+#                end
+#            }
             
-            if values.length > 0
-                puts "Preparing '#{target.name}' for Catalyst\n\n"
-                new_xcconfig = xcconfig + 'OTHER_LDFLAGS[sdk=iphone*] = $(inherited)' + values
-                File.open(xcconfig_path, "w") { |file| file << new_xcconfig }
-            end
-        end
-    end
+#            if values.length > 0
+#                puts "Preparing '#{target.name}' for Catalyst\n\n"
+#                new_xcconfig = xcconfig + 'OTHER_LDFLAGS[sdk=iphone*] = $(inherited)' + values
+#                File.open(xcconfig_path, "w") { |file| file << new_xcconfig }
+#            end
+#        end
+#    end
 end

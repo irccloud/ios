@@ -393,7 +393,6 @@ extern NSURL *__logfile;
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
-    [[FIRMessaging messaging] appDidReceiveMessage:userInfo];
     if([userInfo objectForKey:@"d"]) {
         int cid = [[[userInfo objectForKey:@"d"] objectAtIndex:0] intValue];
         int bid = [[[userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
@@ -454,7 +453,6 @@ extern NSURL *__logfile;
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-    [[FIRMessaging messaging] appDidReceiveMessage:notification.request.content.userInfo];
     if([notification.request.content.userInfo objectForKey:@"d"]) {
         int bid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:1] intValue];
         NSTimeInterval eid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
@@ -473,7 +471,6 @@ extern NSURL *__logfile;
 }
 
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler {
-    [[FIRMessaging messaging] appDidReceiveMessage:response.notification.request.content.userInfo];
     [UIColor setTheme];
     [self.mainViewController applyTheme];
     if([response isKindOfClass:[UNTextInputNotificationResponse class]]) {

@@ -60,6 +60,9 @@
 -(NSComparisonResult)compare:(Channel *)aChannel {
     return [[self->_name lowercaseString] compare:[aChannel.name lowercaseString]];
 }
+-(NSString *)description {
+    return [NSString stringWithFormat:@"{cid: %i, bid: %i, name: %@, type: %@}", _cid, _bid, _name, _type];
+}
 -(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
     if(self) {
