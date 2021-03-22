@@ -133,6 +133,10 @@
                 Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
                 NSTimeInterval eid = [[d objectAtIndex:2] doubleValue];
                 if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || eid <= b.last_seen_eid) {
+                    if(!b)
+                        CLS_LOG(@"Removing eid%f because bid%i doesn't exist", eid, [[d objectAtIndex:1] intValue]);
+                    else
+                        CLS_LOG(@"Removing eid%f because bid%i.last_seen_eid = %f", eid, [[d objectAtIndex:1] intValue], b.last_seen_eid);
                     [identifiers addObject:n.request.identifier];
                 } else if(b && ![[EventsDataSource sharedInstance] event:eid buffer:b.bid]) {
                     b.extraHighlights++;
@@ -141,7 +145,8 @@
                 }
             }
             
-            [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:identifiers];
+            if(identifiers.count > 0)
+                [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:identifiers];
             
             for(Buffer *b in buffers) {
                 int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
