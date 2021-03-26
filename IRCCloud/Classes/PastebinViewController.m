@@ -249,8 +249,24 @@
         [self->_activity stopAnimating];
         self->_lineNumbers.enabled = YES;
         decisionHandler(WKNavigationActionPolicyCancel);
-    } else {
+    } else if(([navigationAction.request.URL.host isEqualToString:IRCCLOUD_HOST] || [navigationAction.request.URL.host isEqualToString:@"www.irccloud.com"]) && [navigationAction.request.URL.path hasPrefix:@"/pastebin/"]) {
         decisionHandler(WKNavigationActionPolicyAllow);
+    } else {
+        decisionHandler(WKNavigationActionPolicyCancel);
+        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Chrome"] && [[OpenInChromeController sharedInstance] openInChrome:navigationAction.request.URL
+                                                                                                                                                withCallbackURL:[NSURL URLWithString:
+#ifdef ENTERPRISE
+                                                                                                                                                                 @"irccloud-enterprise://"
+#else
+                                                                                                                                                                 @"irccloud://"
+#endif
+                                                                                                                                                                 ]
+                                                                                                                                                   createNewTab:NO])
+            return;
+        else if([[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Firefox"] && [[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:navigationAction.request.URL])
+            return;
+        else
+            [[UIApplication sharedApplication] openURL:navigationAction.request.URL options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
     }
 }
 
