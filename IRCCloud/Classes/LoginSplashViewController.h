@@ -64,12 +64,10 @@
     
     CGSize _kbSize;
     NSURL *_accessLink;
-    NSString *_impression;
     BOOL _gotCredentialsFromPasswordManager;
     NSString *_authURL;
 }
 @property NSURL *accessLink;
-@property (nonatomic) NSString *impression;
 -(IBAction)loginButtonPressed:(id)sender;
 -(IBAction)signupButtonPressed:(id)sender;
 -(IBAction)textFieldChanged:(id)sender;

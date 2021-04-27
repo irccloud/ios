@@ -334,8 +334,6 @@ extern NSURL *__logfile;
                 [self.loginSplashViewController viewWillAppear:YES];
             else
                 self.window.rootViewController = self.loginSplashViewController;
-        } else if([url.host isEqualToString:@"referral"]) {
-            [self _sendImpression:url];
         } else {
             return NO;
         }
@@ -345,14 +343,6 @@ extern NSURL *__logfile;
     return YES;
 }
 
--(void)_sendImpression:(NSURL *)url {
-    [[NetworkConnection sharedInstance] impression:[[[ASIdentifierManager sharedManager] advertisingIdentifier] UUIDString] referrer:[url.absoluteString substringFromIndex:url.scheme.length + url.host.length + 4] handler:^(IRCCloudJSONObject *result) {
-        if([[result objectForKey:@"success"] intValue]) {
-            self.loginSplashViewController.impression = [result objectForKey:@"id"];
-        }
-    }];
-}
-    
 - (void)launchURL:(NSURL *)url {
     if (!_urlHandler) {
         self->_urlHandler = [[URLHandler alloc] init];
@@ -366,22 +356,26 @@ extern NSURL *__logfile;
     [self->_urlHandler launchURL:url];
 }
 
+-(void)messaging:(FIRMessaging *)messaging didReceiveRegistrationToken:(NSString *)fcmToken {
+    
+}
+
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
     NSData *oldToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"];
     
-    [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
+    [[FIRMessaging messaging] tokenWithCompletion:^(NSString *token, NSError *error) {
         if (error != nil) {
-            CLS_LOG(@"Error fetching remote instance ID: %@", error);
+            CLS_LOG(@"Error fetching FIRMessaging token: %@", error);
         } else {
             //CLS_LOG(@"FCM Token: %@", result.token);
             if(oldToken && ![devToken isEqualToData:oldToken]) {
               CLS_LOG(@"Unregistering old APNs token");
-                [self->_conn unregisterAPNs:oldToken fcm:result.token session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
+                [self->_conn unregisterAPNs:oldToken fcm:token session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
                   CLS_LOG(@"Unregistration result: %@", result);
               }];
             }
             [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
-            [self->_conn registerAPNs:devToken fcm:result.token handler:^(IRCCloudJSONObject *result) {
+            [self->_conn registerAPNs:devToken fcm:token handler:^(IRCCloudJSONObject *result) {
               CLS_LOG(@"Registration result: %@", result);
             }];
         }
@@ -949,14 +943,16 @@ extern NSURL *__logfile;
 }
 
 -(void)setActiveScene:(UIWindow *)window {
-    for(SceneDelegate *d in _activeScenes) {
-        if(d.window == window) {
-            self.window = d.window;
-            self.splashViewController = d.splashViewController;
-            self.loginSplashViewController = d.loginSplashViewController;
-            self.mainViewController = d.mainViewController;
-            self.slideViewController = d.slideViewController;
-            break;
+    if (@available(iOS 13.0, *)) {
+        for(SceneDelegate *d in _activeScenes) {
+            if(d.window == window) {
+                self.window = d.window;
+                self.splashViewController = d.splashViewController;
+                self.loginSplashViewController = d.loginSplashViewController;
+                self.mainViewController = d.mainViewController;
+                self.slideViewController = d.slideViewController;
+                break;
+            }
         }
     }
 }
@@ -971,10 +967,12 @@ extern NSURL *__logfile;
 }
 
 -(void)closeWindow:(UIWindow *)window {
-    for(UISceneSession *session in [UIApplication sharedApplication].openSessions) {
-        if([session.scene.delegate isKindOfClass:SceneDelegate.class] && ((SceneDelegate *)session.scene.delegate).window == window) {
-            [UIApplication.sharedApplication requestSceneSessionDestruction:session options:nil errorHandler:nil];
-            break;
+    if (@available(iOS 13.0, *)) {
+        for(UISceneSession *session in [UIApplication sharedApplication].openSessions) {
+            if([session.scene.delegate isKindOfClass:SceneDelegate.class] && ((SceneDelegate *)session.scene.delegate).window == window) {
+                [UIApplication.sharedApplication requestSceneSessionDestruction:session options:nil errorHandler:nil];
+                break;
+            }
         }
     }
 }

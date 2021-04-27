@@ -2560,8 +2560,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)_updateTitleArea {
-    UIScene *scene = [(AppDelegate *)[UIApplication sharedApplication].delegate sceneForWindow:self.view.window];
-    scene.title = @"IRCCloud";
+    NSString *sceneTitle = nil;
     Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
     self->_lock.hidden = YES;
     self->_titleLabel.textColor = [UIColor navBarHeadingColor];
@@ -2586,7 +2585,7 @@ NSArray *_sortedChannels;
             self->_lock.text = FA_GLOBE;
         self->_lock.textColor = [UIColor navBarHeadingColor];
         if(s)
-            scene.title = [NSString stringWithFormat:@"%@", s.name.length?s.name:s.hostname];
+            sceneTitle = [NSString stringWithFormat:@"%@", s.name.length?s.name:s.hostname];
     } else {
         self.navigationItem.title = self->_titleLabel.text = self->_buffer.displayName;
         self->_titleLabel.font = [UIFont boldSystemFontOfSize:20];
@@ -2640,7 +2639,7 @@ NSArray *_sortedChannels;
             }
         }
         if(s && _buffer)
-            scene.title = [NSString stringWithFormat:@"%@ | %@", _buffer.displayName, s.name.length?s.name:s.hostname];
+            sceneTitle = [NSString stringWithFormat:@"%@ | %@", _buffer.displayName, s.name.length?s.name:s.hostname];
     }
     if(self->_msgid) {
         self->_topicLabel.text = self->_titleLabel.text;
@@ -2660,6 +2659,11 @@ NSArray *_sortedChannels;
     else
         self->_titleOffsetYConstraint.constant = 0;
     [self->_titleView setNeedsUpdateConstraints];
+    
+    if (@available(iOS 13.0, *)) {
+        UIScene *scene = [(AppDelegate *)[UIApplication sharedApplication].delegate sceneForWindow:self.view.window];
+        scene.title = sceneTitle ? sceneTitle : @"IRCCloud";
+    }
 }
 
 -(void)showJoinPrompt:(NSString *)channel server:(Server *)s {

@@ -55,10 +55,11 @@
 -(void)addScene:(id)scene;
 -(void)removeScene:(id)scene;
 -(void)setActiveScene:(UIWindow *)window;
--(UIScene *)sceneForWindow:(UIWindow *)window;
+-(UIScene *)sceneForWindow:(UIWindow *)window API_AVAILABLE(ios(13.0));
 -(void)closeWindow:(UIWindow *)window;
 @end
 
+API_AVAILABLE(ios(13.0))
 @interface SceneDelegate : NSObject <UIWindowSceneDelegate> {
     AppDelegate *_appDelegate;
     UIScene *_scene;

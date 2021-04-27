@@ -1311,8 +1311,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self _performDataTaskRequest:request handler:handler];
 }
 
--(void)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token impression:(NSString *)impression handler:(IRCCloudAPIResultHandler)handler {
-    [self _postRequest:@"/chat/signup" args:@{@"realname":realname, @"email":email, @"password":password, @"token":token, @"ios_impression":impression} handler:handler];
+-(void)signup:(NSString *)email password:(NSString *)password realname:(NSString *)realname token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler {
+    [self _postRequest:@"/chat/signup" args:@{@"realname":realname, @"email":email, @"password":password, @"token":token} handler:handler];
 }
 
 -(void)requestPassword:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler {
@@ -1346,12 +1346,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 -(void)unregisterAPNs:(NSData *)token fcm:(NSString *)fcm session:(NSString *)session handler:(IRCCloudAPIResultHandler)handler {
 #ifndef EXTENSION
     [self _postRequest:@"/apn-unregister" args:@{@"device_id":[self dataToHex:token], @"fcm_token":fcm, @"session":session} handler:handler];
-#endif
-}
-
--(void)impression:(NSString *)idfa referrer:(NSString *)referrer handler:(IRCCloudAPIResultHandler)handler {
-#ifndef EXTENSION
-    return [self _postRequest:@"/chat/ios-impressions" args:@{@"idfa":idfa, @"referrer":referrer} handler:handler];
 #endif
 }
 
@@ -2560,17 +2554,16 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 
 -(void)_logout:(NSString *)session {
 #ifndef EXTENSION
-    [[FIRInstanceID instanceID] instanceIDWithHandler:^(FIRInstanceIDResult * _Nullable result, NSError * _Nullable error) {
+    [[FIRMessaging messaging] tokenWithCompletion:^(NSString *token, NSError *error) {
         if (error != nil) {
-            NSLog(@"Error fetching remote instance ID: %@", error);
+            NSLog(@"Error fetching FIRMessaging token: %@", error);
         } else if([[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]) {
-            NSLog(@"Remote instance ID token: %@", result.token);
-            [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] fcm:result.token session:session handler:^(IRCCloudJSONObject *result) {
+            [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] fcm:token session:session handler:^(IRCCloudJSONObject *result) {
                 CLS_LOG(@"Unregister result: %@", result);
             }];
         }
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
-        [[FIRInstanceID instanceID] deleteIDWithHandler:^(NSError *error) {
+        [[FIRMessaging messaging] deleteDataWithCompletion:^(NSError *error) {
             if(error)
                 CLS_LOG(@"Unable to delete Firebase ID: %@", error);
         }];

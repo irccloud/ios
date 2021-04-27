@@ -863,7 +863,7 @@
                 };
                 
                 if(nameAlpha)
-                    [[NetworkConnection sharedInstance] signup:user password:pass realname:realname token:[result objectForKey:@"token"] impression:self->_impression?self->_impression:@"" handler:handler];
+                    [[NetworkConnection sharedInstance] signup:user password:pass realname:realname token:[result objectForKey:@"token"] handler:handler];
                 else
                     [[NetworkConnection sharedInstance] login:user password:pass token:[result objectForKey:@"token"] handler:handler];
             } else {
