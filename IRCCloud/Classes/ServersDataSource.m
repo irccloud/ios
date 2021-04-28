@@ -101,7 +101,8 @@
         decodeObjectOfClass(NSString.class, self->_mode);
         decodeObjectOfClass(NSDictionary.class, self->_isupport);
         self->_isupport = self->_isupport.mutableCopy;
-        decodeObjectOfClass(NSArray.class, self->_ignores);
+        NSSet *set = [NSSet setWithObjects:NSArray.class, NSMutableArray.class, NSString.class, nil];
+        decodeObjectOfClasses(set, self->_ignores);
         decodeObjectOfClass(NSString.class, self->_CHANTYPES);
         decodeObjectOfClass(NSDictionary.class, self->_PREFIX);
         decodeInt(self->_order);
@@ -182,7 +183,7 @@
             
             @try {
                 NSError* error = nil;
-                self->_servers = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSArray.class, Server.class]] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+                self->_servers = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSDictionary.class, NSArray.class, Server.class, nil] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
                 if(error)
                     @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {

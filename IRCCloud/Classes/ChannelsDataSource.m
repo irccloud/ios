@@ -73,7 +73,8 @@
         decodeDouble(self->_topic_time);
         decodeObjectOfClass(NSString.class, self->_topic_author);
         decodeObjectOfClass(NSString.class, self->_type);
-        decodeObjectOfClass(NSMutableArray.class, self->_modes);
+        NSSet *set = [NSSet setWithObjects:NSMutableArray.class, NSDictionary.class, nil];
+        decodeObjectOfClasses(set, self->_modes);
         decodeObjectOfClass(NSString.class, self->_mode);
         decodeDouble(self->_timestamp);
         decodeObjectOfClass(NSString.class, self->_url);
@@ -123,7 +124,7 @@
             
             @try {
                 NSError* error = nil;
-                self->_channels = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSArray.class, Channel.class]] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+                self->_channels = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSDictionary.class, NSArray.class, Channel.class, nil] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
                 if(error)
                     @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {

@@ -22,6 +22,7 @@ void FirebaseLog(NSString *format, ...);
 #define encodeFloat(x) [aCoder encodeFloat:x forKey:OBJC_STRINGIFY(x)]
 #define encodeBool(x) [aCoder encodeBool:x forKey:OBJC_STRINGIFY(x)]
 
+#define decodeObjectOfClasses(c,x) x = [aDecoder decodeObjectOfClasses:c forKey:OBJC_STRINGIFY(x)]
 #define decodeObjectOfClass(c,x) x = [aDecoder decodeObjectOfClass:c forKey:OBJC_STRINGIFY(x)]
 #define decodeInt(x) x = [aDecoder decodeIntForKey:OBJC_STRINGIFY(x)]
 #define decodeDouble(x) x = [aDecoder decodeDoubleForKey:OBJC_STRINGIFY(x)]

@@ -185,7 +185,7 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(handleEvent:) name:kIRCCloudEventNotification object:nil];
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]) {
         NSError *error = nil;
-        [self refresh:[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSDictionary.class, NSArray.class, NSNull.class]] fromData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"] error:&error]];
+        [self refresh:[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSDictionary.class, NSArray.class, NSNull.class, nil] fromData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"] error:&error]];
         if(error)
             CLS_LOG(@"Error: %@", error);
     }

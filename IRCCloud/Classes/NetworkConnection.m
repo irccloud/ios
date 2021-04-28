@@ -356,7 +356,7 @@ volatile BOOL __socketPaused = NO;
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
     [__userInfoLock lock];
     NSError* error = nil;
-    self->_userInfo = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithArray:@[NSDictionary.class, NSMutableArray.class, NSNull.class]] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+    self->_userInfo = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSDictionary.class, NSMutableArray.class, NSNull.class, nil] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
     if(error)
         CLS_LOG(@"Error: %@", error);
     [__userInfoLock unlock];
