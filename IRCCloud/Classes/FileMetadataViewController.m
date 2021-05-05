@@ -247,6 +247,9 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     NSInteger section = indexPath.section;
+    if(!_imageView)
+        section++;
+
     NSString *identifier = [NSString stringWithFormat:@"uploadcell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     if(!cell)
@@ -258,9 +261,6 @@
     cell.detailTextLabel.text = nil;
     cell.backgroundView = nil;
     cell.backgroundColor = [UITableViewCell appearance].backgroundColor;
-    
-    if(!_imageView)
-        section++;
     
     switch(section) {
         case 0:
