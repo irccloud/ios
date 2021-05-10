@@ -892,14 +892,6 @@
                                   }
                               }
                           },
-                          @"rehashed_config":^(Event *event, IRCCloudJSONObject *object) {
-                              event.bgColor = [UIColor noticeBackgroundColor];
-                              event.linkify = NO;
-                              event.from = @"";
-                              if(object)
-                                  event.msg = [NSString stringWithFormat:@"Rehashed config: %@ (%@)", [object objectForKey:@"file"], event.msg];
-                              event.monospace = YES;
-                          },
                           @"unknown_umode":^(Event *event, IRCCloudJSONObject *object) {
                               event.color = [UIColor networkErrorColor];
                               event.bgColor = [UIColor errorBackgroundColor];
