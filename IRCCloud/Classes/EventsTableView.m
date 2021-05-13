@@ -1035,10 +1035,12 @@ extern UIImage *__socketClosedBackgroundImage;
                             if(result.range.location)
                                 lastChunk = [msg substringWithRange:NSMakeRange(start, result.range.location - start)];
                             BOOL strippedSpace = NO;
-                            if([lastChunk hasPrefix:@" "] && lastChunk.length > 1) {
+                            if(lastChunk.length > 1 && ([lastChunk hasPrefix:@" "] || [lastChunk hasPrefix:@"\n"])) {
                                 lastChunk = [lastChunk substringFromIndex:1];
                                 strippedSpace = YES;
                             }
+                            if([lastChunk hasSuffix:@" "] || [lastChunk hasSuffix:@"\n"])
+                                lastChunk = [lastChunk substringToIndex:lastChunk.length - 1];
                             if(start > 0) {
                                 Event *e = [event copy];
                                 e.eid = event.eid + ++event.childEventCount;
@@ -1089,7 +1091,7 @@ extern UIImage *__socketClosedBackgroundImage;
                             e.eid = event.eid + ++event.childEventCount;
                             e.msg = e.formattedMsg = [msg substringWithRange:NSMakeRange(start, msg.length - start)];
                             e.mentionOffset = -start;
-                            if([e.formattedMsg hasPrefix:@" "] && e.formattedMsg.length > 1) {
+                            if(e.formattedMsg.length > 1 && ([e.formattedMsg hasPrefix:@" "] || [e.formattedMsg hasPrefix:@"\n"])) {
                                 e.formattedMsg = [e.formattedMsg substringFromIndex:1];
                                 e.mentionOffset--;
                             }

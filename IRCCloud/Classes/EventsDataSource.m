@@ -128,7 +128,8 @@
         decodeObjectOfClass(NSString.class, self->_day);
         decodeObjectOfClass(NSString.class, self->_ignoreMask);
         decodeObjectOfClass(NSString.class, self->_chan);
-        decodeObjectOfClass(NSString.class, self->_entities);
+        NSSet *set = [NSSet setWithObjects:NSArray.class, NSDictionary.class, nil];
+        decodeObjectOfClasses(set, self->_entities);
         decodeFloat(self->_timestampPosition);
         decodeDouble(self->_serverTime);
         decodeObjectOfClass(NSString.class, self->_avatar);
