@@ -1157,8 +1157,6 @@
     else
         event.msgid = nil;
 
-    event.from = nil;
-    
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [self->_formatterMap objectForKey:object.type];
     if(formatter)
         formatter(event, object);
