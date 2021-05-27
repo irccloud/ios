@@ -1115,7 +1115,7 @@
     else
         event.realname = nil;
     event.oldNick = [object objectForKey:@"oldnick"];
-    if([[object objectForKey:@"from_realname"] isKindOfClass:[NSString class]])
+    if([[object objectForKey:@"server"] isKindOfClass:[NSString class]])
         event.server = [object objectForKey:@"server"];
     else
         event.server = nil;
@@ -1157,14 +1157,16 @@
     else
         event.msgid = nil;
 
-    if([event isMessage] && !event.from.length && event.server.length) {
-        event.from = event.fromNick = event.server;
-    }
-
+    event.from = nil;
+    
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [self->_formatterMap objectForKey:object.type];
     if(formatter)
         formatter(event, object);
         
+    if([event isMessage] && !event.from.length && event.server.length) {
+        event.from = event.fromNick = event.server;
+    }
+
     if([object objectForKey:@"value"] && ![event.type hasPrefix:@"cap_"]) {
         event.msg = [NSString stringWithFormat:@"%@ %@", [object objectForKey:@"value"], event.msg];
     }
