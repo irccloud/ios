@@ -1403,17 +1403,17 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)updateAPIHost:(NSString *)host {
-    IRCCLOUD_HOST = host;
-    if([IRCCLOUD_HOST hasPrefix:@"http://"])
-        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:7];
-    if([IRCCLOUD_HOST hasPrefix:@"https://"])
-        IRCCLOUD_HOST = [IRCCLOUD_HOST substringFromIndex:8];
-    if([IRCCLOUD_HOST hasSuffix:@"/"])
-        IRCCLOUD_HOST = [IRCCLOUD_HOST substringToIndex:IRCCLOUD_HOST.length - 1];
+    if([host hasPrefix:@"http://"])
+        host = [host substringFromIndex:7];
+    if([host hasPrefix:@"https://"])
+        host = [host substringFromIndex:8];
+    if([host hasSuffix:@"/"])
+        host = [host substringToIndex:host.length - 1];
     
-    [[NSUserDefaults standardUserDefaults] setObject:IRCCLOUD_HOST forKey:@"host"];
+    [[NSUserDefaults standardUserDefaults] setObject:host forKey:@"host"];
     [[NSUserDefaults standardUserDefaults] synchronize];
 
+    IRCCLOUD_HOST = host;
     CLS_LOG(@"API Host: %@", IRCCLOUD_HOST);
 }
 
