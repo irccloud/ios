@@ -274,7 +274,9 @@ NSArray *_sortedChannels;
         self.navigationController.navigationBar.standardAppearance = a;
         self.navigationController.navigationBar.compactAppearance = a;
         self.navigationController.navigationBar.scrollEdgeAppearance = a;
+#ifdef __IPHONE_15_0
         self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+#endif
     }
     [self->_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];

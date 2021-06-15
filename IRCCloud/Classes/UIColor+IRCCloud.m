@@ -491,9 +491,11 @@ UITraitCollection *__currentTraitCollection;
             a.backgroundImage = [self navBarBackgroundImage];
             a.titleTextAttributes = @{NSForegroundColorAttributeName: [self navBarHeadingColor]};
             [[UINavigationBar appearance] setStandardAppearance:a];
+#ifdef __IPHONE_15_0
             [[UINavigationBar appearance] setCompactAppearance:a];
-            [[UINavigationBar appearance] setScrollEdgeAppearance:a];
             [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
+#endif
+            [[UINavigationBar appearance] setScrollEdgeAppearance:a];
         }
         
         __mIRCColors_FG[0] = [UIColor colorFromHexString:@"FFFFFF"]; //white
@@ -777,9 +779,11 @@ UITraitCollection *__currentTraitCollection;
             a.backgroundImage = [self navBarBackgroundImage];
             a.titleTextAttributes = @{NSForegroundColorAttributeName: [self navBarHeadingColor]};
             [[UINavigationBar appearance] setStandardAppearance:a];
+#ifdef __IPHONE_15_0
             [[UINavigationBar appearance] setCompactAppearance:a];
-            [[UINavigationBar appearance] setScrollEdgeAppearance:a];
             [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
+#endif
+            [[UINavigationBar appearance] setScrollEdgeAppearance:a];
         }
     }
     
