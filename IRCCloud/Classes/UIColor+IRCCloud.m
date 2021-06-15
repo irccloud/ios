@@ -486,6 +486,10 @@ UITraitCollection *__currentTraitCollection;
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
         [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0 green:0.478 blue:1 alpha:1]];
+        if (@available(iOS 13.0, *)) {
+            [[UINavigationBar appearance] setScrollEdgeAppearance:[[UINavigationBarAppearance alloc] init]];
+        } else {
+        }
         
         __mIRCColors_FG[0] = [UIColor colorFromHexString:@"FFFFFF"]; //white
         __mIRCColors_FG[1] = [UIColor blackColor]; //black
