@@ -487,8 +487,13 @@ UITraitCollection *__currentTraitCollection;
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
         [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0 green:0.478 blue:1 alpha:1]];
         if (@available(iOS 13.0, *)) {
-            [[UINavigationBar appearance] setScrollEdgeAppearance:[[UINavigationBarAppearance alloc] init]];
-        } else {
+            UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+            a.backgroundImage = [self navBarBackgroundImage];
+            a.titleTextAttributes = @{NSForegroundColorAttributeName: [self navBarHeadingColor]};
+            [[UINavigationBar appearance] setStandardAppearance:a];
+            [[UINavigationBar appearance] setCompactAppearance:a];
+            [[UINavigationBar appearance] setScrollEdgeAppearance:a];
+            [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
         }
         
         __mIRCColors_FG[0] = [UIColor colorFromHexString:@"FFFFFF"]; //white
@@ -767,6 +772,15 @@ UITraitCollection *__currentTraitCollection;
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
         [[UINavigationBar appearance] setTintColor:[UIColor navBarSubheadingColor]];
+        if (@available(iOS 13.0, *)) {
+            UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+            a.backgroundImage = [self navBarBackgroundImage];
+            a.titleTextAttributes = @{NSForegroundColorAttributeName: [self navBarHeadingColor]};
+            [[UINavigationBar appearance] setStandardAppearance:a];
+            [[UINavigationBar appearance] setCompactAppearance:a];
+            [[UINavigationBar appearance] setScrollEdgeAppearance:a];
+            [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
+        }
     }
     
     __timestampBackgroundImage = nil;

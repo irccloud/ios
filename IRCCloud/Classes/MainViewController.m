@@ -267,6 +267,15 @@ NSArray *_sortedChannels;
     self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
     self->_bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    if (@available(iOS 13.0, *)) {
+        UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+        a.backgroundImage = [UIColor navBarBackgroundImage];
+        a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
+        self.navigationController.navigationBar.standardAppearance = a;
+        self.navigationController.navigationBar.compactAppearance = a;
+        self.navigationController.navigationBar.scrollEdgeAppearance = a;
+        self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+    }
     [self->_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
     [self->_sendBtn setTitleColor:c forState:UIControlStateNormal];

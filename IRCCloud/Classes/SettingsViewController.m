@@ -449,6 +449,16 @@
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.view.backgroundColor = [UIColor navBarColor];
     self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
+    if (@available(iOS 13.0, *)) {
+        UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+        a.backgroundImage = [UIColor navBarBackgroundImage];
+        a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
+        self.navigationController.navigationBar.standardAppearance = a;
+        self.navigationController.navigationBar.compactAppearance = a;
+        self.navigationController.navigationBar.scrollEdgeAppearance = a;
+        self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+    }
+
     [self.navigationController setNeedsStatusBarAppearanceUpdate];
 }
 @end
@@ -646,6 +656,15 @@
     [v addSubview: self.navigationController.view];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.view.backgroundColor = [UIColor navBarColor];
+    if (@available(iOS 13.0, *)) {
+        UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+        a.backgroundImage = [UIColor navBarBackgroundImage];
+        a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
+        self.navigationController.navigationBar.standardAppearance = a;
+        self.navigationController.navigationBar.compactAppearance = a;
+        self.navigationController.navigationBar.scrollEdgeAppearance = a;
+        self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+    }
     [self dismissViewControllerAnimated:YES completion:nil];
 //#endif
 }
