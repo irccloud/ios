@@ -1126,7 +1126,8 @@ extern UIImage *__socketClosedBackgroundImage;
                         e1.formattedMsg = event.formattedMsg;
                         e1.parent = event.eid;
                         [self _addItem:e1 eid:e1.eid];
-                        event.formattedMsg = [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from];
+                        event.formattedPrefix = [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from];
+                        event.formattedMsg = @"";
                     } else {
                         NSString *formattedPrefix = event.formattedPrefix;
                         formattedPrefix = [NSString stringWithFormat:@"%@ %@", [self->_collapsedEvents formatNick:event.fromNick mode:event.fromMode colorize:colors displayName:event.from], formattedPrefix];
