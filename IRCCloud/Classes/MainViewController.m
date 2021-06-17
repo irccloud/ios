@@ -2484,39 +2484,58 @@ NSArray *_sortedChannels;
 
 -(void)_updateMessageWidth {
     self->_message.animateHeightChange = NO;
+    BOOL dirty = NO;
+    CGFloat messageWidth;
+    
     if(self->_message.text.length > 0) {
-        CGFloat c = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
-        c -= self.slidingViewController.view.safeAreaInsets.right;
-        if(self->_messageWidthConstraint.constant != c)
-            self->_messageWidthConstraint.constant = c;
-        [self.view layoutIfNeeded];
-        self->_sendBtn.enabled = YES;
-        self->_sendBtn.alpha = 1;
-        self->_settingsBtn.enabled = NO;
-        self->_settingsBtn.alpha = 0;
+        messageWidth = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
     } else {
-        self->_messageWidthConstraint.constant = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
-        self->_messageWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
-        [self.view layoutIfNeeded];
-        self->_sendBtn.enabled = NO;
-        self->_sendBtn.alpha = 0;
-        self->_settingsBtn.enabled = YES;
-        self->_settingsBtn.alpha = 1;
-        self->_message.delegate = nil;
-        [self->_message clearText];
-        self->_message.delegate = self;
+        messageWidth = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
+    }
+    messageWidth -= self.slidingViewController.view.safeAreaInsets.right;
+
+    if(self->_message.text.length > 0) {
+        if(self->_messageWidthConstraint.constant != messageWidth) {
+            self->_messageWidthConstraint.constant = messageWidth;
+            [self.view layoutIfNeeded];
+            dirty = YES;
+        }
+        if(self->_sendBtn.alpha != 1) {
+            self->_sendBtn.enabled = YES;
+            self->_sendBtn.alpha = 1;
+            self->_settingsBtn.enabled = NO;
+            self->_settingsBtn.alpha = 0;
+        }
+    } else {
+        if(self->_messageWidthConstraint.constant != messageWidth) {
+            self->_messageWidthConstraint.constant = messageWidth;
+            [self.view layoutIfNeeded];
+            dirty = YES;
+        }
+        if(self->_sendBtn.alpha != 0) {
+            self->_sendBtn.enabled = NO;
+            self->_sendBtn.alpha = 0;
+            self->_settingsBtn.enabled = YES;
+            self->_settingsBtn.alpha = 1;
+            self->_message.delegate = nil;
+            [self->_message clearText];
+            self->_message.delegate = self;
+        }
     }
     self->_message.animateHeightChange = YES;
-    self->_messageHeightConstraint.constant = self->_message.frame.size.height;
-    self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
-    CGRect frame = self->_settingsBtn.frame;
-    frame.origin.x = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
-    self->_settingsBtn.frame = frame;
-    frame = self->_sendBtn.frame;
-    frame.origin.x = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.safeAreaInsets.right;
-    self->_sendBtn.frame = frame;
-    [self _updateEventsInsets];
-    [self.view layoutIfNeeded];
+    
+    if(dirty || self->_messageHeightConstraint.constant != self->_message.frame.size.height) {
+        self->_messageHeightConstraint.constant = self->_message.frame.size.height;
+        self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
+        CGRect frame = self->_settingsBtn.frame;
+        frame.origin.x = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
+        self->_settingsBtn.frame = frame;
+        frame = self->_sendBtn.frame;
+        frame.origin.x = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.safeAreaInsets.right;
+        self->_sendBtn.frame = frame;
+        [self _updateEventsInsets];
+        [self.view layoutIfNeeded];
+    }
 }
 
 -(BOOL)expandingTextView:(UIExpandingTextView *)expandingTextView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
@@ -2550,9 +2569,8 @@ NSArray *_sortedChannels;
     [self->_sendBtn setTitleColor:c forState:UIControlStateDisabled];
     [self->_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
     
-    if(self->_handoffTimer)
-        [self->_handoffTimer invalidate];
-    self->_handoffTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_updateHandoffTimer) userInfo:nil repeats:NO];
+    if(!self->_handoffTimer)
+        self->_handoffTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_updateHandoffTimer) userInfo:nil repeats:NO];
 }
 
 -(void)_cancelHandoffTimer {
