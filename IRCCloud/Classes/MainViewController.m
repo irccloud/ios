@@ -3320,8 +3320,9 @@ NSArray *_sortedChannels;
     
     [self.view layoutIfNeeded];
     
-    //Re-calculate the expanding text view height for the new layout
-    _message.text = _message.text;
+    //Re-calculate the expanding text view height for the new layout width
+    if(_previousWidth != size.width)
+        _message.text = _message.text;
     
     UIView *v = self.navigationItem.titleView;
     self.navigationItem.titleView = nil;
@@ -3333,6 +3334,7 @@ NSArray *_sortedChannels;
 
     _ignoreInsetChanges = NO;
     [self _updateEventsInsets];
+    _previousWidth = size.width;
 }
 
 -(void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
