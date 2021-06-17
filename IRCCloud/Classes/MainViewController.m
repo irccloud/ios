@@ -2545,15 +2545,29 @@ NSArray *_sortedChannels;
     } else {
         [self performSelectorOnMainThread:@selector(scheduleSuggestionsTimer) withObject:nil waitUntilDone:NO];
     }
-    [[self userActivity] setNeedsSave:YES];
-    [self userActivityWillSave:[self userActivity]];
-    if(self->_buffer) {
-        self->_buffer.draft = expandingTextView.text.length ? expandingTextView.text : nil;
-    }
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
     [self->_sendBtn setTitleColor:c forState:UIControlStateNormal];
     [self->_sendBtn setTitleColor:c forState:UIControlStateDisabled];
     [self->_sendBtn setTitleColor:c forState:UIControlStateHighlighted];
+    
+    if(self->_handoffTimer)
+        [self->_handoffTimer invalidate];
+    self->_handoffTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_updateHandoffTimer) userInfo:nil repeats:NO];
+}
+
+-(void)_cancelHandoffTimer {
+    if(self->_handoffTimer)
+        [self->_handoffTimer invalidate];
+    _handoffTimer = nil;
+}
+
+-(void)_updateHandoffTimer {
+    _handoffTimer = nil;
+    [[self userActivity] setNeedsSave:YES];
+    [self userActivityWillSave:[self userActivity]];
+    if(self->_buffer) {
+        self->_buffer.draft = _message.text.length ? _message.text : nil;
+    }
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
@@ -2843,6 +2857,7 @@ NSArray *_sortedChannels;
 
 -(void)bufferSelected:(int)bid {
     [self performSelectorOnMainThread:@selector(cancelSuggestionsTimer) withObject:nil waitUntilDone:NO];
+    [self performSelectorOnMainThread:@selector(_cancelHandoffTimer) withObject:nil waitUntilDone:NO];
     _sortedChannels = nil;
     _sortedUsers = nil;
     BOOL changed = (self->_buffer && _buffer.bid != bid) || !_buffer;

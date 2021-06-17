@@ -118,6 +118,7 @@
     BOOL _ignoreInsetChanges;
     NSString *_msgid;
     UIView *_leftBorder, *_rightBorder;
+    NSTimer *_handoffTimer;
 }
 @property (nonatomic) int cidToOpen;
 @property (nonatomic) int bidToOpen;
