@@ -3320,6 +3320,9 @@ NSArray *_sortedChannels;
     
     [self.view layoutIfNeeded];
     
+    //Re-calculate the expanding text view height for the new layout
+    _message.text = _message.text;
+    
     UIView *v = self.navigationItem.titleView;
     self.navigationItem.titleView = nil;
     self.navigationItem.titleView = v;
