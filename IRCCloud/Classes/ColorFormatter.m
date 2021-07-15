@@ -980,6 +980,7 @@ extern BOOL __compact;
                 @"sweat_drops":@"💦",
                 @"droplet":@"💧",
                 @"dash":@"💨",
+                @"pile_of_poo":@"💩",
                 @"hankey":@"💩",
                 @"poop":@"💩",
                 @"shit":@"💩",
@@ -1965,7 +1966,7 @@ extern BOOL __compact;
                 @"part_alternation_mark":@"〽️",
                 @"congratulations":@"㊗️",
                 @"secret":@"㊙️",
-                
+
                 @"like":@"👍",
                 @"thumbs_up":@"👍",
                 @"dislike":@"👎",
