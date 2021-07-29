@@ -113,7 +113,7 @@
             NSMutableString *text = [[NSMutableString alloc] init];
             [text appendFormat:@"%c%c%@Nick%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"nick"]];
             if([line objectForKey:@"user"] && [line objectForKey:@"host"])
-                [text appendFormat:@"%c%c%@Usermask%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"nick"]];
+                [text appendFormat:@"%c%c%@Usermask%c\n%@@%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"user"], [line objectForKey:@"host"]];
             [text appendFormat:@"%c%c%@Real Name%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"realname"]];
             [text appendFormat:@"%c%c%@Last Seen%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"last_seen"]];
             [text appendFormat:@"%c%c%@Connecting Via%c\n%@\n", BOLD, COLOR_RGB, [[UIColor navBarHeadingColor] toHexString], CLEAR, [line objectForKey:@"ircserver"]];
