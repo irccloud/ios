@@ -191,8 +191,15 @@
 }
 
 -(void)_toggleLineNumbers {
-    if(self->_lineNumbers.enabled)
-        [self->_webView evaluateJavaScript:@"window.PASTEVIEW.doToggleLines()" completionHandler:nil];
+    if(self->_lineNumbers.enabled) {
+        if(self->_lineNumbers.on) {
+            [self->_webView evaluateJavaScript:@"window.PASTEVIEW.$el.toggleClass('nolinenums', true);" completionHandler:nil];
+            [self->_webView evaluateJavaScript:@"window.PASTEVIEW.ace.renderer.setShowGutter(true);" completionHandler:nil];
+        } else {
+            [self->_webView evaluateJavaScript:@"window.PASTEVIEW.$el.toggleClass('nolinenums', false);" completionHandler:nil];
+            [self->_webView evaluateJavaScript:@"window.PASTEVIEW.ace.renderer.setShowGutter(false);" completionHandler:nil];
+        }
+    }
 }
 
 -(void)_toggleLineNumbersSwitch {
