@@ -37,6 +37,8 @@
 #import "FLEXManager.h"
 #endif
 @import Firebase;
+@import FirebaseAnalytics;
+@import FirebaseMessaging;
 
 extern NSURL *__logfile;
 
