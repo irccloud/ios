@@ -682,7 +682,7 @@ extern NSURL *__logfile;
         [self.window.rootViewController viewWillDisappear:NO];
     }
     
-    __block UIBackgroundTaskIdentifier background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
+    /*__block UIBackgroundTaskIdentifier background_task = [application beginBackgroundTaskWithExpirationHandler: ^ {
         if(background_task == self->_background_task) {
             if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
                 CLS_LOG(@"Background task expired, disconnecting websocket");
@@ -713,7 +713,7 @@ extern NSURL *__logfile;
                 [application endBackgroundTask: background_task];
             });
         }
-    });
+    });*/
     if(self.window.rootViewController != self->_slideViewController && [ServersDataSource sharedInstance].count) {
         [self showMainView:NO];
         self.window.backgroundColor = [UIColor blackColor];
@@ -721,6 +721,12 @@ extern NSURL *__logfile;
     [[NotificationsDataSource sharedInstance] updateBadgeCount];
     [[ImageCache sharedInstance] clearFailedURLs];
     [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
+    for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
+        if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
+            [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
+    }
+    [[NetworkConnection sharedInstance] serialize];
+    [NetworkConnection sync];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
