@@ -60,6 +60,13 @@
 }
 
 -(void)prune {
+    __block BOOL __interrupt = NO;
+#ifndef EXTENSION
+    UIBackgroundTaskIdentifier background_task = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^ {
+        CLS_LOG(@"ImageCache prune task expired");
+        __interrupt = YES;
+    }];
+#endif
     @synchronized (self) {
         CLS_LOG(@"Pruning image cache directory: %@", _cachePath.path);
         
@@ -75,8 +82,14 @@
                 CLS_LOG(@"Removing stale image cache file: %@", fileURL.path);
                 [[NSFileManager defaultManager] removeItemAtURL:fileURL error:nil];
             }
+            
+            if(__interrupt)
+                break;
         }
     }
+#ifndef EXTENSION
+    [[UIApplication sharedApplication] endBackgroundTask: background_task];
+#endif
 }
 
 -(void)clear {

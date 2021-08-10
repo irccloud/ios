@@ -269,6 +269,13 @@ volatile BOOL __socketPaused = NO;
 }
 
 +(void)sync {
+    __block BOOL __interrupt = NO;
+#ifndef EXTENSION
+    UIBackgroundTaskIdentifier background_task = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^ {
+        CLS_LOG(@"NetworkConnection sync task expired");
+        __interrupt = YES;
+    }];
+#endif
 #ifdef ENTERPRISE
     NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
 #else
@@ -277,11 +284,18 @@ volatile BOOL __socketPaused = NO;
     if(sharedcontainer) {
         NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
         
-        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"servers"] with:[sharedcontainer URLByAppendingPathComponent:@"servers"]];
-        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"buffers"] with:[sharedcontainer URLByAppendingPathComponent:@"buffers"]];
-        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"channels"] with:[sharedcontainer URLByAppendingPathComponent:@"channels"]];
-        [NetworkConnection sync:[caches URLByAppendingPathComponent:@"stream"] with:[sharedcontainer URLByAppendingPathComponent:@"stream"]];
+        if(!__interrupt)
+            [NetworkConnection sync:[caches URLByAppendingPathComponent:@"servers"] with:[sharedcontainer URLByAppendingPathComponent:@"servers"]];
+        if(!__interrupt)
+            [NetworkConnection sync:[caches URLByAppendingPathComponent:@"buffers"] with:[sharedcontainer URLByAppendingPathComponent:@"buffers"]];
+        if(!__interrupt)
+            [NetworkConnection sync:[caches URLByAppendingPathComponent:@"channels"] with:[sharedcontainer URLByAppendingPathComponent:@"channels"]];
+        if(!__interrupt)
+            [NetworkConnection sync:[caches URLByAppendingPathComponent:@"stream"] with:[sharedcontainer URLByAppendingPathComponent:@"stream"]];
     }
+#ifndef EXTENSION
+    [[UIApplication sharedApplication] endBackgroundTask: background_task];
+#endif
 }
 
 -(id)init {
@@ -2473,18 +2487,32 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)serialize {
+    __block BOOL __interrupt = NO;
+#ifndef EXTENSION
+    UIBackgroundTaskIdentifier background_task = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^ {
+        CLS_LOG(@"NetworkConnection serialize task expired");
+        __interrupt = YES;
+    }];
+#endif
     [__serializeLock lock];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-    [self->_servers serialize];
-    [self->_buffers serialize];
-    [self->_channels serialize];
-    [self->_users serialize];
-    [self->_events serialize];
-    [self->_notifications serialize];
+    if(!__interrupt)
+        [self->_servers serialize];
+    if(!__interrupt)
+        [self->_buffers serialize];
+    if(!__interrupt)
+        [self->_channels serialize];
+    if(!__interrupt)
+        [self->_users serialize];
+    if(!__interrupt)
+        [self->_events serialize];
+    if(!__interrupt)
+        [self->_notifications serialize];
 #ifndef EXTENSION
     [__serializeLock unlock];
-    [self _serializeUserInfo];
+    if(!__interrupt)
+        [self _serializeUserInfo];
     [__serializeLock lock];
 #endif
     [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
@@ -2496,10 +2524,14 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"fontSize"] forKey:@"fontSize"];
     [d synchronize];
-    [NetworkConnection sync];
+    if(!__interrupt)
+        [NetworkConnection sync];
     [_serializeTimer invalidate];
     _serializeTimer = nil;
     [__serializeLock unlock];
+#ifndef EXTENSION
+    [[UIApplication sharedApplication] endBackgroundTask: background_task];
+#endif
 }
 
 -(void)_backlogFailed:(NSNotification *)notification {

@@ -33,7 +33,6 @@
     id _IRCEventObserver;
     void (^imageUploadCompletionHandler)(void);
     BOOL _movedToBackground;
-    __block UIBackgroundTaskIdentifier _background_task;
     void (^_fetchHandler)(UIBackgroundFetchResult);
     void (^_refreshHandler)(UIBackgroundFetchResult);
     NSMutableSet *_activeScenes;

@@ -670,6 +670,9 @@ extern NSURL *__logfile;
         }
     }
 #endif
+    [self performSelectorInBackground:@selector(_pruneAndSync) withObject:nil];
+    [[ImageCache sharedInstance] clearFailedURLs];
+    [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
     self->_conn = [NetworkConnection sharedInstance];
     self->_movedToBackground = YES;
     self->_conn.failCount = 0;
@@ -719,14 +722,29 @@ extern NSURL *__logfile;
         self.window.backgroundColor = [UIColor blackColor];
     }
     [[NotificationsDataSource sharedInstance] updateBadgeCount];
-    [[ImageCache sharedInstance] clearFailedURLs];
-    [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
+}
+
+- (void)_pruneAndSync {
+    __block BOOL __interrupt = NO;
+#ifndef EXTENSION
+    UIBackgroundTaskIdentifier background_task = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^ {
+        CLS_LOG(@"AppDelegate pruneAndSync task expired");
+        __interrupt = YES;
+    }];
+#endif
     for(Buffer *b in [[BuffersDataSource sharedInstance] getBuffers]) {
         if(!b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0)
             [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
+        if(__interrupt)
+            break;
     }
-    [[NetworkConnection sharedInstance] serialize];
-    [NetworkConnection sync];
+    if(!__interrupt)
+        [[NetworkConnection sharedInstance] serialize];
+    if(!__interrupt)
+        [NetworkConnection sync];
+#ifndef EXTENSION
+    [[UIApplication sharedApplication] endBackgroundTask: background_task];
+#endif
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
@@ -774,10 +792,6 @@ extern NSURL *__logfile;
             [evc.topViewController viewWillAppear:NO];
         } else {
             [self.window.rootViewController viewWillAppear:NO];
-        }
-        if(self->_background_task != UIBackgroundTaskInvalid) {
-            [application endBackgroundTask:self->_background_task];
-            self->_background_task = UIBackgroundTaskInvalid;
         }
     }
     

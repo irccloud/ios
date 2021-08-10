@@ -114,6 +114,11 @@
 
 -(void)updateBadgeCount {
 #ifndef EXTENSION
+    __block BOOL __interrupt = NO;
+    UIBackgroundTaskIdentifier background_task = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^ {
+        CLS_LOG(@"NotificationsDataSource updateBadgeCount task expired");
+        __interrupt = YES;
+    }];
     [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             NSUInteger count = 0;
@@ -121,6 +126,9 @@
             NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
             NSMutableArray *identifiers = [[NSMutableArray alloc] init];
             NSMutableSet *dirtyBuffers = [[NSMutableSet alloc] init];
+            
+            if(__interrupt)
+                return;
             
             for(Buffer *b in buffers) {
                 if(b.extraHighlights)
@@ -143,6 +151,9 @@
                     [dirtyBuffers addObject:b];
                     CLS_LOG(@"bid%i has notification eid%.0f that's not in the loaded backlog, extraHighlights: %i", b.bid, eid, b.extraHighlights);
                 }
+
+                if(__interrupt)
+                    break;
             }
             
             if(identifiers.count > 0)
@@ -153,6 +164,8 @@
                 if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
                     highlights = 0;
                 count += highlights;
+                if(__interrupt)
+                    break;
             }
 
             if([UIApplication sharedApplication].applicationIconBadgeNumber != count)
@@ -160,6 +173,7 @@
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [UIApplication sharedApplication].applicationIconBadgeNumber = count;
                 [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:dirtyBuffers userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventRefresh]}];
+                [[UIApplication sharedApplication] endBackgroundTask: background_task];
             }];
         }];
     }];
