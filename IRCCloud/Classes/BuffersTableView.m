@@ -554,7 +554,7 @@
 -(void)_updateUnreadIndicators {
 #ifndef EXTENSION
     [self.tableView visibleCells];
-    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
+    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.safeAreaInsets)];
     if(rows.count) {
         NSInteger first = [[rows objectAtIndex:0] row];
         NSInteger last = [[rows lastObject] row];
