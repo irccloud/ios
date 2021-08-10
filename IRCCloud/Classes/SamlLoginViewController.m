@@ -42,11 +42,17 @@
     [self->_activity startAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
 
-    WKPreferences *prefs = [[WKPreferences alloc] init];
-    prefs.javaScriptEnabled = YES;
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
-    config.preferences = prefs;
-    
+    if (@available(iOS 13.0, *)) {
+        WKWebpagePreferences *prefs = [[WKWebpagePreferences alloc] init];
+        prefs.allowsContentJavaScript = YES;
+        config.defaultWebpagePreferences = prefs;
+    } else {
+        WKPreferences *prefs = [[WKPreferences alloc] init];
+        prefs.javaScriptEnabled = YES;
+        config.preferences = prefs;
+    }
+
     self->_webView = [[WKWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height) configuration:config];
     self->_webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     self->_webView.navigationDelegate = self;

@@ -29,6 +29,7 @@
 #import "EventsTableView.h"
 #import "MainViewController.h"
 @import Firebase;
+@import FirebaseAnalytics;
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
