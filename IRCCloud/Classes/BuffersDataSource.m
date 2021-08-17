@@ -265,10 +265,15 @@ NSString *__DEFAULT_CHANTYPES__;
     }
 }
 
--(int)firstBid {
+-(int)mostRecentBid {
     @synchronized(self->_buffers) {
-        if(self->_buffers.count)
-            return ((Buffer *)[self->_buffers.allValues objectAtIndex:0]).bid;
+        Buffer *buffer;
+        for(Buffer *b in self->_buffers.allValues) {
+            if(!buffer || b.last_seen_eid > buffer.last_seen_eid)
+                buffer = b;
+        }
+        if(buffer)
+            return buffer.bid;
         else
             return -1;
     }

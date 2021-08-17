@@ -180,7 +180,7 @@
     if(!self->_buffer)
         self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[[self->_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
     if(!self->_buffer)
-        self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[BuffersDataSource sharedInstance].firstBid];
+        self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[BuffersDataSource sharedInstance].mostRecentBid];
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         [self reloadConfigurationItems];
         [self validateContent];

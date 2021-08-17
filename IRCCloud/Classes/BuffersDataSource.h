@@ -61,7 +61,7 @@
 -(void)clear;
 -(void)invalidate;
 -(NSUInteger)count;
--(int)firstBid;
+-(int)mostRecentBid;
 -(void)addBuffer:(Buffer *)buffer;
 -(Buffer *)getBuffer:(int)bid;
 -(Buffer *)getBufferWithName:(NSString *)name server:(int)cid;

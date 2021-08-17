@@ -1586,7 +1586,7 @@ NSArray *_sortedChannels;
                 else if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                     [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
                 else
-                    [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+                    [self bufferSelected:[[BuffersDataSource sharedInstance] mostRecentBid]];
             }
             [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
             break;
@@ -1598,7 +1598,7 @@ NSArray *_sortedChannels;
                 } else if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]]) {
                     [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
                 } else if([[ServersDataSource sharedInstance] count]) {
-                    [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+                    [self bufferSelected:[[BuffersDataSource sharedInstance] mostRecentBid]];
                 } else {
                     [self bufferSelected:-1];
                     [(AppDelegate *)[UIApplication sharedApplication].delegate showConnectionView];
@@ -1764,14 +1764,7 @@ NSArray *_sortedChannels;
             [self _updateGlobalMsg];
         } else {
             [[NSNotificationCenter defaultCenter] removeObserver:self->_eventsView name:kIRCCloudBacklogCompletedNotification object:nil];
-            int bid = [BuffersDataSource sharedInstance].firstBid;
-            if(self->_buffer && self->_buffer.lastBuffer)
-                bid = self->_buffer.lastBuffer.bid;
-            
-            if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
-                if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-                    bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
-            }
+            int bid = [self _lastSelectedBid];
             if(self->_bidToOpen > 0) {
                 CLS_LOG(@"backlog complete: BID to open: %i", self->_bidToOpen);
                 bid = self->_bidToOpen;
@@ -1863,6 +1856,20 @@ NSArray *_sortedChannels;
     [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
 }
 
+- (int)_lastSelectedBid {
+    int bid = [BuffersDataSource sharedInstance].mostRecentBid;
+    
+    if(self->_buffer && self->_buffer.lastBuffer && [[BuffersDataSource sharedInstance] getBuffer:self->_buffer.lastBuffer.bid]) {
+        bid = self->_buffer.lastBuffer.bid;
+    } else if([[NSUserDefaults standardUserDefaults] objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NSUserDefaults standardUserDefaults] objectForKey:@"last_selected_bid"] intValue]]) {
+        bid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"last_selected_bid"] intValue];
+    } else if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] &&
+              [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]]) {
+            bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
+    }
+    return bid;
+}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     if(self->_ignoreVisibilityChanges)
@@ -1894,13 +1901,7 @@ NSArray *_sortedChannels;
     }
     [[EventsDataSource sharedInstance] clearPendingAndFailed];
     if(!_buffer || ![[BuffersDataSource sharedInstance] getBuffer:self->_buffer.bid]) {
-        int bid = [BuffersDataSource sharedInstance].firstBid;
-        if(self->_buffer && _buffer.lastBuffer)
-            bid = self->_buffer.lastBuffer.bid;
-        if([NetworkConnection sharedInstance].userInfo && [[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"]) {
-            if([[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
-                bid = [[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue];
-        }
+        int bid = [self _lastSelectedBid];
         if(self->_bidToOpen > 0) {
             CLS_LOG(@"viewwillappear: BID to open: %i", _bidToOpen);
             bid = self->_bidToOpen;
@@ -2956,6 +2957,8 @@ NSArray *_sortedChannels;
             }
         }
         [[NetworkConnection sharedInstance] setLastSelectedBID:bid];
+        [[NSUserDefaults standardUserDefaults] setObject:@(bid) forKey:@"last_selected_bid"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
         NSUserActivity *activity = [self userActivity];
         if(![activity.activityType hasSuffix:@".buffer"]) {
             [activity invalidate];
@@ -3980,7 +3983,7 @@ NSArray *_sortedChannels;
             if([[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] && [[BuffersDataSource sharedInstance] getBuffer:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]])
                 [self bufferSelected:[[[NetworkConnection sharedInstance].userInfo objectForKey:@"last_selected_bid"] intValue]];
             else
-                [self bufferSelected:[[BuffersDataSource sharedInstance] firstBid]];
+                [self bufferSelected:[[BuffersDataSource sharedInstance] mostRecentBid]];
         } else {
             [[NetworkConnection sharedInstance] deleteBuffer:self->_selectedBuffer.bid cid:self->_selectedBuffer.cid handler:nil];
         }
