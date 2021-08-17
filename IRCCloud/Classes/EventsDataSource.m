@@ -49,14 +49,26 @@
         return NO;
     if(self->_rowType == ROW_THUMBNAIL || _rowType == ROW_FILE)
         return NO;
+    
+    Server *s = [[ServersDataSource sharedInstance] getServer:self->_cid];
+    if(s) {
+        Ignore *ignore = s.ignore;
+        NSString *from = self->_fromNick;
+        if(!from.length)
+            from = self->_nick;
+        
+        if([ignore match:[NSString stringWithFormat:@"%@!%@",from,self->_hostmask]])
+            return NO;
+    }
+    
     if([self->_type isEqualToString:@"notice"] || [self->_type isEqualToString:@"channel_invite"]) {
         // Notices sent from the server (with no nick sender) aren't important
         // e.g. *** Looking up your hostname...
-        if(self->_from.length == 0)
+        if(self->_from.length == 0 || self->_from == self->_server)
             return NO;
         
         // Notices and invites sent to a buffer shouldn't notify in the server buffer
-        if([bufferType isEqualToString:@"console"] && (self->_toChan || _toBuffer))
+        if([bufferType isEqualToString:@"console"] && (self->_toChan || self->_toBuffer))
             return NO;
     }
 
