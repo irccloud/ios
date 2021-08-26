@@ -120,61 +120,61 @@
         __interrupt = YES;
     }];
     [[UNUserNotificationCenter currentNotificationCenter] getDeliveredNotificationsWithCompletionHandler:^(NSArray *notifications) {
-        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            NSUInteger count = 0;
-            NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
-            NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
-            NSMutableArray *identifiers = [[NSMutableArray alloc] init];
-            NSMutableSet *dirtyBuffers = [[NSMutableSet alloc] init];
-            
+        NSUInteger count = 0;
+        NSArray *buffers = [[BuffersDataSource sharedInstance] getBuffers];
+        NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
+        NSMutableArray *identifiers = [[NSMutableArray alloc] init];
+        NSMutableSet *dirtyBuffers = [[NSMutableSet alloc] init];
+        
+        if(__interrupt)
+            return;
+        
+        for(Buffer *b in buffers) {
+            if(b.extraHighlights)
+                [dirtyBuffers addObject:b];
+            b.extraHighlights = 0;
+        }
+        
+        for(UNNotification *n in notifications) {
+            NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
+            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
+            NSTimeInterval eid = [[d objectAtIndex:2] doubleValue];
+            if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || eid <= b.last_seen_eid) {
+                if(!b)
+                    CLS_LOG(@"Removing eid%f because bid%i doesn't exist", eid, [[d objectAtIndex:1] intValue]);
+                else
+                    CLS_LOG(@"Removing eid%f because bid%i.last_seen_eid = %f", eid, [[d objectAtIndex:1] intValue], b.last_seen_eid);
+                [identifiers addObject:n.request.identifier];
+            } else if(b && ![[EventsDataSource sharedInstance] event:eid buffer:b.bid]) {
+                b.extraHighlights++;
+                [dirtyBuffers addObject:b];
+                CLS_LOG(@"bid%i has notification eid%.0f that's not in the loaded backlog, extraHighlights: %i", b.bid, eid, b.extraHighlights);
+            }
+
             if(__interrupt)
-                return;
-            
-            for(Buffer *b in buffers) {
-                if(b.extraHighlights)
-                    [dirtyBuffers addObject:b];
-                b.extraHighlights = 0;
-            }
-            
-            for(UNNotification *n in notifications) {
-                NSArray *d = [n.request.content.userInfo objectForKey:@"d"];
-                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectAtIndex:1] intValue]];
-                NSTimeInterval eid = [[d objectAtIndex:2] doubleValue];
-                if((!b && [NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) || eid <= b.last_seen_eid) {
-                    if(!b)
-                        CLS_LOG(@"Removing eid%f because bid%i doesn't exist", eid, [[d objectAtIndex:1] intValue]);
-                    else
-                        CLS_LOG(@"Removing eid%f because bid%i.last_seen_eid = %f", eid, [[d objectAtIndex:1] intValue], b.last_seen_eid);
-                    [identifiers addObject:n.request.identifier];
-                } else if(b && ![[EventsDataSource sharedInstance] event:eid buffer:b.bid]) {
-                    b.extraHighlights++;
-                    [dirtyBuffers addObject:b];
-                    CLS_LOG(@"bid%i has notification eid%.0f that's not in the loaded backlog, extraHighlights: %i", b.bid, eid, b.extraHighlights);
-                }
-
-                if(__interrupt)
-                    break;
-            }
-            
-            if(identifiers.count > 0)
+                break;
+        }
+        
+        if(identifiers.count > 0)
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [[UNUserNotificationCenter currentNotificationCenter] removeDeliveredNotificationsWithIdentifiers:identifiers];
-            
-            for(Buffer *b in buffers) {
-                int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
-                if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
-                    highlights = 0;
-                count += highlights;
-                if(__interrupt)
-                    break;
-            }
+            }];
+        
+        for(Buffer *b in buffers) {
+            int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
+            if([b.type isEqualToString:@"conversation"] && [[[prefs objectForKey:@"buffer-disableTrackUnread"] objectForKey:[NSString stringWithFormat:@"%i",b.bid]] intValue] == 1)
+                highlights = 0;
+            count += highlights;
+            if(__interrupt)
+                break;
+        }
 
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             if([UIApplication sharedApplication].applicationIconBadgeNumber != count)
                 CLS_LOG(@"Setting iOS icon badge to %lu", (unsigned long)count);
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [UIApplication sharedApplication].applicationIconBadgeNumber = count;
-                [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:dirtyBuffers userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventRefresh]}];
-                [[UIApplication sharedApplication] endBackgroundTask: background_task];
-            }];
+            [UIApplication sharedApplication].applicationIconBadgeNumber = count;
+            [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:dirtyBuffers userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventRefresh]}];
+            [[UIApplication sharedApplication] endBackgroundTask: background_task];
         }];
     }];
 #endif

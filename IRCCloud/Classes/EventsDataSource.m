@@ -1192,11 +1192,15 @@
 }
 
 -(Event *)event:(NSTimeInterval)eid buffer:(int)bid {
-    return [[self->_events_sorted objectForKey:@(bid)] objectForKey:@(eid)];
+    @synchronized(self->_events) {
+        return [[self->_events_sorted objectForKey:@(bid)] objectForKey:@(eid)];
+    }
 }
 
 -(Event *)message:(NSString *)msgid buffer:(int)bid {
-    return [[self->_msgIDs objectForKey:@(bid)] objectForKey:msgid];
+    @synchronized(self->_events) {
+        return [[self->_msgIDs objectForKey:@(bid)] objectForKey:msgid];
+    }
 }
 
 -(void)removeEvent:(NSTimeInterval)eid buffer:(int)bid {
@@ -1251,11 +1255,15 @@
 }
 
 -(NSUInteger)sizeOfBuffer:(int)bid {
-    return [[self->_events objectForKey:@(bid)] count];
+    @synchronized(self->_events) {
+        return [[self->_events objectForKey:@(bid)] count];
+    }
 }
 
 -(NSTimeInterval)lastEidForBuffer:(int)bid {
-    return [[self->_lastEIDs objectForKey:@(bid)] doubleValue];
+    @synchronized(self->_events) {
+        return [[self->_lastEIDs objectForKey:@(bid)] doubleValue];
+    }
 }
 
 -(void)removeEventsBefore:(NSTimeInterval)min_eid buffer:(int)bid {
@@ -1278,8 +1286,10 @@
 }
 
 -(int)unreadStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
-    if(![self->_events objectForKey:@(bid)])
-        return 0;
+    @synchronized(self->_events) {
+        if(![self->_events objectForKey:@(bid)])
+            return 0;
+    }
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = s.ignore;
@@ -1301,8 +1311,10 @@
 }
 
 -(int)highlightCountForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
-    if(![self->_events objectForKey:@(bid)])
-        return 0;
+    @synchronized(self->_events) {
+        if(![self->_events objectForKey:@(bid)])
+            return 0;
+    }
     int count = 0;
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
@@ -1352,8 +1364,10 @@
 }
 
 -(int)highlightStateForBuffer:(int)bid lastSeenEid:(NSTimeInterval)lastSeenEid type:(NSString *)type {
-    if(![self->_events objectForKey:@(bid)])
-        return 0;
+    @synchronized(self->_events) {
+        if(![self->_events objectForKey:@(bid)])
+            return 0;
+    }
     Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
     Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
     Ignore *ignore = s.ignore;
