@@ -46,7 +46,7 @@
     self.view.backgroundColor = [UIColor blackColor];
 
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
-    if (@available(iOS 13.0, *)) {
+    if (@available(iOS 14.0, *)) {
         WKWebpagePreferences *prefs = [[WKWebpagePreferences alloc] init];
         prefs.allowsContentJavaScript = YES;
         config.defaultWebpagePreferences = prefs;

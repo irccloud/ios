@@ -4940,7 +4940,23 @@ NSArray *_sortedChannels;
         [self dismissKeyboard];
         [self.view.window endEditing:YES];
         
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
+        NSURL *documentsPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+        NSArray *documents = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:documentsPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:nil];
+
+        UIAlertController *alert;
+        if (documents.count) {
+            alert = [UIAlertController alertControllerWithTitle:@"Logout" message:[NSString stringWithFormat:@"You currently have %lu log export%@ stored on this device. %@ will remain on this device after logging out.", (unsigned long)documents.count, documents.count == 1?@"":@"s", documents.count == 1?@"It":@"They"] preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete Log Exports" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                for(NSURL *file in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:documentsPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:nil]) {
+                    if(![file.absoluteString hasSuffix:@"/"]) {
+                        CLS_LOG(@"Removing: %@", file);
+                        [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
+                    }
+                }
+            }]];
+        } else {
+            alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
+        }
         
         [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {

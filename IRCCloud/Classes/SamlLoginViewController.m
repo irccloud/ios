@@ -43,7 +43,7 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
 
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
-    if (@available(iOS 13.0, *)) {
+    if (@available(iOS 14.0, *)) {
         WKWebpagePreferences *prefs = [[WKWebpagePreferences alloc] init];
         prefs.allowsContentJavaScript = YES;
         config.defaultWebpagePreferences = prefs;

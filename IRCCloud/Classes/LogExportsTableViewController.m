@@ -134,6 +134,7 @@
     NSMutableArray *available = [[logs objectForKey:@"available"] mutableCopy];
     NSMutableArray *expired = [[logs objectForKey:@"expired"] mutableCopy];
     NSMutableArray *downloaded = [[NSMutableArray alloc] init];
+    NSMutableSet *filenames = [[NSMutableSet alloc] init];
     
     for(int i = 0; i < available.count; i++) {
         NSDictionary *d = [available objectAtIndex:i];
@@ -141,6 +142,7 @@
             [self cacheFileSize:d];
             [downloaded addObject:d];
             [available removeObject:d];
+            [filenames addObject:[d objectForKey:@"file_name"]];
             i--;
         }
     }
@@ -151,7 +153,18 @@
             [self cacheFileSize:d];
             [downloaded addObject:d];
             [expired removeObject:d];
+            [filenames addObject:[d objectForKey:@"file_name"]];
             i--;
+        }
+    }
+    
+    for(NSURL *file in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:[self downloadsPath] includingPropertiesForKeys:@[NSURLCreationDateKey] options:0 error:nil]) {
+        if(![filenames containsObject:file.lastPathComponent]) {
+            NSDate *creationDate;
+            [file getResourceValue:&creationDate forKey:NSURLCreationDateKey error:nil];
+            NSDictionary *d = @{@"file_name": file.lastPathComponent, @"startdate": @(creationDate.timeIntervalSince1970)};
+            [self cacheFileSize:d];
+            [downloaded addObject:d];
         }
     }
     
@@ -435,7 +448,9 @@
                 NSString *serverName = s ? (s.name.length ? s.name : s.hostname) : [NSString stringWithFormat:@"Unknown Network (%@)", [row objectForKey:@"cid"]];
                 NSString *bufferName = b ? b.name : [NSString stringWithFormat:@"Unknown Log (%@)", [row objectForKey:@"bid"]];
                 
-                if(![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]])
+                if(![row objectForKey:@"bid"] && ![row objectForKey:@"cid"])
+                    cell.textLabel.text = [row objectForKey:@"file_name"];
+                else if(![[row objectForKey:@"bid"] isKindOfClass:[NSNull class]])
                     cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", serverName, bufferName];
                 else if(![[row objectForKey:@"cid"] isKindOfClass:[NSNull class]])
                     cell.textLabel.text = serverName;
