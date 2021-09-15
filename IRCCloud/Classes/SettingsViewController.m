@@ -456,11 +456,9 @@
         self.navigationController.navigationBar.standardAppearance = a;
         self.navigationController.navigationBar.compactAppearance = a;
         self.navigationController.navigationBar.scrollEdgeAppearance = a;
-#ifdef __IPHONE_15_0
         if (@available(iOS 15.0, *)) {
             self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
         }
-#endif
     }
 
     [self.navigationController setNeedsStatusBarAppearanceUpdate];
@@ -667,11 +665,9 @@
         self.navigationController.navigationBar.standardAppearance = a;
         self.navigationController.navigationBar.compactAppearance = a;
         self.navigationController.navigationBar.scrollEdgeAppearance = a;
-#ifdef __IPHONE_15_0
         if (@available(iOS 15.0, *)) {
             self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
         }
-#endif
     }
     [self dismissViewControllerAnimated:YES completion:nil];
 //#endif
