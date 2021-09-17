@@ -714,22 +714,24 @@
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
 #ifndef EXTENSION
-    NSDictionary *d = [self->_data objectAtIndex:[self.tableView indexPathForRowAtPoint:location].row];
+    if ([self.tableView indexPathForRowAtPoint:location].row < self->_data.count) {
+        NSDictionary *d = [self->_data objectAtIndex:[self.tableView indexPathForRowAtPoint:location].row];
 
-    if(d) {
-        Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectForKey:@"bid"] intValue]];
-        if(b) {
-            previewingContext.sourceRect = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]].frame;
-            EventsTableView *e = [[EventsTableView alloc] init];
-            e.navigationItem.title = [d objectForKey:@"name"];
-            [e setBuffer:b];
-            e.modalPresentationStyle = UIModalPresentationCurrentContext;
-            e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
-            lp.enabled = NO;
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                self->lp.enabled = YES;
-            }];
-            return e;
+        if(d) {
+            Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:[[d objectForKey:@"bid"] intValue]];
+            if(b) {
+                previewingContext.sourceRect = [self.tableView cellForRowAtIndexPath:[self.tableView indexPathForRowAtPoint:location]].frame;
+                EventsTableView *e = [[EventsTableView alloc] init];
+                e.navigationItem.title = [d objectForKey:@"name"];
+                [e setBuffer:b];
+                e.modalPresentationStyle = UIModalPresentationCurrentContext;
+                e.preferredContentSize = ((MainViewController *)((UINavigationController *)self.slidingViewController.topViewController).topViewController).eventsView.view.bounds.size;
+                lp.enabled = NO;
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    self->lp.enabled = YES;
+                }];
+                return e;
+            }
         }
     }
 #endif
