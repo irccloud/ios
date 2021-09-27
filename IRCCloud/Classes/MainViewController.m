@@ -5313,7 +5313,7 @@ NSArray *_sortedChannels;
 }
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
-    return @[
+    NSArray *commands = @[
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:) discoverabilityTitle:@"Switch to previous channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:) discoverabilityTitle:@"Switch to next channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltUpPressed:) discoverabilityTitle:@"Switch to previous unread channel"],
@@ -5331,6 +5331,13 @@ NSArray *_sortedChannels;
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageUp" modifierFlags:0 action:@selector(onPgUpPressed:)],
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageDown" modifierFlags:0 action:@selector(onPgDownPressed:)],
              ];
+
+    if (@available(iOS 15.0, *)) {
+        for(UIKeyCommand *c in commands) {
+            c.wantsPriorityOverSystemBehavior = YES;
+        }
+    }
+    return commands;
 }
 
 -(void)getMessageAttributesBold:(BOOL *)bold italic:(BOOL *)italic underline:(BOOL *)underline {
