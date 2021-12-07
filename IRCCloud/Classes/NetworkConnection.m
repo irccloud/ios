@@ -1988,7 +1988,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 [self.httpMetric start];
 #endif
 #endif
-                [self->_socket open];
+                [self->_socket performSelectorOnMainThread:@selector(open) withObject:nil waitUntilDone:YES];
             } else {
                 CLS_LOG(@"Unable to load configuration");
                 [self fail];
@@ -2029,7 +2029,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [self performSelectorOnMainThread:@selector(cancelIdleTimer) withObject:nil waitUntilDone:YES];
     self->_state = kIRCCloudStateDisconnected;
     [self performSelectorOnMainThread:@selector(_postConnectivityChange) withObject:nil waitUntilDone:YES];
-    [self->_socket close];
+    [self->_socket performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
     self->_socket = nil;
     for(Buffer *b in [self->_buffers getBuffers]) {
         if(!b.scrolledUp && [self->_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
@@ -2321,7 +2321,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 -(void)_idle {
     self->_reconnectTimestamp = 0;
     self->_idleTimer = nil;
-    [self->_socket close];
+    [self->_socket performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
     self->_state = kIRCCloudStateDisconnected;
 #ifndef EXTENSION
     if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
