@@ -39,6 +39,7 @@
 #define TYPE_SPAM 5
 #define TYPE_COLLAPSED 6
 #define TYPE_PINNED 7
+#define TYPE_ADD_NETWORK 8
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -116,7 +117,7 @@
     frame.size.width -= self->_borderInset;
     self->_border.frame = CGRectMake(frame.origin.x - _borderInset, frame.origin.y, 6 + _borderInset, frame.size.height);
     frame.size.width -= 8;
-    if(self->_type == TYPE_SERVER) {
+    if(self->_type == TYPE_SERVER || self->_type == TYPE_ADD_NETWORK) {
         frame.origin.y += 6;
         frame.size.height -= 6;
     }
@@ -528,6 +529,17 @@
                  }];
             }
         }
+#ifndef EXTENSION
+        [data addObject:@{
+         @"type":@TYPE_ADD_NETWORK,
+         @"cid":@-1,
+         @"bid":@-1,
+         @"name":@"Add a network",
+         @"unread":@0,
+         @"highlights":@0,
+         @"archived":@0,
+         }];
+#endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             self->_boldFont = [UIFont boldSystemFontOfSize:FONT_SIZE];
             self->_normalFont = [UIFont systemFontOfSize:FONT_SIZE];
@@ -1127,7 +1139,7 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(self->_data) {
-       if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER) {
+       if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SERVER || [[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
            return 46;
        } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_SPAM) {
            return 64;
@@ -1332,6 +1344,13 @@
                 cell.bgColor = [UIColor bufferBackgroundColor];
                 cell.accessibilityLabel = @"Pinned Channels";
                 break;
+            case TYPE_ADD_NETWORK:
+                cell.icon.textColor = cell.label.textColor = [UIColor bufferTextColor];
+                cell.icon.hidden = NO;
+                cell.icon.text = FA_PLUS_CIRCLE;
+                cell.bgColor = [UIColor bufferBackgroundColor];
+                cell.accessibilityLabel = @"Add a network";
+                break;
         }
         return cell;
     }
@@ -1448,6 +1467,8 @@
             return;
     #endif
         } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_PINNED) {
+        } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
+            [(MainViewController *)_delegate addNetwork];
         } else {
     #ifndef EXTENSION
             self->_selectedRow = indexPath.row;

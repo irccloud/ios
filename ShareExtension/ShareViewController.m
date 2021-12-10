@@ -464,4 +464,8 @@
 -(void)spamSelected:(int)cid {
     
 }
+
+-(void)addNetwork {
+    
+}
 @end

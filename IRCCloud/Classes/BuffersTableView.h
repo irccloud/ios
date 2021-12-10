@@ -24,6 +24,7 @@
 -(void)bufferSelected:(int)bid;
 -(void)bufferLongPressed:(int)bid rect:(CGRect)rect;
 -(void)dismissKeyboard;
+-(void)addNetwork;
 @end
 
 @interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate, UIContextMenuInteractionDelegate> {

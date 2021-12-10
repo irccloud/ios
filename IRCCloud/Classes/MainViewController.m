@@ -3990,7 +3990,7 @@ NSArray *_sortedChannels;
     [self presentViewController:alert animated:YES completion:nil];
 }
 
--(void)_addNetwork {
+-(void)addNetwork {
     EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
     [self.slidingViewController resetTopView];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
@@ -4185,7 +4185,7 @@ NSArray *_sortedChannels;
         [self _markAllAsRead];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Add a Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        [self _addNetwork];
+        [self addNetwork];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Join a Channel" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         [self _joinAChannel];
@@ -5049,7 +5049,7 @@ NSArray *_sortedChannels;
     } else if([action isEqualToString:@"Mark All As Read"]) {
         [self _markAllAsRead];
     } else if([action isEqualToString:@"Add A Network"]) {
-        [self _addNetwork];
+        [self addNetwork];
     } else if([action isEqualToString:@"Reorder"]) {
         [self _reorder];
     } else if([action isEqualToString:@"Invite to Channel"]) {
