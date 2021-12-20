@@ -181,6 +181,53 @@ platform :ios do
 end
 
 
+platform :mac do
+  desc "Build and push to iTunes Connect"
+  lane :push do |options|
+    pkg = "IRCCloud.pkg"
+    scheme = "IRCCloud"
+    
+    # Set a build number manually if provided
+    # TODO pull this from the Info.plist
+    default_build_number = "GIT_VERSION"
+    if options[:build]
+        sh "cd .. && agvtool new-version -all #{options[:build]}"
+    end
+    
+    # Build a pkg
+    gym(
+      scheme: scheme,
+      configuration: "AppStore",
+      export_method: "app-store",
+      catalyst_platform: "macos",
+      skip_profile_detection: true,
+      export_options: {
+        method: "app-store",
+        provisioningProfiles: {
+          "com.irccloud.IRCCloud" => "Catalyst IRCCloud",
+          "com.irccloud.IRCCloud.ShareExtension" => "Catalyst ShareExtension",
+          "com.irccloud.IRCCloud.NotificationService" => "Catalyst NotificationService",
+        }
+      }
+    )
+
+    # Reset the build number
+    if options[:build]
+        sh "cd .. && agvtool new-version -all #{default_build_number}"
+    end
+    
+    # Upload to iTunes Connect
+    deliver(
+        pkg: pkg,
+        platform: "osx",
+        run_precheck_before_submit: false,
+        skip_metadata: true,
+        skip_screenshots: true
+    )
+  end
+end
+
+
 # More information about multiple platforms in fastlane: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Platforms.md
 # All available actions: https://github.com/fastlane/fastlane/blob/master/fastlane/docs/Actions.md
 

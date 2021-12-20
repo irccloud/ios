@@ -65,6 +65,8 @@
 	<string>GIT_VERSION</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.social-networking</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>firefox</string>

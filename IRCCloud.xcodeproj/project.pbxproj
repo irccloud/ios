@@ -4558,6 +4558,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CODE_SIGN_ENTITLEMENTS = ShareExtension/ShareExtension.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Distribution";
 				DEVELOPMENT_TEAM = GED45EQAGA;
 				ENABLE_NS_ASSERTIONS = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -4589,6 +4590,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.ShareExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "App Store ShareExtension";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Catalyst ShareExtension";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
 			};
@@ -4687,6 +4689,7 @@
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CODE_SIGN_ENTITLEMENTS = NotificationService/NotificationService.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Distribution";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = GED45EQAGA;
@@ -4714,6 +4717,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.irccloud.IRCCloud.NotificationService;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "App Store NotificationService";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Catalyst NotificationService";
 				SKIP_INSTALL = YES;
 				SUPPORTS_MACCATALYST = YES;
 			};
@@ -5585,6 +5589,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Distribution";
 				DEVELOPMENT_TEAM = GED45EQAGA;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5603,6 +5608,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.irccloud.${PRODUCT_NAME:rfc1034identifier}${BUNDLE_SUFFIX}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "App Store";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Catalyst IRCCloud";
 				SUPPORTS_MACCATALYST = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				WRAPPER_EXTENSION = app;

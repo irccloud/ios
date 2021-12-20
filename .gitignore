@@ -19,3 +19,5 @@ Gemfile.lock
 Podfile.lock
 Pods/
 .env
+IRCCloud.app
+IRCCloud.pkg
