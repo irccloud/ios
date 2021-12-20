@@ -355,14 +355,12 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-#if !TARGET_OS_MACCATALYST
     if([FIROptions defaultOptions]) {
         if(animated && self.parentViewController)
             [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.parentViewController.class)}];
         else
             [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
     }
-#endif
 }
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {

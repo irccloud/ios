@@ -2034,10 +2034,8 @@ extern UIImage *__socketClosedBackgroundImage;
         
         FIRTrace *trace;
 #ifdef CRASHLYTICS_TOKEN
-#if !TARGET_OS_MACCATALYST
         if([FIROptions defaultOptions])
             trace = [FIRPerformance startTraceWithName:@"loadBacklog"];
-#endif
 #endif
         UIFont *f = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;

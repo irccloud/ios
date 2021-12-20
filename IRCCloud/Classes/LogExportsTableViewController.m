@@ -560,21 +560,15 @@
                 }
                 switch(indexPath.row) {
                     case 0:
-#if !TARGET_OS_MACCATALYST
                         [FIRAnalytics logEventWithName:@"export_logs" parameters:@{@"type":@"network"}];
-#endif
                         [self requestExport:self->_server.cid bid:-1];
                         break;
                     case 1:
-#if !TARGET_OS_MACCATALYST
                         [FIRAnalytics logEventWithName:@"export_logs" parameters:@{@"type":@"buffer"}];
-#endif
                         [self requestExport:self->_server.cid bid:self->_buffer.bid];
                         break;
                     case 2:
-#if !TARGET_OS_MACCATALYST
                         [FIRAnalytics logEventWithName:@"export_logs" parameters:@{@"type":@"all"}];
-#endif
                         [self requestExport:-1 bid:-1];
                         break;
                 }

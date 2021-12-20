@@ -493,7 +493,9 @@ UITraitCollection *__currentTraitCollection;
             [[UINavigationBar appearance] setStandardAppearance:a];
             if (@available(iOS 15.0, *)) {
                 [[UINavigationBar appearance] setCompactAppearance:a];
+#if !TARGET_OS_MACCATALYST
                 [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
+#endif
             }
             [[UINavigationBar appearance] setScrollEdgeAppearance:a];
         }
@@ -781,7 +783,9 @@ UITraitCollection *__currentTraitCollection;
             [[UINavigationBar appearance] setStandardAppearance:a];
             if (@available(iOS 15.0, *)) {
                 [[UINavigationBar appearance] setCompactAppearance:a];
+#if !TARGET_OS_MACCATALYST
                 [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
+#endif
             }
             [[UINavigationBar appearance] setScrollEdgeAppearance:a];
         }

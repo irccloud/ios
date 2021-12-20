@@ -275,7 +275,9 @@ NSArray *_sortedChannels;
         self.navigationController.navigationBar.compactAppearance = a;
         self.navigationController.navigationBar.scrollEdgeAppearance = a;
         if (@available(iOS 15.0, *)) {
+#if !TARGET_OS_MACCATALYST
             self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+#endif
         }
     }
     [self->_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
@@ -2013,10 +2015,8 @@ NSArray *_sortedChannels;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
-#if !TARGET_OS_MACCATALYST
     if([FIROptions defaultOptions])
         [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
-#endif
 }
 
 - (void)didReceiveMemoryWarning {
@@ -5332,11 +5332,13 @@ NSArray *_sortedChannels;
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageDown" modifierFlags:0 action:@selector(onPgDownPressed:)],
              ];
 
+#if !TARGET_OS_MACCATALYST
     if (@available(iOS 15.0, *)) {
         for(UIKeyCommand *c in commands) {
             c.wantsPriorityOverSystemBehavior = YES;
         }
     }
+#endif
     return commands;
 }
 

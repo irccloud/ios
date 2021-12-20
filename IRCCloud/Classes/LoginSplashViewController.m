@@ -216,6 +216,7 @@
 }
 
 -(void)_promptForSWC {
+#if !TARGET_OS_MACCATALYST
     if (@available(macCatalyst 14.0, *)) {
         if(username.text.length == 0 && !_gotCredentialsFromPasswordManager && !_accessLink) {
             SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
@@ -237,6 +238,7 @@
             });
         }
     }
+#endif
 }
 
 -(void)_loginWithAccessLink {
@@ -274,12 +276,10 @@
             self->forgotPasswordSignup.alpha = 0;
             [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
 #ifndef ENTERPRISE
-#if !TARGET_OS_MACCATALYST
             [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
                 kFIRParameterMethod:@"access-link",
                 kFIRParameterSuccess:@(1)
             }];
-#endif
 #endif
         } else {
             [UIView beginAnimations:nil context:nil];
@@ -290,12 +290,10 @@
             [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
             [self presentViewController:alert animated:YES completion:nil];
 #ifndef ENTERPRISE
-#if !TARGET_OS_MACCATALYST
             [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
                 kFIRParameterMethod:@"access-link",
                 kFIRParameterSuccess:@(0)
             }];
-#endif
 #endif
         }
     }];
@@ -764,7 +762,6 @@
                         [d setObject:IRCCLOUD_PATH forKey:@"path"];
                         [d synchronize];
 #ifndef ENTERPRISE
-#if !TARGET_OS_MACCATALYST
                         if(nameAlpha) {
                             [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
                                 kFIRParameterMethod:@"email",
@@ -776,7 +773,6 @@
                                 kFIRParameterSuccess:@(1)
                             }];
                         }
-#endif
                         if(!self->_gotCredentialsFromPasswordManager) {
                             if (@available(macCatalyst 14.0, *)) {
                                 SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
@@ -829,7 +825,6 @@
                         }]];
                         [self presentViewController:alert animated:YES completion:nil];
 #ifndef ENTERPRISE
-#if !TARGET_OS_MACCATALYST
                         if(nameAlpha) {
                             if([result objectForKey:@"message"]) {
                                 [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
@@ -857,7 +852,6 @@
                                 }];
                             }
                         }
-#endif
 #endif
                     }
                 };

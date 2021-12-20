@@ -457,7 +457,9 @@
         self.navigationController.navigationBar.compactAppearance = a;
         self.navigationController.navigationBar.scrollEdgeAppearance = a;
         if (@available(iOS 15.0, *)) {
+#if !TARGET_OS_MACCATALYST
             self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+#endif
         }
     }
 
@@ -492,9 +494,7 @@
                 [spinny startAnimating];
                 self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
                 
-#if !TARGET_OS_MACCATALYST
                 [FIRAnalytics logEventWithName:@"change_email" parameters:nil];
-#endif
                 [[NetworkConnection sharedInstance] changeEmail:self->_email.text password:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
                     if([[result objectForKey:@"success"] boolValue]) {
                         [self saveButtonPressed:nil];
@@ -666,7 +666,9 @@
         self.navigationController.navigationBar.compactAppearance = a;
         self.navigationController.navigationBar.scrollEdgeAppearance = a;
         if (@available(iOS 15.0, *)) {
+#if !TARGET_OS_MACCATALYST
             self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+#endif
         }
     }
     [self dismissViewControllerAnimated:YES completion:nil];
@@ -764,9 +766,7 @@
                             [spinny startAnimating];
                             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
 
-#if !TARGET_OS_MACCATALYST
                             [FIRAnalytics logEventWithName:@"change_password" parameters:nil];
-#endif
                             [[NetworkConnection sharedInstance] changePassword:[alert.textFields objectAtIndex:0].text newPassword:[alert.textFields objectAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
                                 if([[result objectForKey:@"success"] boolValue]) {
                                     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
@@ -801,9 +801,7 @@
                             [spinny startAnimating];
                             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
                             
-#if !TARGET_OS_MACCATALYST
                             [FIRAnalytics logEventWithName:@"delete_account" parameters:nil];
-#endif
                             [[NetworkConnection sharedInstance] deleteAccount:[alert.textFields objectAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
                                 if([[result objectForKey:@"success"] boolValue]) {
                                     [self.tableView endEditing:YES];
@@ -945,27 +943,19 @@
               @{@"title":@"Photo Sharing", @"items":photos},
               @{@"title":@"About", @"items":@[
                         @{@"title":@"Feedback Channel", @"selected":^{[self dismissViewControllerAnimated:YES completion:^{
-#if !TARGET_OS_MACCATALYST
                             [FIRAnalytics logEventWithName:@"prefs_url" parameters:@{@"url":@"irc://irc.irccloud.com/%23feedback"}];
-#endif
                             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
                         }];}},
 #ifndef ENTERPRISE
                         @{@"title":@"Become a Beta Tester", @"selected":^{
-#if !TARGET_OS_MACCATALYST
                             [FIRAnalytics logEventWithName:@"beta_invite" parameters:nil];
-#endif
                             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://testflight.apple.com/join/MApr7Une"]];}},
 #endif
                         @{@"title":@"FAQ", @"selected":^{
-#if !TARGET_OS_MACCATALYST
                             [FIRAnalytics logEventWithName:@"prefs_url" parameters:@{@"url":@"https://www.irccloud.com/faq"}];
-#endif
                             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];}},
                         @{@"title":@"Version History", @"selected":^{
-#if !TARGET_OS_MACCATALYST
                             [FIRAnalytics logEventWithName:@"prefs_url" parameters:@{@"url":@"https://github.com/irccloud/ios/releases"}];
-#endif
                             [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://github.com/irccloud/ios/releases"]];}},
                         @{@"title":@"Open-Source Licenses", @"selected":^{[self.navigationController pushViewController:[[LicenseViewController alloc] init] animated:YES];}},
                         @{@"title":@"Version", @"subtitle":self->_version}

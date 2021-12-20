@@ -216,14 +216,12 @@
 
 - (void)viewDidAppear:(BOOL)animated {
     [super viewDidAppear:animated];
-#if !TARGET_OS_MACCATALYST
     if([FIROptions defaultOptions]) {
         if(animated && self.parentViewController)
             [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.parentViewController.class)}];
         else
             [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
     }
-#endif
 }
 
 - (NSMutableDictionary *)_addBuffer:(Buffer *)buffer data:(NSMutableArray *)data prefs:(NSDictionary *)prefs server:(Server *)server collapsed:(NSDictionary *)collapsed unread:(int)unread highlights:(int)highlights firstUnreadPosition:(NSInteger *)firstUnreadPosition lastUnreadPosition:(NSInteger *)lastUnreadPosition firstHighlightPosition:(NSInteger *)firstHighlightPosition lastHighlightPosition:(NSInteger *)lastHighlightPosition {

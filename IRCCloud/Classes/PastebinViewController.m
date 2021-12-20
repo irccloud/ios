@@ -86,11 +86,9 @@
     self->_lineNumbers.enabled = NO;
     self->_lineNumbers.on = YES;
     [self _fetch];
-#if !TARGET_OS_MACCATALYST
     [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
         kFIRParameterContentType:@"Pastebin"
     }];
-#endif
     [self didMoveToParentViewController:nil];
 }
 

@@ -263,11 +263,9 @@
         [self.view addGestureRecognizer:self->_panGesture];
         [self->_progressView removeFromSuperview];
         [self->_movieController.player play];
-#if !TARGET_OS_MACCATALYST
         [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
             kFIRParameterContentType:@"Animation"
         }];
-#endif
         
         [self scrollViewDidZoom:self->_scrollView];
     }];
@@ -401,11 +399,9 @@
             [UIView setAnimationDuration:0.25];
             self->_imageView.alpha = 1;
             [UIView commitAnimations];
-#if !TARGET_OS_MACCATALYST
             [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
                 kFIRParameterContentType:@"Image"
             }];
-#endif
         }];
     } else {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{

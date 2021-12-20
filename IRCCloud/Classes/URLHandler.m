@@ -666,11 +666,9 @@
         player.modalPresentationStyle = UIModalPresentationFullScreen;
         player.player = [[AVPlayer alloc] initWithURL:url];
         [mainViewController presentViewController:player animated:YES completion:nil];
-#if !TARGET_OS_MACCATALYST
         [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
             kFIRParameterContentType:@"Video"
         }];
-#endif
     } else if([[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
 #endif
@@ -756,12 +754,10 @@
                 activityType = [activityType substringFromIndex:25];
             if([activityType hasPrefix:@"com.apple."])
                 activityType = [activityType substringFromIndex:10];
-#if !TARGET_OS_MACCATALYST
             [FIRAnalytics logEventWithName:kFIREventShare parameters:@{
                 kFIRParameterMethod:activityType,
                 kFIRParameterContentType:type
             }];
-#endif
         }
     };
     return activityController;

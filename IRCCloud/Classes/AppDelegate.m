@@ -106,9 +106,7 @@ extern NSURL *__logfile;
 #ifdef CRASHLYTICS_TOKEN
     if([FIROptions defaultOptions]) {
         [FIRApp configure];
-#if !TARGET_OS_MACCATALYST
         [FIRAnalytics setUserID:nil];
-#endif
     }
 #endif
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
@@ -289,10 +287,8 @@ extern NSURL *__logfile;
 
 -(BOOL)continueActivity:(NSUserActivity *)userActivity {
     CLS_LOG(@"Continuing activity type: %@", userActivity.activityType);
-#if !TARGET_OS_MACCATALYST
     if([FIROptions defaultOptions])
         [FIRAnalytics handleUserActivity:userActivity];
-#endif
 #ifdef ENTERPRISE
     if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"])
 #else
@@ -320,10 +316,8 @@ extern NSURL *__logfile;
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-#if !TARGET_OS_MACCATALYST
     if([FIROptions defaultOptions])
         [FIRAnalytics handleOpenURL:url];
-#endif
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     if([url.scheme hasPrefix:@"irccloud"]) {
@@ -831,10 +825,8 @@ extern NSURL *__logfile;
         imageUploadCompletionHandler = completionHandler;
     } else {
         CLS_LOG(@"Unrecognized background task: %@", identifier);
-#if !TARGET_OS_MACCATALYST
         if([FIROptions defaultOptions])
             [FIRAnalytics handleEventsForBackgroundURLSession:identifier completionHandler:completionHandler];
-#endif
         completionHandler();
     }
 }
