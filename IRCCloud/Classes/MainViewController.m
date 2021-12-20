@@ -1789,6 +1789,14 @@ NSArray *_sortedChannels;
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].isiOSAppOnMac) {
+            self->_kbSize = CGSizeMake(0,0);
+            return;
+        }
+    } else {
+        // Fallback on earlier versions
+    }
     if(self->_eventsView.topUnreadView.observationInfo) {
         @try {
             [self->_eventsView.tableView.layer removeObserver:self forKeyPath:@"bounds"];
