@@ -1495,7 +1495,7 @@
     }
 #endif
     @synchronized(self->_data) {
-        if(self->_data.count) {
+        if(self->_data.count > 1) {
             for(int i = 0; i < _data.count; i++) {
                 if([[[self->_data objectAtIndex:i] objectForKey:@"bid"] intValue] == self->_selectedBuffer.bid) {
                     self->_selectedRow = i;

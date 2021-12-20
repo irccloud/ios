@@ -25,6 +25,28 @@
 
 @class ViewController;
 
+@protocol IRCCloudSystemMenu<NSObject>
+-(void)chooseFGColor;
+-(void)chooseBGColor;
+-(void)resetColors;
+-(void)chooseFile;
+-(void)startPastebin;
+-(void)showUploads;
+-(void)showPastebins;
+-(void)logout;
+-(void)markAsRead;
+-(void)markAllAsRead;
+-(void)showSettings;
+-(void)downloadLogs;
+-(void)addNetwork;
+-(void)editConnection;
+-(void)selectNext;
+-(void)selectPrevious;
+-(void)selectNextUnread;
+-(void)selectPreviousUnread;
+-(void)setAllowsAutomaticWindowTabbing:(BOOL)allow;
+@end
+
 @interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate> {
     NetworkConnection *_conn;
     URLHandler *_urlHandler;

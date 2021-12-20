@@ -94,6 +94,11 @@ extern NSURL *__logfile;
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+#if TARGET_OS_MACCATALYST
+    Class _nswindow = NSClassFromString(@"NSWindow");
+    [_nswindow setAllowsAutomaticWindowTabbing:NO];
+#endif
+    
 #ifdef ENTERPRISE
     NSURL *sharedcontainer = [[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.com.irccloud.enterprise.share"];
 #else
@@ -990,6 +995,66 @@ extern NSURL *__logfile;
         }
     }
 }
+
+- (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder {
+    [super buildMenuWithBuilder:builder];
+    
+    NSArray *formatting = @[
+        [builder commandForAction:@selector(toggleBoldface:) propertyList:nil],
+        [builder commandForAction:@selector(toggleItalics:) propertyList:nil],
+        [builder commandForAction:@selector(toggleUnderline:) propertyList:nil],
+        [UICommand commandWithTitle:@"Text Color" image:nil action:@selector(chooseFGColor) propertyList:nil],
+        [UICommand commandWithTitle:@"Background Color" image:nil action:@selector(chooseBGColor) propertyList:nil],
+        [UICommand commandWithTitle:@"Reset Colors" image:nil action:@selector(resetColors) propertyList:nil],
+    ];
+    
+    [builder replaceMenuForIdentifier:UIMenuFont withMenu:[[builder menuForIdentifier:UIMenuFont] menuByReplacingChildren:formatting]];
+    
+    if(builder.system == UIMenuSystem.mainSystem) {
+        [builder removeMenuForIdentifier:UIMenuServices];
+        [builder removeMenuForIdentifier:UIMenuToolbar];
+        
+        [builder replaceMenuForIdentifier:UIMenuPreferences withMenu:[[builder menuForIdentifier:UIMenuPreferences] menuByReplacingChildren:@[
+            [UIKeyCommand commandWithTitle:@"Preferences…" image:nil action:@selector(showSettings) input:@"," modifierFlags:UIKeyModifierCommand propertyList:nil],
+        ]]];
+
+        [builder replaceMenuForIdentifier:UIMenuFormat withMenu:[[builder menuForIdentifier:UIMenuFormat] menuByReplacingChildren:formatting]];
+
+        [builder replaceMenuForIdentifier:UIMenuFile withMenu:[[builder menuForIdentifier:UIMenuFile] menuByReplacingChildren:@[
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UICommand commandWithTitle:@"Upload a File…" image:nil action:@selector(chooseFile) propertyList:nil],
+                [UICommand commandWithTitle:@"New Text Snippet…" image:nil action:@selector(startPastebin) propertyList:nil]
+            ]],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UICommand commandWithTitle:@"Add a Network…" image:nil action:@selector(addNetwork) propertyList:nil],
+                [UICommand commandWithTitle:@"Edit Connection…" image:nil action:@selector(editConnection) propertyList:nil]
+            ]],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UIKeyCommand commandWithTitle:@"Select Next in List" image:nil action:@selector(selectNext) input:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand propertyList:nil],
+                [UIKeyCommand commandWithTitle:@"Select Previous in List" image:nil action:@selector(selectPrevious) input:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand propertyList:nil],
+                [UIKeyCommand commandWithTitle:@"Select Next Unread in List" image:nil action:@selector(selectNextUnread) input:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
+                [UIKeyCommand commandWithTitle:@"Select Previous Unread in List" image:nil action:@selector(selectPreviousUnread) input:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
+            ]],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UIKeyCommand commandWithTitle:@"Mark Current As Read" image:nil action:@selector(markAsRead) input:@"r" modifierFlags:UIKeyModifierCommand propertyList:nil],
+                [UIKeyCommand commandWithTitle:@"Mark All As Read" image:nil action:@selector(markAllAsRead) input:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
+            ]],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UICommand commandWithTitle:@"Download Logs…" image:nil action:@selector(downloadLogs) propertyList:nil],
+            ]],
+            [builder menuForIdentifier:UIMenuClose],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UICommand commandWithTitle:@"Logout" image:nil action:@selector(logout) propertyList:nil]
+            ]],
+        ]]];
+
+        [builder insertSiblingMenu:[UIMenu menuWithTitle:@"Go" children:@[
+            [UICommand commandWithTitle:@"File Uploads" image:nil action:@selector(showUploads) propertyList:nil],
+            [UICommand commandWithTitle:@"Text Snippets" image:nil action:@selector(showPastebins) propertyList:nil]
+        ]] afterMenuForIdentifier:UIMenuView];
+    }
+}
+
 @end
 
 @implementation SceneDelegate

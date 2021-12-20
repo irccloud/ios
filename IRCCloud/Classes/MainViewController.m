@@ -2057,7 +2057,7 @@ NSArray *_sortedChannels;
             
             NSAttributedString *messageText = self->_message.attributedText;
             if([[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"]) {
-                [self resetColors:nil];
+                [self resetColors];
                 if(self->_defaultTextareaFont) {
                     self->_message.internalTextView.font = self->_defaultTextareaFont;
                     self->_message.internalTextView.textColor = [UIColor textareaTextColor];
@@ -2885,7 +2885,7 @@ NSArray *_sortedChannels;
     }
 
     if(changed) {
-        [self resetColors:nil];
+        [self resetColors];
         self->_msgid = self->_eventsView.msgid = nil;
         if(self->_defaultTextareaFont) {
             self->_message.internalTextView.font = self->_defaultTextareaFont;
@@ -3016,13 +3016,13 @@ NSArray *_sortedChannels;
     
     if([[ServersDataSource sharedInstance] getServer:self->_buffer.cid].isSlack) {
         [UIMenuController sharedMenuController].menuItems = @[];
-        [self resetColors:nil];
+        [self resetColors];
         self->_message.internalTextView.allowsEditingTextAttributes = NO;
     } else {
         [UIMenuController sharedMenuController].menuItems = @[[[UIMenuItem alloc] initWithTitle:@"Paste With Style" action:@selector(pasteRich:)],
-                                                              [[UIMenuItem alloc] initWithTitle:@"Color" action:@selector(chooseFGColor:)],
-                                                              [[UIMenuItem alloc] initWithTitle:@"Background" action:@selector(chooseBGColor:)],
-                                                              [[UIMenuItem alloc] initWithTitle:@"Reset Colors" action:@selector(resetColors:)],
+                                                              [[UIMenuItem alloc] initWithTitle:@"Color" action:@selector(chooseFGColor)],
+                                                              [[UIMenuItem alloc] initWithTitle:@"Background" action:@selector(chooseBGColor)],
+                                                              [[UIMenuItem alloc] initWithTitle:@"Reset Colors" action:@selector(resetColors)],
                                                               ];
         self->_message.internalTextView.allowsEditingTextAttributes = YES;
     }
@@ -3928,7 +3928,12 @@ NSArray *_sortedChannels;
     }
 }
 
--(void)_markAllAsRead {
+-(void)markAsRead {
+    [[NetworkConnection sharedInstance] heartbeat:self->_buffer.bid cid:self->_buffer.cid bid:self->_buffer.bid lastSeenEid:[[EventsDataSource sharedInstance] lastEidForBuffer:self->_buffer.bid] handler:nil];
+    self->_buffer.last_seen_eid = [[EventsDataSource sharedInstance] lastEidForBuffer:self->_buffer.bid];
+}
+
+-(void)markAllAsRead {
     NSMutableArray *cids = [[NSMutableArray alloc] init];
     NSMutableArray *bids = [[NSMutableArray alloc] init];
     NSMutableArray *eids = [[NSMutableArray alloc] init];
@@ -3944,7 +3949,7 @@ NSArray *_sortedChannels;
     [[NetworkConnection sharedInstance] heartbeat:self->_buffer.bid cids:cids bids:bids lastSeenEids:eids handler:nil];
 }
 
--(void)_editConnection {
+-(void)editConnection {
     EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
     [ecv setServer:self->_selectedBuffer.cid];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
@@ -4122,7 +4127,7 @@ NSArray *_sortedChannels;
             }]];
         }
         [alert addAction:[UIAlertAction actionWithTitle:@"Edit Connection" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _editConnection];
+            [self editConnection];
         }]];
 #ifndef ENTERPRISE
         Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:@"*" server:s.cid];
@@ -4182,7 +4187,7 @@ NSArray *_sortedChannels;
         }]];
     }
     [alert addAction:[UIAlertAction actionWithTitle:@"Mark All as Read" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        [self _markAllAsRead];
+        [self markAllAsRead];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Add a Network" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         [self addNetwork];
@@ -4374,7 +4379,7 @@ NSArray *_sortedChannels;
     [self->_message clearText];
 }
 
--(void)_choosePhoto:(UIImagePickerControllerSourceType)sourceType {
+-(void)choosePhoto:(UIImagePickerControllerSourceType)sourceType {
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
     picker.sourceType = sourceType;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])
@@ -4391,7 +4396,7 @@ NSArray *_sortedChannels;
     }
 }
 
--(void)_chooseFile {
+-(void)chooseFile {
     UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString *)kUTTypePackage, (NSString *)kUTTypeData]
                                                                                                             inMode:UIDocumentPickerModeImport];
     documentPicker.delegate = self;
@@ -4726,7 +4731,7 @@ NSArray *_sortedChannels;
     }];
 }
 
--(void)_startPastebin {
+-(void)startPastebin {
     if(self->_buffer) {
         PastebinEditorViewController *pv = [[PastebinEditorViewController alloc] initWithBuffer:self->_buffer];
         UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pv];
@@ -4741,7 +4746,7 @@ NSArray *_sortedChannels;
     }
 }
 
--(void)_showPastebins {
+-(void)showPastebins {
     PastebinsTableViewController *ptv = [[PastebinsTableViewController alloc] init];
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ptv];
     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
@@ -4754,7 +4759,7 @@ NSArray *_sortedChannels;
     [self presentViewController:nc animated:YES completion:nil];
 }
 
--(void)_showUploads {
+-(void)showUploads {
     FilesTableViewController *fcv = [[FilesTableViewController alloc] initWithStyle:UITableViewStylePlain];
     fcv.delegate = self;
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fcv];
@@ -4775,30 +4780,30 @@ NSArray *_sortedChannels;
         [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             if(self.presentedViewController)
                 [self dismissViewControllerAnimated:NO completion:nil];
-            [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
+            [self choosePhoto:UIImagePickerControllerSourceTypeCamera];
         }]];
     }
     if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
         [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             if(self.presentedViewController)
                 [self dismissViewControllerAnimated:NO completion:nil];
-            [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+            [self choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
         }]];
     }
     [alert addAction:[UIAlertAction actionWithTitle:@"Start a Text Snippet" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        [self _startPastebin];
+        [self startPastebin];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Text Snippets" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-        [self _showPastebins];
+        [self showPastebins];
     }]];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
         [alert addAction:[UIAlertAction actionWithTitle:@"File Uploads" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            [self _showUploads];
+            [self showUploads];
         }]];
         [alert addAction:[UIAlertAction actionWithTitle:@"Choose Document" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             if(self.presentedViewController)
                 [self dismissViewControllerAnimated:NO completion:nil];
-            [self _chooseFile];
+            [self chooseFile];
         }]];
     }
 #ifndef ENTERPRISE
@@ -4935,35 +4940,7 @@ NSArray *_sortedChannels;
     } else if([action isEqualToString:@"Reconnect"]) {
         [[NetworkConnection sharedInstance] reconnect:self->_selectedBuffer.cid handler:nil];
     } else if([action isEqualToString:@"Logout"]) {
-        [self dismissKeyboard];
-        [self.view.window endEditing:YES];
-        
-        NSURL *documentsPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
-        NSArray *documents = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:documentsPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:nil];
-
-        UIAlertController *alert;
-        if (documents.count) {
-            alert = [UIAlertController alertControllerWithTitle:@"Logout" message:[NSString stringWithFormat:@"You currently have %lu log export%@ stored on this device. %@ will remain on this device after logging out.", (unsigned long)documents.count, documents.count == 1?@"":@"s", documents.count == 1?@"It":@"They"] preferredStyle:UIAlertControllerStyleAlert];
-            [alert addAction:[UIAlertAction actionWithTitle:@"Delete Log Exports" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                for(NSURL *file in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:documentsPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:nil]) {
-                    if(![file.absoluteString hasSuffix:@"/"]) {
-                        CLS_LOG(@"Removing: %@", file);
-                        [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
-                    }
-                }
-            }]];
-        } else {
-            alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
-        }
-        
-        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-            [[NetworkConnection sharedInstance] logout];
-            [self bufferSelected:-1];
-            [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
-        }]];
-        
-        [self presentViewController:alert animated:YES completion:nil];
+        [self logout];
     } else if([action isEqualToString:@"Ignore List"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         IgnoresTableViewController *itv = [[IgnoresTableViewController alloc] initWithStyle:UITableViewStylePlain];
@@ -4983,20 +4960,9 @@ NSArray *_sortedChannels;
             [self _mention];
         }];
     } else if([action isEqualToString:@"Edit Connection"]) {
-        [self _editConnection];
+        [self editConnection];
     } else if([action isEqualToString:@"Settings"]) {
-#if TARGET_OS_MACCATALYST
-        [[UIApplication sharedApplication] requestSceneSessionActivation:nil userActivity:[[NSUserActivity alloc] initWithActivityType:@"com.IRCCloud.settings"] options:nil errorHandler:nil];
-#else
-        SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationPageSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:nc animated:YES completion:nil];
-#endif
+        [self showSettings];
     } else if([action isEqualToString:@"Display Options"]) {
         DisplayOptionsViewController *dvc = [[DisplayOptionsViewController alloc] initWithStyle:UITableViewStyleGrouped];
         dvc.buffer = self->_buffer;
@@ -5009,45 +4975,29 @@ NSArray *_sortedChannels;
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self presentViewController:nc animated:YES completion:nil];
     } else if([action isEqualToString:@"Download Logs"]) {
-        LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        lvc.buffer = self->_buffer;
-        lvc.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
-        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:nc animated:YES completion:nil];
+        [self downloadLogs];
     } else if([action isEqualToString:@"Add Network"]) {
-        EditConnectionViewController *ecv = [[EditConnectionViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:ecv];
-        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationPageSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:nc animated:YES completion:nil];
+        [self addNetwork];
     } else if([action isEqualToString:@"Take a Photo"] || [action isEqualToString:@"Take Photo or Video"]) {
         if(self.presentedViewController)
             [self dismissViewControllerAnimated:NO completion:nil];
-        [self _choosePhoto:UIImagePickerControllerSourceTypeCamera];
+        [self choosePhoto:UIImagePickerControllerSourceTypeCamera];
     } else if([action isEqualToString:@"Choose Photo"] || [action isEqualToString:@"Choose Photo or Video"]) {
         if(self.presentedViewController)
             [self dismissViewControllerAnimated:NO completion:nil];
-        [self _choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+        [self choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
     } else if([action isEqualToString:@"Choose Document"]) {
         if(self.presentedViewController)
             [self dismissViewControllerAnimated:NO completion:nil];
-        [self _chooseFile];
+        [self chooseFile];
     } else if([action isEqualToString:@"File Uploads"]) {
-        [self _showUploads];
+        [self showUploads];
     } else if([action isEqualToString:@"Text Snippets"]) {
-        [self _showPastebins];
+        [self showPastebins];
     } else if([action isEqualToString:@"Start a Text Snippet"]) {
-        [self _startPastebin];
+        [self startPastebin];
     } else if([action isEqualToString:@"Mark All As Read"]) {
-        [self _markAllAsRead];
+        [self markAllAsRead];
     } else if([action isEqualToString:@"Add A Network"]) {
         [self addNetwork];
     } else if([action isEqualToString:@"Reorder"]) {
@@ -5171,6 +5121,66 @@ NSArray *_sortedChannels;
     }
 }
 
+-(void)downloadLogs{
+    LogExportsTableViewController *lvc = [[LogExportsTableViewController alloc] initWithStyle:UITableViewStyleGrouped];
+    lvc.buffer = self->_buffer;
+    lvc.server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationFormSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    [self presentViewController:nc animated:YES completion:nil];
+}
+
+-(void)showSettings {
+//#if TARGET_OS_MACCATALYST
+//        [[UIApplication sharedApplication] requestSceneSessionActivation:nil userActivity:[[NSUserActivity alloc] initWithActivityType:@"com.IRCCloud.settings"] options:nil errorHandler:nil];
+//#else
+        SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationPageSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
+//#endif
+}
+
+-(void)logout {
+    [self dismissKeyboard];
+    [self.view.window endEditing:YES];
+    
+    NSURL *documentsPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
+    NSArray *documents = [[NSFileManager defaultManager] contentsOfDirectoryAtURL:documentsPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:nil];
+
+    UIAlertController *alert;
+    if (documents.count) {
+        alert = [UIAlertController alertControllerWithTitle:@"Logout" message:[NSString stringWithFormat:@"You currently have %lu log export%@ stored on this device. %@ will remain on this device after logging out.", (unsigned long)documents.count, documents.count == 1?@"":@"s", documents.count == 1?@"It":@"They"] preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Delete Log Exports" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+            for(NSURL *file in [[NSFileManager defaultManager] contentsOfDirectoryAtURL:documentsPath includingPropertiesForKeys:nil options:NSDirectoryEnumerationSkipsHiddenFiles error:nil]) {
+                if(![file.absoluteString hasSuffix:@"/"]) {
+                    CLS_LOG(@"Removing: %@", file);
+                    [[NSFileManager defaultManager] removeItemAtURL:file error:nil];
+                }
+            }
+        }]];
+    } else {
+        alert = [UIAlertController alertControllerWithTitle:@"Logout" message:@"Are you sure you want to logout of IRCCloud?" preferredStyle:UIAlertControllerStyleAlert];
+    }
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Logout" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+        [[NetworkConnection sharedInstance] logout];
+        [self bufferSelected:-1];
+        [(AppDelegate *)([UIApplication sharedApplication].delegate) showLoginView];
+    }]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
 -(void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
     [self dismissViewControllerAnimated:YES completion:nil];
 }
@@ -5182,14 +5192,14 @@ NSArray *_sortedChannels;
 -(BOOL)canPerformAction:(SEL)action withSender:(id)sender {
     if (action == @selector(paste:)) {
         return [UIPasteboard generalPasteboard].image != nil;
-    } else if(action == @selector(chooseFGColor:) || action == @selector(chooseBGColor:) || action == @selector(resetColors:)) {
+    } else if(action == @selector(chooseFGColor) || action == @selector(chooseBGColor) || action == @selector(resetColors)) {
         return YES;
     }
-    
+
     return [super canPerformAction:action withSender:sender];
 }
 
--(void)resetColors:(id)sender {
+-(void)resetColors {
     if(self->_message.selectedRange.length) {
         NSRange selection = self->_message.selectedRange;
         NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
@@ -5203,12 +5213,12 @@ NSArray *_sortedChannels;
     }
 }
 
--(void)chooseFGColor:(id)sender {
+-(void)chooseFGColor {
     [self->_colorPickerView updateButtonColors:NO];
     [UIView animateWithDuration:0.25 animations:^{ self->_colorPickerView.alpha = 1; } completion:nil];
 }
 
--(void)chooseBGColor:(id)sender {
+-(void)chooseBGColor {
     [self->_colorPickerView updateButtonColors:YES];
     [UIView animateWithDuration:0.25 animations:^{ self->_colorPickerView.alpha = 1; } completion:nil];
 }
@@ -5314,20 +5324,20 @@ NSArray *_sortedChannels;
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
     NSArray *commands = @[
-             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltUpPressed:) discoverabilityTitle:@"Switch to previous channel"],
-             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(onAltDownPressed:) discoverabilityTitle:@"Switch to next channel"],
-             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltUpPressed:) discoverabilityTitle:@"Switch to previous unread channel"],
-             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftAltDownPressed:) discoverabilityTitle:@"Switch to next unread channel"],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(selectPrevious) discoverabilityTitle:@"Switch to previous channel"],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(selectNext) discoverabilityTitle:@"Switch to next channel"],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(selectPreviousUnread) discoverabilityTitle:@"Switch to previous unread channel"],
+             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(selectNextUnread) discoverabilityTitle:@"Switch to next unread channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate action:@selector(onAltUpPressed:)],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate action:@selector(onAltDownPressed:)],
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltUpPressed:)],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(onShiftAltDownPressed:)],
              [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:) discoverabilityTitle:@"Complete nicknames and channels"],
-             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(onCmdRPressed:) discoverabilityTitle:@"Mark channel as read"],
-             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(onShiftCmdRPressed:) discoverabilityTitle:@"Mark all channels as read"],
-             [UIKeyCommand keyCommandWithInput:@"b" modifierFlags:UIKeyModifierCommand action:@selector(onCmdBPressed:) discoverabilityTitle:@"Bold"],
-             [UIKeyCommand keyCommandWithInput:@"i" modifierFlags:UIKeyModifierCommand action:@selector(onCmdIPressed:) discoverabilityTitle:@"Italic"],
-             [UIKeyCommand keyCommandWithInput:@"u" modifierFlags:UIKeyModifierCommand action:@selector(onCmdUPressed:) discoverabilityTitle:@"Underline"],
+             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(markAsRead) discoverabilityTitle:@"Mark channel as read"],
+             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(markAllAsRead) discoverabilityTitle:@"Mark all channels as read"],
+             [UIKeyCommand keyCommandWithInput:@"b" modifierFlags:UIKeyModifierCommand action:@selector(toggleBoldface:) discoverabilityTitle:@"Bold"],
+             [UIKeyCommand keyCommandWithInput:@"i" modifierFlags:UIKeyModifierCommand action:@selector(toggleItalics:) discoverabilityTitle:@"Italic"],
+             [UIKeyCommand keyCommandWithInput:@"u" modifierFlags:UIKeyModifierCommand action:@selector(toggleUnderline:) discoverabilityTitle:@"Underline"],
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageUp" modifierFlags:0 action:@selector(onPgUpPressed:)],
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageDown" modifierFlags:0 action:@selector(onPgDownPressed:)],
              ];
@@ -5368,21 +5378,21 @@ NSArray *_sortedChannels;
     self->_message.internalTextView.typingAttributes = attributes;
 }
 
--(void)onCmdBPressed:(UIKeyCommand *)sender {
+-(void)toggleBoldface:(UIKeyCommand *)sender {
     BOOL hasBold, hasItalic, hasUnderline;
     
     [self getMessageAttributesBold:&hasBold italic:&hasItalic underline:&hasUnderline];
     [self setMessageAttributesBold:!hasBold italic:hasItalic underline:hasUnderline];
 }
 
--(void)onCmdIPressed:(UIKeyCommand *)sender {
+-(void)toggleItalics:(UIKeyCommand *)sender {
     BOOL hasBold, hasItalic, hasUnderline;
     
     [self getMessageAttributesBold:&hasBold italic:&hasItalic underline:&hasUnderline];
     [self setMessageAttributesBold:hasBold italic:!hasItalic underline:hasUnderline];
 }
 
--(void)onCmdUPressed:(UIKeyCommand *)sender {
+-(void)toggleUnderline:(UIKeyCommand *)sender {
     BOOL hasBold, hasItalic, hasUnderline;
     
     [self getMessageAttributesBold:&hasBold italic:&hasItalic underline:&hasUnderline];
@@ -5405,19 +5415,19 @@ NSArray *_sortedChannels;
     }
 }
 
--(void)onAltUpPressed:(UIKeyCommand *)sender {
+-(void)selectPrevious {
     [self->_buffersView prev];
 }
 
--(void)onAltDownPressed:(UIKeyCommand *)sender {
+-(void)selectNext {
     [self->_buffersView next];
 }
 
--(void)onShiftAltUpPressed:(UIKeyCommand *)sender {
+-(void)selectPreviousUnread {
     [self->_buffersView prevUnread];
 }
 
--(void)onShiftAltDownPressed:(UIKeyCommand *)sender {
+-(void)selectNextUnread {
     [self->_buffersView nextUnread];
 }
 
@@ -5455,12 +5465,4 @@ NSArray *_sortedChannels;
     }
 }
 
--(void)onCmdRPressed:(UIKeyCommand *)sender {
-    [[NetworkConnection sharedInstance] heartbeat:self->_buffer.bid cid:self->_buffer.cid bid:self->_buffer.bid lastSeenEid:[[EventsDataSource sharedInstance] lastEidForBuffer:self->_buffer.bid] handler:nil];
-    self->_buffer.last_seen_eid = [[EventsDataSource sharedInstance] lastEidForBuffer:self->_buffer.bid];
-}
-
--(void)onShiftCmdRPressed:(UIKeyCommand *)sender {
-    [self _markAllAsRead];
-}
 @end
