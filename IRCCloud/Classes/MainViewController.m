@@ -4803,8 +4803,8 @@ NSArray *_sortedChannels;
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
     BOOL isCatalyst = NO;
-    if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].isMacCatalystApp)
+    if (@available(iOS 13.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp)
             isCatalyst = YES;
     }
     

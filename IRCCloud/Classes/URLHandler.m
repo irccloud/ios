@@ -478,6 +478,10 @@
 - (void)launchURL:(NSURL *)url
 {
 #ifndef EXTENSION
+    BOOL isCatalyst = NO;
+    if (@available(iOS 13.0, *)) {
+        isCatalyst = [NSProcessInfo processInfo].macCatalystApp;
+    }
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
     if(_window)
@@ -657,9 +661,9 @@
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"facetime-prompt%@",[url.absoluteString substringFromIndex:8]]]];
     } else if([url.scheme isEqualToString:@"tel"]) {
         [self launchURL:[NSURL URLWithString:[NSString stringWithFormat:@"telprompt%@",[url.absoluteString substringFromIndex:3]]]];
-    } else if(![NSProcessInfo processInfo].isMacCatalystApp && [[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"] && [[self class] isImageURL:url]) {
+    } else if(!isCatalyst && [[NSUserDefaults standardUserDefaults] boolForKey:@"imageViewer"] && [[self class] isImageURL:url]) {
         [self showImage:url];
-    } else if(![NSProcessInfo processInfo].isMacCatalystApp && [[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && ([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"])) {
+    } else if(!isCatalyst && [[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && ([url.pathExtension.lowercaseString isEqualToString:@"mov"] || [url.pathExtension.lowercaseString isEqualToString:@"mp4"] || [url.pathExtension.lowercaseString isEqualToString:@"m4v"] || [url.pathExtension.lowercaseString isEqualToString:@"3gp"] || [url.pathExtension.lowercaseString isEqualToString:@"quicktime"])) {
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
         AVPlayerViewController *player = [[AVPlayerViewController alloc] init];
         player.modalPresentationStyle = UIModalPresentationFullScreen;
@@ -668,7 +672,7 @@
         [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
             kFIRParameterContentType:@"Video"
         }];
-    } else if(![NSProcessInfo processInfo].isMacCatalystApp && [[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
+    } else if(!isCatalyst && [[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
     } else if([url.host.lowercaseString isEqualToString:@"maps.apple.com"]) {
         [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];

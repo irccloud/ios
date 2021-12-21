@@ -724,6 +724,11 @@
 }
 
 -(void)refresh {
+    BOOL isCatalyst = NO;
+    if (@available(iOS 13.0, *)) {
+        isCatalyst = [NSProcessInfo processInfo].macCatalystApp;
+    }
+    
     NSArray *account;
 #ifdef ENTERPRISE
     if([[[NetworkConnection sharedInstance].config objectForKey:@"auth_mechanism"] isEqualToString:@"internal"]) {
@@ -851,21 +856,21 @@
     [device addObject:@{@"title":@"Monospace Font", @"accessory":self->_mono}];
     [device addObject:@{@"title":@"Prevent Auto-Lock", @"accessory":self->_screen}];
     [device addObject:@{@"title":@"Auto-capitalization", @"accessory":self->_autoCaps}];
-    if(![NSProcessInfo processInfo].isMacCatalystApp)
+    if(!isCatalyst)
         [device addObject:@{@"title":@"Preferred Browser", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"], @"selected":^{ [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES]; }}];
     if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
         [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":self->_tabletMode}];
         [device addObject:@{@"title":@"Always show channel members", @"accessory":self->_hiddenMembers}];
     }
     [device addObject:@{@"title":@"Ask To Post A Snippet", @"accessory":self->_pastebin}];
-    if(![NSProcessInfo processInfo].isMacCatalystApp) {
+    if(!isCatalyst) {
         [device addObject:@{@"title":@"Open Images in Browser", @"accessory":self->_imageViewer}];
         [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":self->_videoViewer}];
         [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":self->_browserWarning}];
     }
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
-    if(![NSProcessInfo processInfo].isMacCatalystApp) {
+    if(!isCatalyst) {
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
             [photos addObject:@{@"title":@"Image Service", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"], @"selected":^{[self.navigationController pushViewController:[[ImageServiceViewController alloc] init] animated:YES];}}];
         }

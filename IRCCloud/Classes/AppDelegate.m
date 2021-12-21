@@ -1000,7 +1000,7 @@ extern NSURL *__logfile;
     [super buildMenuWithBuilder:builder];
     
     if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].isiOSAppOnMac || [NSProcessInfo processInfo].isMacCatalystApp) {
+        if([NSProcessInfo processInfo].macCatalystApp) {
             NSArray *formatting = @[
                 [builder commandForAction:@selector(toggleBoldface:) propertyList:nil],
                 [builder commandForAction:@selector(toggleItalics:) propertyList:nil],
