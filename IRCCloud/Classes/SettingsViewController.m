@@ -857,28 +857,30 @@
         [device addObject:@{@"title":@"Always show channel members", @"accessory":self->_hiddenMembers}];
     }
     [device addObject:@{@"title":@"Ask To Post A Snippet", @"accessory":self->_pastebin}];
-#if !TARGET_OS_MACCATALYST
-    [device addObject:@{@"title":@"Open Images in Browser", @"accessory":self->_imageViewer}];
-    [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":self->_videoViewer}];
-#endif
+    if(![NSProcessInfo processInfo].isMacCatalystApp) {
+        [device addObject:@{@"title":@"Open Images in Browser", @"accessory":self->_imageViewer}];
+        [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":self->_videoViewer}];
+    }
     [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":self->_browserWarning}];
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
-    if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-        [photos addObject:@{@"title":@"Image Service", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"], @"selected":^{[self.navigationController pushViewController:[[ImageServiceViewController alloc] init] animated:YES];}}];
+    if(![NSProcessInfo processInfo].isMacCatalystApp) {
+        if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+            [photos addObject:@{@"title":@"Image Service", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"], @"selected":^{[self.navigationController pushViewController:[[ImageServiceViewController alloc] init] animated:YES];}}];
+        }
+        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"] || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"]) {
+            [photos addObject:@{@"title":@"Imgur.com Account", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"]?[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"]:@"", @"selected":^{
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
+                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
+                [[NSUserDefaults standardUserDefaults] synchronize];
+                [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
+            }}];
+        }
+        [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":self->_saveToCameraRoll}];
     }
-    if(![[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"] || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"]) {
-        [photos addObject:@{@"title":@"Imgur.com Account", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"]?[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"]:@"", @"selected":^{
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
-            [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
-            [[NSUserDefaults standardUserDefaults] synchronize];
-            [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
-        }}];
-    }
-    [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":self->_saveToCameraRoll}];
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
 
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
