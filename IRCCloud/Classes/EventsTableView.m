@@ -225,11 +225,10 @@ extern UIImage *__socketClosedBackgroundImage;
     lp.delegate = self;
     [self->_tableView addGestureRecognizer:lp];
 
-#if TARGET_OS_MACCATALYST
     if (@available(iOS 13.0, *)) {
-        [self->_tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
+        if([NSProcessInfo processInfo].macCatalystApp)
+            [self->_tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
     }
-#endif
 
     self->_topUnreadView.backgroundColor = [UIColor chatterBarColor];
     self->_bottomUnreadView.backgroundColor = [UIColor chatterBarColor];

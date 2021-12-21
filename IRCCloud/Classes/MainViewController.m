@@ -1789,13 +1789,11 @@ NSArray *_sortedChannels;
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
-    if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].isiOSAppOnMac) {
+    if (@available(iOS 13.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp) {
             self->_kbSize = CGSizeMake(0,0);
             return;
         }
-    } else {
-        // Fallback on earlier versions
     }
     if(self->_eventsView.topUnreadView.observationInfo) {
         @try {
@@ -3257,6 +3255,11 @@ NSArray *_sortedChannels;
 }
 
 -(void)transitionToSize:(CGSize)size {
+    BOOL isCatalyst = NO;
+    if (@available(iOS 13.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp)
+            isCatalyst = YES;
+    }
     CLS_LOG(@"Transitioning to size: %f, %f", size.width, size.height);
     _ignoreInsetChanges = YES;
     CGPoint center = self.slidingViewController.view.center;
@@ -3272,11 +3275,8 @@ NSArray *_sortedChannels;
     self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height
-#if TARGET_OS_MACCATALYST
-       - 78
-#else
-       && size.width == [UIScreen mainScreen].bounds.size.width
-#endif
+       - (isCatalyst ? 78 : 0)
+       && (isCatalyst || size.width == [UIScreen mainScreen].bounds.size.width)
        && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
         self->_borders.hidden = NO;
         self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
@@ -3467,6 +3467,11 @@ NSArray *_sortedChannels;
 }
 
 -(void)_updateUserListVisibility {
+    BOOL isCatalyst = NO;
+    if (@available(iOS 13.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp)
+            isCatalyst = YES;
+    }
     /*if(![NSThread currentThread].isMainThread) {
         [self performSelectorOnMainThread:@selector(_updateUserListVisibility) withObject:nil waitUntilDone:YES];
         return;
@@ -3485,9 +3490,7 @@ NSArray *_sortedChannels;
         }
     } else {
         if(self.view.bounds.size.width > self.view.bounds.size.height
-#if !TARGET_OS_MACCATALYST
-           && self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width
-#endif
+           && (isCatalyst || self.view.bounds.size.width == [UIScreen mainScreen].bounds.size.width)
            && [[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && ![[NSUserDefaults standardUserDefaults] boolForKey:@"hiddenMembers"]) {
             if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid] && !([NetworkConnection sharedInstance].prefs && [[[[NetworkConnection sharedInstance].prefs objectForKey:@"channel-hiddenMembers"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] boolValue]) && ![[UIDevice currentDevice] isBigPhone] && !self->_msgid) {
                 self.navigationItem.rightBarButtonItem = nil;
@@ -3642,7 +3645,8 @@ NSArray *_sortedChannels;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:self->_buffer.cid].nick cid:self->_buffer.cid bid:self->_buffer.bid];
 
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    
+    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+
     void (^handler)(UIAlertAction *action) = ^(UIAlertAction *a) {
         [self actionSheetActionClicked:a.title];
     };
@@ -3845,6 +3849,7 @@ NSArray *_sortedChannels;
             title = self->_selectedUser.nick;
     }
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
     
     void (^handler)(UIAlertAction *action) = ^(UIAlertAction *a) {
         [self actionSheetActionClicked:a.title];
@@ -4120,6 +4125,7 @@ NSArray *_sortedChannels;
     self->_selectedURL = nil;
     self->_selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
     if([self->_selectedBuffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
@@ -4801,7 +4807,8 @@ NSArray *_sortedChannels;
 
 -(void)uploadsButtonPressed:(id)sender {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    
+    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+
     BOOL isCatalyst = NO;
     if (@available(iOS 13.0, *)) {
         if([NSProcessInfo processInfo].macCatalystApp)

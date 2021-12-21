@@ -645,11 +645,10 @@
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
     
-#if TARGET_OS_MACCATALYST
     if (@available(iOS 13.0, *)) {
-        [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
+        if([NSProcessInfo processInfo].macCatalystApp)
+            [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
     }
-#endif
     
 #ifndef EXTENSION
     if(!_delegate) {
