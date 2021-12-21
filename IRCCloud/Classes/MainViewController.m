@@ -4424,15 +4424,33 @@ NSArray *_sortedChannels;
     [self applyTheme];
 }
 
+- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
+    [self documentPicker:controller didPickDocumentAtURL:urls[0]];
+}
+
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
     [UIColor setTheme];
     [self applyTheme];
     FileUploader *u = [[FileUploader alloc] init];
+    FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
     u.delegate = self;
+    u.metadatadelegate = fvc;
     u.bid = self->_buffer.bid;
     u.msgid = self->_msgid;
     [u uploadFile:url];
-    FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+    
+    if([u.mimeType hasPrefix:@"image/"]) {
+        NSData *d = [NSData dataWithContentsOfURL:url];
+        UIImage *thumbnail = [UIImage imageWithData:d];
+        if(thumbnail) {
+            thumbnail = [FileUploader image:thumbnail scaledCopyOfSize:CGSizeMake(2048, 2048)];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [fvc setImage:thumbnail];
+                [fvc viewWillAppear:YES];
+            }];
+        }
+    }
+
     UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
     [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
@@ -4784,18 +4802,33 @@ NSArray *_sortedChannels;
 -(void)uploadsButtonPressed:(id)sender {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     
-    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-        [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
-            [self choosePhoto:UIImagePickerControllerSourceTypeCamera];
-        }]];
+    BOOL isCatalyst = NO;
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].isMacCatalystApp)
+            isCatalyst = YES;
     }
-    if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+    
+    if(!isCatalyst) {
+        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+            [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Take Photo or Video":@"Take a Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                if(self.presentedViewController)
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                [self choosePhoto:UIImagePickerControllerSourceTypeCamera];
+            }]];
+        }
+        if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
+            [alert addAction:[UIAlertAction actionWithTitle:([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"])?@"Choose Photo or Video":@"Choose Photo" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+                if(self.presentedViewController)
+                    [self dismissViewControllerAnimated:NO completion:nil];
+                [self choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+            }]];
+        }
+    }
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
+        [alert addAction:[UIAlertAction actionWithTitle:@"Choose Document" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             if(self.presentedViewController)
                 [self dismissViewControllerAnimated:NO completion:nil];
-            [self choosePhoto:UIImagePickerControllerSourceTypePhotoLibrary];
+            [self chooseFile];
         }]];
     }
     [alert addAction:[UIAlertAction actionWithTitle:@"Start a Text Snippet" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
@@ -4807,11 +4840,6 @@ NSArray *_sortedChannels;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
         [alert addAction:[UIAlertAction actionWithTitle:@"File Uploads" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
             [self showUploads];
-        }]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Choose Document" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-            if(self.presentedViewController)
-                [self dismissViewControllerAnimated:NO completion:nil];
-            [self chooseFile];
         }]];
     }
 #ifndef ENTERPRISE

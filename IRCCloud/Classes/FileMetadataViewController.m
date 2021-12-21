@@ -80,7 +80,7 @@
         }
     }
     
-    if(!_filename.text.length)
+    if(!self->_filename.text.length)
         self->_filename.text = self->_uploader.originalFilename;
     if(!_metadata) {
         if(self->_uploader.mimeType.length)
@@ -269,6 +269,7 @@
             break;
         case 1:
             cell.textLabel.text = @"Filename";
+            self->_filename.frame = CGRectMake(0, 0, self.tableView.frame.size.width / 3, 22);
             cell.accessoryView = self->_filename;
             break;
         case 2:
