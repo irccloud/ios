@@ -851,7 +851,8 @@
     [device addObject:@{@"title":@"Monospace Font", @"accessory":self->_mono}];
     [device addObject:@{@"title":@"Prevent Auto-Lock", @"accessory":self->_screen}];
     [device addObject:@{@"title":@"Auto-capitalization", @"accessory":self->_autoCaps}];
-    [device addObject:@{@"title":@"Preferred Browser", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"], @"selected":^{ [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES]; }}];
+    if(![NSProcessInfo processInfo].isMacCatalystApp)
+        [device addObject:@{@"title":@"Preferred Browser", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"], @"selected":^{ [self.navigationController pushViewController:[[BrowserViewController alloc] init] animated:YES]; }}];
     if([[UIDevice currentDevice] isBigPhone] || [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
         [device addObject:@{@"title":@"Show Sidebars In Landscape", @"accessory":self->_tabletMode}];
         [device addObject:@{@"title":@"Always show channel members", @"accessory":self->_hiddenMembers}];
@@ -860,8 +861,8 @@
     if(![NSProcessInfo processInfo].isMacCatalystApp) {
         [device addObject:@{@"title":@"Open Images in Browser", @"accessory":self->_imageViewer}];
         [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":self->_videoViewer}];
+        [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":self->_browserWarning}];
     }
-    [device addObject:@{@"title":@"Retry Failed Images in Browser", @"accessory":self->_browserWarning}];
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
     if(![NSProcessInfo processInfo].isMacCatalystApp) {
@@ -884,7 +885,7 @@
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
 
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
-    [notifications addObject:@{@"title":@"Default iOS Alert Sound", @"accessory":self->_defaultSound}];
+    [notifications addObject:@{@"title":@"Default Alert Sound", @"accessory":self->_defaultSound}];
     [notifications addObject:@{@"title":@"Preview Uploaded Files", @"accessory":self->_notificationPreviews}];
     [notifications addObject:@{@"title":@"Preview External URLs", @"accessory":self->_thirdPartyNotificationPreviews}];
     [notifications addObject:@{@"title":@"Notify On All Messages", @"accessory":self->_notifyAll}];
