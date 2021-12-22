@@ -70,7 +70,8 @@
     IBOutlet LinkLabel *_globalMsg;
     IBOutlet UIButton *_loadMoreBacklog;
     IBOutlet NSLayoutConstraint *_eventsViewWidthConstraint;
-    IBOutlet NSLayoutConstraint *_eventsViewOffsetXConstraint;
+    IBOutlet NSLayoutConstraint *_eventsViewHeightConstraint;
+    IBOutlet NSLayoutConstraint *_eventsViewOffsetLeftConstraint;
     IBOutlet NSLayoutConstraint *_bottomBarOffsetConstraint;
     IBOutlet NSLayoutConstraint *_bottomBarHeightConstraint;
     IBOutlet NSLayoutConstraint *_titleOffsetXConstraint;
