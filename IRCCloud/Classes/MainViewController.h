@@ -121,6 +121,7 @@
     UIView *_leftBorder, *_rightBorder;
     NSTimer *_handoffTimer;
     CGFloat _previousWidth;
+    NSString *_sceneTitleExtra;
 }
 @property (nonatomic) int cidToOpen;
 @property (nonatomic) int bidToOpen;

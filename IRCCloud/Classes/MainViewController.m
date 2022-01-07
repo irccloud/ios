@@ -760,15 +760,20 @@ NSArray *_sortedChannels;
             if(highlightCount) {
                 self->_menuBtn.tintColor = [UIColor redColor];
                 self->_menuBtn.accessibilityValue = @"Unread highlights";
+                self->_sceneTitleExtra = [NSString stringWithFormat:@"(%i) ", highlightCount];
             } else if(unreadCount) {
                 if(![self->_menuBtn.tintColor isEqual:[UIColor unreadBlueColor]])
                     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
                 self->_menuBtn.tintColor = [UIColor unreadBlueColor];
                 self->_menuBtn.accessibilityValue = @"Unread messages";
+                self->_sceneTitleExtra = @"* ";
             } else {
                 self->_menuBtn.tintColor = [UIColor navBarSubheadingColor];
                 self->_menuBtn.accessibilityValue = nil;
+                self->_sceneTitleExtra = nil;
             }
+            
+            [self _updateTitleArea];
         }];
     }
 }
@@ -2711,6 +2716,8 @@ NSArray *_sortedChannels;
     [self->_titleView setNeedsUpdateConstraints];
     
     if (@available(iOS 13.0, *)) {
+        if(sceneTitle && self->_sceneTitleExtra.length)
+            sceneTitle = [self->_sceneTitleExtra stringByAppendingString:sceneTitle];
         UIScene *scene = [(AppDelegate *)[UIApplication sharedApplication].delegate sceneForWindow:self.view.window];
         scene.title = sceneTitle ? sceneTitle : @"IRCCloud";
     }
