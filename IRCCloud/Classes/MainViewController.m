@@ -3286,9 +3286,10 @@ NSArray *_sortedChannels;
        - (isCatalyst ? 78 : 0)
        && (isCatalyst || size.width == [UIScreen mainScreen].bounds.size.width)
        && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
+        int buffersViewWidth = [[UIDevice currentDevice] isBigPhone]?180:240;
         self->_borders.hidden = NO;
-        self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?181:221);
-        self->_eventsViewOffsetLeftConstraint.constant = ([[UIDevice currentDevice] isBigPhone]?181:221);
+        self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - buffersViewWidth - 1;
+        self->_eventsViewOffsetLeftConstraint.constant = buffersViewWidth + 1;
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
@@ -3300,7 +3301,7 @@ NSArray *_sortedChannels;
             [self.view addSubview:self->_buffersView.view];
             self->_buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
-        self->_buffersView.view.frame = CGRectMake(0,0,[[UIDevice currentDevice] isBigPhone]?180:220,self.view.frame.size.height);
+        self->_buffersView.view.frame = CGRectMake(0,0,buffersViewWidth,self.view.frame.size.height);
         self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
         self->_borders.hidden = YES;
@@ -3507,11 +3508,11 @@ NSArray *_sortedChannels;
                     [self->_usersView viewWillAppear:NO];
                     self->_usersView.view.autoresizingMask = UIViewAutoresizingNone;
                 }
-                self->_usersView.view.frame = CGRectMake(self.view.frame.size.width - 220,0,220,self.view.frame.size.height);
+                self->_usersView.view.frame = CGRectMake(self.view.frame.size.width - 200,0,200,self.view.frame.size.height);
                 self->_usersView.view.hidden = NO;
                 if(self->_usersView.view.superview != self.view)
                     [self.view insertSubview:self->_usersView.view atIndex:1];
-                self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - 442;
+                self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - self->_buffersView.view.frame.size.width - 202;
             } else {
                 if(self->_msgid) {
                     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_closeThread)];
@@ -3533,7 +3534,7 @@ NSArray *_sortedChannels;
                     self.slidingViewController.underRightViewController = nil;
                     self->_usersView.view.hidden = YES;
                 }
-                self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - ([[UIDevice currentDevice] isBigPhone]?182:222);
+                self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - self->_buffersView.tableView.frame.size.width - 2;
                 self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
                 if(self.slidingViewController.underRightViewController) {
                     self->_eventsViewWidthConstraint.constant++;
