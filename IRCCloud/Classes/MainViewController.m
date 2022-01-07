@@ -1503,6 +1503,11 @@ NSArray *_sortedChannels;
                     if((e.isHighlight || [b.type isEqualToString:@"conversation"]) && !muted) {
                         self->_menuBtn.tintColor = [UIColor redColor];
                         self->_menuBtn.accessibilityValue = @"Unread highlights";
+                        if (@available(iOS 14.0, *)) {
+                            if([NSProcessInfo processInfo].macCatalystApp) {
+                                [self _updateUnreadIndicator];
+                            }
+                        }
                     } else if(self->_menuBtn.accessibilityValue == nil) {
                         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
                         if([b.type isEqualToString:@"channel"]) {
@@ -1524,6 +1529,12 @@ NSArray *_sortedChannels;
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
                         self->_menuBtn.tintColor = [UIColor unreadBlueColor];
                         self->_menuBtn.accessibilityValue = @"Unread messages";
+                        if (@available(iOS 14.0, *)) {
+                            if([NSProcessInfo processInfo].macCatalystApp) {
+                                self->_sceneTitleExtra = @"* ";
+                                [self _updateTitleArea];
+                            }
+                        }
                     }
                 }
             }
