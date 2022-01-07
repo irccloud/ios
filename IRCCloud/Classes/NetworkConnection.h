@@ -191,6 +191,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 +(NetworkConnection*)sharedInstance;
 +(void)sync;
 +(void)sync:(NSURL *)file1 with:(NSURL *)file2;
++(BOOL)shouldReconnect;
 -(BOOL)isWifi;
 -(void)serialize;
 -(NSDictionary *)prefs;

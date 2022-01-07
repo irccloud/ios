@@ -1666,7 +1666,7 @@ NSArray *_sortedChannels;
                 int seconds = (int)([NetworkConnection sharedInstance].reconnectTimestamp - [[NSDate date] timeIntervalSince1970]) + 1;
                 if(seconds < 0) {
                     seconds = 0;
-                    if([NetworkConnection sharedInstance].session.length && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                    if([NetworkConnection sharedInstance].session.length && [NetworkConnection shouldReconnect]) {
                         CLS_LOG(@"Reconnect timestamp in the past, reconnecting");
                         [[NetworkConnection sharedInstance] connect:NO];
                     } else {
@@ -1681,7 +1681,7 @@ NSArray *_sortedChannels;
                 UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"Disconnected");
                 if([[NetworkConnection sharedInstance] reachable] == kIRCCloudReachable) {
                     self->_connectingStatus.text = @"Disconnected";
-                    if([NetworkConnection sharedInstance].session.length && [UIApplication sharedApplication].applicationState == UIApplicationStateActive) {
+                    if([NetworkConnection sharedInstance].session.length && [NetworkConnection shouldReconnect]) {
                         CLS_LOG(@"I'm disconnected but IRCCloud is reachable, reconnecting");
                         [[NetworkConnection sharedInstance] connect:NO];
                     }
@@ -1958,7 +1958,7 @@ NSArray *_sortedChannels;
 #ifdef DEBUG
     }
 #endif
-    if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting &&session != nil && [session length] > 0) {
+    if([NetworkConnection shouldReconnect] && [NetworkConnection sharedInstance].state != kIRCCloudStateConnected && [NetworkConnection sharedInstance].state != kIRCCloudStateConnecting && session != nil && [session length] > 0) {
         [[NetworkConnection sharedInstance] connect:NO];
     }
     

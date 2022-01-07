@@ -359,7 +359,15 @@ volatile BOOL __socketPaused = NO;
     NSString *app = @"IRCCloud";
 #endif
 #endif
-    _userAgent = [NSString stringWithFormat:@"%@/%@ (%@; %@; %@ %@)", app, version, [UIDevice currentDevice].model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
+        
+    NSString *model = [UIDevice currentDevice].model;
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp) {
+            model = @"Mac";
+        }
+    }
+
+    _userAgent = [NSString stringWithFormat:@"%@/%@ (%@; %@; %@ %@)", app, version, model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
     
     NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"stream"];
     [__userInfoLock lock];
@@ -2306,13 +2314,26 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     }
 }
 
++(BOOL)shouldReconnect {
+#ifdef EXTENSION
+    return NO;
+#else
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp) {
+            return YES;
+        }
+    }
+    return [UIApplication sharedApplication].applicationState != UIApplicationStateBackground;
+#endif
+}
+
 -(void)_idle {
     self->_reconnectTimestamp = 0;
     self->_idleTimer = nil;
     [self->_socket performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
     self->_state = kIRCCloudStateDisconnected;
 #ifndef EXTENSION
-    if([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
+    if([NetworkConnection shouldReconnect]) {
         CLS_LOG(@"Websocket idle time exceeded, reconnecting...");
         [self connect:self->_notifier];
     } else {
