@@ -622,6 +622,11 @@
             bottomUnreadIndicator.hidden = YES;
             bottomUnreadIndicator.alpha = 0;
         }
+    } else {
+        topUnreadIndicator.hidden = YES;
+        topUnreadIndicator.alpha = 0;
+        bottomUnreadIndicator.hidden = YES;
+        bottomUnreadIndicator.alpha = 0;
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y + self.tableView.contentInset.top,self.view.frame.size.width, 40);
     bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y - self.tableView.safeAreaInsets.bottom,self.view.frame.size.width, 40);
