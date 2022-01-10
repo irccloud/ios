@@ -3313,16 +3313,15 @@ NSArray *_sortedChannels;
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
-        if(self->_buffersView.view.superview != self.slidingViewController.view) {
-            [self.slidingViewController addChildViewController:self->_buffersView];
-            [self->_buffersView willMoveToParentViewController:self.slidingViewController];
+        if(self->_buffersView.view.superview != self.navigationController.navigationBar.superview) {
+            [self->_buffersView willMoveToParentViewController:self.navigationController];
             [self->_buffersView viewWillAppear:NO];
             self->_buffersView.view.hidden = NO;
-            [self.slidingViewController.view addSubview:self->_buffersView.view];
+            [self.navigationController.navigationBar.superview addSubview:self->_buffersView.view];
             self->_buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
         self->_buffersView.view.frame = CGRectMake(0,self.slidingViewController.view.safeAreaInsets.top,buffersViewWidth,self.slidingViewController.view.frame.size.height - self.slidingViewController.view.safeAreaInsets.top);
-        [self.slidingViewController.view bringSubviewToFront:self->_buffersView.view];
+        [self.navigationController.navigationBar.superview bringSubviewToFront:self->_buffersView.view];
         self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
         self->_borders.hidden = YES;
