@@ -3304,7 +3304,7 @@ NSArray *_sortedChannels;
        - (isCatalyst ? 78 : 0)
        && (isCatalyst || size.width == [UIScreen mainScreen].bounds.size.width)
        && ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad || [[UIDevice currentDevice] isBigPhone])) {
-        int buffersViewWidth = [[UIDevice currentDevice] isBigPhone]?180:240;
+        int buffersViewWidth = [[UIDevice currentDevice] isBigPhone]?200:240;
         self->_borders.hidden = NO;
         self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - buffersViewWidth - 1;
         self->_eventsViewOffsetLeftConstraint.constant = buffersViewWidth + 1;

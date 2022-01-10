@@ -1174,7 +1174,7 @@
         cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
         cell.icon.font = self->_awesomeFont;
 #ifndef EXTENSION
-        cell.borderInset = self.slidingViewController.view.safeAreaInsets.left;
+        cell.borderInset = _delegate.view.safeAreaInsets.left;
 #endif
         if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
             if([[row objectForKey:@"archived"] intValue])
