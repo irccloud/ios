@@ -45,6 +45,12 @@
 -(void)selectNextUnread;
 -(void)selectPreviousUnread;
 -(void)setAllowsAutomaticWindowTabbing:(BOOL)allow;
+-(void)sendFeedback;
+-(void)joinFeedback;
+-(void)joinBeta;
+-(void)FAQ;
+-(void)versionHistory;
+-(void)openSourceLicenses;
 @end
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate> {

@@ -36,6 +36,14 @@
     tv.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     tv.editable = NO;
     [self.view addSubview:tv];
+
+    if(self.navigationController.viewControllers.count == 1) {
+        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(doneButtonPressed)];
+    }
+}
+
+-(void)doneButtonPressed {
+    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)didReceiveMemoryWarning {

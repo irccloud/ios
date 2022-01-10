@@ -374,6 +374,11 @@
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
+    if (@available(iOS 13.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp) {
+            return;
+        }
+    }
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationBeginsFromCurrentState:YES];
     [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];

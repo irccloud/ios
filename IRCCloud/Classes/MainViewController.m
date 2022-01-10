@@ -62,6 +62,7 @@
 #import "ImageCache.h"
 #import "AvatarsTableViewController.h"
 #import "PinReorderViewController.h"
+#import "LicenseViewController.h"
 @import Firebase;
 
 extern NSDictionary *emojiMap;
@@ -5092,7 +5093,7 @@ NSArray *_sortedChannels;
             [[NetworkConnection sharedInstance] whois:self->_buffer.name server:ircserver.length?ircserver:nil cid:self->_buffer.cid handler:nil];
         }
     } else if([action isEqualToString:@"Send Feedback"]) {
-        [[NetworkConnection sharedInstance] sendFeedbackReport:self];
+        [self sendFeedback];
     }
     
     if(!_selectedUser || !_selectedUser.nick || _selectedUser.nick.length < 1)
@@ -5497,6 +5498,41 @@ NSArray *_sortedChannels;
 
 -(void)selectNextUnread {
     [self->_buffersView nextUnread];
+}
+
+-(void)sendFeedback {
+    [[NetworkConnection sharedInstance] sendFeedbackReport:self];
+}
+
+-(void)joinFeedback {
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"irc://irc.irccloud.com/%23feedback"]];
+}
+
+-(void)joinBeta {
+    [FIRAnalytics logEventWithName:@"beta_invite" parameters:nil];
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://testflight.apple.com/join/MApr7Une"]];
+}
+
+-(void)FAQ {
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://www.irccloud.com/faq"]];
+}
+
+-(void)versionHistory {
+    [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://github.com/irccloud/ios/releases"]];
+}
+
+-(void)openSourceLicenses {
+    LicenseViewController *lvc = [[LicenseViewController alloc] init];
+    
+    UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:lvc];
+    [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+        nc.modalPresentationStyle = UIModalPresentationPageSheet;
+    else
+        nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    if(self.presentedViewController)
+        [self dismissViewControllerAnimated:NO completion:nil];
+    [self presentViewController:nc animated:YES completion:nil];
 }
 
 -(void)onTabPressed:(UIKeyCommand *)sender {

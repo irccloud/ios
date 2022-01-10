@@ -1058,6 +1058,15 @@ extern NSURL *__logfile;
                     [UICommand commandWithTitle:@"File Uploads" image:nil action:@selector(showUploads) propertyList:nil],
                     [UICommand commandWithTitle:@"Text Snippets" image:nil action:@selector(showPastebins) propertyList:nil]
                 ]] afterMenuForIdentifier:UIMenuView];
+                
+                [builder insertChildMenu:[UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                    [UICommand commandWithTitle:@"Send Feedback" image:nil action:@selector(sendFeedback) propertyList:nil],
+                    [UICommand commandWithTitle:@"Join #feedback Channel" image:nil action:@selector(joinFeedback) propertyList:nil],
+                    [UICommand commandWithTitle:@"Become A Beta Tester" image:nil action:@selector(joinBeta) propertyList:nil],
+                    [UICommand commandWithTitle:@"FAQ" image:nil action:@selector(FAQ) propertyList:nil],
+                    [UICommand commandWithTitle:@"Version History" image:nil action:@selector(versionHistory) propertyList:nil],
+                    [UICommand commandWithTitle:@"Open-Source Licenses" image:nil action:@selector(openSourceLicenses) propertyList:nil],
+                ]] atStartOfMenuForIdentifier:UIMenuHelp];
             }
         }
     }
