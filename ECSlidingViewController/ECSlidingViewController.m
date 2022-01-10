@@ -626,6 +626,11 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 - (void)updateUnderLeftLayout
 {
+    BOOL isCatalyst = NO;
+    if (@available(iOS 13.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp)
+            isCatalyst = YES;
+    }
     if (self.underLeftWidthLayout == ECFullWidth) {
         [self.underLeftView setAutoresizingMask:self.autoResizeToFillScreen];
         [self.underLeftView setFrame:self.view.bounds];
@@ -645,7 +650,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
     if(sbheight > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
         sbheight -= 20;
-    if(self.view.safeAreaInsets.bottom) {
+    if(self.view.safeAreaInsets.bottom || isCatalyst) {
         sbheight = self.view.safeAreaInsets.top;
     }
     CGRect frame = self.underLeftView.frame;
@@ -658,6 +663,11 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 - (void)updateUnderRightLayout
 {
+    BOOL isCatalyst = NO;
+    if (@available(iOS 13.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp)
+            isCatalyst = YES;
+    }
     if (self.underRightWidthLayout == ECFullWidth) {
         [self.underRightViewController.view setAutoresizingMask:self.autoResizeToFillScreen];
         self.underRightView.frame = self.view.bounds;
@@ -694,7 +704,7 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
     if(sbheight > 20)
         sbheight -= 20;
-    if(self.view.safeAreaInsets.bottom) {
+    if(self.view.safeAreaInsets.bottom || isCatalyst) {
         sbheight = self.view.safeAreaInsets.top;
     }
     CGRect frame = self.underRightView.frame;
