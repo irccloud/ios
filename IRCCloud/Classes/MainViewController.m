@@ -1999,6 +1999,12 @@ NSArray *_sortedChannels;
     }
     [self->_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
     [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
+    
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp) {
+            [[UIMenuSystem mainSystem] setNeedsRebuild];
+        }
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
