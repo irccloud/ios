@@ -528,15 +528,17 @@
             }
         }
 #ifndef EXTENSION
-        [data addObject:@{
-         @"type":@TYPE_ADD_NETWORK,
-         @"cid":@-1,
-         @"bid":@-1,
-         @"name":@"Add a network",
-         @"unread":@0,
-         @"highlights":@0,
-         @"archived":@0,
-         }];
+        if([NetworkConnection sharedInstance].state == kIRCCloudStateConnected && [NetworkConnection sharedInstance].ready) {
+            [data addObject:@{
+             @"type":@TYPE_ADD_NETWORK,
+             @"cid":@-1,
+             @"bid":@-1,
+             @"name":@"Add a network",
+             @"unread":@0,
+             @"highlights":@0,
+             @"archived":@0,
+             }];
+        }
 #endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             self->_boldFont = [UIFont boldSystemFontOfSize:FONT_SIZE];
