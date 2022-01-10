@@ -958,6 +958,7 @@
                         <outlet property="_bottomUnreadBarYOffsetConstraint" destination="J0Y-Xk-O0Z" id="mmJ-qK-vvJ"/>
                         <outlet property="_connectingStatus" destination="Lgm-9B-bG7" id="JDh-bT-fUg"/>
                         <outlet property="_connectingView" destination="HHq-2d-yEd" id="NH2-ao-sp5"/>
+                        <outlet property="_connectingXOffsetConstraint" destination="A49-Jb-UIn" id="6zB-zh-Kfx"/>
                         <outlet property="_eventActivity" destination="37K-X6-4EC" id="w6Q-8m-TGd"/>
                         <outlet property="_eventsView" destination="pci-6M-5ag" id="nMo-GO-grI"/>
                         <outlet property="_eventsViewHeightConstraint" destination="rCT-DO-2FK" id="esC-0s-Uex"/>
@@ -979,6 +980,7 @@
                         <outlet property="_topUnreadBarYOffsetConstraint" destination="Rzg-lw-y1f" id="af9-uk-T0A"/>
                         <outlet property="_topicLabel" destination="Pau-R1-cSx" id="hA1-42-nVB"/>
                         <outlet property="_topicWidthConstraint" destination="XlM-mS-AXU" id="rFn-FH-R0V"/>
+                        <outlet property="_topicXOffsetConstraint" destination="83z-LY-g93" id="k6U-Tq-zj2"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="y4g-wn-AmU" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -1056,7 +1058,6 @@
                     <constraints>
                         <constraint firstItem="Lgm-9B-bG7" firstAttribute="leading" secondItem="HHq-2d-yEd" secondAttribute="leading" id="A49-Jb-UIn"/>
                         <constraint firstItem="Lgm-9B-bG7" firstAttribute="centerY" secondItem="HHq-2d-yEd" secondAttribute="centerY" id="Dbe-gW-oI5"/>
-                        <constraint firstItem="Lgm-9B-bG7" firstAttribute="centerX" secondItem="HHq-2d-yEd" secondAttribute="centerX" id="uY4-vm-4f7"/>
                         <constraint firstAttribute="trailing" secondItem="Lgm-9B-bG7" secondAttribute="trailing" id="w1L-4c-oHW"/>
                     </constraints>
                 </view>
@@ -1064,7 +1065,7 @@
                     <rect key="frame" x="0.0" y="0.0" width="500" height="40"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <subviews>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="16" translatesAutoresizingMaskIntoConstraints="NO" id="gvD-vL-cXM">
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="16" translatesAutoresizingMaskIntoConstraints="NO" id="gvD-vL-cXM" userLabel="Lock">
                             <rect key="frame" x="234" y="11" width="16" height="18"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="18" id="Upo-wn-aPb"/>
@@ -1074,7 +1075,7 @@
                             <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="18" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="YHw-ba-1Ak">
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="18" preferredMaxLayoutWidth="0.0" translatesAutoresizingMaskIntoConstraints="NO" id="YHw-ba-1Ak" userLabel="Title">
                             <rect key="frame" x="250" y="9" width="0.0" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="22" id="uQU-3q-ONr"/>
@@ -1084,7 +1085,7 @@
                             <nil key="highlightedColor"/>
                             <size key="shadowOffset" width="0.0" height="0.0"/>
                         </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="12" preferredMaxLayoutWidth="500" translatesAutoresizingMaskIntoConstraints="NO" id="Pau-R1-cSx">
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="12" preferredMaxLayoutWidth="500" translatesAutoresizingMaskIntoConstraints="NO" id="Pau-R1-cSx" userLabel="Topic">
                             <rect key="frame" x="0.0" y="31" width="500" height="9"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="500" id="XlM-mS-AXU"/>
@@ -1097,7 +1098,7 @@
                     </subviews>
                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                     <constraints>
-                        <constraint firstItem="YHw-ba-1Ak" firstAttribute="centerX" secondItem="nlM-WR-4UV" secondAttribute="centerX" id="0nM-QH-BmQ"/>
+                        <constraint firstItem="YHw-ba-1Ak" firstAttribute="centerX" secondItem="Pau-R1-cSx" secondAttribute="centerX" id="0nM-QH-BmQ"/>
                         <constraint firstItem="Pau-R1-cSx" firstAttribute="leading" secondItem="nlM-WR-4UV" secondAttribute="leading" id="83z-LY-g93"/>
                         <constraint firstItem="gvD-vL-cXM" firstAttribute="trailing" secondItem="YHw-ba-1Ak" secondAttribute="leading" id="AlA-D2-HcQ"/>
                         <constraint firstAttribute="bottom" secondItem="Pau-R1-cSx" secondAttribute="bottom" id="FOq-lM-rw2"/>

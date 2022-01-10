@@ -3307,23 +3307,28 @@ NSArray *_sortedChannels;
         self->_borders.hidden = NO;
         self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - buffersViewWidth - 1;
         self->_eventsViewOffsetLeftConstraint.constant = buffersViewWidth + 1;
+        self->_connectingXOffsetConstraint.constant = buffersViewWidth + 1;
+        self->_topicXOffsetConstraint.constant = buffersViewWidth + 1;
         self.navigationItem.leftBarButtonItem = nil;
         self.navigationItem.rightBarButtonItem = nil;
         self.slidingViewController.underLeftViewController = nil;
-        if(self->_buffersView.view.superview != self.view) {
-            [self addChildViewController:self->_buffersView];
-            [self->_buffersView willMoveToParentViewController:self];
+        if(self->_buffersView.view.superview != self.slidingViewController.view) {
+            [self.slidingViewController addChildViewController:self->_buffersView];
+            [self->_buffersView willMoveToParentViewController:self.slidingViewController];
             [self->_buffersView viewWillAppear:NO];
             self->_buffersView.view.hidden = NO;
-            [self.view addSubview:self->_buffersView.view];
+            [self.slidingViewController.view addSubview:self->_buffersView.view];
             self->_buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
-        self->_buffersView.view.frame = CGRectMake(0,0,buffersViewWidth,self.view.frame.size.height);
+        self->_buffersView.view.frame = CGRectMake(0,self.slidingViewController.view.safeAreaInsets.top,buffersViewWidth,self.slidingViewController.view.frame.size.height - self.slidingViewController.view.safeAreaInsets.top);
+        [self.slidingViewController.view bringSubviewToFront:self->_buffersView.view];
         self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
         self->_borders.hidden = YES;
         self->_eventsViewWidthConstraint.constant = size.width + self.slidingViewController.view.safeAreaInsets.left / 2;
         self->_eventsViewOffsetLeftConstraint.constant = self.slidingViewController.view.safeAreaInsets.left / 2;
+        self->_connectingXOffsetConstraint.constant = 0;
+        self->_topicXOffsetConstraint.constant = 0;
         if(!self.slidingViewController.underLeftViewController)
             self.slidingViewController.underLeftViewController = self->_buffersView;
         if(!self.navigationItem.leftBarButtonItem)
@@ -3337,7 +3342,7 @@ NSArray *_sortedChannels;
         frame.size.height = (size.width > size.height)?24:40;
         self->_topicLabel.alpha = (size.width > size.height)?0:1;
     }
-    self->_topicWidthConstraint.constant = frame.size.width = size.width - 128;
+    self->_topicWidthConstraint.constant = frame.size.width = size.width - 128 - self->_topicXOffsetConstraint.constant;
     frame.size.width -= self.slidingViewController.view.safeAreaInsets.left;
     frame.size.width -= self.slidingViewController.view.safeAreaInsets.right;
     self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.left;
