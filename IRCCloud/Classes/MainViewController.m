@@ -3320,7 +3320,11 @@ NSArray *_sortedChannels;
             [self.navigationController.navigationBar.superview addSubview:self->_buffersView.view];
             self->_buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
+#if TARGET_OS_MACCATALYST
         self->_buffersView.view.frame = CGRectMake(0,self.slidingViewController.view.safeAreaInsets.top,buffersViewWidth,self.slidingViewController.view.frame.size.height - self.slidingViewController.view.safeAreaInsets.top);
+#else
+        self->_buffersView.view.frame = CGRectMake(0,0,buffersViewWidth,self.slidingViewController.view.frame.size.height);
+#endif
         [self.navigationController.navigationBar.superview bringSubviewToFront:self->_buffersView.view];
         self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
