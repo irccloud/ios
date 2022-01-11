@@ -3233,6 +3233,15 @@ NSArray *_sortedChannels;
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
 }
 
+-(BOOL)prefersStatusBarHidden {
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].macCatalystApp) {
+            return YES;
+        }
+    }
+    return UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
+}
+
 -(void)statusBarFrameWillChange:(NSNotification *)n {
     if(self.slidingViewController.view.safeAreaInsets.bottom)
         return;
@@ -3246,7 +3255,7 @@ NSArray *_sortedChannels;
 
 -(void)updateLayout {
     BOOL scrolledUp = _buffer.scrolledUp;
-    [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
+    [UIApplication sharedApplication].statusBarHidden = self.prefersStatusBarHidden;
     [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
     if(self.slidingViewController.view.safeAreaInsets.bottom)
         [self updateLayout:0];
@@ -3396,7 +3405,7 @@ NSArray *_sortedChannels;
     [self.slidingViewController resetTopView];
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
+        [UIApplication sharedApplication].statusBarHidden = self.prefersStatusBarHidden;
         [self transitionToSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         self->_eventActivity.alpha = 0;

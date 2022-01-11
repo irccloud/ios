@@ -611,7 +611,7 @@ extern NSURL *__logfile;
                 [[NetworkConnection sharedInstance] connect:NO];
 
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
+                [UIApplication sharedApplication].statusBarHidden = self.mainViewController.prefersStatusBarHidden;
                 self.slideViewController.view.alpha = 1;
                 if(self.window.rootViewController != self.slideViewController) {
                     if([self.window.rootViewController isKindOfClass:ImageViewController.class])
@@ -634,7 +634,7 @@ extern NSURL *__logfile;
         } else if(self.window.rootViewController != self.slideViewController) {
             if([self.window.rootViewController isKindOfClass:ImageViewController.class])
                 self.mainViewController.ignoreVisibilityChanges = YES;
-            [UIApplication sharedApplication].statusBarHidden = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
+            [UIApplication sharedApplication].statusBarHidden = self.mainViewController.prefersStatusBarHidden;
             self.slideViewController.view.alpha = 1;
             [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
             self.window.rootViewController = self.slideViewController;

@@ -732,8 +732,15 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 
 -(UIStatusBarStyle)preferredStatusBarStyle {
     if(self.topViewController)
-        return self.topViewController.preferredStatusBarStyle;
+        return self.topViewController.childViewControllerForStatusBarStyle ? self.topViewController.childViewControllerForStatusBarStyle.preferredStatusBarStyle : self.topViewController.preferredStatusBarStyle;
     else
         return UIStatusBarStyleDefault;
+}
+
+-(BOOL)prefersStatusBarHidden {
+    if(self.topViewController)
+        return self.topViewController.childViewControllerForStatusBarHidden ? self.topViewController.childViewControllerForStatusBarHidden.prefersStatusBarHidden : self.topViewController.prefersStatusBarHidden;
+    else
+        return NO;
 }
 @end
