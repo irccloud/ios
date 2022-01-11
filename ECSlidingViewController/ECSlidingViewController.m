@@ -658,6 +658,11 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if(self.view.safeAreaInsets.bottom) {
         sbheight = self.view.safeAreaInsets.top;
     }
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].isiOSAppOnMac) {
+            sbheight = 0;
+        }
+    }
 #endif
     CGRect frame = self.underLeftView.frame;
     frame.origin.y = sbheight;
@@ -710,6 +715,11 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 #else
     if(self.view.safeAreaInsets.bottom) {
         sbheight = self.view.safeAreaInsets.top;
+    }
+    if (@available(iOS 14.0, *)) {
+        if([NSProcessInfo processInfo].isiOSAppOnMac) {
+            sbheight = 0;
+        }
     }
 #endif
     CGRect frame = self.underRightView.frame;
