@@ -567,10 +567,11 @@
 -(void)_updateUnreadIndicators {
 #ifndef EXTENSION
     [self.tableView visibleCells];
-    NSArray *rows = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.safeAreaInsets)];
+    CGRect bounds = UIEdgeInsetsInsetRect(self.tableView.bounds, self.safeAreaInsets);
+    NSArray *rows = [self.tableView indexPathsForRowsInRect:bounds];
     if(rows.count) {
         NSInteger first = [[rows objectAtIndex:0] row];
-        NSInteger last = [[rows lastObject] row];
+        NSInteger last = rows.count > 1 ? [[rows objectAtIndex:rows.count - 2] row] : [[rows lastObject] row];
         
         if(self->_firstFailurePosition != -1 && first > _firstFailurePosition) {
             topUnreadIndicator.hidden = NO;
@@ -629,7 +630,7 @@
         bottomUnreadIndicator.alpha = 0;
     }
     topUnreadIndicator.frame = CGRectMake(0,self.tableView.contentOffset.y + self.tableView.contentInset.top,self.view.frame.size.width, 40);
-    bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y - self.tableView.safeAreaInsets.bottom,self.view.frame.size.width, 40);
+    bottomUnreadIndicator.frame = CGRectMake(0,self.view.frame.size.height - 40 + self.tableView.contentOffset.y - self.tableView.contentInset.bottom,self.view.frame.size.width, 40 + self.tableView.contentInset.bottom);
 #endif
 }
 
@@ -689,14 +690,14 @@
     }
 
     if(!bottomUnreadIndicatorColor) {
-        bottomUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,1,self.view.frame.size.width,45)];
+        bottomUnreadIndicatorColor = [[UIView alloc] initWithFrame:CGRectMake(0,1,self.view.frame.size.width,79)];
         bottomUnreadIndicatorColor.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         bottomUnreadIndicatorColor.userInteractionEnabled = NO;
         bottomUnreadIndicatorColor.backgroundColor = [UIColor unreadBlueColor];
     }
 
     if(!bottomUnreadIndicatorBorder) {
-        bottomUnreadIndicatorBorder = [[UIView alloc] initWithFrame:CGRectMake(0,24,self.view.frame.size.width,46)];
+        bottomUnreadIndicatorBorder = [[UIView alloc] initWithFrame:CGRectMake(0,24,self.view.frame.size.width,56)];
         bottomUnreadIndicatorBorder.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         bottomUnreadIndicatorBorder.userInteractionEnabled = NO;
         bottomUnreadIndicatorBorder.backgroundColor = [UIColor unreadBorderColor];
@@ -705,7 +706,7 @@
     
     if(!bottomUnreadIndicator) {
         bottomUnreadIndicator = [[UIControl alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width,80)];
-        bottomUnreadIndicator.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+        bottomUnreadIndicator.autoresizingMask = UIViewAutoresizingFlexibleWidth;
         bottomUnreadIndicator.autoresizesSubviews = YES;
         bottomUnreadIndicator.userInteractionEnabled = YES;
         bottomUnreadIndicator.backgroundColor = [UIColor clearColor];
@@ -1155,6 +1156,10 @@
     }
 }
 
+- (UIEdgeInsets)safeAreaInsets {
+    return self.slidingViewController ? self.slidingViewController.view.safeAreaInsets : _delegate.view.safeAreaInsets;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(self->_data) {
         BOOL selected = (indexPath.row == self->_selectedRow);
@@ -1174,7 +1179,7 @@
         cell.contentView.backgroundColor = [UIColor bufferBackgroundColor];
         cell.icon.font = self->_awesomeFont;
 #ifndef EXTENSION
-        cell.borderInset = _delegate.view.safeAreaInsets.left;
+        cell.borderInset = self.safeAreaInsets.left;
 #endif
         if([[row objectForKey:@"unread"] intValue] || (selected && cell.type != TYPE_ARCHIVES_HEADER)) {
             if([[row objectForKey:@"archived"] intValue])
