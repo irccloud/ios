@@ -5348,18 +5348,33 @@ NSArray *_sortedChannels;
             }
         }
         [self _imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
-    } else if([UIPasteboard generalPasteboard].string) {
-        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
-        if(self->_message.selectedRange.length > 0)
-            [msg deleteCharactersInRange:self->_message.selectedRange];
+    } else if([UIPasteboard generalPasteboard].strings) {
+        NSMutableString *text = @"".mutableCopy;
+        for(NSString *s in [UIPasteboard generalPasteboard].strings) {
+            if(text.length)
+                [text appendString:@" "];
+            [text appendString:s];
+        }
         
-        [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:self->_message.font,NSForegroundColorAttributeName:self->_message.textColor}] atIndex:self->_message.selectedRange.location];
-        
-        [self->_message setAttributedText:msg];
+        if(text.length) {
+            NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+            BOOL shouldMoveCursor = self->_message.selectedRange.location == 0 || self->_message.selectedRange.location == msg.length;
+            if(self->_message.selectedRange.length > 0)
+                [msg deleteCharactersInRange:self->_message.selectedRange];
+            
+            [msg insertAttributedString:[[NSAttributedString alloc] initWithString:text attributes:@{NSFontAttributeName:self->_message.font,NSForegroundColorAttributeName:self->_message.textColor}] atIndex:self->_message.selectedRange.location];
+            
+            [self->_message setAttributedText:msg];
+            if(shouldMoveCursor)
+                self->_message.selectedRange = NSMakeRange(msg.length, 0);
+        }
     }
 }
 
 -(void)pasteRich:(id)sender {
+    NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
+    BOOL shouldMoveCursor = self->_message.selectedRange.location == 0 || self->_message.selectedRange.location == msg.length;
+
     if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"]) {
         NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
         if(self->_message.selectedRange.length > 0)
@@ -5367,6 +5382,8 @@ NSArray *_sortedChannels;
         [msg insertAttributedString:[ColorFormatter format:[[NSString alloc] initWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"] encoding:NSUTF8StringEncoding] defaultColor:self->_message.textColor mono:NO linkify:NO server:nil links:nil] atIndex:self->_message.internalTextView.selectedRange.location];
         
         [self->_message setAttributedText:msg];
+        if(shouldMoveCursor)
+            self->_message.selectedRange = NSMakeRange(msg.length, 0);
     } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
         NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
         if(self->_message.selectedRange.length > 0)
@@ -5374,6 +5391,8 @@ NSArray *_sortedChannels;
         [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
         
         [self->_message setAttributedText:msg];
+        if(shouldMoveCursor)
+            self->_message.selectedRange = NSMakeRange(msg.length, 0);
     } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD]) {
         NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
         if(self->_message.selectedRange.length > 0)
@@ -5381,6 +5400,8 @@ NSArray *_sortedChannels;
         [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
         
         [self->_message setAttributedText:msg];
+        if(shouldMoveCursor)
+            self->_message.selectedRange = NSMakeRange(msg.length, 0);
     } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"]) {
         NSDictionary *d = [NSPropertyListSerialization propertyListWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"] options:NSPropertyListImmutable format:NULL error:NULL];
         NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
@@ -5389,14 +5410,10 @@ NSArray *_sortedChannels;
         [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[d objectForKey:@"WebMainResource"] objectForKey:@"WebResourceData"] options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
         
         [self->_message setAttributedText:msg];
-    } else if([UIPasteboard generalPasteboard].string) {
-        NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
-        if(self->_message.selectedRange.length > 0)
-            [msg deleteCharactersInRange:self->_message.selectedRange];
-        
-        [msg insertAttributedString:[[NSAttributedString alloc] initWithString:[UIPasteboard generalPasteboard].string attributes:@{NSFontAttributeName:self->_message.font,NSForegroundColorAttributeName:self->_message.textColor}] atIndex:self->_message.selectedRange.location];
-        
-        [self->_message setAttributedText:msg];
+        if(shouldMoveCursor)
+            self->_message.selectedRange = NSMakeRange(msg.length, 0);
+    } else if([UIPasteboard generalPasteboard].strings) {
+        [self paste:nil];
     }
 }
 
