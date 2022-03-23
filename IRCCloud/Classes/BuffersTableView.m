@@ -567,7 +567,7 @@
 -(void)_updateUnreadIndicators {
 #ifndef EXTENSION
     [self.tableView visibleCells];
-    CGRect bounds = UIEdgeInsetsInsetRect(self.tableView.bounds, self.safeAreaInsets);
+    CGRect bounds = UIEdgeInsetsInsetRect(self.tableView.bounds, UIEdgeInsetsMake(0, 0, self.safeAreaInsets.bottom, 0));
     NSArray *rows = [self.tableView indexPathsForRowsInRect:bounds];
     if(rows.count) {
         NSInteger first = [[rows objectAtIndex:0] row];

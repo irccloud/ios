@@ -120,7 +120,7 @@ platform :ios do
       skip_open_summary: true,
       clean: true,
       derived_data_path: "./build",
-      devices: ["iPhone X", "iPhone 6 Plus", "iPhone Xs Max"],
+      devices: ["iPhone X", "iPhone 6s Plus", "iPhone 13 Pro Max"],
       ios_version: "12.2",
       launch_arguments: ["-bigphone YES"]
     )
