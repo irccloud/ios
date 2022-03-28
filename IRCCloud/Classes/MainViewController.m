@@ -5340,7 +5340,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)paste:(id)sender {
-    if([UIPasteboard generalPasteboard].image) {
+    if([UIPasteboard generalPasteboard].hasImages && ![UIPasteboard generalPasteboard].hasURLs) {
         for(NSString *type in [UIPasteboard generalPasteboard].pasteboardTypes) {
             if([type isEqualToString:(__bridge NSString *)kUTTypeGIF]) {
                 [self _imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image, @"gifData":[[UIPasteboard generalPasteboard] dataForPasteboardType:(__bridge NSString *)kUTTypeGIF]}];
@@ -5348,7 +5348,7 @@ NSArray *_sortedChannels;
             }
         }
         [self _imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image}];
-    } else if([UIPasteboard generalPasteboard].strings) {
+    } else if([UIPasteboard generalPasteboard].hasStrings) {
         NSMutableString *text = @"".mutableCopy;
         for(NSString *s in [UIPasteboard generalPasteboard].strings) {
             if(text.length)
@@ -5412,7 +5412,7 @@ NSArray *_sortedChannels;
         [self->_message setAttributedText:msg];
         if(shouldMoveCursor)
             self->_message.selectedRange = NSMakeRange(msg.length, 0);
-    } else if([UIPasteboard generalPasteboard].strings) {
+    } else if([UIPasteboard generalPasteboard].hasStrings) {
         [self paste:nil];
     }
 }
