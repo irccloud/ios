@@ -3684,7 +3684,9 @@ NSArray *_sortedChannels;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:self->_buffer.cid].nick cid:self->_buffer.cid bid:self->_buffer.bid];
 
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+    if (@available(iOS 13, *)) {
+        alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+    }
 
     void (^handler)(UIAlertAction *action) = ^(UIAlertAction *a) {
         [self actionSheetActionClicked:a.title];
@@ -3888,7 +3890,9 @@ NSArray *_sortedChannels;
             title = self->_selectedUser.nick;
     }
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+    if (@available(iOS 13, *)) {
+        alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+    }
     
     void (^handler)(UIAlertAction *action) = ^(UIAlertAction *a) {
         [self actionSheetActionClicked:a.title];
@@ -4164,7 +4168,9 @@ NSArray *_sortedChannels;
     self->_selectedURL = nil;
     self->_selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+    if (@available(iOS 13, *)) {
+        alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+    }
     if([self->_selectedBuffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
@@ -4846,7 +4852,9 @@ NSArray *_sortedChannels;
 
 -(void)uploadsButtonPressed:(id)sender {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+    if (@available(iOS 13, *)) {
+        alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
+    }
 
     BOOL isCatalyst = NO;
     if (@available(iOS 13.0, *)) {
