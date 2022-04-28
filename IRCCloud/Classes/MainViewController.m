@@ -5281,7 +5281,7 @@ NSArray *_sortedChannels;
 
 -(BOOL)canPerformAction:(SEL)action withSender:(id)sender {
     if (action == @selector(paste:)) {
-        return [UIPasteboard generalPasteboard].image != nil;
+        return [UIPasteboard generalPasteboard].hasImages;
     } else if(action == @selector(chooseFGColor) || action == @selector(chooseBGColor) || action == @selector(resetColors)) {
         return YES;
     }
