@@ -369,7 +369,7 @@ extern NSURL *__logfile;
     NSData *oldToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"];
     
     [[FIRMessaging messaging] tokenWithCompletion:^(NSString *token, NSError *error) {
-        if (error != nil) {
+        if (error != nil || !token) {
             CLS_LOG(@"Error fetching FIRMessaging token: %@", error);
         } else {
             //CLS_LOG(@"FCM Token: %@", result.token);
