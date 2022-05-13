@@ -1950,21 +1950,12 @@ NSArray *_sortedChannels;
     if(![[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 #endif
     if(session.length) {
-        if(@available(iOS 12, *)) {
-            UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-            
-            [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge + UNAuthorizationOptionProvidesAppNotificationSettings) completionHandler:^(BOOL granted, NSError * _Nullable error) {
-                if(!granted)
-                    CLS_LOG(@"Notification permission denied: %@", error);
-            }];
-        } else {
-            UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-            
-            [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge) completionHandler:^(BOOL granted, NSError * _Nullable error) {
-                if(!granted)
-                    CLS_LOG(@"Notification permission denied: %@", error);
-            }];
-        }
+        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+        
+        [center requestAuthorizationWithOptions:(UNAuthorizationOptionAlert + UNAuthorizationOptionSound + UNAuthorizationOptionBadge + UNAuthorizationOptionProvidesAppNotificationSettings) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+            if(!granted)
+                CLS_LOG(@"Notification permission denied: %@", error);
+        }];
 #ifdef DEBUG
         CLS_LOG(@"This is a debug build, skipping APNs registration");
 #else

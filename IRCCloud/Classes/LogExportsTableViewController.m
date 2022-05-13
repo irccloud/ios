@@ -611,7 +611,9 @@
                                 [[NSFileManager defaultManager] removeItemAtPath:writingURL.path error:NULL];
                                 if(error)
                                     CLS_LOG(@"Error: %@", error);
-                                [self refresh:[NSKeyedUnarchiver unarchiveObjectWithData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"]]];
+                                [self refresh:[NSKeyedUnarchiver unarchivedObjectOfClass:NSDictionary.class fromData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"] error:&error]];
+                                if(error)
+                                    CLS_LOG(@"Error: %@", error);
                                 [self->_downloadingURLs removeObjectForKey:url];
                                 [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
                                 [self performSelectorOnMainThread:@selector(refresh) withObject:nil waitUntilDone:YES];

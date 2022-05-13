@@ -1054,7 +1054,7 @@ WebSocketWaitingState waitingState;
     if (delegate) {
         if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
-                [delegate webSocketDidOpen:self];
+                [self->delegate webSocketDidOpen:self];
             });
         } else {
             [delegate webSocketDidOpen:self];

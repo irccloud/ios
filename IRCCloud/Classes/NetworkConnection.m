@@ -1960,9 +1960,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 if(success && flags & kSCNetworkReachabilityFlagsIsWWAN) {
                     CTTelephonyNetworkInfo *telephonyInfo = [[CTTelephonyNetworkInfo alloc] init];
                     int limit = 50;
-                    if([telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyGPRS] || [telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyEdge]) {
+                    NSString *radioType = telephonyInfo.serviceCurrentRadioAccessTechnology.allValues.firstObject;
+                    if([radioType isEqualToString:CTRadioAccessTechnologyGPRS] || [radioType isEqualToString:CTRadioAccessTechnologyEdge]) {
                         limit = 25;
-                    } else if ([telephonyInfo.currentRadioAccessTechnology isEqualToString:CTRadioAccessTechnologyLTE]) {
+                    } else if ([radioType isEqualToString:CTRadioAccessTechnologyLTE]) {
                         limit = 100;
                     }
                     if([url rangeOfString:@"?"].location == NSNotFound)
@@ -2719,7 +2720,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 #else
         SecItemDelete((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, nil]);
         if(session)
-            SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, (__bridge id)(kSecAttrAccessibleAlways), kSecAttrAccessible, nil], NULL);
+            SecItemAdd((__bridge CFDictionaryRef)[NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)(kSecClassGenericPassword),  kSecClass, @"com.irccloud.IRCCloud", kSecAttrService, [session dataUsingEncoding:NSUTF8StringEncoding], kSecValueData, (__bridge id)(kSecAttrAccessibleAfterFirstUnlock), kSecAttrAccessible, nil], NULL);
 #endif
         self->_session = session;
     }

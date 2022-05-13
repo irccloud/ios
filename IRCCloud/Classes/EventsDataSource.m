@@ -639,7 +639,7 @@
                                   if([[object objectForKey:@"user"] length]) {
                                       event.msg = [NSString stringWithFormat:@"Your hostmask: %c%@%c", BOLD, [object objectForKey:@"usermask"], BOLD];
                                       if([object objectForKey:@"server_realname"]) {
-                                          Event *e1 = [NSKeyedUnarchiver unarchiveObjectWithData:[NSKeyedArchiver archivedDataWithRootObject:event]];
+                                          Event *e1 = [NSKeyedUnarchiver unarchivedObjectOfClass:Event.class fromData:[NSKeyedArchiver archivedDataWithRootObject:event requiringSecureCoding:NO error:nil] error:nil];
                                           e1.eid++;
                                           e1.msg = [NSString stringWithFormat:@"Your name: %c%@%c", BOLD, [object objectForKey:@"server_realname"], BOLD];
                                           e1.linkify = YES;
