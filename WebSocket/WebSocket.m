@@ -126,7 +126,10 @@ WebSocketWaitingState waitingState;
         nw_endpoint_t endpoint = nw_endpoint_create_host(self.config.url.host.UTF8String, [NSNumber numberWithInt:port].stringValue.UTF8String);
         nw_parameters_configure_protocol_block_t configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
         if (self.config.isSecure) {
-            configure_tls = NW_PARAMETERS_DEFAULT_CONFIGURATION;
+            configure_tls = ^(nw_protocol_options_t tls_options) {
+                sec_protocol_options_t options = nw_tls_copy_sec_protocol_options(tls_options);
+                sec_protocol_options_set_tls_server_name(options, self.config.host.UTF8String);
+            };
         }
         nw_parameters_t parameters = nw_parameters_create_secure_tcp(configure_tls, ^(nw_protocol_options_t tcp_options) {
             nw_tcp_options_set_connection_timeout(tcp_options, self.config.timeout);
