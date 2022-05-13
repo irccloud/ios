@@ -128,7 +128,12 @@ WebSocketWaitingState waitingState;
         if (self.config.isSecure) {
             configure_tls = ^(nw_protocol_options_t tls_options) {
                 sec_protocol_options_t options = nw_tls_copy_sec_protocol_options(tls_options);
-                sec_protocol_options_set_tls_server_name(options, self.config.host.UTF8String);
+                sec_protocol_options_set_tls_server_name(options, self.config.host.UTF8String);                
+                sec_protocol_options_set_verify_block(options, ^(sec_protocol_metadata_t metadata, sec_trust_t trust_ref, sec_protocol_verify_complete_t complete) {
+                    SecTrustRef trust = sec_trust_copy_ref(trust_ref);
+                    TSKTrustDecision trustDecision = [TSKPinningValidator evaluateTrust:trust forHostname:self.config.host];
+                    complete(trustDecision != TSKTrustDecisionShouldBlockConnection);
+                }, dispatch_get_main_queue());
             };
         }
         nw_parameters_t parameters = nw_parameters_create_secure_tcp(configure_tls, ^(nw_protocol_options_t tcp_options) {
