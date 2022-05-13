@@ -1976,10 +1976,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
 #endif
                 WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", [result objectForKey:@"socket_host"]] protocols:nil
-                                                                                 tlsSettings:[@{
-                                                                                 (NSString *)kCFStreamSSLPeerName: [result objectForKey:@"socket_host"],
-                                                                                 (NSString *)GCDAsyncSocketSSLProtocolVersionMin:@(kTLSProtocol1)
-                                                                                                } mutableCopy]
                                                                                      headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
                                                                            verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
                 self->_socket = [WebSocket webSocketWithConfig:config delegate:self];

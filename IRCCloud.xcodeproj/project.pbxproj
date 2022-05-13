@@ -62,7 +62,6 @@
 		2210350D197EFC6200AB414F /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		2210350E197EFC6200AB414F /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		2210350F197EFC6200AB414F /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
-		2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		2210351F197EFC6200AB414F /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		22103520197EFC6200AB414F /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
 		22103521197EFC6200AB414F /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
@@ -125,7 +124,6 @@
 		221D4BCD1E23F5EC00D403E6 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
 		221D4BCE1E23F5EC00D403E6 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		221D4BCF1E23F5EC00D403E6 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
-		221D4BD21E23F75300D403E6 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		221D4BD31E23F75300D403E6 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		221D4BD41E23F75300D403E6 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
 		221D4BD51E23F75300D403E6 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
@@ -133,7 +131,6 @@
 		221D4BD71E23F75300D403E6 /* WebSocketConnectConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286116D831A800498507 /* WebSocketConnectConfig.m */; };
 		221D4BD81E23F75300D403E6 /* WebSocketFragment.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286316D831A800498507 /* WebSocketFragment.m */; };
 		221D4BD91E23F75300D403E6 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
-		221D4BDA1E23F75400D403E6 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		221D4BDB1E23F75400D403E6 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		221D4BDC1E23F75400D403E6 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
 		221D4BDD1E23F75400D403E6 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
@@ -309,7 +306,6 @@
 		225D973A18AA995900065087 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05AF16D3DB7B0029769C /* AppDelegate.m */; };
 		225D973C18AA995900065087 /* LoginSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05DC16D3E40E0029769C /* LoginSplashViewController.m */; };
 		225D974718AA995900065087 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
-		225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		225D974A18AA995900065087 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		225D974B18AA995900065087 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
 		225D974C18AA995900065087 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
@@ -559,7 +555,6 @@
 		22B203701B5FE3BE0058078D /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */; };
 		22B203711B5FE3BE0058078D /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */; };
 		22B4284816D7E36300498507 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
-		22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		22B4286C16D831A800498507 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
 		22B4286E16D831A800498507 /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
@@ -616,7 +611,6 @@
 		22D97799215BC910005C2713 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		22D9779A215BC910005C2713 /* LinksListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221D4B851E1BE2F700D403E6 /* LinksListTableViewController.m */; };
 		22D9779B215BC910005C2713 /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */; };
-		22D9779C215BC910005C2713 /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		22D9779D215BC910005C2713 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		22D977A0215BC910005C2713 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22D977A1215BC910005C2713 /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */; };
@@ -871,7 +865,6 @@
 		22DB25051982DF2B0008728E /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		22DB25061982DF2B0008728E /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
 		22DB25071982DF2B0008728E /* UsersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F64516DD138B007BE535 /* UsersDataSource.m */; };
-		22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284E16D831A800498507 /* GCDAsyncSocket.m */; };
 		22DB25171982DF2B0008728E /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
 		22DB25181982DF2B0008728E /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
 		22DB25191982DF2B0008728E /* NSData+Base64.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285416D831A800498507 /* NSData+Base64.m */; };
@@ -1374,8 +1367,6 @@
 		22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NotificationsDataSource.m; sourceTree = "<group>"; };
 		22B4284616D7E36300498507 /* NetworkConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkConnection.h; sourceTree = "<group>"; };
 		22B4284716D7E36300498507 /* NetworkConnection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NetworkConnection.m; sourceTree = "<group>"; };
-		22B4284D16D831A800498507 /* GCDAsyncSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncSocket.h; sourceTree = "<group>"; };
-		22B4284E16D831A800498507 /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		22B4284F16D831A800498507 /* HandshakeHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HandshakeHeader.h; sourceTree = "<group>"; };
 		22B4285016D831A800498507 /* HandshakeHeader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HandshakeHeader.m; sourceTree = "<group>"; };
 		22B4285116D831A800498507 /* MutableQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MutableQueue.h; sourceTree = "<group>"; };
@@ -2391,8 +2382,6 @@
 		22B4284A16D831A800498507 /* WebSocket */ = {
 			isa = PBXGroup;
 			children = (
-				22B4284D16D831A800498507 /* GCDAsyncSocket.h */,
-				22B4284E16D831A800498507 /* GCDAsyncSocket.m */,
 				22B4284F16D831A800498507 /* HandshakeHeader.h */,
 				22B4285016D831A800498507 /* HandshakeHeader.m */,
 				22B4285116D831A800498507 /* MutableQueue.h */,
@@ -3684,7 +3673,6 @@
 				2238762B1F70047F00943160 /* YYSpriteSheetImage.m in Sources */,
 				2293245B1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				222C80DF1E4A112300A243E7 /* SBJson5StreamParserState.m in Sources */,
-				2210351E197EFC6200AB414F /* GCDAsyncSocket.m in Sources */,
 				2210351F197EFC6200AB414F /* HandshakeHeader.m in Sources */,
 				222C80DB1E4A111D00A243E7 /* SBJson5StreamParser.m in Sources */,
 				22103520197EFC6200AB414F /* MutableQueue.m in Sources */,
@@ -3756,7 +3744,6 @@
 				229324211E8945D700ADAA22 /* registry_search.c in Sources */,
 				221D4BC41E23F4FD00D403E6 /* UsersDataSource.m in Sources */,
 				223876351F70048000943160 /* YYSpriteSheetImage.m in Sources */,
-				221D4BD21E23F75300D403E6 /* GCDAsyncSocket.m in Sources */,
 				221D4B911E23EAD700D403E6 /* NotificationService.m in Sources */,
 				222C80EE1E4A112E00A243E7 /* SBJson5Writer.m in Sources */,
 				229324691E8945D700ADAA22 /* vendor_identifier.m in Sources */,
@@ -3816,7 +3803,6 @@
 				229324221E8945D700ADAA22 /* registry_search.c in Sources */,
 				221D4BC51E23F4FE00D403E6 /* UsersDataSource.m in Sources */,
 				2238763A1F70048100943160 /* YYSpriteSheetImage.m in Sources */,
-				221D4BDA1E23F75400D403E6 /* GCDAsyncSocket.m in Sources */,
 				221D4B9C1E23EB4900D403E6 /* NotificationService.m in Sources */,
 				222C80F21E4A112F00A243E7 /* SBJson5Writer.m in Sources */,
 				2293246A1E8945D700ADAA22 /* vendor_identifier.m in Sources */,
@@ -3851,7 +3837,6 @@
 				225D974718AA995900065087 /* NetworkConnection.m in Sources */,
 				221D4B871E1BE2F700D403E6 /* LinksListTableViewController.m in Sources */,
 				22B2036F1B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
-				225D974918AA995900065087 /* GCDAsyncSocket.m in Sources */,
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
 				22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
 				2293245A1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
@@ -3970,7 +3955,6 @@
 				22B4284816D7E36300498507 /* NetworkConnection.m in Sources */,
 				221D4B861E1BE2F700D403E6 /* LinksListTableViewController.m in Sources */,
 				22B2036E1B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
-				22B4286816D831A800498507 /* GCDAsyncSocket.m in Sources */,
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
 				22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
 				229324591E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
@@ -4103,7 +4087,6 @@
 				22D97799215BC910005C2713 /* NetworkConnection.m in Sources */,
 				22D9779A215BC910005C2713 /* LinksListTableViewController.m in Sources */,
 				22D9779B215BC910005C2713 /* NotificationsDataSource.m in Sources */,
-				22D9779C215BC910005C2713 /* GCDAsyncSocket.m in Sources */,
 				22D9779D215BC910005C2713 /* HandshakeHeader.m in Sources */,
 				22D97957215BC979005C2713 /* FLEXNetworkSettingsTableViewController.m in Sources */,
 				22D97972215BC979005C2713 /* FLEXArgumentInputViewFactory.m in Sources */,
@@ -4317,7 +4300,6 @@
 				223876301F70047F00943160 /* YYSpriteSheetImage.m in Sources */,
 				2293245C1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				222C80E01E4A112300A243E7 /* SBJson5StreamParserState.m in Sources */,
-				22DB25161982DF2B0008728E /* GCDAsyncSocket.m in Sources */,
 				22DB25171982DF2B0008728E /* HandshakeHeader.m in Sources */,
 				222C80DC1E4A111E00A243E7 /* SBJson5StreamParser.m in Sources */,
 				22DB25181982DF2B0008728E /* MutableQueue.m in Sources */,
@@ -5046,7 +5028,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
 				INFOPLIST_PREPROCESS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -5094,7 +5076,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
 				INFOPLIST_PREPROCESS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
@@ -5570,7 +5552,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				INFOPLIST_PREFIX_HEADER = IRCCloud/InfoPlist.h;
 				INFOPLIST_PREPROCESS = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-DNS_BLOCK_ASSERTIONS=1",

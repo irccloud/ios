@@ -123,7 +123,31 @@ WebSocketWaitingState waitingState;
     NSError *error = nil;
     BOOL successful = false;
     @try {
-        successful = [socket connectToHost:self.config.url.host onPort:port withTimeout:30 error:&error];
+        nw_endpoint_t endpoint = nw_endpoint_create_host(self.config.url.host.UTF8String, [NSNumber numberWithInt:port].stringValue.UTF8String);
+        nw_parameters_configure_protocol_block_t configure_tls = NW_PARAMETERS_DISABLE_PROTOCOL;
+        if (self.config.isSecure) {
+            configure_tls = NW_PARAMETERS_DEFAULT_CONFIGURATION;
+        }
+        nw_parameters_t parameters = nw_parameters_create_secure_tcp(configure_tls, ^(nw_protocol_options_t tcp_options) {
+            nw_tcp_options_set_connection_timeout(tcp_options, self.config.timeout);
+        });
+        connection = nw_connection_create(endpoint, parameters);
+        if (connection != NULL) {
+            nw_connection_set_queue(connection, dispatch_get_main_queue());
+            
+            nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
+                if (state == nw_connection_state_waiting || state == nw_connection_state_failed) {
+                    [self socketDidDisconnectWithError:(__bridge NSError *)nw_error_copy_cf_error(error)];
+                } else if (state == nw_connection_state_ready) {
+                    [self socketDidConnectToHost:self.config.url.host port:port];
+                } else if (state == nw_connection_state_cancelled) {
+                    [self socketDidDisconnectWithError:NULL];
+                }
+            });
+            
+            nw_connection_start(connection);
+            successful = YES;
+        }
         if (self.config.version == WebSocketVersion07) {
             closeStatusCode = WebSocketCloseStatusNormal;
         }
@@ -284,14 +308,17 @@ WebSocketWaitingState waitingState;
 
 - (void)sendMessage:(WebSocketFragment *)aFragment {
     if (!isClosing || aFragment.opCode == MessageOpCodeClose) {
-        [socket writeData:aFragment.fragment withTimeout:self.config.timeout tag:TagMessage];
+        [self writeData:aFragment.fragment withTag:TagMessage];
     }
 }
 
 
 #pragma mark Internal Web Socket Logic
 - (void)continueReadingMessageStream {
-    [socket readDataWithTimeout:self.config.timeout tag:TagMessage];
+    dispatch_block_t schedule_next_receive = ^{
+        [self readDataWithTag:TagMessage];
+    };
+    schedule_next_receive();
 }
 
 - (void)repeatPing {
@@ -314,7 +341,11 @@ WebSocketWaitingState waitingState;
 
 - (void)closeSocket {
     readystate = WebSocketReadyStateClosing;
-    [socket disconnectAfterWriting];
+    nw_connection_send(connection, NULL, NW_CONNECTION_FINAL_MESSAGE_CONTEXT, true, ^(nw_error_t  _Nullable error) {
+        if (error != NULL) {
+            [self socketDidDisconnectWithError:(__bridge NSError *)nw_error_copy_cf_error(error)];
+        }
+    });
 }
 
 - (void)handleCompleteFragment:(WebSocketFragment *)aFragment {
@@ -891,7 +922,7 @@ WebSocketWaitingState waitingState;
     return false;
 }
 
-- (void)sendHandshake:(GCDAsyncSocket*)aSocket {
+- (void)sendHandshake {
     //continue with handshake
     NSString *requestPath = self.config.url.path;
     if (requestPath == nil || requestPath.length == 0) {
@@ -901,7 +932,7 @@ WebSocketWaitingState waitingState;
         requestPath = [requestPath stringByAppendingFormat:@"?%@", self.config.url.query];
     }
     NSString *getRequest = [self getRequest:requestPath];
-    [aSocket writeData:[getRequest dataUsingEncoding:NSASCIIStringEncoding] withTimeout:self.config.timeout tag:TagHandshake];
+    [self writeData:[getRequest dataUsingEncoding:NSASCIIStringEncoding] withTag:TagHandshake];
 }
 
 - (NSMutableArray *)getServerVersions:(NSMutableArray *)aServerHeaders {
@@ -986,89 +1017,113 @@ WebSocketWaitingState waitingState;
 #pragma mark Web Socket Delegate
 - (void)dispatchFailure:(NSError *)aError {
     if (delegate) {
-        [delegate webSocket:self didReceiveError:aError];
-       /* if (delegateQueue) {
+        if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
-                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-                [delegate didReceiveError:aError];
-                [pool drain];
+                [self->delegate webSocket:self didReceiveError:aError];
             });
 
         } else {
-            [delegate didReceiveError:aError];
-        }*/
+            [delegate webSocket:self didReceiveError:aError];
+        }
     }
 }
 
 - (void)dispatchClosed:(NSUInteger)aStatusCode message:(NSString *)aMessage error:(NSError *)aError {
     [self stopPingTimer];
     if (delegate) {
-        [delegate webSocket:self didClose:aStatusCode message:aMessage error:aError];
-        /*if (delegateQueue) {
+        if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
-                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-                [delegate didClose:aStatusCode message:aMessage error:aError];
-                [pool drain];
+                [self->delegate webSocket:self didClose:aStatusCode message:aMessage error:aError];
             });
 
         } else {
-            [delegate didClose:aStatusCode message:aMessage error:aError];
-        }*/
+            [delegate webSocket:self didClose:aStatusCode message:aMessage error:aError];
+        }
     }
 }
 
 - (void)dispatchOpened {
     if (delegate) {
-        [delegate webSocketDidOpen:self];
-        /*if (delegateQueue) {
+        if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
-                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-                [delegate didOpen];
-                [pool drain];
+                [delegate webSocketDidOpen:self];
             });
-
         } else {
-            [delegate didOpen];
-        }*/
+            [delegate webSocketDidOpen:self];
+        }
     }
     [self startPingTimer];
 }
 
 - (void)dispatchTextMessageReceived:(NSString *)aMessage {
     if (delegate) {
-        [delegate webSocket:self didReceiveTextMessage:aMessage];
-        /*if (delegateQueue) {
+        if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
-                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-                [delegate didReceiveTextMessage:aMessage];
-                [pool drain];
+                [self->delegate webSocket:self didReceiveTextMessage:aMessage];
             });
-
         } else {
-            [delegate didReceiveTextMessage:aMessage];
-        }*/
+            [self->delegate webSocket:self didReceiveTextMessage:aMessage];
+        }
     }
 }
 
 - (void)dispatchBinaryMessageReceived:(NSData *)aMessage {
     if (delegate) {
-        [delegate webSocket:self didReceiveBinaryMessage:aMessage];
-        /*if (delegateQueue) {
+        if (delegateQueue) {
             dispatch_async(delegateQueue, ^{
-                NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-                [delegate didReceiveBinaryMessage:aMessage];
-                [pool drain];
+                [self->delegate webSocket:self didReceiveBinaryMessage:aMessage];
             });
-
         } else {
-            [delegate didReceiveBinaryMessage:aMessage];
-        }*/
+            [self->delegate webSocket:self didReceiveBinaryMessage:aMessage];
+        }
     }
 }
 
 
-#pragma mark GCDAsyncSocket Delegate
-- (void)socketDidDisconnect:(GCDAsyncSocket*)aSocket withError:(NSError*)aError {
+#pragma mark Network callbacks
+- (void)readDataWithTag:(long)tag {
+    nw_connection_receive(self->connection, 0, 8192, ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
+        if(content != NULL) {
+            [self socketDidReadData:(NSData *)content withTag:tag];
+        }
+        if (is_complete && (context == NULL || nw_content_context_get_is_final(context))) {
+            [self socketDidDisconnectWithError:NULL];
+        }
+    });
+}
+
+- (void)writeData:(NSData *)data withTag:(long)tag {
+    dispatch_data_t d = dispatch_data_create(data.bytes, data.length, delegateQueue, DISPATCH_DATA_DESTRUCTOR_DEFAULT);
+    nw_connection_send(self->connection, d, NW_CONNECTION_DEFAULT_MESSAGE_CONTEXT, true, ^(nw_error_t  _Nullable error) {
+        if(error != NULL) {
+            [self socketDidDisconnectWithError:(__bridge NSError *)nw_error_copy_cf_error(error)];
+        } else {
+            [self socketDidWriteDataWithTag:tag];
+        }
+    });
+}
+
+- (void)readNextHandshakeByte {
+    nw_connection_receive(self->connection, 0, 8192, ^(dispatch_data_t content, nw_content_context_t context, bool is_complete, nw_error_t receive_error) {
+        if(content != NULL) {
+            [self->handshakeBuffer appendData:(NSData *)content];
+            if(self->handshakeBuffer.length > 4) {
+                char b[4];
+                [self->handshakeBuffer getBytes:b range:NSMakeRange(self->handshakeBuffer.length - 4, 4)];
+                if(b[0] == '\r' && b[1] == '\n' && b[2] == '\r' && b[3] == '\n') {
+                    [self socketDidReadData:self->handshakeBuffer withTag:TagHandshake];
+                    return;
+                }
+            }
+            [self readNextHandshakeByte];
+        }
+        if (is_complete && (context == NULL || nw_content_context_get_is_final(context))) {
+            [self socketDidDisconnectWithError:NULL];
+        }
+    });
+}
+
+- (void)socketDidDisconnectWithError:(NSError*)aError {
     if (readystate != WebSocketReadyStateClosing && readystate != WebSocketReadyStateClosed) {
         closingError = aError;
     } else {
@@ -1094,68 +1149,18 @@ WebSocketWaitingState waitingState;
     [self dispatchClosed:closeStatusCode message:closeMessage error:closingError];
 }
 
-- (void)socketDidSecure:(GCDAsyncSocket*)aSocket;{
-    [aSocket performBlock:^{
-        if (self.config.isSecure) {
-            SSLContextRef ctx = self->socket.sslContext;
-            if(ctx != NULL) {
-                SecTrustRef tm;
-                SSLCopyPeerTrust(ctx, &tm);
-                TSKTrustDecision trustDecision = TSKTrustDecisionShouldBlockConnection;
-            
-                // Check the trust object against the pinning policy
-                trustDecision = [TSKPinningValidator evaluateTrust:tm forHostname:self.config.host];
-                
-                if(trustDecision == TSKTrustDecisionShouldBlockConnection) {
-                    [self close:WebSocketCloseStatusTlsHandshakeError message:@"Certificate mismatch"];
-                    [self dispatchClosed:WebSocketCloseStatusTlsHandshakeError message:@"Certificate mismatch" error:[NSError errorWithDomain:WebSocketErrorDomain code:WebSocketCloseStatusTlsHandshakeError userInfo:nil]];
-                    return;
-                }
-            }
-            [self sendHandshake:aSocket];
-        }
-    }];
+- (void)socketDidConnectToHost:(NSString *)aHost port:(UInt16)aPort {
+    [self sendHandshake];
 }
 
-- (NSTimeInterval)socket:(GCDAsyncSocket*)sock shouldTimeoutReadWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length {
-    return self.config.timeout;
-}
-
-- (NSTimeInterval)socket:(GCDAsyncSocket*)sock shouldTimeoutWriteWithTag:(long)tag elapsed:(NSTimeInterval)elapsed bytesDone:(NSUInteger)length {
-    return self.config.timeout;
-}
-
-#ifdef DEBUG
-- (void)socket:(GCDAsyncSocket *)sock didReceiveTrust:(SecTrustRef)trust completionHandler:(void (^)(BOOL))completionHandler {
-    completionHandler(YES);
-}
-#endif
-
-- (void)socket:(GCDAsyncSocket*)aSocket didConnectToHost:(NSString *)aHost port:(UInt16)aPort {
-    //start TLS if this is a secure websocket
-    if (self.config.isSecure) {
-        // Configure SSL/TLS settings
-        NSDictionary *settings = self.config.tlsSettings;
-
-        //seed with defaults if missing
-        if (!settings) {
-            settings = [NSMutableDictionary dictionaryWithCapacity:3];
-        }
-
-        [socket startTLS:settings];
-    }
-    else {
-        [self sendHandshake:aSocket];
-    }
-}
-
-- (void)socket:(GCDAsyncSocket*)aSocket didWriteDataWithTag:(long)aTag {
+- (void)socketDidWriteDataWithTag:(long)aTag {
     if (aTag == TagHandshake) {
-        [aSocket readDataToData:[@"\r\n\r\n" dataUsingEncoding:NSASCIIStringEncoding] withTimeout:self.config.timeout tag:TagHandshake];
+        self->handshakeBuffer = [[NSMutableData alloc] initWithCapacity:8192];
+        [self readNextHandshakeByte];
     }
 }
 
-- (void)socket:(GCDAsyncSocket*)aSocket didReadData:(NSData *)aData withTag:(long)aTag {
+- (void)socketDidReadData:(NSData *)aData withTag:(long)aTag {
     if (aTag == TagHandshake) {
         NSString *response = [[NSString alloc] initWithData:aData encoding:NSASCIIStringEncoding];
         if ([self isUpgradeResponse:response]) {
@@ -1261,7 +1266,7 @@ WebSocketWaitingState waitingState;
     NSString *uuidString = (NSString *) CFBridgingRelease(CFUUIDCreateString(nil, uuidObj));
     CFRelease(uuidObj);
     NSString *gcdDelegateQueueName = [NSString stringWithFormat:@"com.unitt.ws.delegate:%@", uuidString];
-    dispatch_queue_t gcdDelegateQueue = dispatch_queue_create([gcdDelegateQueueName cStringUsingEncoding:NSASCIIStringEncoding], NULL);
+    dispatch_queue_t gcdDelegateQueue = dispatch_queue_create([gcdDelegateQueueName cStringUsingEncoding:NSASCIIStringEncoding], 0);
     id result = [self initWithConfig:aConfig queue:gcdDelegateQueue delegate:aDelegate];
     return result;
 }
@@ -1273,8 +1278,6 @@ WebSocketWaitingState waitingState;
         self.delegate = aDelegate;
         self.config = aConfig;
         delegateQueue = aDispatchQueue;
-        socket = [[GCDAsyncSocket alloc] initWithDelegate:self delegateQueue:delegateQueue];
-        socket.IPv4PreferredOverIPv6 = NO;
         pendingFragments = [[MutableQueue alloc] init];
         isClosing = NO;
         isInContinuation = NO;

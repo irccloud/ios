@@ -40,7 +40,6 @@
 @synthesize host;
 @synthesize timeout;
 @synthesize closeTimeout;
-@synthesize tlsSettings;
 @synthesize retryOtherVersion;
 @synthesize protocols;
 @synthesize verifySecurityKey;
@@ -75,12 +74,12 @@ NSString* const WebSocketConnectConfigErrorDomain = @"WebSocketConnectConfigErro
     return [[[self class] alloc] init];
 }
 
-+ (id) configWithURLString:(NSString*) aUrlString origin:(NSString*) aOrigin protocols:(NSArray*) aProtocols tlsSettings:(NSDictionary*) aTlsSettings headers:(NSArray*) aHeaders verifySecurityKey:(BOOL) aVerifySecurityKey extensions:(NSArray*) aExtensions
++ (id) configWithURLString:(NSString*) aUrlString origin:(NSString*) aOrigin protocols:(NSArray*) aProtocols headers:(NSArray*) aHeaders verifySecurityKey:(BOOL) aVerifySecurityKey extensions:(NSArray*) aExtensions
 {
-    return [[[self class] alloc] initWithURLString:aUrlString origin:aOrigin protocols:aProtocols tlsSettings:aTlsSettings headers:aHeaders verifySecurityKey:aVerifySecurityKey extensions:aExtensions];
+    return [[[self class] alloc] initWithURLString:aUrlString origin:aOrigin protocols:aProtocols headers:aHeaders verifySecurityKey:aVerifySecurityKey extensions:aExtensions];
 }
 
-- (id) initWithURLString:(NSString *) aUrlString origin:(NSString*) aOrigin protocols:(NSArray*) aProtocols tlsSettings:(NSDictionary*) aTlsSettings headers:(NSArray*) aHeaders verifySecurityKey:(BOOL) aVerifySecurityKey extensions:(NSArray*) aExtensions
+- (id) initWithURLString:(NSString *) aUrlString origin:(NSString*) aOrigin protocols:(NSArray*) aProtocols headers:(NSArray*) aHeaders verifySecurityKey:(BOOL) aVerifySecurityKey extensions:(NSArray*) aExtensions
 {
     self = [super init];
     if (self) 
@@ -109,10 +108,6 @@ NSString* const WebSocketConnectConfigErrorDomain = @"WebSocketConnectConfigErro
         if (aProtocols)
         {
             self.protocols = [NSMutableArray arrayWithArray:aProtocols];
-        }
-        if (aTlsSettings)
-        {
-            self.tlsSettings = [NSMutableDictionary dictionaryWithDictionary:aTlsSettings];
         }
         if (aHeaders)
         {

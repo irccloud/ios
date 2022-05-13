@@ -20,7 +20,7 @@
 
 
 #import <Foundation/Foundation.h>
-#import "GCDAsyncSocket.h"
+#include <Network/Network.h>
 #import <Security/Security.h>
 #import <CommonCrypto/CommonDigest.h>
 #import <CommonCrypto/CommonCryptor.h>
@@ -115,10 +115,10 @@ typedef NSUInteger WebSocketReadyState;
 @end
 
 
-@interface WebSocket : NSObject <GCDAsyncSocketDelegate>
+@interface WebSocket : NSObject
 {
 @protected
-    GCDAsyncSocket* socket;
+    nw_connection_t connection;
     NSError* closingError;
     NSString* wsSecKey;
     NSString* wsSecKeyHandshake;
@@ -138,6 +138,7 @@ typedef NSUInteger WebSocketReadyState;
     z_stream zstrm_in;
     z_stream zstrm_out;
     NSObject *zlibLock;
+    NSMutableData *handshakeBuffer;
 }
 
 

@@ -39,7 +39,6 @@ typedef NSUInteger WebSocketVersion;
     NSString* origin;
     NSString* host;
     NSTimeInterval timeout;
-    NSMutableDictionary* tlsSettings;
     NSMutableArray* protocols;
     NSString* serverProtocol;
     BOOL verifySecurityKey;
@@ -133,26 +132,6 @@ typedef NSUInteger WebSocketVersion;
 @property(nonatomic,retain) NSMutableArray* extensions;
 
 /**
- * Settings for securing the connection using SSL/TLS.
- * 
- * The possible keys and values for the TLS settings are well documented.
- * Some possible keys are:
- * - kCFStreamSSLLevel
- * - kCFStreamSSLAllowsExpiredCertificates
- * - kCFStreamSSLAllowsExpiredRoots
- * - kCFStreamSSLAllowsAnyRoot
- * - kCFStreamSSLValidatesCertificateChain
- * - kCFStreamSSLPeerName
- * - kCFStreamSSLCertificates
- * - kCFStreamSSLIsServer
- * 
- * Please refer to Apple's documentation for associated values, as well as other possible keys.
- * 
- * If the value is nil or an empty dictionary, then the websocket cannot be secured.
- **/
-@property(nonatomic,retain) NSMutableDictionary* tlsSettings;
-
-/**
  * The subprotocols supported by the client. Each subprotocol is represented by an NSString.
  **/
 @property(nonatomic,retain) NSMutableArray* protocols;
@@ -181,8 +160,8 @@ typedef NSUInteger WebSocketVersion;
 
 
 + (id) config;
-+ (id) configWithURLString:(NSString*) aUrlString origin:(NSString*) aOrigin protocols:(NSArray*) aProtocols tlsSettings:(NSDictionary*) aTlsSettings headers:(NSArray*) aHeaders verifySecurityKey:(BOOL) aVerifySecurityKey extensions:(NSArray*) aExtensions;
-- (id) initWithURLString:(NSString *) aUrlString origin:(NSString*) aOrigin protocols:(NSArray*) aProtocols tlsSettings:(NSDictionary*) aTlsSettings headers:(NSArray*) aHeaders verifySecurityKey:(BOOL) aVerifySecurityKey extensions:(NSArray*) aExtensions;
++ (id) configWithURLString:(NSString*) aUrlString origin:(NSString*) aOrigin protocols:(NSArray*) aProtocols headers:(NSArray*) aHeaders verifySecurityKey:(BOOL) aVerifySecurityKey extensions:(NSArray*) aExtensions;
+- (id) initWithURLString:(NSString *) aUrlString origin:(NSString*) aOrigin protocols:(NSArray*) aProtocols headers:(NSArray*) aHeaders verifySecurityKey:(BOOL) aVerifySecurityKey extensions:(NSArray*) aExtensions;
 
 /**
 * Add a supported extension.
