@@ -1616,7 +1616,7 @@
             else
                 d = nil;
             row++;
-        } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+        } while(d && ([[d objectForKey:@"type"] intValue] > TYPE_CONVERSATION));
         
         if(d) {
             [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
@@ -1635,7 +1635,7 @@
             else
                 d = nil;
             row--;
-        } while(d && ([[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+        } while(d && ([[d objectForKey:@"type"] intValue] > TYPE_CONVERSATION));
         
         if(d) {
             [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
@@ -1654,7 +1654,7 @@
             else
                 d = nil;
             row++;
-        } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+        } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] > TYPE_CONVERSATION));
         
         if(d) {
             [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
@@ -1673,7 +1673,7 @@
             else
                 d = nil;
             row--;
-        } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] == TYPE_ARCHIVES_HEADER || [[d objectForKey:@"type"] intValue] == TYPE_JOIN_CHANNEL));
+        } while(d && ([[d objectForKey:@"unread"] intValue] == 0 || [[d objectForKey:@"type"] intValue] > TYPE_CONVERSATION));
         
         if(d) {
             [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
