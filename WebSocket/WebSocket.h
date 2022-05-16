@@ -133,6 +133,7 @@ typedef NSUInteger WebSocketReadyState;
     WebSocketReadyState readystate;
     WebSocketConnectConfig* config;
     dispatch_queue_t delegateQueue;
+    dispatch_queue_t networkQueue;
     NSTimer* pingTimer;
     BOOL _deflate;
     z_stream zstrm_in;

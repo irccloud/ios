@@ -141,7 +141,7 @@ WebSocketWaitingState waitingState;
         });
         connection = nw_connection_create(endpoint, parameters);
         if (connection != NULL) {
-            nw_connection_set_queue(connection, dispatch_get_main_queue());
+            nw_connection_set_queue(connection, networkQueue);
             
             nw_connection_set_state_changed_handler(connection, ^(nw_connection_state_t state, nw_error_t error) {
                 if (state == nw_connection_state_waiting || state == nw_connection_state_failed) {
@@ -1290,6 +1290,7 @@ WebSocketWaitingState waitingState;
         isClosing = NO;
         isInContinuation = NO;
         zlibLock = [[NSObject alloc] init];
+        networkQueue = dispatch_queue_create(NULL, DISPATCH_QUEUE_SERIAL);
     }
     return self;
 }
