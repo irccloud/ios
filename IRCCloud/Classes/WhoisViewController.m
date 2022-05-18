@@ -135,7 +135,7 @@
     [self appendWhoisLine:data key:@"help" data:object nick:nick server:s];
     [self appendWhoisLine:data key:@"staff" data:object nick:nick server:s format:@"%@ is staff: %@\n"];
     
-    if([[object objectForKey:@"special"] length]) {
+    if([[object objectForKey:@"special"] isKindOfClass:NSArray.class] && [(NSArray *)[object objectForKey:@"special"] count]) {
         for(NSString *sp in [object objectForKey:@"special"]) {
             [data appendAttributedString:[ColorFormatter format:[NSString stringWithFormat:@"%@ %@\n", nick, sp] defaultColor:[UIColor messageTextColor] mono:NO linkify:NO server:s links:nil]];
         }
