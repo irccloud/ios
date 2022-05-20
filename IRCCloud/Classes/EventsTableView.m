@@ -970,6 +970,7 @@ extern UIImage *__socketClosedBackgroundImage;
         }
         
         event.childEventCount = 0;
+        event.hasReplyRow = NO;
         
         if(!event.formatted) {
             if(event.rowType == ROW_THUMBNAIL) {
@@ -1188,13 +1189,14 @@ extern UIImage *__socketClosedBackgroundImage;
         event.isReply = event.reply != nil;
         if(event.isReply && __replyCollapsePref) {
             Event *parent = [self->_msgids objectForKey:event.reply];
-            if(parent && !parent.childEventCount) {
+            if(parent && !parent.hasReplyRow) {
                 Event *e1 = [self entity:parent eid:parent.eid + ++parent.childEventCount properties:nil];
                 e1.rowType = ROW_REPLY_COUNT;
                 e1.type = TYPE_REPLY_COUNT;
                 e1.msg = e1.formattedMsg = nil;
                 e1.formatted = nil;
                 e1.entities = @{@"parent":parent};
+                parent.hasReplyRow = YES;
                 [self insertEvent:e1 backlog:YES nextIsGrouped:NO];
             }
             if(!backlog)
