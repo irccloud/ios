@@ -5564,6 +5564,11 @@ NSArray *_sortedChannels;
     [self presentViewController:nc animated:YES completion:nil];
 }
 
+-(void)pressesBegan:(NSSet<UIPress *> *)presses withEvent:(UIPressesEvent *)event {
+    [self->_message becomeFirstResponder];
+    [super pressesBegan:presses withEvent:event];
+}
+
 -(void)onTabPressed:(UIKeyCommand *)sender {
     if(!self->_message.internalTextView.isFirstResponder)
         [self->_message.internalTextView becomeFirstResponder];
