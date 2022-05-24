@@ -3683,6 +3683,8 @@ NSArray *_sortedChannels;
         [self actionSheetActionClicked:a.title];
     };
     
+    [self _addPinAction:alert buffer:self->_buffer];
+    
     if([self->_buffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
@@ -4281,15 +4283,36 @@ NSArray *_sortedChannels;
     [alert addAction:[UIAlertAction actionWithTitle:@"Reorder Connections" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         [self _reorder];
     }]];
-    
-    if(!self->_selectedBuffer.archived && ([self->_selectedBuffer.type isEqualToString:@"channel"] || [self->_selectedBuffer.type isEqualToString:@"conversation"])) {
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reorder Pins" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+        PinReorderViewController *pvc = [[PinReorderViewController alloc] initWithStyle:UITableViewStylePlain];
+        [self.slidingViewController resetTopView];
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pvc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
+    }]];
+
+    [self _addPinAction:alert buffer:self->_selectedBuffer];
+
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    alert.popoverPresentationController.sourceRect = rect;
+    alert.popoverPresentationController.sourceView = self->_buffersView.tableView;
+    [self presentViewController:alert animated:YES completion:nil];
+}
+
+-(void)_addPinAction:(UIAlertController *)alert buffer:(Buffer *)buffer {
+    if(!buffer.archived && ([buffer.type isEqualToString:@"channel"] || [buffer.type isEqualToString:@"conversation"])) {
         BOOL pinned = NO;
         
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
         if([[prefs objectForKey:@"pinnedBuffers"] isKindOfClass:NSArray.class] && [(NSArray *)[prefs objectForKey:@"pinnedBuffers"] count] > 0) {
             for(NSNumber *n in [prefs objectForKey:@"pinnedBuffers"]) {
-                if(n.intValue == self->_selectedBuffer.bid) {
+                if(n.intValue == buffer.bid) {
                     pinned = YES;
                     break;
                 }
@@ -4297,17 +4320,6 @@ NSArray *_sortedChannels;
         }
         
         if(pinned) {
-            [alert addAction:[UIAlertAction actionWithTitle:@"Reorder Pins" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
-                PinReorderViewController *pvc = [[PinReorderViewController alloc] initWithStyle:UITableViewStylePlain];
-                [self.slidingViewController resetTopView];
-                UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:pvc];
-                [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-                if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                    nc.modalPresentationStyle = UIModalPresentationFormSheet;
-                else
-                    nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-                [self presentViewController:nc animated:YES completion:nil];
-            }]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Remove Pin" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 NSMutableDictionary *mutablePrefs = prefs.mutableCopy;
                 NSMutableArray *pinnedBuffers;
@@ -4316,7 +4328,7 @@ NSArray *_sortedChannels;
                 } else {
                     pinnedBuffers = [[NSMutableArray alloc] init];
                 }
-                [pinnedBuffers removeObject:@(self->_selectedBuffer.bid)];
+                [pinnedBuffers removeObject:@(buffer.bid)];
                 [mutablePrefs setObject:pinnedBuffers forKey:@"pinnedBuffers"];
                 SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                 NSString *json = [writer stringWithObject:mutablePrefs];
@@ -4330,7 +4342,7 @@ NSArray *_sortedChannels;
                 }];
             }]];
         } else {
-            [alert addAction:[UIAlertAction actionWithTitle:[self->_selectedBuffer.type isEqualToString:@"channel"]?@"Pin Channel":@"Pin Conversation" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
+            [alert addAction:[UIAlertAction actionWithTitle:[buffer.type isEqualToString:@"channel"]?@"Pin Channel":@"Pin Conversation" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
                 NSMutableDictionary *mutablePrefs = prefs.mutableCopy;
                 NSMutableArray *pinnedBuffers;
                 if([[prefs objectForKey:@"pinnedBuffers"] isKindOfClass:NSArray.class] && [(NSArray *)[prefs objectForKey:@"pinnedBuffers"] count] > 0) {
@@ -4338,7 +4350,7 @@ NSArray *_sortedChannels;
                 } else {
                     pinnedBuffers = [[NSMutableArray alloc] init];
                 }
-                [pinnedBuffers addObject:@(self->_selectedBuffer.bid)];
+                [pinnedBuffers addObject:@(buffer.bid)];
                 [mutablePrefs setObject:pinnedBuffers forKey:@"pinnedBuffers"];
                 SBJson5Writer *writer = [[SBJson5Writer alloc] init];
                 NSString *json = [writer stringWithObject:mutablePrefs];
@@ -4353,11 +4365,6 @@ NSArray *_sortedChannels;
             }]];
         }
     }
-
-    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-    alert.popoverPresentationController.sourceRect = rect;
-    alert.popoverPresentationController.sourceView = self->_buffersView.tableView;
-    [self presentViewController:alert animated:YES completion:nil];
 }
 
 -(void)spamSelected:(int)cid {
