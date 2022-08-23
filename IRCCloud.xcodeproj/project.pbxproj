@@ -207,6 +207,12 @@
 		2232ABD7230C1D66007431B5 /* UITableViewController+HeaderColorFix.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */; };
 		223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
+		2236193828B5435F0077C850 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2236193728B5435F0077C850 /* Intents.framework */; };
+		2236193A28B54D970077C850 /* IntentsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2236193928B54D970077C850 /* IntentsUI.framework */; };
+		2236193B28B54DAC0077C850 /* IntentsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2236193928B54D970077C850 /* IntentsUI.framework */; };
+		2236193C28B54FAB0077C850 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
+		2236193D28B54FD70077C850 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
+		2236193E28B5515C0077C850 /* SourceSansPro-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 225173E21DB13A5500D63405 /* SourceSansPro-Semibold.otf */; };
 		2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
 		2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
 		2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
@@ -404,7 +410,7 @@
 		2284EF731B4AD48E0058D483 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2284EF711B4AD47F0058D483 /* MediaPlayer.framework */; };
 		2289EF631D7866BD00DB285E /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF621D7866BD00DB285E /* UserNotifications.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		2289EF641D7866D200DB285E /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF621D7866BD00DB285E /* UserNotifications.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		2289EF781D787CC500DB285E /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF771D787CC500DB285E /* Intents.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		2289EF781D787CC500DB285E /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF771D787CC500DB285E /* Intents.framework */; settings = {ATTRIBUTES = (Required, ); }; };
 		2289EF791D787CD100DB285E /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2289EF771D787CC500DB285E /* Intents.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		228A057016D3DABA0029769C /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		228A057216D3DABA0029769C /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A057116D3DABA0029769C /* Foundation.framework */; };
@@ -1180,6 +1186,8 @@
 		2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITableViewController+HeaderColorFix.m"; sourceTree = "<group>"; };
 		223581C1191AD79B00A4B124 /* ImageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUploader.h; sourceTree = "<group>"; };
 		223581C2191AD79B00A4B124 /* ImageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUploader.m; sourceTree = "<group>"; };
+		2236193728B5435F0077C850 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/Library/Frameworks/Intents.framework; sourceTree = DEVELOPER_DIR; };
+		2236193928B54D970077C850 /* IntentsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IntentsUI.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/IntentsUI.framework; sourceTree = DEVELOPER_DIR; };
 		2236BD621BAA5E0900015753 /* FontAwesome.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.otf; sourceTree = "<group>"; };
 		2236BD671BAA600900015753 /* FontAwesome.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FontAwesome.h; path = Classes/FontAwesome.h; sourceTree = "<group>"; };
 		2236BD681BAC61A900015753 /* SourceSansPro-LightIt.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SourceSansPro-LightIt.otf"; sourceTree = "<group>"; };
@@ -1635,6 +1643,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2236193B28B54DAC0077C850 /* IntentsUI.framework in Frameworks */,
+				2236193828B5435F0077C850 /* Intents.framework in Frameworks */,
 				229C85441B50293B004964DE /* CoreMedia.framework in Frameworks */,
 				229C85431B502934004964DE /* AVFoundation.framework in Frameworks */,
 				221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */,
@@ -1746,6 +1756,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2236193A28B54D970077C850 /* IntentsUI.framework in Frameworks */,
 				2238763B1F70061C00943160 /* WebP.framework in Frameworks */,
 				2289EF781D787CC500DB285E /* Intents.framework in Frameworks */,
 				2289EF631D7866BD00DB285E /* UserNotifications.framework in Frameworks */,
@@ -1974,6 +1985,8 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				2236193928B54D970077C850 /* IntentsUI.framework */,
+				2236193728B5435F0077C850 /* Intents.framework */,
 				225BEDC2252CB27F0050A8CC /* CoreServices.framework */,
 				22374408252C9D3C0085D41C /* WebKit.framework */,
 				2238761C1F70038A00943160 /* WebP.framework */,
@@ -3106,6 +3119,7 @@
 				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
 				2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22103528197EFCEE00AB414F /* Images.xcassets in Resources */,
+				2236193E28B5515C0077C850 /* SourceSansPro-Semibold.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3687,6 +3701,7 @@
 				2238762A1F70047F00943160 /* YYImageCoder.m in Sources */,
 				22103521197EFC6200AB414F /* NSData+Base64.m in Sources */,
 				22103522197EFC6200AB414F /* WebSocket.m in Sources */,
+				2236193C28B54FAB0077C850 /* AvatarsDataSource.m in Sources */,
 				2293247F1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				22103523197EFC6200AB414F /* WebSocketConnectConfig.m in Sources */,
 				229324551E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
@@ -3709,6 +3724,7 @@
 				2293244B1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
 				229324631E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				223876311F70048000943160 /* YYAnimatedImageView.m in Sources */,
+				2236193D28B54FD70077C850 /* AvatarsDataSource.m in Sources */,
 				221D4BD31E23F75300D403E6 /* HandshakeHeader.m in Sources */,
 				222C80EB1E4A112E00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
 				229324571E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,

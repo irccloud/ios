@@ -63,6 +63,10 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>GIT_VERSION</string>
+	<key>INIntentsSupported</key>
+	<array>
+		<string>INSendMessageIntent</string>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>
@@ -114,6 +118,7 @@
 	<key>NSUserActivityTypes</key>
 	<array>
 		<string>com.irccloud.buffer</string>
+		<string>INSendMessageIntent</string>
 	</array>
 	<key>UIAppFonts</key>
 	<array>

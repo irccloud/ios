@@ -16,7 +16,7 @@
 
 #import <SafariServices/SafariServices.h>
 #import <AdSupport/AdSupport.h>
-#import <Intents/Intents.h>
+#import <IntentsUI/IntentsUI.h>
 #import "AppDelegate.h"
 #import "NetworkConnection.h"
 #import "EditConnectionViewController.h"
@@ -298,6 +298,102 @@ extern NSURL *__logfile;
     }
     
     return NO;
+}
+
+-(id)application:(UIApplication *)application handlerForIntent:(INIntent *)intent {
+    if([intent isKindOfClass:INSendMessageIntent.class]) {
+        return self;
+    }
+    return nil;
+}
+
+-(INSendMessageRecipientResolutionResult *)resolvePerson:(INPerson *)person {
+    if(person && [person.customIdentifier hasPrefix:@"irccloud://"]) {
+        INPersonResolutionResult *result = [INPersonResolutionResult successWithResolvedPerson:person];
+        return [[INSendMessageRecipientResolutionResult alloc] initWithPersonResolutionResult:result];
+    } else if (person.displayName) {
+        NSMutableArray *matches = [[NSMutableArray alloc] init];
+        NSArray *buffers = [BuffersDataSource sharedInstance].getBuffers;
+        NSString *personName = person.displayName.lowercaseString;
+        for(Buffer *b in buffers) {
+            if([personName isEqualToString:b.name.lowercaseString]) {
+                Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+                NSString *serverName = s.name;
+                if(!serverName.length)
+                    serverName = s.hostname;
+                Avatar *a = [[Avatar alloc] init];
+                a.nick = a.displayName = b.name;
+                INImage *img = [INImage imageWithUIImage:[a getImage:512 isSelf:NO]];
+                [matches addObject:[[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:b.name type:INPersonHandleTypeUnknown] nameComponents:nil displayName:[NSString stringWithFormat:@"%@ (%@)", b.name, serverName] image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", b.cid, b.name]]];
+            }
+        }
+        NSArray *servers = [ServersDataSource sharedInstance].getServers;
+        for(Server *s in servers) {
+            User *u = [[UsersDataSource sharedInstance] getUser:personName cid:s.cid];
+            if(u) {
+                NSString *serverName = s.name;
+                if(!serverName.length)
+                    serverName = s.hostname;
+                Avatar *a = [[Avatar alloc] init];
+                a.nick = a.displayName = u.display_name;
+                INImage *img = [INImage imageWithUIImage:[a getImage:512 isSelf:NO]];
+                [matches addObject:[[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:u.nick type:INPersonHandleTypeUnknown] nameComponents:nil displayName:[NSString stringWithFormat:@"%@ (%@)", u.display_name, serverName] image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", s.cid, u.nick]]];
+            }
+        }
+        NSLog(@"Matches: %@", matches);
+        if(matches.count == 1) {
+            INPersonResolutionResult *result = [INPersonResolutionResult successWithResolvedPerson:matches.firstObject];
+            return [[INSendMessageRecipientResolutionResult alloc] initWithPersonResolutionResult:result];
+        } else if(matches.count) {
+            INPersonResolutionResult *result = [INPersonResolutionResult disambiguationWithPeopleToDisambiguate:matches];
+            return [[INSendMessageRecipientResolutionResult alloc] initWithPersonResolutionResult:result];
+        }
+    }
+    return [INSendMessageRecipientResolutionResult unsupportedForReason:INSendMessageRecipientUnsupportedReasonNoHandleForLabel];
+}
+
+-(void)resolveRecipientsForSendMessage:(INSendMessageIntent *)intent completion:(void (^)(NSArray<INSendMessageRecipientResolutionResult *> * _Nonnull))completion {
+    NSLog(@"Resolve intent: %@", intent);
+    NSMutableArray *results = [[NSMutableArray alloc] init];
+    
+    for(INPerson *person in intent.recipients) {
+        [results addObject:[self resolvePerson:person]];
+    }
+    completion(results);
+}
+
+-(void)confirmSendMessage:(INSendMessageIntent *)intent completion:(void (^)(INSendMessageIntentResponse * _Nonnull))completion {
+    NSLog(@"Confirm intent: %@", intent);
+    int code = INSendMessageIntentResponseCodeSuccess;
+    for(INPerson *person in intent.recipients) {
+        if(![person.customIdentifier hasPrefix:@"irccloud://"]) {
+            code = INSendMessageIntentResponseCodeFailure;
+        }
+    }
+    completion([[INSendMessageIntentResponse alloc] initWithCode:code userActivity:nil]);
+}
+
+-(void)handleSendMessage:(INSendMessageIntent *)intent completion:(void (^)(INSendMessageIntentResponse * _Nonnull))completion {
+    NSLog(@"Send intent: %@", intent);
+    __block int code = INSendMessageIntentResponseCodeSuccess;
+    __block int responseCount = 0;
+
+    for(INPerson *person in intent.recipients) {
+        NSString *ident = [person.customIdentifier substringFromIndex:11];
+        NSUInteger sep = [ident rangeOfString:@"/"].location;
+        int cid = [ident substringToIndex:sep].intValue;
+        NSString *to = [ident substringFromIndex:sep + 1];
+
+        [[NetworkConnection sharedInstance] POSTsay:intent.content to:to cid:cid handler:^(IRCCloudJSONObject *result) {
+            if(![[result objectForKey:@"success"] boolValue]) {
+                CLS_LOG(@"Message failed to send: %@", result);
+                code = INSendMessageIntentResponseCodeFailure;
+            }
+            
+            if(++responseCount == intent.recipients.count)
+                completion([[INSendMessageIntentResponse alloc] initWithCode:code userActivity:nil]);
+        }];
+    }
 }
 
 -(BOOL)application:(UIApplication *)application continueUserActivity:(NSUserActivity *)userActivity restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {

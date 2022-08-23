@@ -7,6 +7,7 @@
 //
 
 #import <AudioToolbox/AudioToolbox.h>
+#import <Intents/Intents.h>
 #import "ShareViewController.h"
 #import "BuffersTableView.h"
 #import "UIColor+IRCCloud.h"
@@ -155,9 +156,10 @@
         [[NSUserDefaults standardUserDefaults] setObject:[d objectForKey:@"fontSize"] forKey:@"fontSize"];
     [NetworkConnection sync];
     self->_conn = [NetworkConnection sharedInstance];
+    self->_buffer = nil;
     if(self->_conn.session.length) {
         if([BuffersDataSource sharedInstance].count && _conn.userInfo) {
-            self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[[self->_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
+            [self backlogComplete:nil];
         }
         [self->_conn connect:YES];
     }
@@ -177,6 +179,24 @@
 }
 
 - (void)backlogComplete:(NSNotification *)n {
+    if (@available(iOS 13.0, *)) {
+        if(self.extensionContext && [self.extensionContext.intent isKindOfClass:INSendMessageIntent.class]) {
+            INSendMessageIntent *intent = (INSendMessageIntent *)self.extensionContext.intent;
+            INPerson *person = intent.recipients.firstObject;
+            if(person && [person.customIdentifier hasPrefix:@"irccloud://"]) {
+                NSString *ident = [person.customIdentifier substringFromIndex:11];
+                NSUInteger sep = [ident rangeOfString:@"/"].location;
+                int cid = [ident substringToIndex:sep].intValue;
+                NSString *to = [ident substringFromIndex:sep + 1];
+                Buffer *b = [[Buffer alloc] init];
+                b.bid = -1;
+                b.cid = cid;
+                b.name = to;
+                self->_buffer = b;
+            }
+        }
+    } else {
+    }
     if(!self->_buffer)
         self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[[self->_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];
     if(!self->_buffer)

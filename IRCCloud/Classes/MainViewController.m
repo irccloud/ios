@@ -3072,16 +3072,19 @@ NSArray *_sortedChannels;
             activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#?/text=%@&url=%@%@:%i", draft_escaped, s.ssl?@"ircs://":@"", s.hostname, s.port]];
         else
             activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/!%@%@:%i", s.ssl?@"ircs://":@"", s.hostname, s.port]];
-        activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", s.hostname];
+        activity.title = s.hostname;
     } else {
         if(self->_message.text.length)
             activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#?/text=%@&url=%@%@:%i/%@", draft_escaped, s.ssl?@"ircs://":@"", s.hostname, s.port, [self->_buffer.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
         else
             activity.webpageURL = [NSURL URLWithString:[NSString stringWithFormat:@"https://www.irccloud.com/#!/%@%@:%i/%@", s.ssl?@"ircs://":@"", s.hostname, s.port, [self->_buffer.name stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLPathAllowedCharacterSet]]]];
-        activity.title = [NSString stringWithFormat:@"%@ | IRCCloud", self->_buffer.name];
+        activity.title = self->_buffer.name;
     }
 #endif
         [activity addUserInfoEntriesFromDictionary:@{@"bid":@(self->_buffer.bid), @"cid":@(self->_buffer.cid), @"draft":(self->_message.text?self->_message.text:@"")}];
+        activity.eligibleForPrediction = YES;
+        activity.persistentIdentifier = [NSString stringWithFormat:@"%i.%i", self->_buffer.cid, self->_buffer.bid];
+        [activity becomeCurrent];
     }];
 }
 

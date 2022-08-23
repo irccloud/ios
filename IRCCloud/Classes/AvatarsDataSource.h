@@ -28,6 +28,7 @@
 @property (nonatomic, copy) NSString *nick, *displayName;
 @property (nonatomic, readonly) NSTimeInterval lastAccessTime;
 -(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf;
+-(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf isChannel:(BOOL)isChannel;
 @end
 
 @interface AvatarsDataSource : NSObject {

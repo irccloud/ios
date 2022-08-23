@@ -17,6 +17,8 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <MessageUI/MFMailComposeViewController.h>
 #import <MobileCoreServices/UTCoreTypes.h>
+#import <Intents/Intents.h>
+#import <IntentsUI/IntentsUI.h>
 #import "NetworkConnection.h"
 #import "HandshakeHeader.h"
 #import "IRCCloudJSONObject.h"
@@ -24,6 +26,7 @@
 #import "ImageCache.h"
 #import "TrustKit.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
+#import "AvatarsDataSource.h"
 @import Firebase;
 #ifndef EXTENSION
 @import FirebasePerformance;
@@ -1517,20 +1520,51 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
+-(void)_donateSendIntent:(NSString *)message to:(NSString *)to cid:(int)cid {
+    if (@available(iOS 14.0, *)) {
+        if(!to || !to.length || [to isEqualToString:@"*"])
+            return;
+        
+        BOOL isChannel = NO;
+        Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:to server:cid];
+        if(b && [b.type isEqualToString:@"channel"])
+            isChannel = YES;
+        
+        Avatar *a = [[Avatar alloc] init];
+        a.nick = a.displayName = to;
+        INImage *img = [INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:isChannel]];
+        INPerson *person = [[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:to type:INPersonHandleTypeUnknown] nameComponents:nil displayName:nil image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to]];
+
+        INSendMessageIntent *intent = [[INSendMessageIntent alloc] initWithRecipients:@[person] outgoingMessageType:INOutgoingMessageTypeOutgoingMessageText content:message speakableGroupName:nil conversationIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to] serviceName:nil sender:nil attachments:nil];
+        
+        INInteraction *interaction = [[INInteraction alloc] initWithIntent:intent response:nil];
+        [interaction donateInteractionWithCompletion:^(NSError *error) {
+            if(error) {
+                NSLog(@"Intent donation failed: %@", error);
+            }
+        }];
+    } else {
+    }
+}
+
 -(void)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
-    if(to)
+    if(to) {
+        [self _donateSendIntent:message to:to cid:cid];
         [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":to, @"cid":[@(cid) stringValue]} handler:resultHandler];
-    else
+    } else {
         [self _postRequest:@"/chat/say" args:@{@"msg":message, @"to":@"*", @"cid":[@(cid) stringValue]} handler:resultHandler];
+    }
 }
 
 -(int)say:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     if(!message)
         message = @"";
-    if(to)
+    if(to) {
+        [self _donateSendIntent:message to:to cid:cid];
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":to} handler:resultHandler];
-    else
+    } else {
         return [self _sendRequest:@"say" args:@{@"cid":@(cid), @"msg":message, @"to":@"*"} handler:resultHandler];
+    }
 }
 
 -(void)POSTreply:(NSString *)message to:(NSString *)to cid:(int)cid msgid:(NSString *)msgid handler:(IRCCloudAPIResultHandler)handler {

@@ -16,6 +16,7 @@
 
 #import <UIKit/UIKit.h>
 #import <UserNotifications/UserNotifications.h>
+#import <Intents/Intents.h>
 #import "LoginSplashViewController.h"
 #import "MainViewController.h"
 #import "ECSlidingViewController.h"
@@ -53,7 +54,7 @@
 -(void)openSourceLicenses;
 @end
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate> {
+@interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate, INSendMessageIntentHandling> {
     NetworkConnection *_conn;
     URLHandler *_urlHandler;
     id _backlogCompletedObserver;
