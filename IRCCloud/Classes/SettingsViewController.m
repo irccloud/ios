@@ -620,7 +620,7 @@
             [ColorFormatter loadFonts];
         }
         [[EventsDataSource sharedInstance] clearFormattingCache];
-        [[AvatarsDataSource sharedInstance] clear];
+        [[AvatarsDataSource sharedInstance] invalidate];
         
         [((AppDelegate *)[UIApplication sharedApplication].delegate).mainViewController viewWillAppear:YES];
 //#if TARGET_OS_MACCATALYST
@@ -648,7 +648,7 @@
         [ColorFormatter loadFonts];
     }
     [[EventsDataSource sharedInstance] clearFormattingCache];
-    [[AvatarsDataSource sharedInstance] clear];
+    [[AvatarsDataSource sharedInstance] invalidate];
     [[EventsDataSource sharedInstance] reformat];
 //#if TARGET_OS_MACCATALYST
 //    [(AppDelegate *)UIApplication.sharedApplication.delegate closeWindow:self.view.window];

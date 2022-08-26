@@ -25,6 +25,7 @@
 #import "UsersDataSource.h"
 #import "EventsDataSource.h"
 #import "NotificationsDataSource.h"
+#import "AvatarsDataSource.h"
 #import "CSURITemplate.h"
 
 extern NSString *IRCCLOUD_HOST;
@@ -127,6 +128,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
     UsersDataSource *_users;
     EventsDataSource *_events;
     NotificationsDataSource *_notifications;
+    AvatarsDataSource *_avatars;
     NSMutableArray *_oobQueue;
     NSMutableDictionary *_awayOverride;
     NSTimer *_idleTimer;

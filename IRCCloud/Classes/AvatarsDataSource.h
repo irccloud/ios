@@ -33,8 +33,12 @@
 
 @interface AvatarsDataSource : NSObject {
     NSMutableDictionary *_avatars;
+    NSMutableDictionary *_avatarURLs;
 }
 +(AvatarsDataSource *)sharedInstance;
--(void)clear;
+-(void)invalidate;
+-(void)serialize;
 -(Avatar *)getAvatar:(NSString *)displayName nick:(NSString *)nick bid:(int)bid;
+-(void)setAvatarURL:(NSURL *)url bid:(int)bid eid:(NSTimeInterval)eid;
+-(NSURL *)URLforBid:(int)bid;
 @end

@@ -318,25 +318,88 @@ extern NSURL *__logfile;
         for(Buffer *b in buffers) {
             if([personName isEqualToString:b.name.lowercaseString]) {
                 Server *s = [[ServersDataSource sharedInstance] getServer:b.cid];
+                if(![s.status isEqualToString:@"connected_ready"])
+                    continue;
+                
                 NSString *serverName = s.name;
                 if(!serverName.length)
                     serverName = s.hostname;
-                Avatar *a = [[Avatar alloc] init];
-                a.nick = a.displayName = b.name;
-                INImage *img = [INImage imageWithUIImage:[a getImage:512 isSelf:NO]];
+                
+                BOOL exists = NO;
+                for(INPerson *p in matches) {
+                    if([p.customIdentifier isEqualToString:[NSString stringWithFormat:@"irccloud://%i/%@", s.cid, b.name]]) {
+                        exists = YES;
+                        break;
+                    }
+                }
+                if(exists)
+                    continue;
+
+                INImage *img = nil;
+                if([b.type isEqualToString:@"conversation"]) {
+                    NSURL *url = [[AvatarsDataSource sharedInstance] URLforBid:b.bid];
+                    if(!url) {
+                        User *u = [[UsersDataSource sharedInstance] getUser:b.name cid:b.cid];
+                        if(u) {
+                            Event *e = [[Event alloc] init];
+                            e.cid = b.cid;
+                            e.bid = b.bid;
+                            e.hostmask = u.hostmask;
+                            e.from = b.name;
+                            e.type = @"buffer_msg";
+                            
+                            url = [e avatar:512];
+                        }
+                    }
+                    
+                    if(url && [[ImageCache sharedInstance] imageForURL:url]) {
+                        img = [INImage imageWithURL:[[ImageCache sharedInstance] pathForURL:url]];
+                    }
+                }
+
+                if(!img) {
+                    Avatar *a = [[Avatar alloc] init];
+                    a.nick = a.displayName = b.name;
+                    img = [INImage imageWithUIImage:[a getImage:512 isSelf:NO]];
+                }
                 [matches addObject:[[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:b.name type:INPersonHandleTypeUnknown] nameComponents:nil displayName:[NSString stringWithFormat:@"%@ (%@)", b.name, serverName] image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", b.cid, b.name]]];
             }
         }
         NSArray *servers = [ServersDataSource sharedInstance].getServers;
         for(Server *s in servers) {
+            if(![s.status isEqualToString:@"connected_ready"])
+                continue;
             User *u = [[UsersDataSource sharedInstance] getUser:personName cid:s.cid];
             if(u) {
+                BOOL exists = NO;
+                for(INPerson *p in matches) {
+                    if([p.customIdentifier isEqualToString:[NSString stringWithFormat:@"irccloud://%i/%@", s.cid, u.nick]]) {
+                        exists = YES;
+                        break;
+                    }
+                }
+                if(exists)
+                    continue;
+                
                 NSString *serverName = s.name;
                 if(!serverName.length)
                     serverName = s.hostname;
-                Avatar *a = [[Avatar alloc] init];
-                a.nick = a.displayName = u.display_name;
-                INImage *img = [INImage imageWithUIImage:[a getImage:512 isSelf:NO]];
+                
+                INImage *img = nil;
+                Event *e = [[Event alloc] init];
+                e.hostmask = u.hostmask;
+                e.from = u.nick;
+                e.type = @"buffer_msg";
+                NSURL *url = [e avatar:512];
+                if(url && [[ImageCache sharedInstance] imageForURL:url]) {
+                    img = [INImage imageWithURL:[[ImageCache sharedInstance] pathForURL:url]];
+                }
+
+                if(!img) {
+                    Avatar *a = [[Avatar alloc] init];
+                    a.nick = a.displayName = u.nick;
+                    img = [INImage imageWithUIImage:[a getImage:512 isSelf:NO]];
+                }
                 [matches addObject:[[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:u.nick type:INPersonHandleTypeUnknown] nameComponents:nil displayName:[NSString stringWithFormat:@"%@ (%@)", u.display_name, serverName] image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", s.cid, u.nick]]];
             }
         }
@@ -354,17 +417,31 @@ extern NSURL *__logfile;
 
 -(void)resolveRecipientsForSendMessage:(INSendMessageIntent *)intent completion:(void (^)(NSArray<INSendMessageRecipientResolutionResult *> * _Nonnull))completion {
     NSLog(@"Resolve intent: %@", intent);
-    NSMutableArray *results = [[NSMutableArray alloc] init];
+    NSMutableArray *results;
     
-    for(INPerson *person in intent.recipients) {
-        [results addObject:[self resolvePerson:person]];
+    if(intent.recipients.count) {
+        results = [[NSMutableArray alloc] init];
+        
+        for(INPerson *person in intent.recipients) {
+            [results addObject:[self resolvePerson:person]];
+        }
+    } else {
+        results = @[[INSendMessageRecipientResolutionResult needsValue]].mutableCopy;
     }
     completion(results);
 }
 
+-(void)resolveContentForSendMessage:(INSendMessageIntent *)intent withCompletion:(void (^)(INStringResolutionResult * _Nonnull))completion {
+    if(intent.content.length)
+        completion([INStringResolutionResult successWithResolvedString:intent.content]);
+    else
+        completion([INStringResolutionResult needsValue]);
+    
+}
+
 -(void)confirmSendMessage:(INSendMessageIntent *)intent completion:(void (^)(INSendMessageIntentResponse * _Nonnull))completion {
     NSLog(@"Confirm intent: %@", intent);
-    int code = INSendMessageIntentResponseCodeSuccess;
+    int code = INSendMessageIntentResponseCodeReady;
     for(INPerson *person in intent.recipients) {
         if(![person.customIdentifier hasPrefix:@"irccloud://"]) {
             code = INSendMessageIntentResponseCodeFailure;
@@ -860,7 +937,7 @@ extern NSURL *__logfile;
         if([ColorFormatter shouldClearFontCache]) {
             [ColorFormatter clearFontCache];
             [[EventsDataSource sharedInstance] clearFormattingCache];
-            [[AvatarsDataSource sharedInstance] clear];
+            [[AvatarsDataSource sharedInstance] invalidate];
             [ColorFormatter loadFonts];
         }
         self->_conn.reconnectTimestamp = -1;

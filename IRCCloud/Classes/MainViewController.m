@@ -1907,7 +1907,7 @@ NSArray *_sortedChannels;
             [ColorFormatter loadFonts];
         }
         [[EventsDataSource sharedInstance] reformat];
-        [[AvatarsDataSource sharedInstance] clear];
+        [[AvatarsDataSource sharedInstance] invalidate];
         
         [self->_eventsView clearRowCache];
         [self->_eventsView refresh];
@@ -2166,7 +2166,7 @@ NSArray *_sortedChannels;
                         [ColorFormatter loadFonts];
                     }
                     [[EventsDataSource sharedInstance] clearFormattingCache];
-                    [[AvatarsDataSource sharedInstance] clear];
+                    [[AvatarsDataSource sharedInstance] invalidate];
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                         [[NSNotificationCenter defaultCenter] postNotificationName:kIRCCloudEventNotification object:nil userInfo:@{kIRCCloudEventKey:[NSNumber numberWithInt:kIRCEventUserInfo]}];
                     }];

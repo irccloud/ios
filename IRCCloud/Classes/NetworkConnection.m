@@ -26,7 +26,6 @@
 #import "ImageCache.h"
 #import "TrustKit.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
-#import "AvatarsDataSource.h"
 @import Firebase;
 #ifndef EXTENSION
 @import FirebasePerformance;
@@ -282,6 +281,8 @@ volatile BOOL __socketPaused = NO;
         NSURL *caches = [[[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask] objectAtIndex:0];
         
         if(!__interrupt)
+            [NetworkConnection sync:[caches URLByAppendingPathComponent:@"avatarURLs"] with:[sharedcontainer URLByAppendingPathComponent:@"avatarURLs"]];
+        if(!__interrupt)
             [NetworkConnection sync:[caches URLByAppendingPathComponent:@"servers"] with:[sharedcontainer URLByAppendingPathComponent:@"servers"]];
         if(!__interrupt)
             [NetworkConnection sync:[caches URLByAppendingPathComponent:@"buffers"] with:[sharedcontainer URLByAppendingPathComponent:@"buffers"]];
@@ -331,6 +332,7 @@ volatile BOOL __socketPaused = NO;
     self->_users = [UsersDataSource sharedInstance];
     self->_events = [EventsDataSource sharedInstance];
     self->_notifications = [NotificationsDataSource sharedInstance];
+    self->_avatars = [AvatarsDataSource sharedInstance];
     self->_state = kIRCCloudStateDisconnected;
     self->_oobQueue = [[NSMutableArray alloc] init];
     self->_awayOverride = nil;
@@ -470,6 +472,8 @@ volatile BOOL __socketPaused = NO;
                     self->_highestEID = event.eid;
                 }
                 if([event isImportant:b.type]) {
+                    if([b.type isEqualToString:@"conversation"] && [b.name isEqualToString:event.from])
+                        [self->_avatars setAvatarURL:[event avatar:512] bid:event.bid eid:event.eid];
                     User *u = [self->_users getUser:event.from cid:event.cid bid:event.bid];
                     if(u) {
                         if(u.lastMessage < event.eid)
@@ -1520,19 +1524,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     }
 }
 
--(void)_donateSendIntent:(NSString *)message to:(NSString *)to cid:(int)cid {
+-(void)_donateSendIntent:(NSString *)message to:(NSString *)to cid:(int)cid  image:(INImage *)img {
     if (@available(iOS 14.0, *)) {
-        if(!to || !to.length || [to isEqualToString:@"*"])
-            return;
-        
-        BOOL isChannel = NO;
-        Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:to server:cid];
-        if(b && [b.type isEqualToString:@"channel"])
-            isChannel = YES;
-        
-        Avatar *a = [[Avatar alloc] init];
-        a.nick = a.displayName = to;
-        INImage *img = [INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:isChannel]];
         INPerson *person = [[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:to type:INPersonHandleTypeUnknown] nameComponents:nil displayName:nil image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to]];
 
         INSendMessageIntent *intent = [[INSendMessageIntent alloc] initWithRecipients:@[person] outgoingMessageType:INOutgoingMessageTypeOutgoingMessageText content:message speakableGroupName:nil conversationIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to] serviceName:nil sender:nil attachments:nil];
@@ -1543,7 +1536,56 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
                 NSLog(@"Intent donation failed: %@", error);
             }
         }];
-    } else {
+    }
+}
+
+-(void)_donateSendIntent:(NSString *)message to:(NSString *)to cid:(int)cid {
+    if (@available(iOS 14.0, *)) {
+        if(!to || !to.length || [to isEqualToString:@"*"])
+            return;
+        
+        Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:to server:cid];
+        if(b) {
+            Avatar *a = [[Avatar alloc] init];
+            a.nick = a.displayName = to;
+            
+            if([b.type isEqualToString:@"channel"]) {
+                [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:YES]]];
+            } else {
+                NSURL *url = [[AvatarsDataSource sharedInstance] URLforBid:b.bid];
+                if(!url) {
+                    User *u = [[UsersDataSource sharedInstance] getUser:to cid:cid];
+                    if(u) {
+                        Event *e = [[Event alloc] init];
+                        e.cid = cid;
+                        e.bid = b.bid;
+                        e.hostmask = u.hostmask;
+                        e.from = to;
+                        e.type = @"buffer_msg";
+                        
+                        url = [e avatar:512];
+                    }
+                }
+                
+                if(url) {
+                    UIImage *img = [[ImageCache sharedInstance] imageForURL:url];
+                    if(img) {
+                        [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithURL:[[ImageCache sharedInstance] pathForURL:url]]];
+                        return;
+                    } else if([[ImageCache sharedInstance] isValidURL:url]) {
+                        [[ImageCache sharedInstance] fetchURL:url completionHandler:^(BOOL success) {
+                            if(success) {
+                                [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithURL:[[ImageCache sharedInstance] pathForURL:url]]];
+                            } else {
+                                [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:NO]]];
+                            }
+                        }];
+                        return;
+                    }
+                }
+                [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:NO]]];
+            }
+        }
     }
 }
 
@@ -2537,6 +2579,8 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [__serializeLock lock];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    if(!__interrupt)
+        [self->_avatars serialize];
     if(!__interrupt)
         [self->_servers serialize];
     if(!__interrupt)
