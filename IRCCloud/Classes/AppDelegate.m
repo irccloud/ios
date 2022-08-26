@@ -432,6 +432,13 @@ extern NSURL *__logfile;
 }
 
 -(void)resolveContentForSendMessage:(INSendMessageIntent *)intent withCompletion:(void (^)(INStringResolutionResult * _Nonnull))completion {
+    if (@available(iOS 14.0, *)) {
+        if(intent.attachments.count) {
+            completion([INStringResolutionResult unsupported]);
+            return;
+        }
+    }
+
     if(intent.content.length)
         completion([INStringResolutionResult successWithResolvedString:intent.content]);
     else
