@@ -39,6 +39,7 @@
 		2200DB4718B7EDF100343583 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
 		2200DB5118BCFA0E00343583 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
 		22032A6F1884529700BE4A10 /* NickCompletionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22032A6E1884529700BE4A10 /* NickCompletionView.m */; };
+		2209B82D28C27A3B00D59B75 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 226E642223F1C6AA001CE069 /* GoogleService-Info.plist */; };
 		221034ED197EFBAF00AB414F /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221034EC197EFBAF00AB414F /* ShareViewController.m */; };
 		221034F2197EFBAF00AB414F /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 221034E7197EFBAF00AB414F /* ShareExtension.appex */; };
 		221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
@@ -3122,6 +3123,7 @@
 			files = (
 				22103529197EFCF100AB414F /* Icons.xcassets in Resources */,
 				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
+				2209B82D28C27A3B00D59B75 /* GoogleService-Info.plist in Resources */,
 				2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22103528197EFCEE00AB414F /* Images.xcassets in Resources */,
 			);
@@ -3329,7 +3331,6 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(SRCROOT)/IRCCloud/GoogleService-Info.plist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

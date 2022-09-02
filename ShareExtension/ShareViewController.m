@@ -11,6 +11,7 @@
 #import "ShareViewController.h"
 #import "BuffersTableView.h"
 #import "UIColor+IRCCloud.h"
+@import Firebase;
 
 @implementation ShareViewController
 
@@ -120,6 +121,9 @@
 }
 
 - (void)viewDidLoad {
+    if([FIROptions defaultOptions]) {
+        [FIRApp configure];
+    }
     __weak ShareViewController *weakSelf = self;
     self->_resultHandler = ^(IRCCloudJSONObject *result) {
         NSLog(@"Say result: %@", result);
