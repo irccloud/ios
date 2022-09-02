@@ -221,7 +221,7 @@
     if(output.attachments.count) {
         if(self->_fileUploader.originalFilename) {
             NSLog(@"Setting filename, bid, and message for IRCCloud upload");
-            self->_fileUploader.bid = self->_buffer.bid;
+            self->_fileUploader.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
             [self->_fileUploader setFilename:self->_filename message:self.contentText];
             if(!self->_fileUploader.finished) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{

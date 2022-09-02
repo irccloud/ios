@@ -28,7 +28,6 @@
     self = [super init];
     
     if(self) {
-        _bid = [[task objectForKey:@"bid"] intValue];
         _originalFilename = [task objectForKey:@"original_filename"];
         _msg = [task objectForKey:@"msg"];
         _filename = [task objectForKey:@"filename"];
@@ -64,7 +63,6 @@
 #endif
     CLS_LOG(@"File upload cancelled");
     self->_cancelled = YES;
-    self->_bid = -1;
     self->_msg = self->_filename = self->_originalFilename = self->_mimeType = nil;
     [self->_task cancel];
     if(self->_delegate)
@@ -85,18 +83,11 @@
             }
             self->_msg = [self->_msg stringByAppendingFormat:@"%@", [[result objectForKey:@"file"] objectForKey:@"url"]];
             
-            if(self->_to.count) {
-                for(NSDictionary *d in self->_to) {
+            for(NSDictionary *d in self->_to) {
+                if(self->_msgid.length > 0)
+                    [[NetworkConnection sharedInstance] POSTreply:self->_msg to:[d objectForKey:@"to"] cid:[[d objectForKey:@"cid"] intValue] msgid:self->_msgid handler:nil];
+                else
                     [[NetworkConnection sharedInstance] POSTsay:self->_msg to:[d objectForKey:@"to"] cid:[[d objectForKey:@"cid"] intValue] handler:nil];
-                }
-            } else {
-                Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:self->_bid];
-                if(b) {
-                    if(self->_msgid.length > 0)
-                        [[NetworkConnection sharedInstance] POSTreply:self->_msg to:b.name cid:b.cid msgid:self->_msgid handler:nil];
-                    else
-                        [[NetworkConnection sharedInstance] POSTsay:self->_msg to:b.name cid:b.cid handler:nil];
-                }
             }
             [self->_delegate fileUploadDidFinish];
         }
@@ -505,7 +496,7 @@
     if(!tasks)
         tasks = [[NSMutableDictionary alloc] init];
     
-    [tasks setObject:@{@"service":@"irccloud", @"bid":@(self->_bid), @"original_filename":self->_originalFilename?_originalFilename:@"", @"msg":self->_msg?self->_msg:@"", @"filename":self->_filename?_filename:@"", @"avatar":@(self->_avatar), @"orgId":@(self->_orgId), @"cid":@(self->_cid), @"msgid":self->_msgid?self->_msgid:@"", @"to":self->_to?self->_to:@[]} forKey:self->_backgroundID];
+    [tasks setObject:@{@"service":@"irccloud", @"original_filename":self->_originalFilename?_originalFilename:@"", @"msg":self->_msg?self->_msg:@"", @"filename":self->_filename?_filename:@"", @"avatar":@(self->_avatar), @"orgId":@(self->_orgId), @"cid":@(self->_cid), @"msgid":self->_msgid?self->_msgid:@"", @"to":self->_to?self->_to:@[]} forKey:self->_backgroundID];
     
     [d setObject:tasks forKey:@"uploadtasks"];
     

@@ -212,7 +212,6 @@
 		2236193B28B54DAC0077C850 /* IntentsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2236193928B54D970077C850 /* IntentsUI.framework */; };
 		2236193C28B54FAB0077C850 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
 		2236193D28B54FD70077C850 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
-		2236193E28B5515C0077C850 /* SourceSansPro-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 225173E21DB13A5500D63405 /* SourceSansPro-Semibold.otf */; };
 		2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
 		2236BD641BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
 		2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2236BD621BAA5E0900015753 /* FontAwesome.otf */; };
@@ -3125,7 +3124,6 @@
 				22103527197EFCEB00AB414F /* Logo.xcassets in Resources */,
 				2236BD651BAA5E0900015753 /* FontAwesome.otf in Resources */,
 				22103528197EFCEE00AB414F /* Images.xcassets in Resources */,
-				2236193E28B5515C0077C850 /* SourceSansPro-Semibold.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

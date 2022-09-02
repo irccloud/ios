@@ -34,7 +34,6 @@
     NSObject<FileUploaderDelegate> *_delegate;
     NSObject<FileUploaderMetadataDelegate> *_metadatadelegate;
     int _cid;
-    int _bid;
     BOOL _filenameSet;
     BOOL _finished;
     BOOL _cancelled;
@@ -54,7 +53,7 @@
 }
 @property NSObject<FileUploaderDelegate> *delegate;
 @property NSObject<FileUploaderMetadataDelegate> *metadatadelegate;
-@property int bid, orgId, cid;
+@property int orgId, cid;
 @property NSString *originalFilename, *mimeType, *msgid;
 @property BOOL finished, avatar;
 @property NSArray *to;

@@ -554,7 +554,7 @@ NSArray *_sortedChannels;
     
     FileUploader *u = [[FileUploader alloc] init];
     u.delegate = self;
-    u.bid = self->_buffer.bid;
+    u.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
     u.msgid = self->_msgid;
     NSString *UTI = i.registeredTypeIdentifiers.lastObject;
     u.originalFilename = i.suggestedName;
@@ -4487,7 +4487,7 @@ NSArray *_sortedChannels;
     FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
     u.delegate = self;
     u.metadatadelegate = fvc;
-    u.bid = self->_buffer.bid;
+    u.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
     u.msgid = self->_msgid;
     [u uploadFile:url];
     
@@ -4533,7 +4533,7 @@ NSArray *_sortedChannels;
         if((!img || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
             FileUploader *u = [[FileUploader alloc] init];
             u.delegate = self;
-            u.bid = self->_buffer.bid;
+            u.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
             u.msgid = self->_msgid;
             fvc = [[FileMetadataViewController alloc] initWithUploader:u];
             if(picker == nil || picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
