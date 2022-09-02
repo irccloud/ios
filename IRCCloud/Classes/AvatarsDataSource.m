@@ -136,7 +136,7 @@
 }
 
 -(void)setAvatarURL:(NSURL *)url bid:(int)bid eid:(NSTimeInterval)eid {
-    if([[[_avatarURLs objectForKey:@(bid)] objectForKey:@"eid"] longValue] < eid) {
+    if(url && [[[_avatarURLs objectForKey:@(bid)] objectForKey:@"eid"] longValue] < eid) {
         [_avatarURLs setObject:@{@"eid":@(eid), @"url":url} forKey:@(bid)];
     }
 }
