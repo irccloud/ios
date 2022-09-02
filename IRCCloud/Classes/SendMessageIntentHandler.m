@@ -167,6 +167,9 @@
         if(intent.attachments.count > 1) {
             completion([INStringResolutionResult unsupported]);
             return;
+        } else if(intent.attachments.count == 1) {
+            completion([INStringResolutionResult successWithResolvedString:intent.content]);
+            return;
         }
     }
 
