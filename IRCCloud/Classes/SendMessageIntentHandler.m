@@ -26,7 +26,6 @@
 @property INFile *file;
 @end
 
-
 @implementation SendMessageIntentHandler
 -(instancetype)init {
     self = [super init];

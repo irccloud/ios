@@ -1528,7 +1528,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     if (@available(iOS 14.0, *)) {
         INPerson *person = [[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:to type:INPersonHandleTypeUnknown] nameComponents:nil displayName:nil image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to]];
 
-        INSendMessageIntent *intent = [[INSendMessageIntent alloc] initWithRecipients:@[person] outgoingMessageType:INOutgoingMessageTypeOutgoingMessageText content:message speakableGroupName:nil conversationIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to] serviceName:nil sender:nil attachments:nil];
+        INSendMessageIntent *intent = [[INSendMessageIntent alloc] initWithRecipients:@[person] outgoingMessageType:INOutgoingMessageTypeOutgoingMessageText content:nil speakableGroupName:nil conversationIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to] serviceName:nil sender:nil attachments:nil];
         
         INInteraction *interaction = [[INInteraction alloc] initWithIntent:intent response:nil];
         [interaction donateInteractionWithCompletion:^(NSError *error) {
