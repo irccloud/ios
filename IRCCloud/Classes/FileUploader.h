@@ -49,12 +49,16 @@
     NSString *_backgroundID;
     NSString *_boundary;
     NSString *_msgid;
+    NSArray *_to;
+    void (^completionHandler)(void);
 }
 @property NSObject<FileUploaderDelegate> *delegate;
 @property NSObject<FileUploaderMetadataDelegate> *metadatadelegate;
 @property int bid, orgId, cid;
 @property NSString *originalFilename, *mimeType, *msgid;
 @property BOOL finished, avatar;
+@property NSArray *to;
+-(id)initWithTask:(NSDictionary *)task response:(NSData *)response completion:(void (^)(void))completionHandler;
 -(void)uploadVideo:(NSURL *)file;
 -(void)uploadFile:(NSURL *)file;
 -(void)uploadFile:(NSString *)filename UTI:(NSString *)UTI data:(NSData *)data;
@@ -63,4 +67,5 @@
 -(void)setFilename:(NSString *)filename message:(NSString *)message;
 -(void)cancel;
 +(UIImage *)image:(UIImage *)image scaledCopyOfSize:(CGSize)newSize;
+-(void)connectionDidFinishLoading;
 @end

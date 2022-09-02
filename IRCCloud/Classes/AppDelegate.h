@@ -54,7 +54,7 @@
 -(void)openSourceLicenses;
 @end
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate, INSendMessageIntentHandling> {
+@interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate> {
     NetworkConnection *_conn;
     URLHandler *_urlHandler;
     id _backlogCompletedObserver;

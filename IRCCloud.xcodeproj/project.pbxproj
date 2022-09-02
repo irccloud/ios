@@ -569,6 +569,8 @@
 		22B4287C16D831A800498507 /* WebSocketFragment.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286316D831A800498507 /* WebSocketFragment.m */; };
 		22B4287E16D831A800498507 /* WebSocketMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4286516D831A800498507 /* WebSocketMessage.m */; };
 		22B4288616D846BF00498507 /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
+		22BB0A2A28C22FB2008EE509 /* SendMessageIntentHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB0A2928C22FB2008EE509 /* SendMessageIntentHandler.m */; };
+		22BB0A2B28C22FB2008EE509 /* SendMessageIntentHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB0A2928C22FB2008EE509 /* SendMessageIntentHandler.m */; };
 		22BB94AA1D425A4F00BFB6F0 /* SamlLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */; };
 		22BB94AB1D425D3800BFB6F0 /* SamlLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */; };
 		22C2075C1A19125700EDACA4 /* FileMetadataViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2075B1A19125700EDACA4 /* FileMetadataViewController.m */; };
@@ -1393,6 +1395,8 @@
 		22B4288416D846BF00498507 /* IRCCloudJSONObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IRCCloudJSONObject.h; sourceTree = "<group>"; };
 		22B4288516D846BF00498507 /* IRCCloudJSONObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IRCCloudJSONObject.m; sourceTree = "<group>"; };
 		22B6F9771982F47E004C291C /* ShareExtension Enterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "ShareExtension Enterprise.entitlements"; sourceTree = SOURCE_ROOT; };
+		22BB0A2828C22FB2008EE509 /* SendMessageIntentHandler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SendMessageIntentHandler.h; sourceTree = "<group>"; };
+		22BB0A2928C22FB2008EE509 /* SendMessageIntentHandler.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SendMessageIntentHandler.m; sourceTree = "<group>"; };
 		22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SamlLoginViewController.m; sourceTree = "<group>"; };
 		22BB94A91D425A4E00BFB6F0 /* SamlLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SamlLoginViewController.h; sourceTree = "<group>"; };
 		22C2075A1A19125700EDACA4 /* FileMetadataViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileMetadataViewController.h; sourceTree = "<group>"; };
@@ -2187,6 +2191,8 @@
 				221E85F0241FBD9300EB5120 /* PinReorderViewController.m */,
 				22BB94A91D425A4E00BFB6F0 /* SamlLoginViewController.h */,
 				22BB94A81D425A4E00BFB6F0 /* SamlLoginViewController.m */,
+				22BB0A2828C22FB2008EE509 /* SendMessageIntentHandler.h */,
+				22BB0A2928C22FB2008EE509 /* SendMessageIntentHandler.m */,
 				22462B5018906B03009EF986 /* ServerReorderViewController.h */,
 				22462B5118906B03009EF986 /* ServerReorderViewController.m */,
 				2236F5F816DA765C007BE535 /* ServersDataSource.h */,
@@ -3918,6 +3924,7 @@
 				22D268C71BF4F95200B682AE /* SplashViewController.m in Sources */,
 				225D976318AA995900065087 /* IgnoresTableViewController.m in Sources */,
 				228F69741DF8A3F30079E276 /* SpamViewController.m in Sources */,
+				22BB0A2B28C22FB2008EE509 /* SendMessageIntentHandler.m in Sources */,
 				222C80D61E4A0BB600A243E7 /* SBJson5Writer.m in Sources */,
 				225D976418AA995900065087 /* UIExpandingTextView.m in Sources */,
 				22E54AE11D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
@@ -4036,6 +4043,7 @@
 				22D268C61BF4F95200B682AE /* SplashViewController.m in Sources */,
 				22D430A0171C663A003C0684 /* IgnoresTableViewController.m in Sources */,
 				228F69731DF8A3F30079E276 /* SpamViewController.m in Sources */,
+				22BB0A2A28C22FB2008EE509 /* SendMessageIntentHandler.m in Sources */,
 				222C80D51E4A0BB600A243E7 /* SBJson5Writer.m in Sources */,
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
 				22E54AE01D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
