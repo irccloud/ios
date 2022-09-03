@@ -332,7 +332,9 @@ volatile BOOL __socketPaused = NO;
     self->_users = [UsersDataSource sharedInstance];
     self->_events = [EventsDataSource sharedInstance];
     self->_notifications = [NotificationsDataSource sharedInstance];
+#ifndef EXTENSION
     self->_avatars = [AvatarsDataSource sharedInstance];
+#endif
     self->_state = kIRCCloudStateDisconnected;
     self->_oobQueue = [[NSMutableArray alloc] init];
     self->_awayOverride = nil;
@@ -472,8 +474,10 @@ volatile BOOL __socketPaused = NO;
                     self->_highestEID = event.eid;
                 }
                 if([event isImportant:b.type]) {
+#ifndef EXTENSION
                     if([b.type isEqualToString:@"conversation"] && [b.name isEqualToString:event.from])
                         [self->_avatars setAvatarURL:[event avatar:512] bid:event.bid eid:event.eid];
+#endif
                     User *u = [self->_users getUser:event.from cid:event.cid bid:event.bid];
                     if(u) {
                         if(u.lastMessage < event.eid)
@@ -2581,8 +2585,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [__serializeLock lock];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
     [[NSUserDefaults standardUserDefaults] synchronize];
+#ifndef EXTENSION
     if(!__interrupt)
         [self->_avatars serialize];
+#endif
     if(!__interrupt)
         [self->_servers serialize];
     if(!__interrupt)
