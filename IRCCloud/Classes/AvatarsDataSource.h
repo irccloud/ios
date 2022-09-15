@@ -41,4 +41,5 @@
 -(Avatar *)getAvatar:(NSString *)displayName nick:(NSString *)nick bid:(int)bid;
 -(void)setAvatarURL:(NSURL *)url bid:(int)bid eid:(NSTimeInterval)eid;
 -(NSURL *)URLforBid:(int)bid;
+-(void)removeAllURLs;
 @end

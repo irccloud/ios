@@ -128,7 +128,8 @@
         decodeBool(self->_toChan);
         decodeBool(self->_toBuffer);
         decodeObjectOfClass(UIColor.class, self->_color);
-        decodeObjectOfClass(NSDictionary.class, self->_ops);
+        NSSet *set = [NSSet setWithObjects:NSDictionary.class, NSMutableArray.class, NSString.class, NSNumber.class, NSNull.class, nil];
+        decodeObjectOfClasses(set, self->_ops);
         decodeInt(self->_rowType);
         decodeBool(self->_linkify);
         decodeObjectOfClass(NSString.class, self->_targetMode);
@@ -140,7 +141,7 @@
         decodeObjectOfClass(NSString.class, self->_day);
         decodeObjectOfClass(NSString.class, self->_ignoreMask);
         decodeObjectOfClass(NSString.class, self->_chan);
-        NSSet *set = [NSSet setWithObjects:NSArray.class, NSDictionary.class, NSNull.class, nil];
+        [NSSet setWithObjects:NSArray.class, NSDictionary.class, NSString.class, NSNumber.class, NSNull.class, nil];
         decodeObjectOfClasses(set, self->_entities);
         decodeFloat(self->_timestampPosition);
         decodeDouble(self->_serverTime);
@@ -359,19 +360,18 @@
             
             @try {
                 NSError* error = nil;
-                self->_events = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSDictionary.class, NSArray.class, Event.class,NSString.class,NSNumber.class, nil] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+                self->_events = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSDictionary.class, NSArray.class, Event.class,NSString.class,NSNumber.class,NSMutableArray.class,nil] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
                 if(error)
                     @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {
                 CLS_LOG(@"Exception: %@", e);
-                [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
+                /*[[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
                 [[ServersDataSource sharedInstance] clear];
                 [[BuffersDataSource sharedInstance] clear];
                 [[ChannelsDataSource sharedInstance] clear];
-                [[UsersDataSource sharedInstance] clear];
+                [[UsersDataSource sharedInstance] clear];*/
             }
-            [self->_events removeAllObjects];
         }
 #endif
         self->_dirtyBIDs = [[NSMutableDictionary alloc] init];

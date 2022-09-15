@@ -35,7 +35,7 @@
     self->_lastAccessTime = [[NSDate date] timeIntervalSince1970];
     NSMutableDictionary *images = isSelf?_selfImages:self->_images;
     if(![images objectForKey:@(size)]) {
-        UIFont *font = [UIFont fontWithName:@"SourceSansPro-Semibold" size:(size * (isChannel ? 0.5 : 0.65))];
+        UIFont *font = [UIFont boldSystemFontOfSize:(size * (isChannel ? 0.5 : 0.65))];
         UIGraphicsBeginImageContextWithOptions(CGSizeMake(size, size), NO, 0);
         CGContextRef ctx = UIGraphicsGetCurrentContext();
         if(isChannel) {
@@ -92,12 +92,14 @@
     if(self) {
         self->_avatars = [[NSMutableDictionary alloc] init];
 
+        NSLog(@"cacheVersion: %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"]);
+        
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"avatarURLs"];
             
             @try {
                 NSError* error = nil;
-                self->_avatarURLs = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSDictionary.class,NSURL.class,NSString.class,NSNumber.class,nil] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
+                self->_avatarURLs = [[NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSDictionary.class, NSURL.class,nil] fromData:[NSData dataWithContentsOfFile:cacheFile] error:&error] mutableCopy];
                 if(error)
                     @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {
@@ -109,6 +111,8 @@
         
         if(!_avatarURLs)
             self->_avatarURLs = [[NSMutableDictionary alloc] init];
+        
+        NSLog(@"Cached URLs: %@", _avatarURLs);
     }
     return self;
 }
@@ -129,7 +133,8 @@
                 CLS_LOG(@"Error archiving: %@", error);
             [[NSURL fileURLWithPath:cacheFile] setResourceValue:[NSNumber numberWithBool:YES] forKey:NSURLIsExcludedFromBackupKey error:NULL];
         }
-        @catch (NSException *exception) {
+        @catch (NSException *e) {
+            CLS_LOG(@"Exception: %@", e);
             [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
         }
     }
@@ -169,5 +174,9 @@
 
 -(void)invalidate {
     [self->_avatars removeAllObjects];
+}
+
+-(void)removeAllURLs {
+    [self->_avatarURLs removeAllObjects];
 }
 @end

@@ -128,9 +128,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
     UsersDataSource *_users;
     EventsDataSource *_events;
     NotificationsDataSource *_notifications;
-#ifndef EXTENSION
     AvatarsDataSource *_avatars;
-#endif
     NSMutableArray *_oobQueue;
     NSMutableDictionary *_awayOverride;
     NSTimer *_idleTimer;

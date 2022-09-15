@@ -73,7 +73,7 @@
         decodeDouble(self->_topic_time);
         decodeObjectOfClass(NSString.class, self->_topic_author);
         decodeObjectOfClass(NSString.class, self->_type);
-        NSSet *set = [NSSet setWithObjects:NSMutableArray.class, NSDictionary.class, nil];
+        NSSet *set = [NSSet setWithObjects:NSMutableArray.class, NSDictionary.class, NSString.class, NSNumber.class, nil];
         decodeObjectOfClasses(set, self->_modes);
         decodeObjectOfClass(NSString.class, self->_mode);
         decodeDouble(self->_timestamp);

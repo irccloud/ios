@@ -326,15 +326,13 @@ volatile BOOL __socketPaused = NO;
     __logQueue = [[NSOperationQueue alloc] init];
     [__logQueue setMaxConcurrentOperationCount:1];
     self->_queue = [[NSOperationQueue alloc] init];
+    self->_avatars = [AvatarsDataSource sharedInstance];
     self->_servers = [ServersDataSource sharedInstance];
     self->_buffers = [BuffersDataSource sharedInstance];
     self->_channels = [ChannelsDataSource sharedInstance];
     self->_users = [UsersDataSource sharedInstance];
     self->_events = [EventsDataSource sharedInstance];
     self->_notifications = [NotificationsDataSource sharedInstance];
-#ifndef EXTENSION
-    self->_avatars = [AvatarsDataSource sharedInstance];
-#endif
     self->_state = kIRCCloudStateDisconnected;
     self->_oobQueue = [[NSMutableArray alloc] init];
     self->_awayOverride = nil;
@@ -1544,7 +1542,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_donateSendIntent:(NSString *)message to:(NSString *)to cid:(int)cid {
-#ifndef EXTENSION
     if (@available(iOS 14.0, *)) {
         if(!to || !to.length || [to isEqualToString:@"*"])
             return;
@@ -1592,7 +1589,6 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
             }
         }
     }
-#endif
 }
 
 -(void)POSTsay:(NSString *)message to:(NSString *)to cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
@@ -2575,20 +2571,17 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)serialize {
-    __block BOOL __interrupt = NO;
 #ifndef EXTENSION
+    __block BOOL __interrupt = NO;
     UIBackgroundTaskIdentifier background_task = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler: ^ {
         CLS_LOG(@"NetworkConnection serialize task expired");
         __interrupt = YES;
     }];
-#endif
     [__serializeLock lock];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
     [[NSUserDefaults standardUserDefaults] synchronize];
-#ifndef EXTENSION
     if(!__interrupt)
         [self->_avatars serialize];
-#endif
     if(!__interrupt)
         [self->_servers serialize];
     if(!__interrupt)
@@ -2601,12 +2594,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         [self->_events serialize];
     if(!__interrupt)
         [self->_notifications serialize];
-#ifndef EXTENSION
     [__serializeLock unlock];
     if(!__interrupt)
         [self _serializeUserInfo];
     [__serializeLock lock];
-#endif
     [[NSUserDefaults standardUserDefaults] setObject:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"] forKey:@"cacheVersion"];
 #ifdef ENTERPRISE
     NSUserDefaults *d = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.irccloud.enterprise.share"];
@@ -2621,7 +2612,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [_serializeTimer invalidate];
     _serializeTimer = nil;
     [__serializeLock unlock];
-#ifndef EXTENSION
     [[UIApplication sharedApplication] endBackgroundTask: background_task];
 #endif
 }
@@ -2730,6 +2720,8 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [self->_users clear];
     [self->_channels clear];
     [self->_events clear];
+    [self->_avatars invalidate];
+    [self->_avatars removeAllURLs];
     self->_pendingEdits = [[NSMutableArray alloc] init];
     [self serialize];
     [NetworkConnection sync];

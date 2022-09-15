@@ -396,6 +396,10 @@
 		2271FDA11DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
 		2271FDA21DCDF45C00A39F84 /* TextTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2271FDA01DCDF45C00A39F84 /* TextTableViewController.m */; };
 		2274F49F1756723F0039B4CB /* OpenInChromeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2274F49E1756723F0039B4CB /* OpenInChromeController.m */; };
+		2275AF6C28D3679C00D11811 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
+		2275AF6D28D3679D00D11811 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
+		2275AF6E28D3679E00D11811 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
+		2275AF6F28D3679F00D11811 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
 		227C63BA1C7B8C4800B674D6 /* SafariServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22A1F1141C232B3A00AEC09A /* SafariServices.framework */; };
 		227DA89E1CF381B60041B1BF /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 227DA89D1CF381B60041B1BF /* CoreTelephony.framework */; };
 		227DA89F1CF381D70041B1BF /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 227DA89D1CF381B60041B1BF /* CoreTelephony.framework */; };
@@ -3704,6 +3708,7 @@
 				2238762A1F70047F00943160 /* YYImageCoder.m in Sources */,
 				22103521197EFC6200AB414F /* NSData+Base64.m in Sources */,
 				22103522197EFC6200AB414F /* WebSocket.m in Sources */,
+				2275AF6C28D3679C00D11811 /* AvatarsDataSource.m in Sources */,
 				2293247F1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				22103523197EFC6200AB414F /* WebSocketConnectConfig.m in Sources */,
 				229324551E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
@@ -3726,6 +3731,7 @@
 				2293244B1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
 				229324631E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				223876311F70048000943160 /* YYAnimatedImageView.m in Sources */,
+				2275AF6E28D3679E00D11811 /* AvatarsDataSource.m in Sources */,
 				221D4BD31E23F75300D403E6 /* HandshakeHeader.m in Sources */,
 				222C80EB1E4A112E00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
 				229324571E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
@@ -3785,6 +3791,7 @@
 				2293244C1E8945D700ADAA22 /* ssl_pin_verifier.m in Sources */,
 				229324641E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				223876361F70048100943160 /* YYAnimatedImageView.m in Sources */,
+				2275AF6F28D3679F00D11811 /* AvatarsDataSource.m in Sources */,
 				221D4BDB1E23F75400D403E6 /* HandshakeHeader.m in Sources */,
 				222C80EF1E4A112F00A243E7 /* SBJson5StreamTokeniser.m in Sources */,
 				229324581E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
@@ -4333,6 +4340,7 @@
 				2238762F1F70047F00943160 /* YYImageCoder.m in Sources */,
 				22DB25191982DF2B0008728E /* NSData+Base64.m in Sources */,
 				22DB251A1982DF2B0008728E /* WebSocket.m in Sources */,
+				2275AF6D28D3679D00D11811 /* AvatarsDataSource.m in Sources */,
 				229324801E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
 				22DB251B1982DF2B0008728E /* WebSocketConnectConfig.m in Sources */,
 				229324561E8945D700ADAA22 /* TSKBackgroundReporter.m in Sources */,
