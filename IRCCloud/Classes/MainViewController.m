@@ -3767,7 +3767,7 @@ NSArray *_sortedChannels;
         }]];
         [self presentViewController:alert animated:YES completion:nil];
     } else if(e.rowType == ROW_REPLY_COUNT) {
-        [self setMsgId:[[e.entities objectForKey:@"parent"] msgid]];
+        [self setMsgId:((Event *)[e.entities objectForKey:@"parent"]).msgid];
     } else {
         [self->_eventsView clearLastSeenMarker];
     }
