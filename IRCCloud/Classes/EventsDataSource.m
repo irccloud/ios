@@ -365,12 +365,12 @@
                     @throw [NSException exceptionWithName:@"NSError" reason:error.debugDescription userInfo:@{ @"NSError" : error }];
             } @catch(NSException *e) {
                 CLS_LOG(@"Exception: %@", e);
-                /*[[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
+                [[NSFileManager defaultManager] removeItemAtPath:cacheFile error:nil];
                 [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cacheVersion"];
                 [[ServersDataSource sharedInstance] clear];
                 [[BuffersDataSource sharedInstance] clear];
                 [[ChannelsDataSource sharedInstance] clear];
-                [[UsersDataSource sharedInstance] clear];*/
+                [[UsersDataSource sharedInstance] clear];
             }
         }
 #endif

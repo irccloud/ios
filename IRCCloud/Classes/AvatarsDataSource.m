@@ -92,8 +92,6 @@
     if(self) {
         self->_avatars = [[NSMutableDictionary alloc] init];
 
-        NSLog(@"cacheVersion: %@", [[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"]);
-        
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"avatarURLs"];
             
@@ -111,8 +109,6 @@
         
         if(!_avatarURLs)
             self->_avatarURLs = [[NSMutableDictionary alloc] init];
-        
-        NSLog(@"Cached URLs: %@", _avatarURLs);
     }
     return self;
 }
