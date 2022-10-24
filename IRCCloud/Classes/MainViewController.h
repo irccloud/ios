@@ -124,6 +124,9 @@
     NSTimer *_handoffTimer;
     CGFloat _previousWidth;
     NSString *_sceneTitleExtra;
+    NSTimer *_typingIndicatorTimer;
+    UILabel *_typingIndicator;
+    NSTimer *_typingTimer;
 }
 @property (nonatomic) int cidToOpen;
 @property (nonatomic) int bidToOpen;

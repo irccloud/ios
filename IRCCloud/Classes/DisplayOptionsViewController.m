@@ -59,6 +59,8 @@
     NSMutableDictionary *disableMuted = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *colors = [[NSMutableDictionary alloc] init];
     NSMutableDictionary *nocolors = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *disableTypingStatus = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary *enableTypingStatus = [[NSMutableDictionary alloc] init];
 
     if([self->_buffer.type isEqualToString:@"channel"]) {
         NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
@@ -288,6 +290,30 @@
             else
                 [prefs removeObjectForKey:@"channel-chat-nocolor"];
         }
+        
+        if([[prefs objectForKey:@"channel-disableTypingStatus"] isKindOfClass:[NSDictionary class]])
+            [disableTypingStatus addEntriesFromDictionary:[prefs objectForKey:@"channel-disableTypingStatus"]];
+        if([[prefs objectForKey:@"channel-enableTypingStatus"] isKindOfClass:[NSDictionary class]])
+            [enableTypingStatus addEntriesFromDictionary:[prefs objectForKey:@"channel-enableTypingStatus"]];
+        if([[prefs objectForKey:@"disableTypingStatus"] intValue] == 1) {
+            if(!_typingStatus.on)
+                [enableTypingStatus removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [enableTypingStatus setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(enableTypingStatus.count)
+                [prefs setObject:enableTypingStatus forKey:@"channel-enableTypingStatus"];
+            else
+                [prefs removeObjectForKey:@"channel-enableTypingStatus"];
+        } else {
+            if(self->_typingStatus.on)
+                [disableTypingStatus removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            else
+                [disableTypingStatus setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+            if(disableTypingStatus.count)
+                [prefs setObject:disableTypingStatus forKey:@"channel-disableTypingStatus"];
+            else
+                [prefs removeObjectForKey:@"channel-disableTypingStatus"];
+        }
     } else {
         if([[prefs objectForKey:@"buffer-disableReadOnSelect"] isKindOfClass:[NSDictionary class]])
             [disableReadOnSelect addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableReadOnSelect"]];
@@ -414,6 +440,30 @@
                 [prefs setObject:replyCollapse forKey:@"buffer-reply-collapse"];
             else
                 [prefs removeObjectForKey:@"buffer-reply-collapse"];
+            
+            if([[prefs objectForKey:@"buffer-disableTypingStatus"] isKindOfClass:[NSDictionary class]])
+                [disableTypingStatus addEntriesFromDictionary:[prefs objectForKey:@"buffer-disableTypingStatus"]];
+            if([[prefs objectForKey:@"buffer-enableTypingStatus"] isKindOfClass:[NSDictionary class]])
+                [enableTypingStatus addEntriesFromDictionary:[prefs objectForKey:@"buffer-enableTypingStatus"]];
+            if([[prefs objectForKey:@"disableTypingStatus"] intValue] == 1) {
+                if(!_typingStatus.on)
+                    [enableTypingStatus removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+                else
+                    [enableTypingStatus setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+                if(enableTypingStatus.count)
+                    [prefs setObject:enableTypingStatus forKey:@"buffer-enableTypingStatus"];
+                else
+                    [prefs removeObjectForKey:@"buffer-enableTypingStatus"];
+            } else {
+                if(self->_typingStatus.on)
+                    [disableTypingStatus removeObjectForKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+                else
+                    [disableTypingStatus setObject:@YES forKey:[NSString stringWithFormat:@"%i", _buffer.bid]];
+                if(disableTypingStatus.count)
+                    [prefs setObject:disableTypingStatus forKey:@"buffer-disableTypingStatus"];
+                else
+                    [prefs removeObjectForKey:@"buffer-disableTypingStatus"];
+            }
         }
         
         if([self->_buffer.type isEqualToString:@"console"]) {
@@ -497,6 +547,18 @@
                 self->_trackUnread.on = NO;
             else
                 self->_trackUnread.on = YES;
+        }
+        
+        if([[prefs objectForKey:@"disableTypingStatus"] intValue] == 1) {
+            if([[[prefs objectForKey:@"channel-enableTypingStatus"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                self->_typingStatus.on = YES;
+            else
+                self->_typingStatus.on = NO;
+        } else {
+            if([[[prefs objectForKey:@"channel-disableTypingStatus"] objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue] == 1)
+                self->_typingStatus.on = NO;
+            else
+                self->_typingStatus.on = YES;
         }
         
         if([[prefs objectForKey:@"notifications-all"] intValue] == 1) {
@@ -714,6 +776,7 @@
     [self->_inlineImages addTarget:self action:@selector(thirdPartyNotificationPreviewsToggled:) forControlEvents:UIControlEventValueChanged];
     self->_muted = [[UISwitch alloc] init];
     self->_nocolors = [[UISwitch alloc] init];
+    self->_typingStatus = [[UISwitch alloc] init];
 
     [self refresh];
 }
@@ -757,11 +820,11 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     int count;
     if([self->_buffer.type isEqualToString:@"channel"])
-        count = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?11:12;
+        count = ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone)?12:13;
     else if([self->_buffer.type isEqualToString:@"console"])
         count = 5;
     else
-        count = 9;
+        count = 10;
 #ifdef ENTERPRISE
     count--;
 #endif
@@ -840,6 +903,10 @@
         case 11:
             cell.textLabel.text = @"Embed external media";
             cell.accessoryView = self->_inlineImages;
+            break;
+        case 12:
+            cell.textLabel.text = @"Share typing status";
+            cell.accessoryView = self->_typingStatus;
             break;
     }
     return cell;

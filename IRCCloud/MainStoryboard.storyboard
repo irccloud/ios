@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19162" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="QPs-Li-UDL">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="QPs-Li-UDL">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19144"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -788,7 +788,7 @@
                                 </connections>
                             </view>
                             <view alpha="0.0" contentMode="scaleToFill" placeholderIntrinsicWidth="768" placeholderIntrinsicHeight="32" translatesAutoresizingMaskIntoConstraints="NO" id="scS-39-nDE" userLabel="Bottom Unread View" customClass="UIControl">
-                                <rect key="frame" x="0.0" y="878" width="768" height="32"/>
+                                <rect key="frame" x="0.0" y="854" width="768" height="32"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="↓" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="14" translatesAutoresizingMaskIntoConstraints="NO" id="MQi-6s-Aew">
                                         <rect key="frame" x="6" y="7" width="11" height="17"/>
@@ -827,7 +827,7 @@
                                 </connections>
                             </view>
                             <view hidden="YES" autoresizesSubviews="NO" contentMode="scaleToFill" placeholderIntrinsicWidth="768" placeholderIntrinsicHeight="32" translatesAutoresizingMaskIntoConstraints="NO" id="QgU-LW-Wne" userLabel="Server Status Bar" customClass="UIControl">
-                                <rect key="frame" x="0.0" y="878" width="768" height="32"/>
+                                <rect key="frame" x="0.0" y="854" width="768" height="32"/>
                                 <subviews>
                                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sIl-WH-w2W">
                                         <rect key="frame" x="6" y="6" width="756" height="20"/>
@@ -854,7 +854,7 @@
                                 <rect key="frame" x="374" y="467" width="20" height="20"/>
                             </activityIndicatorView>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Double-tap to quickly reply to the sender" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="290" translatesAutoresizingMaskIntoConstraints="NO" id="biy-MM-eKX">
-                                <rect key="frame" x="239" y="823" width="290" height="55"/>
+                                <rect key="frame" x="239" y="799" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="55" id="8Ck-Wn-AOK"/>
                                     <constraint firstAttribute="width" constant="290" id="EmZ-vM-uzU"/>
@@ -864,7 +864,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Swipe with 2 fingers to return to the previous channel or conversation" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="290" translatesAutoresizingMaskIntoConstraints="NO" id="Me3-jh-nJf">
-                                <rect key="frame" x="239" y="823" width="290" height="55"/>
+                                <rect key="frame" x="239" y="799" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="290" id="TRm-q9-E0j"/>
                                     <constraint firstAttribute="height" constant="55" id="bXb-fr-AbV"/>
@@ -874,7 +874,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.0" contentMode="left" text="Swipe left and right to quickly open and close the sidebars" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="290" translatesAutoresizingMaskIntoConstraints="NO" id="IOs-dt-XUa">
-                                <rect key="frame" x="239" y="823" width="290" height="55"/>
+                                <rect key="frame" x="239" y="799" width="290" height="55"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="55" id="DY5-aL-REE"/>
                                     <constraint firstAttribute="width" constant="290" id="e9j-Ou-nSL"/>
@@ -905,10 +905,10 @@
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="fW5-GL-Rkw">
-                                <rect key="frame" x="0.0" y="910" width="768" height="44"/>
+                                <rect key="frame" x="0.0" y="886" width="768" height="68"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="SuG-V2-yni"/>
+                                    <constraint firstAttribute="height" constant="68" id="SuG-V2-yni"/>
                                 </constraints>
                             </view>
                         </subviews>

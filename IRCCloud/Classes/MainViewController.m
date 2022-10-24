@@ -296,6 +296,8 @@ NSArray *_sortedChannels;
     self->_message.minimumHeight = FONT_SIZE + 22;
     if(self->_message.minimumHeight < 35)
         self->_message.minimumHeight = 35;
+    self->_typingIndicator.font = [UIFont systemFontOfSize:FONT_SIZE*0.65 weight:UIFontWeightRegular];
+    self->_typingIndicator.textColor = [UIColor timestampColor];
     
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
     [users setImage:[[UIImage imageNamed:@"users"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
@@ -416,7 +418,7 @@ NSArray *_sortedChannels;
     [self->_uploadsBtn setImage:[[UIImage imageNamed:@"upload_arrow"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self->_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self->_uploadsBtn sizeToFit];
-    self->_uploadsBtn.frame = CGRectMake(9,2,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
+    self->_uploadsBtn.frame = CGRectMake(9,10,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
     self->_uploadsBtn.accessibilityLabel = @"Uploads";
     [self->_bottomBar addSubview:self->_uploadsBtn];
 
@@ -426,7 +428,7 @@ NSArray *_sortedChannels;
     [self->_sendBtn setTitle:@"Send" forState:UIControlStateNormal];
     [self->_sendBtn setTitleColor:[UIColor lightGrayColor] forState:UIControlStateDisabled];
     [self->_sendBtn sizeToFit];
-    self->_sendBtn.frame = CGRectMake(self->_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,4,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
+    self->_sendBtn.frame = CGRectMake(self->_bottomBar.frame.size.width - _sendBtn.frame.size.width - 8,12,_sendBtn.frame.size.width,_sendBtn.frame.size.height);
     [self->_sendBtn addTarget:self action:@selector(sendButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self->_sendBtn sizeToFit];
     self->_sendBtn.enabled = NO;
@@ -442,7 +444,7 @@ NSArray *_sortedChannels;
     self->_settingsBtn.accessibilityLabel = @"Menu";
     self->_settingsBtn.enabled = NO;
     self->_settingsBtn.alpha = 0;
-    self->_settingsBtn.frame = CGRectMake(self->_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 24,2,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
+    self->_settingsBtn.frame = CGRectMake(self->_bottomBar.frame.size.width - _settingsBtn.frame.size.width - 24,10,_settingsBtn.frame.size.width + 16,_settingsBtn.frame.size.height + 16);
     [self->_bottomBar addSubview:self->_settingsBtn];
     
     self.slidingViewController.shouldAllowPanningPastAnchor = NO;
@@ -474,10 +476,20 @@ NSArray *_sortedChannels;
     [self->_message addConstraints:@[self->_messageWidthConstraint, _messageHeightConstraint]];
 
     [self->_bottomBar addSubview:self->_message];
+
+    self->_typingIndicator = [[UILabel alloc] initWithFrame:CGRectZero];
+    self->_typingIndicator.translatesAutoresizingMaskIntoConstraints = NO;
+    self->_typingIndicator.lineBreakMode = NSLineBreakByTruncatingHead;
+    [self->_bottomBar addSubview:_typingIndicator];
+
     [self->_bottomBar addConstraints:@[
                              [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:50.0f],
-                             [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-2.0f]
+                             [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:12.0f],
+                             [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self->_message attribute:NSLayoutAttributeLeading multiplier:1.0f constant:0],
+                             [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-8.0f],
+                             [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self->_message attribute:NSLayoutAttributeWidth multiplier:1.0f constant:0]
                              ]];
+    
     self->_nickCompletionView = [[NickCompletionView alloc] initWithFrame:CGRectZero];
     self->_nickCompletionView.translatesAutoresizingMaskIntoConstraints = NO;
     self->_nickCompletionView.completionDelegate = self;
@@ -1648,6 +1660,12 @@ NSArray *_sortedChannels;
                 [self presentViewController:ac animated:YES completion:nil];
             }
             break;
+        case kIRCEventUserTyping:
+            o = notification.object;
+            if(o.bid == self->_buffer.bid) {
+                [self _updateTypingIndicatorTimer];
+            }
+            break;
         default:
             break;
     }
@@ -2503,6 +2521,56 @@ NSArray *_sortedChannels;
     self->_nickCompletionTimer = nil;
 }
 
+-(void)_updateTypingIndicatorTimer {
+    NSMutableString *typing = nil;
+    NSTimeInterval now = [NSDate date].timeIntervalSince1970;
+    
+    for (NSString *from in self->_buffer.typingIndicators.allKeys) {
+        if (now - [[self->_buffer.typingIndicators objectForKey:from] doubleValue] > 6.5)
+            [self->_buffer.typingIndicators removeObjectForKey:from];
+    }
+    
+    NSUInteger count = self->_buffer.typingIndicators.count;
+    if (count > 5) {
+        typing = [NSString stringWithFormat:@"%lu people are typing", (unsigned long)count].mutableCopy;
+    } else if (count == 1) {
+        typing = [NSString stringWithFormat:@"%@ is typing", self->_buffer.typingIndicators.allKeys.firstObject].mutableCopy;
+    } else if (count > 0) {
+        typing = [[NSMutableString alloc] init];
+        int i = 0;
+        for (NSString *from in self->_buffer.typingIndicators.allKeys) {
+            if (++i == count)
+                [typing appendString:@"and "];
+            [typing appendString:from];
+            if(count != 2 && i > 0 && i < count)
+                [typing appendString:@","];
+            [typing appendString:@" "];
+        }
+        [typing appendString:@"are typing"];
+    }
+    
+    self->_typingIndicator.text = typing;
+    
+    if(count && !self->_typingIndicatorTimer)
+        [self scheduleTypingIndicatorTimer];
+
+    if(!count && self->_typingIndicatorTimer)
+        [self cancelTypingIndicatorTimer];
+}
+
+-(void)scheduleTypingIndicatorTimer {
+    if(self->_typingIndicatorTimer)
+        [self->_typingIndicatorTimer invalidate];
+    self->_typingIndicatorTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(_updateTypingIndicatorTimer) userInfo:nil repeats:YES];
+}
+
+-(void)cancelTypingIndicatorTimer {
+    if(self->_typingIndicatorTimer)
+        [self->_typingIndicatorTimer invalidate];
+    self->_typingIndicatorTimer = nil;
+}
+
+
 -(void)_updateMessageWidth {
     self->_message.animateHeightChange = NO;
     BOOL dirty = NO;
@@ -2547,7 +2615,7 @@ NSArray *_sortedChannels;
     
     if(dirty || self->_messageHeightConstraint.constant != self->_message.frame.size.height) {
         self->_messageHeightConstraint.constant = self->_message.frame.size.height;
-        self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
+        self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 12 + 16;
         CGRect frame = self->_settingsBtn.frame;
         frame.origin.x = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
         self->_settingsBtn.frame = frame;
@@ -2592,6 +2660,25 @@ NSArray *_sortedChannels;
     
     if(!self->_handoffTimer)
         self->_handoffTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_updateHandoffTimer) userInfo:nil repeats:NO];
+    
+    if(expandingTextView.text.length && [NetworkConnection sharedInstance].prefs) {
+        BOOL disableTypingStatus = [[[[NetworkConnection sharedInstance].prefs objectForKey:[self->_buffer.type isEqualToString:@"channel"]?@"channel-disableTypingStatus":@"buffer-disableTypingStatus"] objectForKey:[NSString stringWithFormat:@"%i",self->_buffer.bid]] boolValue] || [[[NetworkConnection sharedInstance].prefs objectForKey:@"disableTypingStatus"] intValue] == 1;
+        if([[[[NetworkConnection sharedInstance].prefs objectForKey:[self->_buffer.type isEqualToString:@"channel"]?@"channel-enableTypingStatus":@"buffer-enableTypingStatus"] objectForKey:[NSString stringWithFormat:@"%i",self->_buffer.bid]] boolValue])
+            disableTypingStatus = NO;
+        
+        Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        if(s.blocksTyping)
+            disableTypingStatus = YES;
+
+        if(!disableTypingStatus && !self->_typingTimer) {
+            self->_typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(sendTyping) userInfo:nil repeats:NO];
+        }
+    }
+}
+
+-(void)sendTyping {
+    [[NetworkConnection sharedInstance] typing:@"active" cid:self->_buffer.cid to:self->_buffer.name handler:nil];
+    self->_typingTimer = nil;
 }
 
 -(void)_cancelHandoffTimer {
@@ -2914,6 +3001,10 @@ NSArray *_sortedChannels;
             self->_message.internalTextView.textColor = [UIColor textareaTextColor];
             self->_message.internalTextView.typingAttributes = @{NSForegroundColorAttributeName:[UIColor textareaTextColor], NSFontAttributeName:self->_defaultTextareaFont };
         }
+        if(self->_typingTimer) {
+            [self->_typingTimer invalidate];
+            self->_typingTimer = nil;
+        }
     }
     
     Buffer *lastBuffer = self->_buffer;
@@ -3035,6 +3126,7 @@ NSArray *_sortedChannels;
     [self.slidingViewController resetTopView];
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
     [self updateSuggestions:NO];
+    [self _updateTypingIndicatorTimer];
     
     if([[ServersDataSource sharedInstance] getServer:self->_buffer.cid].isSlack) {
         [UIMenuController sharedMenuController].menuItems = @[];
@@ -3300,7 +3392,7 @@ NSArray *_sortedChannels;
     self.navigationController.view.center = center;
     self.navigationController.view.layer.position = self.navigationController.view.center;
 
-    self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 8;
+    self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 12 + 16;
     self->_eventsViewHeightConstraint.constant = self.slidingViewController.view.frame.size.height - self.navigationController.navigationBar.frame.size.height - self.slidingViewController.view.safeAreaInsets.top - self.slidingViewController.view.safeAreaInsets.bottom;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height
@@ -3364,6 +3456,7 @@ NSArray *_sortedChannels;
     [self _updateTitleArea];
     [self _updateServerStatus];
     [self _updateGlobalMsg];
+    [self _updateTypingIndicatorTimer];
     
     [self.view layoutIfNeeded];
     

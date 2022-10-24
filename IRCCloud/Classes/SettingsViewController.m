@@ -554,6 +554,7 @@
         [prefs setObject:[NSNumber numberWithBool:!_disableQuote.isOn] forKey:@"chat-noquote"];
         [prefs setObject:[NSNumber numberWithBool:_muteNotifications.isOn] forKey:@"notifications-mute"];
         [prefs setObject:[NSNumber numberWithBool:!_noColor.isOn] forKey:@"chat-nocolor"];
+        [prefs setObject:[NSNumber numberWithBool:!_disableTypingStatus.isOn] forKey:@"disableTypingStatus"];
 
         SBJson5Writer *writer = [[SBJson5Writer alloc] init];
         NSString *json = [writer stringWithObject:prefs];
@@ -934,6 +935,7 @@
                         @{@"title":@"Format quoted text", @"accessory":self->_disableQuote},
                         @{@"title":@"Format colours", @"accessory":self->_noColor},
                         @{@"title":@"Clear colours after sending", @"accessory":self->_clearFormattingAfterSending},
+                        @{@"title":@"Share typing status", @"accessory":self->_disableTypingStatus},
                         ]},
               @{@"title":@"Device", @"items":device},
               @{@"title":@"Notifications", @"items":notifications},
@@ -1048,6 +1050,7 @@
     self->_hiddenMembers = [[UISwitch alloc] init];
     self->_muteNotifications = [[UISwitch alloc] init];
     self->_noColor = [[UISwitch alloc] init];
+    self->_disableTypingStatus = [[UISwitch alloc] init];
 
     self->_highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     self->_highlights.text = @"";
@@ -1291,6 +1294,12 @@
         self->_noColor.on = ![[prefs objectForKey:@"chat-nocolor"] boolValue];
     } else {
         self->_noColor.on = YES;
+    }
+    
+    if([[prefs objectForKey:@"disableTypingStatus"] isKindOfClass:[NSNumber class]]) {
+        self->_disableTypingStatus.on = ![[prefs objectForKey:@"disableTypingStatus"] boolValue];
+    } else {
+        self->_disableTypingStatus.on = YES;
     }
     
     self->_screen.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"];

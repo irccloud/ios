@@ -101,6 +101,7 @@ typedef enum {
     kIRCEventTextList,
     kIRCEventAlert,
     kIRCEventMessageChanged,
+    kIRCEventUserTyping,
     kIRCEventRefresh
 } kIRCEvent;
 
@@ -258,6 +259,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(int)setNetworkName:(NSString *)name cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler;
 -(int)deleteMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to handler:(IRCCloudAPIResultHandler)handler;
 -(int)editMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to msg:(NSString *)msg handler:(IRCCloudAPIResultHandler)handler;
+-(int)typing:(NSString *)value cid:(int)cid to:(NSString *)to handler:(IRCCloudAPIResultHandler)handler;
 
 //GET
 -(void)requestConfigurationWithHandler:(IRCCloudAPIResultHandler)handler;

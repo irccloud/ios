@@ -33,6 +33,7 @@
     UISwitch *_replyCollapse;
     UISwitch *_muted;
     UISwitch *_nocolors;
+    UISwitch *_typingStatus;
 }
 @property (strong, nonatomic) Buffer *buffer;
 @end

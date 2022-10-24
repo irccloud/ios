@@ -40,6 +40,7 @@
     int _extraHighlights;
     BOOL _serverIsSlack;
     NSString *_displayName;
+    NSMutableDictionary *_typingIndicators;
 }
 @property (nonatomic, assign) int bid, cid, archived, deferred, timeout, extraHighlights;
 @property (nonatomic, assign) NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom, created;
@@ -48,6 +49,7 @@
 @property (nonatomic, assign) BOOL valid, scrolledUp, serverIsSlack;
 @property (nonatomic, copy) NSString *draft;
 @property (nonatomic, strong) Buffer *lastBuffer, *nextBuffer;
+@property (nonatomic, strong) NSMutableDictionary *typingIndicators;
 @property (readonly) NSString *accessibilityValue, *normalizedName, *displayName;
 @property (readonly) BOOL isMPDM;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;

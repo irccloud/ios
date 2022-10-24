@@ -1084,6 +1084,18 @@ volatile BOOL __socketPaused = NO;
                        if(!backlog && !self->_resuming)
                            [self postObject:e forEvent:kIRCEventBufferMsg];
                    },
+                   @"user_typing": ^(IRCCloudJSONObject *object, BOOL backlog) {
+                       Buffer *b = [self->_buffers getBuffer:object.bid];
+                       if(b) {
+                           if(!b.typingIndicators)
+                               b.typingIndicators = [[NSMutableDictionary alloc] init];
+                           
+                           [b.typingIndicators setObject:@([NSDate date].timeIntervalSince1970) forKey:[object objectForKey:@"from"]];
+
+                           if(!backlog && !self->_resuming)
+                               [self postObject:object forEvent:kIRCEventUserTyping];
+                       }
+                   },
                }.mutableCopy;
         
         for(NSString *type in @[@"buffer_msg", @"buffer_me_msg", @"wait", @"banned", @"kill", @"connectingself->_cancelled",
@@ -1927,6 +1939,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 
 -(int)setNetworkName:(NSString *)name cid:(int)cid handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"set-netname" args:@{@"cid":@(cid), @"netname":name} handler:resultHandler];
+}
+
+-(int)typing:(NSString *)value cid:(int)cid to:(NSString *)to handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"typing" args:@{@"cid":@(cid), @"to":to, @"value":value} handler:resultHandler];
 }
 
 -(void)_createJSONParser {
