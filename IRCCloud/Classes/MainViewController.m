@@ -2667,6 +2667,9 @@ NSArray *_sortedChannels;
             disableTypingStatus = NO;
         
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
+        if(![s.caps containsObject:@"message-tags"])
+            disableTypingStatus = YES;
+        
         if(s.blocksTyping)
             disableTypingStatus = YES;
 
