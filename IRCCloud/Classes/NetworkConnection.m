@@ -2118,6 +2118,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     [self->_socket performSelectorOnMainThread:@selector(close) withObject:nil waitUntilDone:YES];
     self->_socket = nil;
     for(Buffer *b in [self->_buffers getBuffers]) {
+        b.typingIndicators = nil;
         if(!b.scrolledUp && [self->_events highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0) {
             dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                 [self->_events pruneEventsForBuffer:b.bid maxSize:50];
