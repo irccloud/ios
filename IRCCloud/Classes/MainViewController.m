@@ -2657,7 +2657,7 @@ NSArray *_sortedChannels;
     if(!self->_handoffTimer)
         self->_handoffTimer = [NSTimer scheduledTimerWithTimeInterval:0.25 target:self selector:@selector(_updateHandoffTimer) userInfo:nil repeats:NO];
     
-    if(expandingTextView.text.length && [NetworkConnection sharedInstance].prefs) {
+    if(![self->_buffer.type isEqualToString:@"console"] && expandingTextView.text.length && [NetworkConnection sharedInstance].prefs) {
         BOOL disableTypingStatus = [[[[NetworkConnection sharedInstance].prefs objectForKey:[self->_buffer.type isEqualToString:@"channel"]?@"channel-disableTypingStatus":@"buffer-disableTypingStatus"] objectForKey:[NSString stringWithFormat:@"%i",self->_buffer.bid]] boolValue] || [[[NetworkConnection sharedInstance].prefs objectForKey:@"disableTypingStatus"] intValue] == 1;
         if([[[[NetworkConnection sharedInstance].prefs objectForKey:[self->_buffer.type isEqualToString:@"channel"]?@"channel-enableTypingStatus":@"buffer-enableTypingStatus"] objectForKey:[NSString stringWithFormat:@"%i",self->_buffer.bid]] boolValue])
             disableTypingStatus = NO;
