@@ -1087,10 +1087,7 @@ volatile BOOL __socketPaused = NO;
                    @"user_typing": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        Buffer *b = [self->_buffers getBuffer:object.bid];
                        if(b) {
-                           if(!b.typingIndicators)
-                               b.typingIndicators = [[NSMutableDictionary alloc] init];
-                           
-                           [b.typingIndicators setObject:@([NSDate date].timeIntervalSince1970) forKey:[object objectForKey:@"from"]];
+                           [b addTyping:[object objectForKey:@"from"]];
 
                            if(!backlog && !self->_resuming)
                                [self postObject:object forEvent:kIRCEventUserTyping];

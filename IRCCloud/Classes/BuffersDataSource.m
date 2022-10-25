@@ -29,6 +29,24 @@ NSString *__DEFAULT_CHANTYPES__;
     return YES;
 }
 
+-(void)purgeExpiredTypingIndicators {
+    NSTimeInterval now = [NSDate date].timeIntervalSince1970;
+    
+    for (NSString *from in _typingIndicators.allKeys) {
+        if (now - [[_typingIndicators objectForKey:from] doubleValue] > 6.5)
+            [_typingIndicators removeObjectForKey:from];
+    }
+}
+
+-(void)addTyping:(NSString *)nick {
+    if(!_typingIndicators)
+        _typingIndicators = [[NSMutableDictionary alloc] init];
+    
+    [_typingIndicators setObject:@([NSDate date].timeIntervalSince1970) forKey:nick];
+    
+    [self purgeExpiredTypingIndicators];
+}
+
 -(NSComparisonResult)compare:(Buffer *)aBuffer {
     @synchronized (self) {
         int joinedLeft = 1, joinedRight = 1;
@@ -414,4 +432,5 @@ NSString *__DEFAULT_CHANTYPES__;
         }
     }
 }
+
 @end

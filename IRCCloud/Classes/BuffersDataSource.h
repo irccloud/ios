@@ -53,6 +53,8 @@
 @property (readonly) NSString *accessibilityValue, *normalizedName, *displayName;
 @property (readonly) BOOL isMPDM;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;
+-(void)purgeExpiredTypingIndicators;
+-(void)addTyping:(NSString *)nick;
 @end
 
 @interface BuffersDataSource : NSObject {

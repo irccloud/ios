@@ -2523,12 +2523,8 @@ NSArray *_sortedChannels;
 
 -(void)_updateTypingIndicatorTimer {
     NSMutableString *typing = nil;
-    NSTimeInterval now = [NSDate date].timeIntervalSince1970;
-    
-    for (NSString *from in self->_buffer.typingIndicators.allKeys) {
-        if (now - [[self->_buffer.typingIndicators objectForKey:from] doubleValue] > 6.5)
-            [self->_buffer.typingIndicators removeObjectForKey:from];
-    }
+
+    [self->_buffer purgeExpiredTypingIndicators];
     
     NSUInteger count = self->_buffer.typingIndicators.count;
     if (count > 5) {
