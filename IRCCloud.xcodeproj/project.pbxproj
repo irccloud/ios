@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXAggregateTarget section */
@@ -41,7 +41,7 @@
 		22032A6F1884529700BE4A10 /* NickCompletionView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22032A6E1884529700BE4A10 /* NickCompletionView.m */; };
 		2209B82D28C27A3B00D59B75 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 226E642223F1C6AA001CE069 /* GoogleService-Info.plist */; };
 		221034ED197EFBAF00AB414F /* ShareViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221034EC197EFBAF00AB414F /* ShareViewController.m */; };
-		221034F2197EFBAF00AB414F /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 221034E7197EFBAF00AB414F /* ShareExtension.appex */; };
+		221034F2197EFBAF00AB414F /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 221034E7197EFBAF00AB414F /* ShareExtension.appex */; };
 		221034FA197EFC0500AB414F /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2200DB4618B7EDF100343583 /* QuartzCore.framework */; };
 		221034FB197EFC0500AB414F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2283322F17944E2B00ED22EA /* AudioToolbox.framework */; };
 		221034FC197EFC0500AB414F /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05C916D3DCB60029769C /* CFNetwork.framework */; };
@@ -91,9 +91,9 @@
 		221D4B861E1BE2F700D403E6 /* LinksListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221D4B851E1BE2F700D403E6 /* LinksListTableViewController.m */; };
 		221D4B871E1BE2F700D403E6 /* LinksListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221D4B851E1BE2F700D403E6 /* LinksListTableViewController.m */; };
 		221D4B911E23EAD700D403E6 /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 221D4B901E23EAD700D403E6 /* NotificationService.m */; };
-		221D4B951E23EAD700D403E6 /* NotificationService.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 221D4B8D1E23EAD600D403E6 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		221D4B951E23EAD700D403E6 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 221D4B8D1E23EAD600D403E6 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		221D4B9C1E23EB4900D403E6 /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 221D4B901E23EAD700D403E6 /* NotificationService.m */; };
-		221D4BA71E23ECB200D403E6 /* NotificationService Enterprise.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 221D4BA31E23EB4900D403E6 /* NotificationService Enterprise.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		221D4BA71E23ECB200D403E6 /* NotificationService Enterprise.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 221D4BA31E23EB4900D403E6 /* NotificationService Enterprise.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		221D4BAE1E23F47900D403E6 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		221D4BAF1E23F47900D403E6 /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		221D4BB01E23F48300D403E6 /* Ignore.m in Sources */ = {isa = PBXBuildFile; fileRef = 2230F8E717162ACC007F7C98 /* Ignore.m */; };
@@ -782,8 +782,8 @@
 		22D97890215BC910005C2713 /* Hack-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2210671F1F28C3BB0075A18F /* Hack-Regular.ttf */; };
 		22D97891215BC910005C2713 /* a.caf in Resources */ = {isa = PBXBuildFile; fileRef = 22F5C4BC1791F205005E09A9 /* a.caf */; };
 		22D97892215BC910005C2713 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
-		22D97895215BC910005C2713 /* ShareExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 221034E7197EFBAF00AB414F /* ShareExtension.appex */; };
-		22D97896215BC910005C2713 /* NotificationService.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 221D4B8D1E23EAD600D403E6 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		22D97895215BC910005C2713 /* ShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 221034E7197EFBAF00AB414F /* ShareExtension.appex */; };
+		22D97896215BC910005C2713 /* NotificationService.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 221D4B8D1E23EAD600D403E6 /* NotificationService.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		22D9794A215BC979005C2713 /* FLEXArrayExplorerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D978A1215BC979005C2713 /* FLEXArrayExplorerViewController.m */; };
 		22D9794B215BC979005C2713 /* FLEXObjectExplorerFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D978A2215BC979005C2713 /* FLEXObjectExplorerFactory.m */; };
 		22D9794C215BC979005C2713 /* FLEXGlobalsTableViewControllerEntry.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D978A5215BC979005C2713 /* FLEXGlobalsTableViewControllerEntry.m */; };
@@ -897,7 +897,7 @@
 		22DB252D1982DF2B0008728E /* Twitter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2250173F178340AB00066E71 /* Twitter.framework */; };
 		22DB252E1982DF2B0008728E /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A056F16D3DABA0029769C /* UIKit.framework */; };
 		22DB25301982DF2B0008728E /* Icons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA95318D0B198007D5022 /* Icons.xcassets */; };
-		22DB25391982DFFB0008728E /* ShareExtension Enterprise.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */; };
+		22DB25391982DFFB0008728E /* ShareExtension Enterprise.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 22DB25371982DF2B0008728E /* ShareExtension Enterprise.appex */; };
 		22DB253F1982E3100008728E /* EnterpriseLogo.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1A7382A918D0A9A30039FDB3 /* EnterpriseLogo.xcassets */; };
 		22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
 		22DB8D701C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
@@ -1068,40 +1068,40 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22772F91197EC42E001A9890 /* Embed App Extensions */ = {
+		22772F91197EC42E001A9890 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				221034F2197EFBAF00AB414F /* ShareExtension.appex in Embed App Extensions */,
-				221D4B951E23EAD700D403E6 /* NotificationService.appex in Embed App Extensions */,
+				221034F2197EFBAF00AB414F /* ShareExtension.appex in Embed Foundation Extensions */,
+				221D4B951E23EAD700D403E6 /* NotificationService.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22D97894215BC910005C2713 /* Embed App Extensions */ = {
+		22D97894215BC910005C2713 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				22D97895215BC910005C2713 /* ShareExtension.appex in Embed App Extensions */,
-				22D97896215BC910005C2713 /* NotificationService.appex in Embed App Extensions */,
+				22D97895215BC910005C2713 /* ShareExtension.appex in Embed Foundation Extensions */,
+				22D97896215BC910005C2713 /* NotificationService.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		22DB253C1982DFFB0008728E /* Embed App Extensions */ = {
+		22DB253C1982DFFB0008728E /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				221D4BA71E23ECB200D403E6 /* NotificationService Enterprise.appex in Embed App Extensions */,
-				22DB25391982DFFB0008728E /* ShareExtension Enterprise.appex in Embed App Extensions */,
+				221D4BA71E23ECB200D403E6 /* NotificationService Enterprise.appex in Embed Foundation Extensions */,
+				22DB25391982DFFB0008728E /* ShareExtension Enterprise.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -2842,7 +2842,7 @@
 				225D973718AA995900065087 /* Sources */,
 				225D977818AA995900065087 /* Frameworks */,
 				225D978718AA995900065087 /* Resources */,
-				22DB253C1982DFFB0008728E /* Embed App Extensions */,
+				22DB253C1982DFFB0008728E /* Embed Foundation Extensions */,
 				D14C8BA1619831C6D365647F /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
@@ -2865,7 +2865,7 @@
 				228A056816D3DABA0029769C /* Sources */,
 				228A056916D3DABA0029769C /* Frameworks */,
 				228A056A16D3DABA0029769C /* Resources */,
-				22772F91197EC42E001A9890 /* Embed App Extensions */,
+				22772F91197EC42E001A9890 /* Embed Foundation Extensions */,
 				226E642423F1C91F001CE069 /* ShellScript */,
 				226E642123F1C696001CE069 /* CopyFiles */,
 				D5FE5004D02B6D866851DCEC /* [CP] Embed Pods Frameworks */,
@@ -2910,7 +2910,7 @@
 				22D9784E215BC910005C2713 /* Frameworks */,
 				22D9786D215BC910005C2713 /* Resources */,
 				22D97893215BC910005C2713 /* ShellScript */,
-				22D97894215BC910005C2713 /* Embed App Extensions */,
+				22D97894215BC910005C2713 /* Embed Foundation Extensions */,
 				F4F5092F64004755EE174E93 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
@@ -2953,7 +2953,7 @@
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
 				LastTestingUpgradeCheck = 0510;
-				LastUpgradeCheck = 1010;
+				LastUpgradeCheck = 1400;
 				ORGANIZATIONNAME = "IRCCloud, Ltd.";
 				TargetAttributes = {
 					221034E6197EFBAF00AB414F = {
@@ -3323,6 +3323,7 @@
 		};
 		226E642423F1C91F001CE069 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -3353,6 +3354,7 @@
 		};
 		22DE05B518D8CA2C00590FC3 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -4954,6 +4956,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 096184601771D02417AC2EA7 /* Pods-IRCCloud Enterprise.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -4985,6 +4988,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F7E442A5DB675C1935189274 /* Pods-IRCCloud Enterprise.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -5034,6 +5038,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -5089,6 +5094,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -5124,6 +5130,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = BB5BF7CE5566B5B9E80ACC95 /* Pods-IRCCloud.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -5157,6 +5164,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 8B18E14B6DD31D7CDE986D5B /* Pods-IRCCloud.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
@@ -5300,6 +5308,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 747834BB92EAB6AFAEC360EA /* Pods-IRCCloud FLEX.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -5333,6 +5342,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1C7FC0255C6F93D841E44603 /* Pods-IRCCloud FLEX.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
@@ -5362,6 +5372,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 501E461E42461CCDCA1FEA73 /* Pods-IRCCloud FLEX.appstore.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
@@ -5565,6 +5576,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = NO;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -5601,6 +5613,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 26CA7871B88FD75900DEEA57 /* Pods-IRCCloud.appstore.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCCloud/IRCCloud.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
@@ -5634,6 +5647,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 1BBDF60D720CF290BFDB54FA /* Pods-IRCCloud Enterprise.appstore.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = IRCEnterprise.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
