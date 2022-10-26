@@ -296,7 +296,6 @@ NSArray *_sortedChannels;
     self->_message.minimumHeight = FONT_SIZE + 22;
     if(self->_message.minimumHeight < 35)
         self->_message.minimumHeight = 35;
-    self->_typingIndicator.font = [UIFont systemFontOfSize:FONT_SIZE*0.65 weight:UIFontWeightRegular];
     self->_typingIndicator.textColor = [UIColor timestampColor];
     
     UIButton *users = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -478,6 +477,7 @@ NSArray *_sortedChannels;
     [self->_bottomBar addSubview:self->_message];
 
     self->_typingIndicator = [[UILabel alloc] initWithFrame:CGRectZero];
+    self->_typingIndicator.font = [UIFont systemFontOfSize:12 weight:UIFontWeightRegular];
     self->_typingIndicator.translatesAutoresizingMaskIntoConstraints = NO;
     self->_typingIndicator.lineBreakMode = NSLineBreakByTruncatingHead;
     [self->_bottomBar addSubview:_typingIndicator];
@@ -486,7 +486,7 @@ NSArray *_sortedChannels;
                              [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:50.0f],
                              [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:12.0f],
                              [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self->_message attribute:NSLayoutAttributeLeading multiplier:1.0f constant:0],
-                             [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-8.0f],
+                             [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-6.0f],
                              [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:self->_message attribute:NSLayoutAttributeWidth multiplier:1.0f constant:0]
                              ]];
     
