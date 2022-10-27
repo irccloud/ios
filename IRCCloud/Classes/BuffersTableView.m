@@ -383,6 +383,13 @@
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 NSUInteger oldCount = self->_data.count;
                 self->_data = data;
+                self->_selectedRow = selectedRow;
+                self->_firstUnreadPosition = firstUnreadPosition;
+                self->_firstHighlightPosition = firstHighlightPosition;
+                self->_firstFailurePosition = firstFailurePosition;
+                self->_lastUnreadPosition = lastUnreadPosition;
+                self->_lastHighlightPosition = lastHighlightPosition;
+                self->_lastFailurePosition = lastFailurePosition;
 
                 NSMutableArray *paths = [[NSMutableArray alloc] init];
                 if(oldCount > self->_data.count) {
@@ -405,13 +412,6 @@
                 }
                 [self.tableView reloadRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationNone];
                 
-                self->_selectedRow = selectedRow;
-                self->_firstUnreadPosition = firstUnreadPosition;
-                self->_firstHighlightPosition = firstHighlightPosition;
-                self->_firstFailurePosition = firstFailurePosition;
-                self->_lastUnreadPosition = lastUnreadPosition;
-                self->_lastHighlightPosition = lastHighlightPosition;
-                self->_lastFailurePosition = lastFailurePosition;
                 [self _updateUnreadIndicators];
             }];
             return;
