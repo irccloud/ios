@@ -210,7 +210,7 @@
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [self.tableView reloadData];
+        [self reloadData];
         [self _updateUnreadIndicators];
     }
      ];
@@ -669,9 +669,18 @@
             self.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
             [self.tableView reloadData];
             [self _updateUnreadIndicators];
-            [self _scrollToSelectedBuffer];
         }];
     }
+}
+
+-(void)reloadData {
+    NSMutableArray *paths = [[NSMutableArray alloc] init];
+    
+    for(NSUInteger row = 0; row < self->_data.count; row++) {
+        if (row >= 1)
+            [paths addObject:[NSIndexPath indexPathForRow:row inSection:0]];
+    }
+    [self.tableView reloadRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationNone];
 }
 
 -(void)_updateUnreadIndicators {
@@ -902,12 +911,12 @@
     }
 }
 
-- (void)_scrollToSelectedBuffer {
+- (void)scrollToSelectedBuffer {
     if(self->_selectedRow != -1) {
         NSArray *a = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
         if(a.count) {
             if([[a objectAtIndex:0] row] > self->_selectedRow || [[a lastObject] row] < self->_selectedRow)
-                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
         }
     }
 }
@@ -916,9 +925,11 @@
     @synchronized(self->_data) {
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         NSMutableArray *data = self->_data;
+        int pos = -1;
         for(int i = 1; i < data.count; i++) {
             NSDictionary *d = [data objectAtIndex:i];
             if(b.bid == [[d objectForKey:@"bid"] intValue]) {
+                pos = i;
                 NSMutableDictionary *m = [d mutableCopy];
                 int unread = [[EventsDataSource sharedInstance] unreadStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
                 int highlights = [[EventsDataSource sharedInstance] highlightCountForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type];
@@ -1037,7 +1048,7 @@
                     }
                 }
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.tableView reloadData];
+                    [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:pos inSection:0]] withRowAnimation:UITableViewRowAnimationNone];
                     [self _updateUnreadIndicators];
                 }];
             }
@@ -1127,7 +1138,7 @@
             }
         }
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-            [self.tableView reloadData];
+            [self reloadData];
             [self _updateUnreadIndicators];
         }];
     }
@@ -1176,6 +1187,7 @@
         case kIRCEventAlert:
         case kIRCEventAvatarChange:
         case kIRCEventMessageChanged:
+        case kIRCEventUserTyping:
             break;
         case kIRCEventJoin:
         case kIRCEventPart:
@@ -1640,7 +1652,7 @@
             if([self->_delegate isKindOfClass:MainViewController.class])
                 [(MainViewController *)_delegate clearMsgId];
     #endif
-            [self.tableView reloadData];
+            [self reloadData];
             [self _updateUnreadIndicators];
             if(self->_delegate)
                 [self->_delegate bufferSelected:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
@@ -1677,9 +1689,9 @@
                 }
             }
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self.tableView reloadData];
+                [self reloadData];
                 [self _updateUnreadIndicators];
-                [self _scrollToSelectedBuffer];
+                [self scrollToSelectedBuffer];
             }];
         } else {
             [self performSelectorInBackground:@selector(refresh) withObject:nil];

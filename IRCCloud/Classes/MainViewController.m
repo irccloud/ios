@@ -3714,6 +3714,7 @@ NSArray *_sortedChannels;
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
         self.view.accessibilityElementsHidden = NO;
     }
+    [self->_buffersView scrollToSelectedBuffer];
 }
 
 -(void)showSwipeTip {
