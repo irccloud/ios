@@ -756,17 +756,15 @@
     self.tableView.insetsLayoutMarginsFromSafeArea = NO;
     self.tableView.insetsContentViewsToSafeArea = NO;
     
-    if (@available(iOS 13, *)) {
-        self->_searchText = [[UITextField alloc] initWithFrame:CGRectZero];
-        self->_searchText.placeholder = @"Jump to channel";
-        self->_searchText.autocapitalizationType = UITextAutocapitalizationTypeNone;
-        self->_searchText.spellCheckingType = UITextSpellCheckingTypeNo;
-        self->_searchText.returnKeyType = UIReturnKeySearch;
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(searchTextDidChange)
-                                                     name:UITextFieldTextDidChangeNotification
-                                                   object:self->_searchText];
-    }
+    self->_searchText = [[UITextField alloc] initWithFrame:CGRectZero];
+    self->_searchText.placeholder = @"Jump to channel";
+    self->_searchText.autocapitalizationType = UITextAutocapitalizationTypeNone;
+    self->_searchText.spellCheckingType = UITextSpellCheckingTypeNo;
+    self->_searchText.returnKeyType = UIReturnKeySearch;
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(searchTextDidChange)
+                                                 name:UITextFieldTextDidChangeNotification
+                                               object:self->_searchText];
     
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     self->_boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
