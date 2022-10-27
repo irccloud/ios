@@ -323,6 +323,8 @@ NSArray *_sortedChannels;
     self->_globalMsg.linkAttributes = [UIColor lightLinkAttributes];
     
     self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
+    
+    [self->_buffersView viewWillAppear:NO];
 }
 
 - (void)viewDidLoad {
@@ -5524,6 +5526,7 @@ NSArray *_sortedChannels;
 
 -(NSArray<UIKeyCommand *> *)keyCommands {
     NSArray *commands = @[
+             [UIKeyCommand keyCommandWithInput:@"k" modifierFlags:UIKeyModifierCommand action:@selector(jumpToChannel) discoverabilityTitle:@"Jump to channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(selectPrevious) discoverabilityTitle:@"Switch to previous channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(selectNext) discoverabilityTitle:@"Switch to next channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(selectPreviousUnread) discoverabilityTitle:@"Switch to previous unread channel"],
@@ -5613,6 +5616,12 @@ NSArray *_sortedChannels;
     if(last && last.row > 0) {
         [self->_eventsView.tableView scrollToRowAtIndexPath:last atScrollPosition:UITableViewScrollPositionTop animated:YES];
     }
+}
+
+-(void)jumpToChannel {
+    if(self.slidingViewController.underLeftViewController)
+        [self.slidingViewController anchorTopViewTo:ECRight];
+    [self->_buffersView focusSearchText];
 }
 
 -(void)selectPrevious {

@@ -52,6 +52,7 @@
 -(void)FAQ;
 -(void)versionHistory;
 -(void)openSourceLicenses;
+-(void)jumpToChannel;
 @end
 
 @interface AppDelegate : UIResponder <UIApplicationDelegate, NSURLSessionDataDelegate, UNUserNotificationCenterDelegate> {

@@ -28,6 +28,7 @@
 #import "FontAwesome.h"
 #import "EventsTableView.h"
 #import "MainViewController.h"
+#import "NSString+Score.h"
 @import Firebase;
 @import FirebaseAnalytics;
 
@@ -40,6 +41,7 @@
 #define TYPE_COLLAPSED 6
 #define TYPE_PINNED 7
 #define TYPE_ADD_NETWORK 8
+#define TYPE_FILTER 9
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -54,6 +56,7 @@
     UIColor *_bgColor;
     UIColor *_highlightColor;
     CGFloat _borderInset;
+    UITextField *_searchText;
 }
 @property int type;
 @property UIColor *bgColor, *highlightColor;
@@ -62,6 +65,7 @@
 @property (readonly) UIView *unreadIndicator, *bg, *border;
 @property (readonly) HighlightsCountView *highlights;
 @property (readonly) UIActivityIndicatorView *activity;
+@property (strong) UITextField *searchText;
 @end
 
 @implementation BuffersTableCell
@@ -110,8 +114,8 @@
 }
 
 - (void)layoutSubviews {
-	[super layoutSubviews];
-	
+    [super layoutSubviews];
+    
     CGRect frame = [self.contentView bounds];
     frame.origin.x += self->_borderInset;
     frame.size.width -= self->_borderInset;
@@ -150,6 +154,8 @@
     } else {
         self->_spamHint.hidden = YES;
     }
+    
+    self->_searchText.frame = CGRectMake(frame.origin.x + 12 + _icon.frame.size.width + 6, frame.origin.y, frame.size.width - 6 - _icon.frame.size.width - 16, frame.size.height);
 }
 
 -(void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated {
@@ -212,6 +218,17 @@
 
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [self performSelectorInBackground:@selector(refresh) withObject:nil];
+}
+
+-(void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
+    UIView *v = self->_searchText.superview;
+    [self->_searchText removeFromSuperview];
+    
+    self->_searchText.keyboardAppearance = [UITextField appearance].keyboardAppearance;
+    self->_searchText.attributedPlaceholder = [[NSAttributedString alloc] initWithString:self->_searchText.placeholder attributes:@{NSForegroundColorAttributeName: [UIColor inactiveBufferTextColor]}];
+
+    [v addSubview:self->_searchText];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -307,6 +324,98 @@
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         NSMutableSet *pinnedBIDs = [[NSMutableSet alloc] init];
         NSMutableDictionary *pinnedNames = [[NSMutableDictionary alloc] init];
+        
+#ifndef EXTENSION
+        if (@available(iOS 13, *)) {
+            [data addObject:@{@"type":@TYPE_FILTER}];
+        }
+#endif
+
+        if(self->_filter.length) {
+            NSMutableArray *results = [[NSMutableArray alloc] init];
+            for(Server *server in [self->_servers getServers]) {
+                NSArray *buffers = [self->_buffers getBuffersForServer:server.cid];
+                for(Buffer *buffer in buffers) {
+                    if(![buffer.type isEqualToString:@"console"]) {
+                        CGFloat score = [buffer.name scoreAgainst:self->_filter fuzziness:nil options:NSStringScoreOptionReducedLongStringPenalty];
+                        if(score) {
+                            int type = -1;
+                            int key = 0;
+                            int joined = 1;
+                            if([buffer.type isEqualToString:@"channel"] || buffer.isMPDM) {
+                                type = buffer.isMPDM ? TYPE_CONVERSATION : TYPE_CHANNEL;
+                                Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
+                                if(channel) {
+                                    if(channel.key || (buffer.serverIsSlack && !buffer.isMPDM && [channel hasMode:@"s"]))
+                                        key = 1;
+                                } else {
+                                    joined = 0;
+                                }
+                            } else if([buffer.type isEqualToString:@"conversation"]) {
+                                type = TYPE_CONVERSATION;
+                            }
+                            NSString *serverName = server.name;
+                            if(!serverName || serverName.length == 0)
+                                serverName = server.hostname;
+                            NSString *name = buffer.displayName?buffer.displayName:buffer.name;
+
+                            NSMutableDictionary *entry = @{
+                            @"type":@(type),
+                            @"cid":@(buffer.cid),
+                            @"bid":@(buffer.bid),
+                            @"name":[NSString stringWithFormat:@"%@ (%@)", name, serverName],
+                            @"joined":@(joined),
+                            @"key":@(key),
+                            @"status":server.status,
+                            @"server":serverName,
+                            @"score":@(score),
+                            }.mutableCopy;
+                            [results addObject:entry];
+                        }
+                    }
+                }
+            }
+            
+            if(results.count) {
+                [data addObjectsFromArray:[results sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO]]]];
+            }
+            
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                NSUInteger oldCount = self->_data.count;
+                self->_data = data;
+
+                NSMutableArray *paths = [[NSMutableArray alloc] init];
+                if(oldCount > self->_data.count) {
+                    for(NSUInteger row = self->_data.count; row < oldCount; row++) {
+                        [paths addObject:[NSIndexPath indexPathForRow:row inSection:0]];
+                    }
+                    [self.tableView deleteRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationNone];
+                } else if(oldCount < self->_data.count) {
+                    [paths removeAllObjects];
+                    for(NSUInteger row = oldCount; row < self->_data.count; row++) {
+                        [paths addObject:[NSIndexPath indexPathForRow:row inSection:0]];
+                    }
+                    [self.tableView insertRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationNone];
+                }
+                
+                [paths removeAllObjects];
+                for(NSUInteger row = 0; row < self->_data.count; row++) {
+                    if (row >= 1)
+                        [paths addObject:[NSIndexPath indexPathForRow:row inSection:0]];
+                }
+                [self.tableView reloadRowsAtIndexPaths:paths withRowAnimation:UITableViewRowAnimationNone];
+                
+                self->_selectedRow = selectedRow;
+                self->_firstUnreadPosition = firstUnreadPosition;
+                self->_firstHighlightPosition = firstHighlightPosition;
+                self->_firstFailurePosition = firstFailurePosition;
+                self->_lastUnreadPosition = lastUnreadPosition;
+                self->_lastHighlightPosition = lastHighlightPosition;
+                self->_lastFailurePosition = lastFailurePosition;
+                [self _updateUnreadIndicators];
+            }];
+            return;
+        }
         
         if([[prefs objectForKey:@"pinnedBuffers"] isKindOfClass:NSArray.class] && [(NSArray *)[prefs objectForKey:@"pinnedBuffers"] count] > 0) {
             for(NSNumber *n in [prefs objectForKey:@"pinnedBuffers"]) {
@@ -560,6 +669,7 @@
             self.view.backgroundColor = [UIColor buffersDrawerBackgroundColor];
             [self.tableView reloadData];
             [self _updateUnreadIndicators];
+            [self _scrollToSelectedBuffer];
         }];
     }
 }
@@ -634,13 +744,30 @@
 #endif
 }
 
+- (void)searchTextDidChange {
+    self->_filter = self->_searchText.text.lowercaseString;
+    [self performSelectorInBackground:@selector(refresh) withObject:nil];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
     self.tableView.contentInsetAdjustmentBehavior = UIScrollViewContentInsetAdjustmentNever;
     self.tableView.insetsLayoutMarginsFromSafeArea = NO;
     self.tableView.insetsContentViewsToSafeArea = NO;
-
+    
+    if (@available(iOS 13, *)) {
+        self->_searchText = [[UITextField alloc] initWithFrame:CGRectZero];
+        self->_searchText.placeholder = @"Jump to channel";
+        self->_searchText.autocapitalizationType = UITextAutocapitalizationTypeNone;
+        self->_searchText.spellCheckingType = UITextSpellCheckingTypeNo;
+        self->_searchText.returnKeyType = UIReturnKeySearch;
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(searchTextDidChange)
+                                                     name:UITextFieldTextDidChangeNotification
+                                                   object:self->_searchText];
+    }
+    
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     self->_boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
@@ -771,11 +898,21 @@
     }
 }
 
+- (void)_scrollToSelectedBuffer {
+    if(self->_selectedRow != -1) {
+        NSArray *a = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
+        if(a.count) {
+            if([[a objectAtIndex:0] row] > self->_selectedRow || [[a lastObject] row] < self->_selectedRow)
+                [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+        }
+    }
+}
+
 - (void)refreshBuffer:(Buffer *)b {
     @synchronized(self->_data) {
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         NSMutableArray *data = self->_data;
-        for(int i = 0; i < data.count; i++) {
+        for(int i = 1; i < data.count; i++) {
             NSDictionary *d = [data objectAtIndex:i];
             if(b.bid == [[d objectForKey:@"bid"] intValue]) {
                 NSMutableDictionary *m = [d mutableCopy];
@@ -1163,9 +1300,9 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     @synchronized(self->_data) {
         BOOL selected = (indexPath.row == self->_selectedRow);
-        BuffersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"bufferscell"];
+        BuffersTableCell *cell = [tableView dequeueReusableCellWithIdentifier:indexPath.row > 0 ? @"bufferscell" : @"searchcell"];
         if(!cell) {
-            cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"bufferscell"];
+            cell = [[BuffersTableCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:indexPath.row > 0 ? @"bufferscell" : @"searchcell"];
         }
         NSDictionary *row = [self->_data objectAtIndex:[indexPath row]];
         NSString *status = [row objectForKey:@"status"];
@@ -1208,7 +1345,21 @@
         } else {
             cell.highlights.hidden = YES;
         }
+        
         switch(cell.type) {
+            case TYPE_FILTER:
+                cell.icon.text = FA_SEARCH;
+                cell.icon.hidden = NO;
+                cell.label.text = nil;
+                if(!cell.searchText) {
+                    cell.searchText = self->_searchText;
+                    [cell.contentView addSubview:self->_searchText];
+                }
+                cell.searchText.delegate = self;
+                cell.bgColor = cell.highlightColor = [UIColor bufferBackgroundColor];
+                cell.icon.textColor = cell.label.textColor = cell.searchText.textColor = [UIColor bufferTextColor];
+                cell.accessibilityLabel = @"";
+                break;
             case TYPE_SERVER:
                 cell.accessibilityLabel = @"Network";
                 if([[row objectForKey:@"slack"] intValue]) {
@@ -1475,6 +1626,7 @@
             }
             return;
     #endif
+        } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_FILTER) {
         } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_PINNED) {
         } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
             [(MainViewController *)_delegate addNetwork];
@@ -1488,6 +1640,13 @@
             [self _updateUnreadIndicators];
             if(self->_delegate)
                 [self->_delegate bufferSelected:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
+#ifndef EXTENSION
+        if(self->_searchText.text.length) {
+            self->_searchText.text = nil;
+            self->_filter = nil;
+            [self refresh];
+        }
+#endif
         }
     }
 }
@@ -1516,13 +1675,7 @@
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [self.tableView reloadData];
                 [self _updateUnreadIndicators];
-                if(self->_selectedRow != -1) {
-                    NSArray *a = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
-                    if(a.count) {
-                        if([[a objectAtIndex:0] row] > self->_selectedRow || [[a lastObject] row] < self->_selectedRow)
-                            [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
-                    }
-                }
+                [self _scrollToSelectedBuffer];
             }];
         } else {
             [self performSelectorInBackground:@selector(refresh) withObject:nil];
@@ -1679,6 +1832,10 @@
             [self->_delegate bufferSelected:[[d objectForKey:@"bid"] intValue]];
         }
     }
+}
+
+-(void)focusSearchText {
+    [self->_searchText becomeFirstResponder];
 }
 
 @end

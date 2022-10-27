@@ -381,6 +381,8 @@
 		225D979B18AA995900065087 /* TUSafariActivity.strings in Resources */ = {isa = PBXBuildFile; fileRef = 2251693117B5A8040093ADC5 /* TUSafariActivity.strings */; };
 		225EC2BB2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib in Resources */ = {isa = PBXBuildFile; fileRef = 225EC2BA2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib */; };
 		225EC2BC2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib in Resources */ = {isa = PBXBuildFile; fileRef = 225EC2BA2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib */; };
+		2263D3A2290A979500692EEC /* NSString+Score.m in Sources */ = {isa = PBXBuildFile; fileRef = 2263D3A1290A979500692EEC /* NSString+Score.m */; };
+		2263D3A3290A979500692EEC /* NSString+Score.m in Sources */ = {isa = PBXBuildFile; fileRef = 2263D3A1290A979500692EEC /* NSString+Score.m */; };
 		2264A30119659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		2264A30219659BB100DCFDDD /* URLHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = 2264A30019659BB100DCFDDD /* URLHandler.m */; };
 		2265DC891C722E6B00382C7C /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2265DC881C722E6B00382C7C /* MessageUI.framework */; };
@@ -1267,6 +1269,8 @@
 		225D979F18AA995900065087 /* IRCEnterprise.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IRCEnterprise.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		225D97A118AA9EBC00065087 /* IRCCloud-Enterprise-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "IRCCloud-Enterprise-Info.plist"; sourceTree = "<group>"; };
 		225EC2BA2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EventsTableCell_ReplyCount.xib; sourceTree = "<group>"; };
+		2263D3A0290A979500692EEC /* NSString+Score.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+Score.h"; sourceTree = "<group>"; };
+		2263D3A1290A979500692EEC /* NSString+Score.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+Score.m"; sourceTree = "<group>"; };
 		2264A2FF19659BB100DCFDDD /* URLHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = URLHandler.h; sourceTree = "<group>"; };
 		2264A30019659BB100DCFDDD /* URLHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = URLHandler.m; sourceTree = "<group>"; };
 		2265DC881C722E6B00382C7C /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
@@ -1958,6 +1962,15 @@
 			path = TUSafariActivity;
 			sourceTree = SOURCE_ROOT;
 		};
+		2263D39F290A979500692EEC /* StringScore */ = {
+			isa = PBXGroup;
+			children = (
+				2263D3A0290A979500692EEC /* NSString+Score.h */,
+				2263D3A1290A979500692EEC /* NSString+Score.m */,
+			);
+			path = StringScore;
+			sourceTree = SOURCE_ROOT;
+		};
 		228A056316D3DABA0029769C = {
 			isa = PBXGroup;
 			children = (
@@ -2067,6 +2080,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				2263D39F290A979500692EEC /* StringScore */,
 				226E642223F1C6AA001CE069 /* GoogleService-Info.plist */,
 				22D9789D215BC979005C2713 /* FLEX */,
 				2238761B1F70036900943160 /* WebP.framework */,
@@ -3960,6 +3974,7 @@
 				22A363BD19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				225D977318AA995900065087 /* TUSafariActivity.m in Sources */,
 				2293247E1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
+				2263D3A3290A979500692EEC /* NSString+Score.m in Sources */,
 				226F080F1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */,
 				225D977418AA995900065087 /* LicenseViewController.m in Sources */,
 				223C407D1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,
@@ -4079,6 +4094,7 @@
 				22A363BC19D0A7A700500478 /* UIDevice+UIDevice_iPhone6Hax.m in Sources */,
 				2250176D1783434900066E71 /* TUSafariActivity.m in Sources */,
 				2293247D1E8945D700ADAA22 /* TSKPinningValidator.m in Sources */,
+				2263D3A2290A979500692EEC /* NSString+Score.m in Sources */,
 				226F080E1E6495C8003EED23 /* WhoWasTableViewController.m in Sources */,
 				224FCF361787288400FC3879 /* LicenseViewController.m in Sources */,
 				223C407C1C60FE880081B02B /* IRCCloudSafariViewController.m in Sources */,

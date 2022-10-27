@@ -27,7 +27,7 @@
 -(void)addNetwork;
 @end
 
-@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate, UIContextMenuInteractionDelegate> {
+@interface BuffersTableView : UITableViewController<UITextFieldDelegate, UIGestureRecognizerDelegate,UIViewControllerPreviewingDelegate, UIContextMenuInteractionDelegate,UISearchTextFieldDelegate> {
     NSMutableArray *_data;
     NSMutableDictionary *_expandedCids;
     NSInteger _selectedRow;
@@ -35,6 +35,9 @@
     NSMutableDictionary *_expandedArchives;
     Buffer *_selectedBuffer;
     
+    API_AVAILABLE(ios(13.0)) UITextField *_searchText;
+    NSString *_filter;
+
     UIControl *topUnreadIndicator;
     UIView *topUnreadIndicatorColor;
     UIView *topUnreadIndicatorBorder;
@@ -70,4 +73,5 @@
 -(void)prev;
 -(void)nextUnread;
 -(void)prevUnread;
+-(void)focusSearchText;
 @end

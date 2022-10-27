@@ -970,6 +970,7 @@ extern NSURL *__logfile;
                 ]]];
 
                 [builder insertSiblingMenu:[UIMenu menuWithTitle:@"Go" children:@[
+                    [UIKeyCommand commandWithTitle:@"Jump To Channel" image:nil action:@selector(jumpToChannel) input:@"k" modifierFlags:UIKeyModifierCommand propertyList:nil],
                     [UICommand commandWithTitle:@"File Uploads" image:nil action:@selector(showUploads) propertyList:nil],
                     [UICommand commandWithTitle:@"Text Snippets" image:nil action:@selector(showPastebins) propertyList:nil]
                 ]] afterMenuForIdentifier:UIMenuView];
