@@ -1659,6 +1659,7 @@
         } else if([[[self->_data objectAtIndex:indexPath.row] objectForKey:@"type"] intValue] == TYPE_ADD_NETWORK) {
             [(MainViewController *)_delegate addNetwork];
         } else {
+            [self->_searchText resignFirstResponder];
     #ifndef EXTENSION
             self->_selectedRow = indexPath.row;
             if([self->_delegate isKindOfClass:MainViewController.class])
@@ -1674,7 +1675,6 @@
                 self->_filter = nil;
                 [self refresh];
             }
-            [self->_searchText resignFirstResponder];
 #endif
         }
     }
