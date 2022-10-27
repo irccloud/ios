@@ -749,6 +749,12 @@
     [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
+-(BOOL)textFieldShouldReturn:(UITextField *)textField {
+    if(self->_data.count > 1)
+        [self tableView:self.tableView didSelectRowAtIndexPath:[NSIndexPath indexPathForRow:1 inSection:0]];
+    return NO;
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.tableView.scrollsToTop = NO;
@@ -760,7 +766,7 @@
     self->_searchText.placeholder = @"Jump to channel";
     self->_searchText.autocapitalizationType = UITextAutocapitalizationTypeNone;
     self->_searchText.spellCheckingType = UITextSpellCheckingTypeNo;
-    self->_searchText.returnKeyType = UIReturnKeySearch;
+    self->_searchText.returnKeyType = UIReturnKeyGo;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(searchTextDidChange)
                                                  name:UITextFieldTextDidChangeNotification
