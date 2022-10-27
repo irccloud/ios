@@ -793,6 +793,10 @@
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
     
+    UISwipeGestureRecognizer *swipe =[[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(focusSearchText)];
+    swipe.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.tableView addGestureRecognizer:swipe];
+    
     if (@available(iOS 13.0, *)) {
         if([NSProcessInfo processInfo].macCatalystApp)
             [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
