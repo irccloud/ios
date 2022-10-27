@@ -74,5 +74,6 @@
 -(void)nextUnread;
 -(void)prevUnread;
 -(void)focusSearchText;
+-(void)unfocusSearchText;
 -(void)scrollToSelectedBuffer;
 @end

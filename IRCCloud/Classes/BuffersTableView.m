@@ -229,6 +229,12 @@
     self->_searchText.attributedPlaceholder = [[NSAttributedString alloc] initWithString:self->_searchText.placeholder attributes:@{NSForegroundColorAttributeName: [UIColor inactiveBufferTextColor]}];
 
     [v addSubview:self->_searchText];
+    [self scrollToSelectedBuffer];
+}
+
+-(void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    [self->_searchText resignFirstResponder];
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -771,6 +777,7 @@
     self.tableView.insetsLayoutMarginsFromSafeArea = NO;
     self.tableView.insetsContentViewsToSafeArea = NO;
     
+#ifndef EXTENSION
     self->_searchText = [[UITextField alloc] initWithFrame:CGRectZero];
     self->_searchText.placeholder = @"Jump to channel";
     self->_searchText.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -780,7 +787,8 @@
                                              selector:@selector(searchTextDidChange)
                                                  name:UITextFieldTextDidChangeNotification
                                                object:self->_searchText];
-    
+#endif
+
     UIFontDescriptor *d = [[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] fontDescriptorWithSymbolicTraits:UIFontDescriptorTraitBold];
     self->_boldFont = [UIFont fontWithDescriptor:d size:d.pointSize];
     
@@ -1661,11 +1669,12 @@
             if(self->_delegate)
                 [self->_delegate bufferSelected:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
 #ifndef EXTENSION
-        if(self->_searchText.text.length) {
-            self->_searchText.text = nil;
-            self->_filter = nil;
-            [self refresh];
-        }
+            if(self->_searchText.text.length) {
+                self->_searchText.text = nil;
+                self->_filter = nil;
+                [self refresh];
+            }
+            [self->_searchText resignFirstResponder];
 #endif
         }
     }
@@ -1693,7 +1702,7 @@
                 }
             }
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self reloadData];
+                [self.tableView reloadData];
                 [self _updateUnreadIndicators];
                 [self scrollToSelectedBuffer];
             }];

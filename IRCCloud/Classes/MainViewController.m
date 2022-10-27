@@ -3707,14 +3707,17 @@ NSArray *_sortedChannels;
     if([n.name isEqualToString:ECSlidingViewUnderLeftWillAppear]) {
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [self->_buffersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
         self.view.accessibilityElementsHidden = YES;
+        [self->_buffersView viewWillAppear:YES];
     } else if([n.name isEqualToString:ECSlidingViewUnderRightWillAppear]) {
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, [self->_usersView.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0]]);
         self.view.accessibilityElementsHidden = YES;
     } else {
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, _titleLabel);
         self.view.accessibilityElementsHidden = NO;
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 0.2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+            [self->_buffersView viewWillDisappear:NO];
+        });
     }
-    [self->_buffersView scrollToSelectedBuffer];
 }
 
 -(void)showSwipeTip {
