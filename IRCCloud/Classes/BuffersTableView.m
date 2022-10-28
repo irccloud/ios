@@ -761,6 +761,10 @@
 
 - (void)searchTextDidChange {
     self->_filter = self->_searchText.text.lowercaseString;
+    for(UIView *v in self->_searchText.superview.subviews) {
+        if([v isKindOfClass:UILabel.class] && [((UILabel *)v).text isEqualToString:FA_SEARCH])
+            ((UILabel *)v).textColor = self->_searchText.text.length ? [UIColor bufferTextColor] : [UIColor inactiveBufferTextColor];
+    }
     [self performSelectorInBackground:@selector(refresh) withObject:nil];
 }
 
@@ -1390,8 +1394,10 @@
                     [cell.contentView addSubview:self->_searchText];
                 }
                 cell.searchText.delegate = self;
-                cell.bgColor = cell.highlightColor = [UIColor bufferBackgroundColor];
-                cell.icon.textColor = cell.label.textColor = cell.searchText.textColor = [UIColor bufferTextColor];
+                cell.border.backgroundColor = [UIColor serverBorderColor];
+                cell.bgColor = cell.highlightColor = [UIColor serverBackgroundColor];
+                cell.icon.textColor = self->_filter.length ? [UIColor bufferTextColor] : [UIColor inactiveBufferTextColor];
+                cell.label.textColor = cell.searchText.textColor = [UIColor bufferTextColor];
                 cell.accessibilityLabel = @"";
                 break;
             case TYPE_SERVER:
