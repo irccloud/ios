@@ -1671,7 +1671,7 @@
             if([self->_delegate isKindOfClass:MainViewController.class])
                 [(MainViewController *)_delegate clearMsgId];
     #endif
-            [self reloadData];
+            [self.tableView reloadData];
             [self _updateUnreadIndicators];
             if(self->_delegate)
                 [self->_delegate bufferSelected:[[[self->_data objectAtIndex:indexPath.row] objectForKey:@"bid"] intValue]];
@@ -1708,7 +1708,7 @@
                 }
             }
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self.tableView reloadData];
+                [self reloadData];
                 [self _updateUnreadIndicators];
                 [self scrollToSelectedBuffer];
             }];
