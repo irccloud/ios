@@ -935,6 +935,9 @@
 
 - (void)refreshBuffer:(Buffer *)b {
     @synchronized(self->_data) {
+        if(self->_filter.length)
+            return;
+        
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         NSMutableArray *data = self->_data;
         int pos = -1;
@@ -1070,6 +1073,9 @@
 
 - (void)refreshCollapsed:(Server *)s {
     @synchronized(self->_data) {
+        if(self->_filter.length)
+            return;
+        
         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
         
         int unread = 0, highlights = 0;
