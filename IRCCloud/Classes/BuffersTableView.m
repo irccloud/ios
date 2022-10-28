@@ -42,6 +42,7 @@
 #define TYPE_PINNED 7
 #define TYPE_ADD_NETWORK 8
 #define TYPE_FILTER 9
+#define TYPE_LOADING 10
 
 @interface BuffersTableCell : UITableViewCell {
     UILabel *_label;
@@ -338,8 +339,16 @@
 #endif
 
         if(self->_filter.length) {
-            NSMutableArray *results = [[NSMutableArray alloc] init];
+            NSMutableDictionary *current_buffer = nil;
+            NSMutableArray *results_active = [[NSMutableArray alloc] init];
+            NSMutableArray *results_inactive = [[NSMutableArray alloc] init];
+            NSMutableArray *results_archived = [[NSMutableArray alloc] init];
             for(Server *server in [self->_servers getServers]) {
+                if(server.deferred_archives) {
+                    _requestingArchives = YES;
+                    [[NetworkConnection sharedInstance] requestArchives:server.cid];
+                }
+
                 NSArray *buffers = [self->_buffers getBuffersForServer:server.cid];
                 for(Buffer *buffer in buffers) {
                     if(![buffer.type isEqualToString:@"console"]) {
@@ -347,7 +356,7 @@
                         if(score) {
                             int type = -1;
                             int key = 0;
-                            int joined = 1;
+                            int joined = !buffer.archived;
                             if([buffer.type isEqualToString:@"channel"] || buffer.isMPDM) {
                                 type = buffer.isMPDM ? TYPE_CONVERSATION : TYPE_CHANNEL;
                                 Channel *channel = [[ChannelsDataSource sharedInstance] channelForBuffer:buffer.bid];
@@ -376,14 +385,40 @@
                             @"server":serverName,
                             @"score":@(score),
                             }.mutableCopy;
-                            [results addObject:entry];
+                            
+                            if(self->_selectedBuffer.bid == buffer.bid)
+                                current_buffer = entry;
+                            else if(buffer.archived)
+                                [results_archived addObject:entry];
+                            else if(joined == 0)
+                                [results_inactive addObject:entry];
+                            else
+                                [results_active addObject:entry];
                         }
                     }
                 }
             }
             
-            if(results.count) {
-                [data addObjectsFromArray:[results sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO]]]];
+            if(results_active.count) {
+                [data addObjectsFromArray:[results_active sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO]]]];
+            }
+            if(current_buffer) {
+                [data addObject:current_buffer];
+            }
+            if(results_inactive.count) {
+                [data addObjectsFromArray:[results_inactive sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO]]]];
+            }
+            if(results_archived.count) {
+                [data addObjectsFromArray:[results_archived sortedArrayUsingDescriptors:@[[[NSSortDescriptor alloc] initWithKey:@"score" ascending:NO]]]];
+            }
+
+            if(_requestingArchives) {
+                NSMutableDictionary *entry = @{
+                @"type":@TYPE_LOADING,
+                @"name":@"Loading Archives",
+                }.mutableCopy;
+                [data addObject:entry];
+
             }
             
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -920,6 +955,13 @@
     if(notification.object == nil || [notification.object bid] < 1) {
         if(!_requestingArchives)
             [_expandedArchives removeAllObjects];
+        if(_filter.length) {
+            for(Server *s in [[ServersDataSource sharedInstance] getServers]) {
+                if(s.deferred_archives) {
+                    return;
+                }
+            }
+        }
         _requestingArchives = NO;
         [self performSelectorInBackground:@selector(refresh) withObject:nil];
     } else {
@@ -1436,7 +1478,8 @@
                         cell.bgColor = [UIColor serverBackgroundColor];
                 }
                 if(![status isEqualToString:@"connected_ready"] && ![status isEqualToString:@"quitting"] && ![status isEqualToString:@"disconnected"]) {
-                    [cell.activity startAnimating];
+                    if(!cell.activity.isAnimating)
+                        [cell.activity startAnimating];
                     cell.activity.hidden = NO;
                     cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
                 } else {
@@ -1485,7 +1528,8 @@
                     }
                 }
                 if([[row objectForKey:@"timeout"] intValue]) {
-                    [cell.activity startAnimating];
+                    if(!cell.activity.isAnimating)
+                        [cell.activity startAnimating];
                     cell.activity.hidden = NO;
                     cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
                 } else {
@@ -1501,7 +1545,8 @@
                     cell.bgColor = [UIColor timestampColor];
                     cell.accessibilityHint = @"Hides archive list";
                     if(_requestingArchives && [[ServersDataSource sharedInstance] getServer:[[row objectForKey:@"cid"] intValue]].deferred_archives) {
-                        [cell.activity startAnimating];
+                        if(!cell.activity.isAnimating)
+                            [cell.activity startAnimating];
                         cell.activity.hidden = NO;
                         cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
                     } else {
@@ -1550,6 +1595,15 @@
                 cell.icon.text = FA_PLUS_CIRCLE;
                 cell.bgColor = [UIColor bufferBackgroundColor];
                 cell.accessibilityLabel = @"Add a network";
+            case TYPE_LOADING:
+                cell.icon.textColor = cell.label.textColor = [UIColor bufferTextColor];
+                cell.icon.hidden = YES;
+                cell.bgColor = [UIColor bufferBackgroundColor];
+                cell.accessibilityLabel = @"Loading";
+                if(!cell.activity.isAnimating)
+                    [cell.activity startAnimating];
+                cell.activity.hidden = NO;
+                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
                 break;
         }
         return cell;

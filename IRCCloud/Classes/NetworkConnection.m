@@ -2447,8 +2447,18 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)requestArchives:(int)cid {
-  OOBFetcher *fetcher = [self fetchOOB:[NSString stringWithFormat:@"https://%@/chat/archives?cid=%i", IRCCLOUD_HOST, cid]];
-  fetcher.bid = -1;
+    @synchronized(self->_oobQueue) {
+        NSString *url = [NSString stringWithFormat:@"https://%@/chat/archives?cid=%i", IRCCLOUD_HOST, cid];
+        NSArray *fetchers = self->_oobQueue.copy;
+        for(OOBFetcher *fetcher in fetchers) {
+            if([fetcher.url isEqualToString:url]) {
+                CLS_LOG(@"Ignoring duplicate archives request");
+                return;
+            }
+        }
+        OOBFetcher *fetcher = [self fetchOOB:url];
+        fetcher.bid = -1;
+    }
 }
 
 -(OOBFetcher *)fetchOOB:(NSString *)url {
@@ -2541,6 +2551,15 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
     CLS_LOG(@"I downloaded %i events", _totalCount);
     @synchronized (self->_oobQueue) {
         [self->_oobQueue removeObject:fetcher];
+
+        if(fetcher.bid == -1 && self->_oobQueue.count > 0) {
+            [self->_queue addOperationWithBlock:^{
+                if(self->_oobQueue.count > 0 && ((OOBFetcher *)[self->_oobQueue objectAtIndex:0]).bid == -1) {
+                    CLS_LOG(@"Starting next queued OOB fetcher");
+                    [(OOBFetcher *)[self->_oobQueue objectAtIndex:0] start];
+                }
+            }];
+        }
     }
     [self->_notifications updateBadgeCount];
     [self _processPendingEdits:NO];
