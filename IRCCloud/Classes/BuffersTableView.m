@@ -227,7 +227,7 @@
     [self->_searchText removeFromSuperview];
     
     self->_searchText.keyboardAppearance = [UITextField appearance].keyboardAppearance;
-    self->_searchText.attributedPlaceholder = [[NSAttributedString alloc] initWithString:self->_searchText.placeholder attributes:@{NSForegroundColorAttributeName: [UIColor inactiveBufferTextColor]}];
+    self->_searchText.attributedPlaceholder = [[NSAttributedString alloc] initWithString:@"Jump to channel" attributes:@{NSForegroundColorAttributeName: [UIColor inactiveBufferTextColor]}];
 
     [v addSubview:self->_searchText];
     [self scrollToSelectedBuffer];
@@ -818,7 +818,6 @@
     
 #ifndef EXTENSION
     self->_searchText = [[UITextField alloc] initWithFrame:CGRectZero];
-    self->_searchText.placeholder = @"Jump to channel";
     self->_searchText.autocapitalizationType = UITextAutocapitalizationTypeNone;
     self->_searchText.spellCheckingType = UITextSpellCheckingTypeNo;
     self->_searchText.returnKeyType = UIReturnKeyGo;
@@ -918,6 +917,8 @@
         __previewer = [self registerForPreviewingWithDelegate:self sourceView:self.tableView];
     }
 #endif
+    
+    [self viewWillAppear:NO];
 }
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
