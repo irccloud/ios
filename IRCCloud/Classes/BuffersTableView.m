@@ -1596,6 +1596,7 @@
                 cell.icon.text = FA_PLUS_CIRCLE;
                 cell.bgColor = [UIColor bufferBackgroundColor];
                 cell.accessibilityLabel = @"Add a network";
+                break;
             case TYPE_LOADING:
                 cell.icon.textColor = cell.label.textColor = [UIColor bufferTextColor];
                 cell.icon.hidden = YES;
