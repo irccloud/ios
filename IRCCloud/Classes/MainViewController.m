@@ -3338,6 +3338,11 @@ NSArray *_sortedChannels;
     }
 }
 
+-(void)viewSafeAreaInsetsDidChange {
+    [super viewSafeAreaInsetsDidChange];
+    [self updateLayout];
+}
+
 -(void)updateLayout {
     BOOL scrolledUp = _buffer.scrolledUp;
     [UIApplication sharedApplication].statusBarHidden = self.prefersStatusBarHidden;
