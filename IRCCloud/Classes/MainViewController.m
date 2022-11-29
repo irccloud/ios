@@ -3386,13 +3386,13 @@ NSArray *_sortedChannels;
     }
     CLS_LOG(@"Transitioning to size: %f, %f", size.width, size.height);
     _ignoreInsetChanges = YES;
-    CGPoint center = self.slidingViewController.view.center;
+    CGPoint center = self.slidingViewController.view.window.center;
     if(self.slidingViewController.underLeftShowing)
         center.x += self->_buffersView.tableView.frame.size.width;
     if(self.slidingViewController.underRightShowing)
         center.x -= self->_buffersView.tableView.frame.size.width;
     
-    self.navigationController.view.frame = self.slidingViewController.view.bounds;
+    self.navigationController.view.frame = self.slidingViewController.view.window.bounds;
     self.navigationController.view.center = center;
     self.navigationController.view.layer.position = self.navigationController.view.center;
 
