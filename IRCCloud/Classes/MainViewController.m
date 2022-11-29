@@ -1840,10 +1840,8 @@ NSArray *_sortedChannels;
         }
     }
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
-    int height = size.height;
-    
     CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
-    height = [UIScreen mainScreen].bounds.size.height - origin.y;
+    int height = [UIScreen mainScreen].bounds.size.height - origin.y;
     height -= self.slidingViewController.view.safeAreaInsets.bottom / 2;
     if(height != self->_kbSize.height) {
         self->_kbSize = size;
@@ -3343,8 +3341,8 @@ NSArray *_sortedChannels;
 -(void)updateLayout {
     BOOL scrolledUp = _buffer.scrolledUp;
     [UIApplication sharedApplication].statusBarHidden = self.prefersStatusBarHidden;
-    [UIColor setSafeInsets:self.slidingViewController.view.safeAreaInsets];
-    if(self.slidingViewController.view.safeAreaInsets.bottom)
+    [UIColor setSafeInsets:self.slidingViewController.view.window.safeAreaInsets];
+    if(self.slidingViewController.view.window.safeAreaInsets.bottom)
         [self updateLayout:0];
     else
         [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
@@ -3521,6 +3519,8 @@ NSArray *_sortedChannels;
     if(self.slidingViewController.view.safeAreaInsets.bottom) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
             self->_bottomBarOffsetConstraint.constant -= self.slidingViewController.view.safeAreaInsets.bottom/2;
+        if(self.slidingViewController.view.safeAreaInsets.top >= 51) //iPhone 14 with Dynamic Island returns the wrong bottom safe area inset
+            self->_bottomBarOffsetConstraint.constant -= 12;
     }
     CGFloat height = self->_bottomBarHeightConstraint.constant + _kbSize.height;
     CGFloat top = 0;
