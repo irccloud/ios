@@ -410,7 +410,7 @@
         if(tableView.isEditing)
             return 148;
         CGFloat height = [LinkTextView heightOfString:self->_topic constrainedToWidth:self.tableView.bounds.size.width - offset];
-        self->_topicLabel.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height);
+        self->_topicLabel.frame = CGRectMake(8,8,self.tableView.bounds.size.width - offset,height + 20);
         self->_topicEdit.frame = CGRectMake(4,4,self.tableView.bounds.size.width - offset,140);
         return height + 20;
     } else if(indexPath.section == 1 && _url.attributedText.length) {
