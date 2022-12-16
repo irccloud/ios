@@ -3346,7 +3346,7 @@ NSArray *_sortedChannels;
 
 -(void)viewSafeAreaInsetsDidChange {
     [super viewSafeAreaInsetsDidChange];
-    [self updateLayout];
+    [self performSelector:@selector(updateLayout) withObject:nil afterDelay:0.25];
 }
 
 -(void)updateLayout {
