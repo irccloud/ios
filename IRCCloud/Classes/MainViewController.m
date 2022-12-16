@@ -3867,7 +3867,10 @@ NSArray *_sortedChannels;
             self->_selectedEvent.rowType = ROW_MESSAGE;
             self->_selectedEvent.bgColor = [UIColor selfBackgroundColor];
             self->_selectedEvent.pending = YES;
-            self->_selectedEvent.reqId = [[NetworkConnection sharedInstance] say:self->_selectedEvent.command to:self->_buffer.name cid:self->_buffer.cid handler:nil];
+            if([self->_selectedEvent.entities objectForKey:@"reply"])
+                self->_selectedEvent.reqId = [[NetworkConnection sharedInstance] reply:self->_selectedEvent.command to:self->_buffer.name cid:self->_buffer.cid msgid:[self->_selectedEvent.entities objectForKey:@"reply"] handler:nil];
+            else
+                self->_selectedEvent.reqId = [[NetworkConnection sharedInstance] say:self->_selectedEvent.command to:self->_buffer.name cid:self->_buffer.cid handler:nil];
             if(self->_selectedEvent.msg)
                 [self->_pendingEvents addObject:self->_selectedEvent];
             [self->_eventsView reloadData];
