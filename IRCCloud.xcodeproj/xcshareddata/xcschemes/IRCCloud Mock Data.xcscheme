@@ -89,7 +89,11 @@
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-theme midnight"
+            argument = "-theme ash"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-theme dusk"
             isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument

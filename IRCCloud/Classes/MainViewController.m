@@ -2545,6 +2545,12 @@ NSArray *_sortedChannels;
         [typing appendString:@"are typing"];
     }
     
+#ifdef DEBUG
+    if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
+        typing = @"ike and kira are typing";
+    }
+#endif
+    
     self->_typingIndicator.text = typing;
     
     if(count && !self->_typingIndicatorTimer)
