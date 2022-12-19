@@ -33,8 +33,10 @@ NSString *__DEFAULT_CHANTYPES__;
     NSTimeInterval now = [NSDate date].timeIntervalSince1970;
     
     for (NSString *from in _typingIndicators.allKeys) {
-        if (now - [[_typingIndicators objectForKey:from] doubleValue] > 6.5)
-            [_typingIndicators removeObjectForKey:from];
+        if (from != nil) {
+            if (now - [[_typingIndicators objectForKey:from] doubleValue] > 6.5)
+                [_typingIndicators removeObjectForKey:from];
+        }
     }
 }
 
