@@ -160,6 +160,14 @@
     return NO;
 }
 
+-(BOOL)hasMessageTags {
+    return [self->_caps containsObject:@"message-tags"];
+}
+
+-(BOOL)hasLabels {
+    return [self->_caps containsObject:@"labeled-response"] ||  [self->_caps containsObject:@"draft/labeled-response"] ||  [self->_caps containsObject:@"draft/labeled-response-0.2"];
+}
+
 @end
 
 @implementation ServersDataSource

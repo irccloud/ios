@@ -2669,7 +2669,7 @@ NSArray *_sortedChannels;
             disableTypingStatus = NO;
         
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
-        if(![s.caps containsObject:@"message-tags"])
+        if(!s.hasMessageTags)
             disableTypingStatus = YES;
         
         if(s.blocksTyping)
@@ -4020,10 +4020,10 @@ NSArray *_sortedChannels;
         if(!server.blocksReplies && !_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Reply" style:UIAlertActionStyleDefault handler:handler]];
         }
-        if(!server.blocksEdits && self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId) && self->_selectedEvent.chan) {
+        if(!server.blocksEdits && server.hasLabels && self->_selectedEvent.isSelf && _selectedEvent.msgid.length && self->_selectedEvent.chan) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Edit Message" style:UIAlertActionStyleDefault handler:handler]];
         }
-        if(!server.blocksDeletes && self->_selectedEvent.isSelf && _selectedEvent.msgid.length && (server.isSlack || server.orgId)) {
+        if(!server.blocksDeletes && server.hasLabels && self->_selectedEvent.isSelf && _selectedEvent.msgid.length) {
             [alert addAction:[UIAlertAction actionWithTitle:@"Delete Message" style:UIAlertActionStyleDefault handler:handler]];
         }
     }

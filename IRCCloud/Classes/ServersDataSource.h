@@ -72,6 +72,8 @@
 -(BOOL)isSlack;
 -(NSString *)slackBaseURL;
 -(BOOL)clientTagDeny:(NSString *)tagName;
+-(BOOL)hasMessageTags;
+-(BOOL)hasLabels;
 @end
 
 @interface ServersDataSource : NSObject {
