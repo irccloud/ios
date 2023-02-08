@@ -48,6 +48,7 @@
     self->_done = YES;
     [self.tableView endEditing:YES];
     [self->_uploader setFilename:self->_filename.text message:self->_msg.text];
+    [((AppDelegate *)[UIApplication sharedApplication].delegate).mainViewController clearText];
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
@@ -128,6 +129,7 @@
     } else {
         self->_msg.autocapitalizationType = UITextAutocapitalizationTypeNone;
     }
+    self->_msg.text = ((AppDelegate *)[UIApplication sharedApplication].delegate).mainViewController.buffer.draft;
     
     self->_imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     self->_imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
