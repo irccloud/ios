@@ -27,7 +27,6 @@
     id<PastebinsTableViewDelegate> _delegate;
     UIView *_footerView;
     NSDictionary *_selectedPaste;
-    NSDictionary *_fileTypeMap;
     NSMutableDictionary *_extensions;
 }
 @property id<PastebinsTableViewDelegate> delegate;

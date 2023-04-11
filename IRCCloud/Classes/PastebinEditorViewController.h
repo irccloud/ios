@@ -25,10 +25,11 @@
     int _sayreqid;
     Buffer *_buffer;
     NSString *_pasteID;
-    NSString *_extension;
     UISegmentedControl *_type;
     UILabel *_messageFooter;
 }
++(NSString *)pastebinType:(NSString *)extension;
 -(id)initWithBuffer:(Buffer *)buffer;
 -(id)initWithPasteID:(NSString *)pasteID;
+@property NSString *extension;
 @end

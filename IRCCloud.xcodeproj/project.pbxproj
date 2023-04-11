@@ -426,6 +426,8 @@
 		228A05D016D3DD570029769C /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05CB16D3DCE20029769C /* Security.framework */; };
 		228A05D716D3DFDA0029769C /* CoreText.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 228A05D516D3DFD00029769C /* CoreText.framework */; };
 		228A05DE16D3E40F0029769C /* LoginSplashViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228A05DC16D3E40E0029769C /* LoginSplashViewController.m */; };
+		228B909029E597D9001CBACB /* emocode-data.js in Resources */ = {isa = PBXBuildFile; fileRef = 228B908F29E597D9001CBACB /* emocode-data.js */; };
+		228B909329E5980F001CBACB /* ace-modes.js in Resources */ = {isa = PBXBuildFile; fileRef = 228B909229E5980F001CBACB /* ace-modes.js */; };
 		228EFBC8177B4F7300B83A4C /* DisplayOptionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */; };
 		228F69731DF8A3F30079E276 /* SpamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228F69721DF8A3F30079E276 /* SpamViewController.m */; };
 		228F69741DF8A3F30079E276 /* SpamViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 228F69721DF8A3F30079E276 /* SpamViewController.m */; };
@@ -1308,6 +1310,8 @@
 		228A05D516D3DFD00029769C /* CoreText.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreText.framework; path = System/Library/Frameworks/CoreText.framework; sourceTree = SDKROOT; };
 		228A05DB16D3E40E0029769C /* LoginSplashViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginSplashViewController.h; sourceTree = "<group>"; };
 		228A05DC16D3E40E0029769C /* LoginSplashViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginSplashViewController.m; sourceTree = "<group>"; };
+		228B908F29E597D9001CBACB /* emocode-data.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "emocode-data.js"; path = "build-scripts/emocode-data.js"; sourceTree = SOURCE_ROOT; };
+		228B909229E5980F001CBACB /* ace-modes.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = "ace-modes.js"; path = "build-scripts/ace-modes.js"; sourceTree = SOURCE_ROOT; };
 		228EFBC6177B4F6000B83A4C /* DisplayOptionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DisplayOptionsViewController.h; sourceTree = "<group>"; };
 		228EFBC7177B4F7300B83A4C /* DisplayOptionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DisplayOptionsViewController.m; sourceTree = "<group>"; };
 		228F69711DF8A3F30079E276 /* SpamViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpamViewController.h; sourceTree = "<group>"; };
@@ -2080,6 +2084,8 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				228B909229E5980F001CBACB /* ace-modes.js */,
+				228B908F29E597D9001CBACB /* emocode-data.js */,
 				2263D39F290A979500692EEC /* StringScore */,
 				226E642223F1C6AA001CE069 /* GoogleService-Info.plist */,
 				22D9789D215BC979005C2713 /* FLEX */,
@@ -3212,6 +3218,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				22EE12841C9B20DF00E7AE8D /* Firefox.png in Resources */,
+				228B909029E597D9001CBACB /* emocode-data.js in Resources */,
 				22EE12861C9B20DF00E7AE8D /* Firefox@2x.png in Resources */,
 				22EE12881C9B20DF00E7AE8D /* Firefox@3x.png in Resources */,
 				2236BD6C1BAC61A900015753 /* SourceSansPro-Regular.otf in Resources */,
@@ -3223,6 +3230,7 @@
 				2236BD6A1BAC61A900015753 /* SourceSansPro-LightIt.otf in Resources */,
 				22EEA95418D0B198007D5022 /* Icons.xcassets in Resources */,
 				2236BD631BAA5E0900015753 /* FontAwesome.otf in Resources */,
+				228B909329E5980F001CBACB /* ace-modes.js in Resources */,
 				225EC2BB2061678B00AA0C79 /* EventsTableCell_ReplyCount.xib in Resources */,
 				221EB2F01F8F965E00A71428 /* EventsTableCell.xib in Resources */,
 				221EB2F41F962C2D00A71428 /* EventsTableCell_File.xib in Resources */,
