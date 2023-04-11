@@ -143,6 +143,7 @@
         [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         [[NSURLCache sharedURLCache] removeAllCachedResponses];
         NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":self->_pasteID, @"type":@"json"} error:nil];
+        url = [url stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/" withString:[NSString stringWithFormat:@"https://%@/", IRCCLOUD_HOST]];
         NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30];
         [request setHTTPShouldHandleCookies:NO];
         [request setValue:[NSString stringWithFormat:@"session=%@",NetworkConnection.sharedInstance.session] forHTTPHeaderField:@"Cookie"];

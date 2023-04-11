@@ -71,7 +71,8 @@
 
 -(void)_fetchPaste {
     NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":self->_pasteID, @"type":@"json"} error:nil];
-    
+    url = [url stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/" withString:[NSString stringWithFormat:@"https://%@/", IRCCLOUD_HOST]];
+
     [[[NetworkConnection sharedInstance].urlSession dataTaskWithURL:[NSURL URLWithString:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
             CLS_LOG(@"Error fetching pastebin. Error %li : %@", (long)error.code, error.userInfo);
@@ -201,7 +202,7 @@
     self.navigationController.navigationBar.clipsToBounds = YES;
     self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
 
-    self->_filename = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width - 32, 22)];
+    self->_filename = [[UITextField alloc] initWithFrame:CGRectZero];
     self->_filename.text = @"";
     self->_filename.textColor = [UITableViewCell appearance].detailTextLabelColor;
     self->_filename.autocapitalizationType = UITextAutocapitalizationTypeNone;
@@ -353,19 +354,20 @@
     cell.accessoryView = nil;
     cell.accessoryType = UITableViewCellAccessoryNone;
     cell.detailTextLabel.text = nil;
+    cell.textLabel.text = nil;
 
     switch(indexPath.section) {
         case 0:
-            cell.textLabel.text = nil;
             [self->_text removeFromSuperview];
             self->_text.frame = CGRectInset(cell.contentView.bounds, 4, 4);
             [cell.contentView addSubview:self->_text];
             break;
         case 1:
-            cell.accessoryView = self->_filename;
+            [self->_filename removeFromSuperview];
+            self->_filename.frame = CGRectInset(cell.contentView.bounds, 4, 4);
+            [cell.contentView addSubview:self->_filename];
             break;
         case 2:
-            cell.textLabel.text = nil;
             [self->_message removeFromSuperview];
             self->_message.frame = CGRectInset(cell.contentView.bounds, 4, 4);
             [cell.contentView addSubview:self->_message];
