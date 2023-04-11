@@ -22,6 +22,7 @@
 
 @interface PastebinTypeViewController : UITableViewController {
     NSArray *_pastebinTypes;
+    NSString *_selected;
 }
 @property PastebinEditorViewController *delegate;
 @end
@@ -129,6 +130,7 @@
             @{@"name": @"pgSQL", @"extension": @"pgsql"},
             @{@"name": @"PHP", @"extension": @"php"},
             @{@"name": @"Pig", @"extension": @"pig"},
+            @{@"name": @"Plain Text", @"extension": @"txt"},
             @{@"name": @"Powershell", @"extension": @"ps1"},
             @{@"name": @"Praat", @"extension": @"praat"},
             @{@"name": @"Prolog", @"extension": @"plg"},
@@ -161,7 +163,6 @@
             @{@"name": @"Swift", @"extension": @"swift"},
             @{@"name": @"Tcl", @"extension": @"tcl"},
             @{@"name": @"Tex", @"extension": @"tex"},
-            @{@"name": @"Text", @"extension": @"txt"},
             @{@"name": @"Textile", @"extension": @"textile"},
             @{@"name": @"Toml", @"extension": @"toml"},
             @{@"name": @"TSX", @"extension": @"tsx"},
@@ -203,6 +204,7 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"pastebintypecell"];
     
     cell.textLabel.text = [[self->_pastebinTypes objectAtIndex:indexPath.row] objectForKey:@"name"];
+    cell.accessoryType = [_selected isEqualToString:cell.textLabel.text]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
     
     return cell;
 }
@@ -211,7 +213,16 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     _delegate.extension = [[self->_pastebinTypes objectAtIndex:indexPath.row] objectForKey:@"extension"];
-    [self.navigationController popViewControllerAnimated:YES];
+    _selected = [[self->_pastebinTypes objectAtIndex:indexPath.row] objectForKey:@"name"];
+    [self.tableView reloadData];
+    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+        [self.navigationController popViewControllerAnimated:YES];
+    }];
+}
+
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    _selected = [PastebinEditorViewController pastebinType:_delegate.extension];
 }
 
 @end
