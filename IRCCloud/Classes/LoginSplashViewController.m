@@ -275,12 +275,6 @@
             self->forgotPasswordLogin.alpha = 0;
             self->forgotPasswordSignup.alpha = 0;
             [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
-#ifndef ENTERPRISE
-            [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                kFIRParameterMethod:@"access-link",
-                kFIRParameterSuccess:@(1)
-            }];
-#endif
         } else {
             [UIView beginAnimations:nil context:nil];
             self->loginView.alpha = 1;
@@ -289,12 +283,6 @@
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:@"Invalid access link" preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
             [self presentViewController:alert animated:YES completion:nil];
-#ifndef ENTERPRISE
-            [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                kFIRParameterMethod:@"access-link",
-                kFIRParameterSuccess:@(0)
-            }];
-#endif
         }
     }];
 }
@@ -767,17 +755,6 @@
                         [d setObject:IRCCLOUD_PATH forKey:@"path"];
                         [d synchronize];
 #ifndef ENTERPRISE
-                        if(nameAlpha) {
-                            [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                                kFIRParameterMethod:@"email",
-                                kFIRParameterSuccess:@(1)
-                            }];
-                        } else {
-                            [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                                kFIRParameterMethod:@"email",
-                                kFIRParameterSuccess:@(1)
-                            }];
-                        }
                         if(!self->_gotCredentialsFromPasswordManager) {
                             if (@available(macCatalyst 14.0, *)) {
                                 SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)user, (__bridge CFStringRef)pass, ^(CFErrorRef error) {
@@ -829,35 +806,6 @@
                             [[NetworkConnection sharedInstance] sendFeedbackReport:self];
                         }]];
                         [self presentViewController:alert animated:YES completion:nil];
-#ifndef ENTERPRISE
-                        if(nameAlpha) {
-                            if([result objectForKey:@"message"]) {
-                                [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                                    kFIRParameterMethod:@"email",
-                                    kFIRParameterSuccess:@(0),
-                                    @"failure":[result objectForKey:@"message"]
-                                }];
-                            } else {
-                                [FIRAnalytics logEventWithName:kFIREventSignUp parameters:@{
-                                    kFIRParameterMethod:@"email",
-                                    kFIRParameterSuccess:@(0)
-                                }];
-                            }
-                        } else {
-                            if([result objectForKey:@"message"]) {
-                                [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                                    kFIRParameterMethod:@"email",
-                                    kFIRParameterSuccess:@(0),
-                                    @"failure":[result objectForKey:@"message"]
-                                }];
-                            } else {
-                                [FIRAnalytics logEventWithName:kFIREventLogin parameters:@{
-                                    kFIRParameterMethod:@"email",
-                                    kFIRParameterSuccess:@(0)
-                                }];
-                            }
-                        }
-#endif
                     }
                 };
                 

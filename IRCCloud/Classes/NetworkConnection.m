@@ -2776,7 +2776,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         }
     }
     [[ImageCache sharedInstance] purge];
-    [FIRAnalytics resetAnalyticsData];
 #endif
     [self cancelIdleTimer];
 }

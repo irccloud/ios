@@ -11,8 +11,7 @@ pod 'GoogleUtilities/NSData+zlib'
 pod 'GoogleUtilities/Network'
 pod 'GoogleUtilities/Reachability'
 pod 'GoogleUtilities/UserDefaults'
-pod 'Firebase/Crashlytics'
-pod 'Firebase/Analytics'
+pod 'Firebase/Crashlytics', '10.5.0'
 pod 'SSZipArchive'
 
 target 'IRCCloud' do
@@ -92,29 +91,4 @@ post_install do |installer|
       end
   end
 
-#    installer.pods_project.targets.each do |target|
-#        
-        # handle non catalyst libs
-#        libs = ["FirebaseAnalytics", "FIRAnalyticsConnector", "FirebasePerformance", "GoogleAppMeasurement"]
-        
-#        target.build_configurations.each do |config|
-#            xcconfig_path = config.base_configuration_reference.real_path
-#            xcconfig = File.read(xcconfig_path)
-#            values = ""
-            
-#            libs.each { |lib|
-#                if xcconfig["-framework \"#{lib}\""]
-#                    puts "Found '#{lib}' on target '#{target.name}'"
-#                    xcconfig.sub!(" -framework \"#{lib}\"", '')
-#                    values += " -framework \"#{lib}\""
-#                end
-#            }
-            
-#            if values.length > 0
-#                puts "Preparing '#{target.name}' for Catalyst\n\n"
-#                new_xcconfig = xcconfig + 'OTHER_LDFLAGS[sdk=iphone*] = $(inherited)' + values
-#                File.open(xcconfig_path, "w") { |file| file << new_xcconfig }
-#            end
-#        end
-#    end
 end

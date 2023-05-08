@@ -565,15 +565,12 @@
                 }
                 switch(indexPath.row) {
                     case 0:
-                        [FIRAnalytics logEventWithName:@"export_logs" parameters:@{@"type":@"network"}];
                         [self requestExport:self->_server.cid bid:-1];
                         break;
                     case 1:
-                        [FIRAnalytics logEventWithName:@"export_logs" parameters:@{@"type":@"buffer"}];
                         [self requestExport:self->_server.cid bid:self->_buffer.bid];
                         break;
                     case 2:
-                        [FIRAnalytics logEventWithName:@"export_logs" parameters:@{@"type":@"all"}];
                         [self requestExport:-1 bid:-1];
                         break;
                 }

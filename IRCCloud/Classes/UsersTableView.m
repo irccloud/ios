@@ -352,16 +352,6 @@
     [self.tableView reloadData];
 }
 
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if([FIROptions defaultOptions]) {
-        if(animated && self.parentViewController)
-            [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.parentViewController.class)}];
-        else
-            [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
-    }
-}
-
 - (void)didMoveToParentViewController:(UIViewController *)parent {
     [self refresh];
     self->_refreshTimer = nil;

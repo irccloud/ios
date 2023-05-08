@@ -30,7 +30,6 @@
 #import "MainViewController.h"
 #import "NSString+Score.h"
 @import Firebase;
-@import FirebaseAnalytics;
 
 #define TYPE_SERVER 0
 #define TYPE_CHANNEL 1
@@ -236,16 +235,6 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self->_searchText resignFirstResponder];
-}
-
-- (void)viewDidAppear:(BOOL)animated {
-    [super viewDidAppear:animated];
-    if([FIROptions defaultOptions]) {
-        if(animated && self.parentViewController)
-            [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.parentViewController.class)}];
-        else
-            [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
-    }
 }
 
 - (NSMutableDictionary *)_addBuffer:(Buffer *)buffer data:(NSMutableArray *)data prefs:(NSDictionary *)prefs server:(Server *)server collapsed:(NSDictionary *)collapsed unread:(int)unread highlights:(int)highlights firstUnreadPosition:(NSInteger *)firstUnreadPosition lastUnreadPosition:(NSInteger *)lastUnreadPosition firstHighlightPosition:(NSInteger *)firstHighlightPosition lastHighlightPosition:(NSInteger *)lastHighlightPosition {

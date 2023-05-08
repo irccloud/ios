@@ -669,9 +669,6 @@
         player.modalPresentationStyle = UIModalPresentationFullScreen;
         player.player = [[AVPlayer alloc] initWithURL:url];
         [mainViewController presentViewController:player animated:YES completion:nil];
-        [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
-            kFIRParameterContentType:@"Video"
-        }];
     } else if(!isCatalyst && [[NSUserDefaults standardUserDefaults] boolForKey:@"videoViewer"] && IS_YOUTUBE(url)) {
         [mainViewController launchURL:url];
     } else if([url.host.lowercaseString isEqualToString:@"maps.apple.com"]) {
@@ -756,10 +753,6 @@
                 activityType = [activityType substringFromIndex:25];
             if([activityType hasPrefix:@"com.apple."])
                 activityType = [activityType substringFromIndex:10];
-            [FIRAnalytics logEventWithName:kFIREventShare parameters:@{
-                kFIRParameterMethod:activityType,
-                kFIRParameterContentType:type
-            }];
         }
     };
     return activityController;

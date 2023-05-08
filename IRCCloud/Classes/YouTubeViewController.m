@@ -188,10 +188,6 @@
     self->_activity.hidesWhenStopped = YES;
     [self->_activity startAnimating];
     [self.view addSubview:self->_activity];
-    
-    [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
-        kFIRParameterContentType:@"Youtube"
-    }];
 }
 
 -(void)_YTWrapperTapped {

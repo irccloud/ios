@@ -38,7 +38,6 @@
 #import "FLEXManager.h"
 #endif
 @import Firebase;
-@import FirebaseAnalytics;
 @import FirebaseMessaging;
 
 extern NSURL *__logfile;
@@ -112,7 +111,6 @@ extern NSURL *__logfile;
 #ifdef CRASHLYTICS_TOKEN
     if([FIROptions defaultOptions]) {
         [FIRApp configure];
-        [FIRAnalytics setUserID:nil];
     }
 #endif
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
@@ -277,8 +275,6 @@ extern NSURL *__logfile;
 
 -(BOOL)continueActivity:(NSUserActivity *)userActivity {
     CLS_LOG(@"Continuing activity type: %@", userActivity.activityType);
-    if([FIROptions defaultOptions])
-        [FIRAnalytics handleUserActivity:userActivity];
 #ifdef ENTERPRISE
     if([userActivity.activityType isEqualToString:@"com.irccloud.enterprise.buffer"])
 #else
@@ -313,8 +309,6 @@ extern NSURL *__logfile;
 }
 
 - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-    if([FIROptions defaultOptions])
-        [FIRAnalytics handleOpenURL:url];
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 
     if([url.scheme hasPrefix:@"irccloud"]) {
@@ -822,8 +816,6 @@ extern NSURL *__logfile;
         imageUploadCompletionHandler = completionHandler;
     } else {
         CLS_LOG(@"Unrecognized background task: %@", identifier);
-        if([FIROptions defaultOptions])
-            [FIRAnalytics handleEventsForBackgroundURLSession:identifier completionHandler:completionHandler];
         completionHandler();
     }
 }

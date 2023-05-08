@@ -86,9 +86,6 @@
     self->_lineNumbers.enabled = NO;
     self->_lineNumbers.on = YES;
     [self _fetch];
-    [FIRAnalytics logEventWithName:kFIREventViewItem parameters:@{
-        kFIRParameterContentType:@"Pastebin"
-    }];
     [self didMoveToParentViewController:nil];
 }
 

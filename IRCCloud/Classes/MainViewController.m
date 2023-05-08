@@ -2053,8 +2053,6 @@ NSArray *_sortedChannels;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
-    if([FIROptions defaultOptions])
-        [FIRAnalytics logEventWithName:kFIREventScreenView parameters:@{kFIRParameterScreenName:NSStringFromClass(self.class)}];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -5667,7 +5665,6 @@ NSArray *_sortedChannels;
 }
 
 -(void)joinBeta {
-    [FIRAnalytics logEventWithName:@"beta_invite" parameters:nil];
     [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:[NSURL URLWithString:@"https://testflight.apple.com/join/MApr7Une"]];
 }
 
