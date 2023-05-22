@@ -1383,7 +1383,7 @@ extern UIImage *__socketClosedBackgroundImage;
         self->_topUnreadLabelXOffsetConstraint.constant = 0;
     }
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone]) {
-        self->_topUnreadDismissXOffsetConstraint.constant = -self.slidingViewController.view.safeAreaInsets.left;
+        self->_topUnreadDismissXOffsetConstraint.constant = -self.slidingViewController.view.window.safeAreaInsets.left;
     }
     if(self->_lastSeenEidPos == 0 && firstRow < _data.count) {
         int seconds;
@@ -1756,7 +1756,7 @@ extern UIImage *__socketClosedBackgroundImage;
         if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"]) {
             self->_stickyAvatarXOffsetConstraint.constant = 20;
         } else {
-            self->_stickyAvatarXOffsetConstraint.constant = 20 + self.slidingViewController.view.safeAreaInsets.left;
+            self->_stickyAvatarXOffsetConstraint.constant = 20 + self.slidingViewController.view.window.safeAreaInsets.left;
         }
 
         __24hrPref = NO;

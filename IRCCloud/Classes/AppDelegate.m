@@ -610,6 +610,10 @@ extern NSURL *__logfile;
                     } completion:^(BOOL finished){
                         [v removeFromSuperview];
                         self.window.backgroundColor = [UIColor textareaBackgroundColor];
+                        self.mainViewController.ignoreVisibilityChanges = YES;
+                        self.window.rootViewController = nil;
+                        self.window.rootViewController = self.slideViewController;
+                        self.mainViewController.ignoreVisibilityChanges = NO;
                     }];
                 }
             }];

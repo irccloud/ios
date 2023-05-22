@@ -708,7 +708,7 @@ NSDictionary *__pastebinTypeMap = nil;
 -(UIView *)tableView:(UITableView *)tableView viewForFooterInSection:(NSInteger)section {
     if(section == 0) {
         CGRect frame = self->_messageFooter.frame;
-        frame.origin.x = self.view.safeAreaInsets.left;
+        frame.origin.x = self.view.window.safeAreaInsets.left;
         self->_messageFooter.frame = frame;
         return _messageFooter;
     }

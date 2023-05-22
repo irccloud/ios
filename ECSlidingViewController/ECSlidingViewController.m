@@ -260,13 +260,13 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
 {
   if(@available(iOS 13, *)) {
       BOOL hasGestureBar = NO;
-      hasGestureBar = self.view.safeAreaInsets.bottom > 0 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
+      hasGestureBar = self.view.window.safeAreaInsets.bottom > 0 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad;
       if(!hasGestureBar) {
         int sbheight = [UIApplication sharedApplication].statusBarFrame.size.height;
         if(sbheight > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
           sbheight -= 20;
-        if(self.view.safeAreaInsets.bottom) {
-            sbheight = self.view.safeAreaInsets.top;
+        if(self.view.window.safeAreaInsets.bottom) {
+            sbheight = self.view.window.safeAreaInsets.top;
         }
 #if !TARGET_OS_MACCATALYST
         if (@available(iOS 14.0, *)) {
@@ -280,8 +280,8 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
         frame.size.height = self.view.bounds.size.height - sbheight;
         if([UIApplication sharedApplication].statusBarFrame.size.height > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
           frame.size.height += 20;
-        if([[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad && self.view.safeAreaInsets.bottom) {
-          frame.size.height -= self.view.safeAreaInsets.bottom;
+        if([[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad && self.view.window.safeAreaInsets.bottom) {
+          frame.size.height -= self.view.window.safeAreaInsets.bottom;
         }
         self.topView.frame = frame;
         _topViewController.view.layer.shadowOffset = CGSizeZero;
@@ -653,10 +653,10 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if(sbheight > 20 && [[UIDevice currentDevice] userInterfaceIdiom] != UIUserInterfaceIdiomPad)
         sbheight -= 20;
 #if TARGET_OS_MACCATALYST
-    sbheight = self.view.safeAreaInsets.top;
+    sbheight = self.view.window.safeAreaInsets.top;
 #else
-    if(self.view.safeAreaInsets.bottom) {
-        sbheight = self.view.safeAreaInsets.top;
+    if(self.view.window.safeAreaInsets.bottom) {
+        sbheight = self.view.window.safeAreaInsets.top;
     }
     if (@available(iOS 14.0, *)) {
         if([NSProcessInfo processInfo].isiOSAppOnMac) {
@@ -711,10 +711,10 @@ NSString *const ECSlidingViewTopDidReset             = @"ECSlidingViewTopDidRese
     if(sbheight > 20)
         sbheight -= 20;
 #if TARGET_OS_MACCATALYST
-    sbheight = self.view.safeAreaInsets.top;
+    sbheight = self.view.window.safeAreaInsets.top;
 #else
-    if(self.view.safeAreaInsets.bottom) {
-        sbheight = self.view.safeAreaInsets.top;
+    if(self.view.window.safeAreaInsets.bottom) {
+        sbheight = self.view.window.safeAreaInsets.top;
     }
     if (@available(iOS 14.0, *)) {
         if([NSProcessInfo processInfo].isiOSAppOnMac) {

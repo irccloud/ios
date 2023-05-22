@@ -85,7 +85,7 @@
 
 -(UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
     CGRect frame = self->_header.frame;
-    frame.origin.x = self.view.safeAreaInsets.left + 8;
+    frame.origin.x = self.view.window.safeAreaInsets.left + 8;
     self->_header.frame = frame;
 
     return _header;

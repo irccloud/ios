@@ -1364,7 +1364,7 @@
 }
 
 - (UIEdgeInsets)safeAreaInsets {
-    return self.slidingViewController ? self.slidingViewController.view.safeAreaInsets : _delegate.view.safeAreaInsets;
+    return self.slidingViewController ? self.slidingViewController.view.window.safeAreaInsets : _delegate.view.window.safeAreaInsets;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {

@@ -1842,7 +1842,7 @@ NSArray *_sortedChannels;
     CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
     CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
     int height = [UIScreen mainScreen].bounds.size.height - origin.y;
-    height -= self.slidingViewController.view.safeAreaInsets.bottom / 2;
+    height -= self.slidingViewController.view.window.safeAreaInsets.bottom / 2;
     if(height != self->_kbSize.height) {
         self->_kbSize = size;
         self->_kbSize.height = height;
@@ -2581,7 +2581,7 @@ NSArray *_sortedChannels;
     } else {
         messageWidth = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
     }
-    messageWidth -= self.slidingViewController.view.safeAreaInsets.right;
+    messageWidth -= self.slidingViewController.view.window.safeAreaInsets.right;
 
     if(self->_message.text.length > 0) {
         if(self->_messageWidthConstraint.constant != messageWidth) {
@@ -2617,10 +2617,10 @@ NSArray *_sortedChannels;
         self->_messageHeightConstraint.constant = self->_message.frame.size.height;
         self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 12 + 16;
         CGRect frame = self->_settingsBtn.frame;
-        frame.origin.x = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.safeAreaInsets.right;
+        frame.origin.x = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - 10 - self.slidingViewController.view.window.safeAreaInsets.right;
         self->_settingsBtn.frame = frame;
         frame = self->_sendBtn.frame;
-        frame.origin.x = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.safeAreaInsets.right;
+        frame.origin.x = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - 8 - self.slidingViewController.view.window.safeAreaInsets.right;
         self->_sendBtn.frame = frame;
         [self _updateEventsInsets];
         [self.view layoutIfNeeded];
@@ -3316,7 +3316,7 @@ NSArray *_sortedChannels;
 }
 
 -(SupportedOrientationsReturnType)supportedInterfaceOrientations {
-    if(self.slidingViewController.view.safeAreaInsets.bottom) {
+    if(self.slidingViewController.view.window.safeAreaInsets.bottom) {
         return UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeRight;
     }
     return ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPhone)?UIInterfaceOrientationMaskAllButUpsideDown:UIInterfaceOrientationMaskAll;
@@ -3332,7 +3332,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)statusBarFrameWillChange:(NSNotification *)n {
-    if(self.slidingViewController.view.safeAreaInsets.bottom)
+    if(self.slidingViewController.view.window.safeAreaInsets.bottom)
         return;
     CGRect newFrame = [[n.userInfo objectForKey:UIApplicationStatusBarFrameUserInfoKey] CGRectValue];
     if(newFrame.size.width > 0 && newFrame.size.width == [UIApplication sharedApplication].statusBarFrame.size.width) {
@@ -3350,6 +3350,14 @@ NSArray *_sortedChannels;
 -(void)updateLayout {
     BOOL scrolledUp = _buffer.scrolledUp;
     [UIApplication sharedApplication].statusBarHidden = self.prefersStatusBarHidden;
+    
+    if(self.slidingViewController.view.window.safeAreaInsets.top != self.slidingViewController.view.safeAreaInsets.top) {
+        NSLog(@"Insets mismatch");
+        UIWindow *w = self.slidingViewController.view.window;
+        w.rootViewController = nil;
+        w.rootViewController = self.slidingViewController;
+    }
+    
     [UIColor setSafeInsets:self.slidingViewController.view.window.safeAreaInsets];
     if(self.slidingViewController.view.window.safeAreaInsets.bottom)
         [self updateLayout:0];
@@ -3401,7 +3409,7 @@ NSArray *_sortedChannels;
     self.navigationController.view.layer.position = self.navigationController.view.center;
 
     self->_bottomBarHeightConstraint.constant = self->_message.frame.size.height + 12 + 16;
-    self->_eventsViewHeightConstraint.constant = self.slidingViewController.view.frame.size.height - self.navigationController.navigationBar.frame.size.height - self.slidingViewController.view.safeAreaInsets.top - self.slidingViewController.view.safeAreaInsets.bottom;
+    self->_eventsViewHeightConstraint.constant = self.slidingViewController.view.frame.size.height - self.navigationController.navigationBar.frame.size.height - self.slidingViewController.view.window.safeAreaInsets.top - self.slidingViewController.view.window.safeAreaInsets.bottom;
     
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && size.width > size.height
        - (isCatalyst ? 78 : 0)
@@ -3424,7 +3432,7 @@ NSArray *_sortedChannels;
             self->_buffersView.view.autoresizingMask = UIViewAutoresizingNone;
         }
 #if TARGET_OS_MACCATALYST
-        self->_buffersView.view.frame = CGRectMake(0,self.slidingViewController.view.safeAreaInsets.top,buffersViewWidth,self.slidingViewController.view.frame.size.height - self.slidingViewController.view.safeAreaInsets.top);
+        self->_buffersView.view.frame = CGRectMake(0,self.slidingViewController.view.window.safeAreaInsets.top,buffersViewWidth,self.slidingViewController.view.frame.size.height - self.slidingViewController.view.window.safeAreaInsets.top);
 #else
         self->_buffersView.view.frame = CGRectMake(0,0,buffersViewWidth,self.slidingViewController.view.frame.size.height);
 #endif
@@ -3432,8 +3440,8 @@ NSArray *_sortedChannels;
         self.navigationController.view.center = self.slidingViewController.view.center;
     } else {
         self->_borders.hidden = YES;
-        self->_eventsViewWidthConstraint.constant = size.width + self.slidingViewController.view.safeAreaInsets.left / 2;
-        self->_eventsViewOffsetLeftConstraint.constant = self.slidingViewController.view.safeAreaInsets.left / 2;
+        self->_eventsViewWidthConstraint.constant = size.width + self.slidingViewController.view.window.safeAreaInsets.left / 2;
+        self->_eventsViewOffsetLeftConstraint.constant = self.slidingViewController.view.window.safeAreaInsets.left / 2;
         self->_connectingXOffsetConstraint.constant = 0;
         self->_topicXOffsetConstraint.constant = 0;
         if(!self.slidingViewController.underLeftViewController)
@@ -3450,10 +3458,10 @@ NSArray *_sortedChannels;
         self->_topicLabel.alpha = (size.width > size.height)?0:1;
     }
     self->_topicWidthConstraint.constant = frame.size.width = size.width - 128 - self->_topicXOffsetConstraint.constant;
-    frame.size.width -= self.slidingViewController.view.safeAreaInsets.left;
-    frame.size.width -= self.slidingViewController.view.safeAreaInsets.right;
-    self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.left;
-    self->_topicWidthConstraint.constant -= self.slidingViewController.view.safeAreaInsets.right;
+    frame.size.width -= self.slidingViewController.view.window.safeAreaInsets.left;
+    frame.size.width -= self.slidingViewController.view.window.safeAreaInsets.right;
+    self->_topicWidthConstraint.constant -= self.slidingViewController.view.window.safeAreaInsets.left;
+    self->_topicWidthConstraint.constant -= self.slidingViewController.view.window.safeAreaInsets.right;
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"tabletMode"] && [[UIDevice currentDevice] isBigPhone] && (size.width > size.height))
         frame.size.width -= self->_buffersView.tableView.frame.size.width;
     self->_connectingView.frame = self->_titleView.frame = frame;
@@ -3525,10 +3533,10 @@ NSArray *_sortedChannels;
     if(_ignoreInsetChanges)
         return;
     self->_bottomBarOffsetConstraint.constant = self->_kbSize.height;
-    if(self.slidingViewController.view.safeAreaInsets.bottom) {
+    if(self.slidingViewController.view.window.safeAreaInsets.bottom) {
         if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
-            self->_bottomBarOffsetConstraint.constant -= self.slidingViewController.view.safeAreaInsets.bottom/2;
-        if(self.slidingViewController.view.safeAreaInsets.top >= 51) //iPhone 14 with Dynamic Island returns the wrong bottom safe area inset
+            self->_bottomBarOffsetConstraint.constant -= self.slidingViewController.view.window.safeAreaInsets.bottom/2;
+        if(self.slidingViewController.view.window.safeAreaInsets.top >= 51) //iPhone 14 with Dynamic Island returns the wrong bottom safe area inset
             self->_bottomBarOffsetConstraint.constant -= 12;
     }
     CGFloat height = self->_bottomBarHeightConstraint.constant + _kbSize.height;
@@ -3540,12 +3548,12 @@ NSArray *_sortedChannels;
     if(!_serverStatusBar.hidden)
         height += self->_serverStatusBar.bounds.size.height;
     if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
-        height -= self.slidingViewController.view.safeAreaInsets.bottom/2;
+        height -= self.slidingViewController.view.window.safeAreaInsets.bottom/2;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        CGFloat bottom = self->_kbSize.height + self.slidingViewController.view.safeAreaInsets.bottom;
+        CGFloat bottom = self->_kbSize.height + self.slidingViewController.view.window.safeAreaInsets.bottom;
         if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
-            bottom += self.slidingViewController.view.safeAreaInsets.top;
+            bottom += self.slidingViewController.view.window.safeAreaInsets.top;
         if(@available(iOS 14, *)) {
             self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
             self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
@@ -3668,7 +3676,7 @@ NSArray *_sortedChannels;
                     self->_usersView.view.hidden = YES;
                 }
                 self->_eventsViewWidthConstraint.constant = self.view.frame.size.width - self->_buffersView.tableView.frame.size.width - 2;
-                self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.safeAreaInsets.right;
+                self->_eventsViewWidthConstraint.constant += self.slidingViewController.view.window.safeAreaInsets.right;
                 if(self.slidingViewController.underRightViewController) {
                     self->_eventsViewWidthConstraint.constant++;
                 }

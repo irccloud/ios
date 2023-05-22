@@ -428,7 +428,7 @@
     
     UIView *v = [self->_themePreviews objectAtIndex:indexPath.row];
     [v removeFromSuperview];
-    v.frame = CGRectMake(self.view.safeAreaInsets.left?-12:8,cell.contentView.frame.size.height / 2 - 12,24,24);
+    v.frame = CGRectMake(self.view.window.safeAreaInsets.left?-12:8,cell.contentView.frame.size.height / 2 - 12,24,24);
     v.layer.cornerRadius = v.frame.size.width / 2;
     [cell.contentView addSubview:v];
     
