@@ -2143,7 +2143,21 @@ extern BOOL __compact;
     @synchronized (self) {
         static NSRegularExpression *_pattern = nil;
         if(!_pattern) {
-            NSString *pattern = @"spotify:([^<>\"\\s]+)";
+            NSString *pattern = @"spotify:([^<>()\"\\s]+)";
+            _pattern = [NSRegularExpression
+                        regularExpressionWithPattern:pattern
+                        options:NSRegularExpressionCaseInsensitive
+                        error:nil];
+        }
+        return _pattern;
+    }
+}
+
++(NSRegularExpression *)geo {
+    @synchronized (self) {
+        static NSRegularExpression *_pattern = nil;
+        if(!_pattern) {
+            NSString *pattern = @"geo:([^<>()\"\\s]+)";
             _pattern = [NSRegularExpression
                         regularExpressionWithPattern:pattern
                         options:NSRegularExpressionCaseInsensitive
@@ -2797,6 +2811,11 @@ extern BOOL __compact;
         results = [[self spotify] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
         for(NSTextCheckingResult *result in results) {
             NSString *url = [[output string] substringWithRange:result.range];
+            [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
+        }
+        results = [[self geo] matchesInString:[[output string] lowercaseString] options:0 range:NSMakeRange(0, [output length])];
+        for(NSTextCheckingResult *result in results) {
+            NSString *url = [NSString stringWithFormat:@"http://maps.apple.com/?ll=%@",[[output string] substringWithRange:NSMakeRange(result.range.location+4, result.range.length-4)]];
             [matches addObject:[NSTextCheckingResult linkCheckingResultWithRange:result.range URL:[NSURL URLWithString:url]]];
         }
         if(server) {
