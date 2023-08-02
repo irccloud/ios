@@ -2672,6 +2672,9 @@ NSArray *_sortedChannels;
         
         if(s.blocksTyping)
             disableTypingStatus = YES;
+        
+        if([_buffer.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid])
+            disableTypingStatus = YES;
 
         if(!disableTypingStatus && !self->_typingTimer) {
             self->_typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(sendTyping) userInfo:nil repeats:NO];
