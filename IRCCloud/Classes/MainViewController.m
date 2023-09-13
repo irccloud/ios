@@ -5473,7 +5473,10 @@ NSArray *_sortedChannels;
     if([UIPasteboard generalPasteboard].hasImages && ![UIPasteboard generalPasteboard].hasURLs) {
         for(NSString *type in [UIPasteboard generalPasteboard].pasteboardTypes) {
             if([type isEqualToString:(__bridge NSString *)kUTTypeGIF] && [UIPasteboard generalPasteboard].image) {
-                [self _imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:[UIPasteboard generalPasteboard].image, @"gifData":[[UIPasteboard generalPasteboard] dataForPasteboardType:(__bridge NSString *)kUTTypeGIF]}];
+                UIImage *img = [UIPasteboard generalPasteboard].image;
+                NSData *gifData = [[UIPasteboard generalPasteboard] dataForPasteboardType:(__bridge NSString *)kUTTypeGIF];
+                if(img != nil && gifData != nil)
+                    [self _imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:img, @"gifData":gifData}];
                 return;
             }
         }

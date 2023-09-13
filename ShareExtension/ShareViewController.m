@@ -222,6 +222,10 @@
     NSExtensionItem *output = [input copy];
     output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
 
+    if(self->_buffer == nil || self->_buffer.name == nil) {
+        return;
+    }
+    
     if(output.attachments.count) {
         if(self->_fileUploader.originalFilename) {
             NSLog(@"Setting filename, bid, and message for IRCCloud upload");

@@ -2135,7 +2135,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 }
 
 -(void)webSocketDidOpen:(WebSocket *)socket {
-    if(socket == self->_socket) {
+    if(socket == self->_socket && self.session != nil) {
         CLS_LOG(@"Socket connected");
         self->_idleInterval = 20;
         self->_reconnectTimestamp = -1;

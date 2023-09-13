@@ -30,6 +30,11 @@
 + (BOOL)supportsSecureCoding {
     return YES;
 }
+-(instancetype)init {
+    self = [super init];
+    self->_type = (NSString *)[[NSNull alloc] init];
+    return self;
+}
 -(NSComparisonResult)compare:(Event *)aEvent {
     if(aEvent.pending && !_pending)
         return NSOrderedAscending;
@@ -57,7 +62,7 @@
         if(!from.length)
             from = self->_nick;
         
-        if([ignore match:[NSString stringWithFormat:@"%@!%@",from,self->_hostmask]])
+        if(from != nil && self->_hostmask != nil && [ignore match:[NSString stringWithFormat:@"%@!%@",from,self->_hostmask]])
             return NO;
     }
     
