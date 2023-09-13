@@ -68,12 +68,12 @@
     NSMutableSet *_activeScenes;
 }
 
-@property (strong, nonatomic) UIWindow *window;
+@property (strong) UIWindow *window;
 
-@property (strong, nonatomic) LoginSplashViewController *loginSplashViewController;
-@property (strong, nonatomic) MainViewController *mainViewController;
-@property (strong, nonatomic) ECSlidingViewController *slideViewController;
-@property (strong, nonatomic) SplashViewController *splashViewController;
+@property (strong) LoginSplashViewController *loginSplashViewController;
+@property (strong) MainViewController *mainViewController;
+@property (strong) ECSlidingViewController *slideViewController;
+@property (strong) SplashViewController *splashViewController;
 
 @property BOOL movedToBackground;
 
@@ -93,11 +93,11 @@ API_AVAILABLE(ios(13.0))
     AppDelegate *_appDelegate;
     UIScene *_scene;
 }
-@property (strong, nonatomic) UIWindow *window;
-@property (strong, nonatomic) UIScene *scene;
+@property (strong) UIWindow *window;
+@property (strong) UIScene *scene;
 
-@property (strong, nonatomic) LoginSplashViewController *loginSplashViewController;
-@property (strong, nonatomic) MainViewController *mainViewController;
-@property (strong, nonatomic) ECSlidingViewController *slideViewController;
-@property (strong, nonatomic) SplashViewController *splashViewController;
+@property (strong) LoginSplashViewController *loginSplashViewController;
+@property (strong) MainViewController *mainViewController;
+@property (strong) ECSlidingViewController *slideViewController;
+@property (strong) SplashViewController *splashViewController;
 @end

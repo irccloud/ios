@@ -53,8 +53,8 @@ extern NSURL *__logfile;
 //From: http://stackoverflow.com/a/19313559
 @interface NavBarHax : UINavigationBar
 
-@property (nonatomic, assign) BOOL changingUserInteraction;
-@property (nonatomic, assign) BOOL userInteractionChangedBySystem;
+@property (assign) BOOL changingUserInteraction;
+@property (assign) BOOL userInteractionChangedBySystem;
 
 @end
 

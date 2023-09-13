@@ -24,6 +24,6 @@
     int _cid;
     UILabel *_placeholder;
 }
-@property (strong, nonatomic) NSArray *ignores;
+@property (strong) NSArray *ignores;
 @property int cid;
 @end

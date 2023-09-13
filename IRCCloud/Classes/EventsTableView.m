@@ -83,7 +83,7 @@ extern UIImage *__socketClosedBackgroundImage;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
 @property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter, *replyXOffset, *avatarTop;
 @property (readonly) UIControl *replyButton;
-@property (nonatomic) NSURL *largeAvatarURL;
+@property (strong) NSURL *largeAvatarURL;
 
 -(IBAction)avatarTapped:(UITapGestureRecognizer *)sender;
 @end

@@ -30,11 +30,6 @@
 + (BOOL)supportsSecureCoding {
     return YES;
 }
--(instancetype)init {
-    self = [super init];
-    self->_type = (NSString *)[[NSNull alloc] init];
-    return self;
-}
 -(NSComparisonResult)compare:(Event *)aEvent {
     if(aEvent.pending && !_pending)
         return NSOrderedAscending;

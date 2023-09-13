@@ -30,7 +30,7 @@
     
     UIActivityIndicatorView *_activityIndicator;
 }
-@property (nonatomic) NSString *selection;
+@property (copy) NSString *selection;
 -(id)initWithDelegate:(id)delegate;
 - (void)fetchServerList;
 @end

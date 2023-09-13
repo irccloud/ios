@@ -25,7 +25,7 @@
     UILabel *_placeholder;
     UIActivityIndicatorView *_activity;
 }
-@property (strong, nonatomic) NSArray *channels;
-@property (strong, nonatomic) IRCCloudJSONObject *event;
+@property (strong) NSArray *channels;
+@property (strong) IRCCloudJSONObject *event;
 -(void)refresh;
 @end

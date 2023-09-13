@@ -23,6 +23,6 @@
     IRCCloudJSONObject *_event;
     UILabel *_placeholder;
 }
-@property (strong, nonatomic) IRCCloudJSONObject *event;
+@property (strong) IRCCloudJSONObject *event;
 -(void)refresh;
 @end

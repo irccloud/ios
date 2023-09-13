@@ -23,6 +23,6 @@
     NSArray *_data;
     NSDictionary *_selectedRow;
 }
-@property (strong, nonatomic) IRCCloudJSONObject *event;
+@property (strong) IRCCloudJSONObject *event;
 -(void)refresh;
 @end

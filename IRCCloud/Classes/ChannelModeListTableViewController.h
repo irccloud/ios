@@ -31,8 +31,8 @@
     NSString *_mask;
     BOOL _canChangeMode;
 }
-@property (strong, nonatomic) NSArray *data;
-@property (strong, nonatomic) IRCCloudJSONObject *event;
+@property (strong) NSArray *data;
+@property (strong) IRCCloudJSONObject *event;
 @property NSString *mask;
 
 -(id)initWithList:(int)list mode:(NSString *)mode param:(NSString *)param placeholder:(NSString *)placeholder cid:(int)cid bid:(int)bid;

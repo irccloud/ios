@@ -42,14 +42,14 @@
     NSString *_displayName;
     NSMutableDictionary *_typingIndicators;
 }
-@property (nonatomic, assign) int bid, cid, archived, deferred, timeout, extraHighlights;
-@property (nonatomic, assign) NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom, created;
-@property (nonatomic, assign) CGFloat savedScrollOffset;
-@property (nonatomic, copy) NSString *name, *type, *away_msg, *chantypes;
-@property (nonatomic, assign) BOOL valid, scrolledUp, serverIsSlack;
-@property (nonatomic, copy) NSString *draft;
-@property (nonatomic, strong) Buffer *lastBuffer, *nextBuffer;
-@property (nonatomic, strong) NSMutableDictionary *typingIndicators;
+@property (assign) int bid, cid, archived, deferred, timeout, extraHighlights;
+@property (assign) NSTimeInterval min_eid, last_seen_eid, scrolledUpFrom, created;
+@property (assign) CGFloat savedScrollOffset;
+@property (copy) NSString *name, *type, *away_msg, *chantypes;
+@property (assign) BOOL valid, scrolledUp, serverIsSlack;
+@property (copy) NSString *draft;
+@property (strong) Buffer *lastBuffer, *nextBuffer;
+@property (strong) NSMutableDictionary *typingIndicators;
 @property (readonly) NSString *accessibilityValue, *normalizedName, *displayName;
 @property (readonly) BOOL isMPDM;
 -(NSComparisonResult)compare:(Buffer *)aBuffer;

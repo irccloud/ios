@@ -128,11 +128,11 @@
     UILabel *_typingIndicator;
     NSTimer *_typingTimer;
 }
-@property (nonatomic) int cidToOpen;
-@property (nonatomic) int bidToOpen;
-@property (nonatomic) NSTimeInterval eidToOpen;
-@property (nonatomic) NSString *incomingDraft;
-@property (nonatomic) NSString *bufferToOpen;
+@property (assign) int cidToOpen;
+@property (assign) int bidToOpen;
+@property (assign) NSTimeInterval eidToOpen;
+@property (copy) NSString *incomingDraft;
+@property (copy) NSString *bufferToOpen;
 @property (readonly) EventsTableView *eventsView;
 @property (readonly) Buffer *buffer;
 @property BOOL isShowingPreview;

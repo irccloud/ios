@@ -24,6 +24,6 @@
     UIBarButtonItem *_addButton;
     UILabel *_placeholder;
 }
-@property (strong, nonatomic) NSArray *nicks;
-@property (strong, nonatomic) IRCCloudJSONObject *event;
+@property (strong) NSArray *nicks;
+@property (strong) IRCCloudJSONObject *event;
 @end

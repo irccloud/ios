@@ -24,9 +24,9 @@
     NSMutableDictionary *_selfImages;
     NSTimeInterval _lastAccessTime;
 }
-@property (nonatomic, assign) int bid;
-@property (nonatomic, copy) NSString *nick, *displayName;
-@property (nonatomic, readonly) NSTimeInterval lastAccessTime;
+@property (assign) int bid;
+@property (copy) NSString *nick, *displayName;
+@property (readonly) NSTimeInterval lastAccessTime;
 -(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf;
 -(UIImage *)getImage:(int)size isSelf:(BOOL)isSelf isChannel:(BOOL)isChannel;
 @end

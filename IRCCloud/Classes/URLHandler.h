@@ -24,8 +24,8 @@ typedef void (^mediaURLResult)(BOOL, NSString *);
     NSMutableDictionary *_fileIDs;
 }
 
-@property (nonatomic, copy) NSURL *appCallbackURL;
-@property (strong, nonatomic) UIWindow *window;
+@property (copy) NSURL *appCallbackURL;
+@property (strong) UIWindow *window;
 
 + (BOOL)isImageURL:(NSURL *)url;
 + (BOOL)isYouTubeURL:(NSURL *)url;

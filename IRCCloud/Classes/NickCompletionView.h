@@ -27,7 +27,7 @@
     NSInteger _selection;
 }
 @property (readonly) UIFont *font;
-@property (nonatomic, assign) id<NickCompletionViewDelegate> completionDelegate;
+@property (assign) id<NickCompletionViewDelegate> completionDelegate;
 @property NSInteger selection;
 -(void)setSuggestions:(NSArray *)suggestions;
 -(NSUInteger)count;

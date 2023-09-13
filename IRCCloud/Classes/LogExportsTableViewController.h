@@ -35,7 +35,7 @@
 
 @property Buffer *buffer;
 @property Server *server;
-@property (nonatomic, copy) void (^completionHandler)(void);
+@property (copy) void (^completionHandler)(void);
 
 -(void)download:(NSURL *)url;
 

@@ -35,5 +35,5 @@
     UISwitch *_nocolors;
     UISwitch *_typingStatus;
 }
-@property (strong, nonatomic) Buffer *buffer;
+@property (strong) Buffer *buffer;
 @end

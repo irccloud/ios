@@ -110,7 +110,7 @@ volatile BOOL __socketPaused = NO;
 }
 @property (readonly) NSString *url;
 @property int bid;
-@property (nonatomic, copy) void (^completionHandler)(BOOL);
+@property (copy) void (^completionHandler)(BOOL);
 -(id)initWithURL:(NSString *)URL;
 -(void)cancel;
 -(void)start;

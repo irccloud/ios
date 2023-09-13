@@ -22,8 +22,8 @@
     UITapGestureRecognizer *_tapGesture;
     NSMutableArray *_links;
 }
-@property (nonatomic, unsafe_unretained) id <LinkTextViewDelegate> linkDelegate;
-@property (nonatomic, strong) NSDictionary *linkAttributes;
+@property (unsafe_unretained) id <LinkTextViewDelegate> linkDelegate;
+@property (strong) NSDictionary *linkAttributes;
 
 - (void)addLinkToURL:(NSURL *)url withRange:(NSRange)range;
 - (void)addLinkWithTextCheckingResult:(NSTextCheckingResult *)result;

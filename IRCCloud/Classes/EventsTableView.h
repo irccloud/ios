@@ -98,11 +98,11 @@
 @property (readonly) UILabel *topUnreadLabel;
 @property (readonly) UILabel *bottomUnreadLabel;
 @property (readonly) UILabel *bottomUnreadArrow;
-@property (nonatomic) NSTimeInterval eidToOpen;
+@property (assign) NSTimeInterval eidToOpen;
 @property (readonly) UIImageView *stickyAvatar;
 @property Buffer *buffer;
 @property NSString *msgid;
-@property (nonatomic) BOOL shouldAutoFetch;
+@property (assign) BOOL shouldAutoFetch;
 -(void)insertEvent:(Event *)event backlog:(BOOL)backlog nextIsGrouped:(BOOL)nextIsGrouped;
 -(IBAction)topUnreadBarClicked:(id)sender;
 -(IBAction)bottomUnreadBarClicked:(id)sender;
