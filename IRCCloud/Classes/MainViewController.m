@@ -65,6 +65,8 @@
 #import "LicenseViewController.h"
 @import Firebase;
 
+#define TEXT_AREA_FONT_SIZE (FONT_SIZE > 14 ? FONT_SIZE : 14)
+
 extern NSDictionary *emojiMap;
 
 NSArray *_sortedUsers;
@@ -290,10 +292,10 @@ NSArray *_sortedChannels;
     [self->_message setBackgroundImage:[UIColor textareaBackgroundImage]];
     self->_message.textColor = [UIColor textareaTextColor];
     self->_message.keyboardAppearance = [UITextField appearance].keyboardAppearance;
-    self->_defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
+    self->_defaultTextareaFont = [UIFont systemFontOfSize:TEXT_AREA_FONT_SIZE weight:UIFontWeightRegular];
     if(!_message.text.length)
         self->_message.font = self->_defaultTextareaFont;
-    self->_message.minimumHeight = FONT_SIZE + 22;
+    self->_message.minimumHeight = TEXT_AREA_FONT_SIZE + 22;
     if(self->_message.minimumHeight < 35)
         self->_message.minimumHeight = 35;
     self->_typingIndicator.textColor = [UIColor timestampColor];
@@ -471,7 +473,7 @@ NSArray *_sortedChannels;
     self->_message.autoresizesSubviews = NO;
     self->_message.translatesAutoresizingMaskIntoConstraints = NO;
     //    _message.internalTextView.font = self->_defaultTextareaFont = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:FONT_SIZE];
-    self->_message.internalTextView.font = self->_defaultTextareaFont = [UIFont systemFontOfSize:FONT_SIZE weight:UIFontWeightRegular];
+    self->_message.internalTextView.font = self->_defaultTextareaFont = [UIFont systemFontOfSize:TEXT_AREA_FONT_SIZE weight:UIFontWeightRegular];
     self->_messageWidthConstraint = [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:0.0f];
     self->_messageHeightConstraint = [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:0 multiplier:1.0f constant:36.0f];
     [self->_message addConstraints:@[self->_messageWidthConstraint, _messageHeightConstraint]];
