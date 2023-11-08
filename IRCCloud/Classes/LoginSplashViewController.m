@@ -563,8 +563,8 @@
                     }
                     return;
                 }
-                if([loginDict[AppExtensionReturnedFieldsKey][@"Name"] length])
-                    self->name.text = loginDict[AppExtensionReturnedFieldsKey][@"Name"];
+                if(((NSString *)loginDict[AppExtensionReturnedFieldsKey][@"Name"]).length)
+                    self->name.text = (NSString *)(loginDict[AppExtensionReturnedFieldsKey][@"Name"]);
                 if([loginDict[AppExtensionUsernameKey] length])
                     self->username.text = loginDict[AppExtensionUsernameKey];
                 self->password.text = loginDict[AppExtensionPasswordKey] ? : @"";
