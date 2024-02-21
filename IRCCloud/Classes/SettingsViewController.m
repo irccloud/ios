@@ -21,7 +21,6 @@
 #import "AppDelegate.h"
 #import "UIColor+IRCCloud.h"
 #import "OpenInChromeController.h"
-#import "ImgurLoginViewController.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "ColorFormatter.h"
 #import "OpenInChromeController.h"
@@ -69,9 +68,9 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"imageservicecell"];
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"browserservicecell"];
     if(!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"imageservicecell"];
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"browserservicecell"];
     
     cell.textLabel.text = [self->_browsers objectAtIndex:indexPath.row];
     cell.accessoryType = [[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:[self->_browsers objectAtIndex:indexPath.row]]?UITableViewCellAccessoryCheckmark:UITableViewCellAccessoryNone;
@@ -148,75 +147,6 @@
 
 -(void)setSelected:(BOOL)selected animated:(BOOL)animated {
     [super setSelected:selected animated:animated];
-}
-
-@end
-
-@interface ImageServiceViewController : UITableViewController
-@end
-
-@implementation ImageServiceViewController
-
--(id)init {
-    self = [super initWithStyle:UITableViewStyleGrouped];
-    if (self) {
-        self.navigationItem.title = @"Image Service";
-    }
-    return self;
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-#pragma mark - Table view data source
-
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
-    return 1;
-}
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return 2;
-}
-
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"imageservicecell"];
-    if(!cell)
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"imageservicecell"];
-    
-    cell.accessoryType = UITableViewCellAccessoryNone;
-    
-    switch(indexPath.row) {
-        case 0:
-            cell.textLabel.text = @"IRCCloud";
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"])
-                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            break;
-        case 1:
-            cell.textLabel.text = @"imgur";
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"])
-                cell.accessoryType = UITableViewCellAccessoryCheckmark;
-            break;
-    }
-    
-    return cell;
-}
-
-#pragma mark - Table view delegate
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
-    switch(indexPath.row) {
-        case 0:
-            [[NSUserDefaults standardUserDefaults] setObject:@"IRCCloud" forKey:@"imageService"];
-            break;
-        case 1:
-            [[NSUserDefaults standardUserDefaults] setObject:@"imgur" forKey:@"imageService"];
-            break;
-    }
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    [tableView reloadData];
-    [self.navigationController popViewControllerAnimated:YES];
 }
 
 @end
@@ -865,20 +795,6 @@
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
     if(!isCatalyst) {
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-            [photos addObject:@{@"title":@"Image Service", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"], @"selected":^{[self.navigationController pushViewController:[[ImageServiceViewController alloc] init] animated:YES];}}];
-        }
-        if(![[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"] || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"imgur"]) {
-            [photos addObject:@{@"title":@"Imgur.com Account", @"value":[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"]?[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"]:@"", @"selected":^{
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
-                [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
-                [[NSUserDefaults standardUserDefaults] synchronize];
-                [self.navigationController pushViewController:[[ImgurLoginViewController alloc] init] animated:YES];
-            }}];
-        }
         [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":self->_saveToCameraRoll}];
     }
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];

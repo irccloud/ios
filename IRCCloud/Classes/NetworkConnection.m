@@ -2736,11 +2736,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         [self _logout:s];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"host"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"path"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
-    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"uploadsAvailable"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"theme"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"logs_cache"];

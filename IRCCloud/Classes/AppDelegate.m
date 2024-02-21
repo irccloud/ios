@@ -136,7 +136,7 @@ extern NSURL *__logfile;
     sharedcontainer = [sharedcontainer URLByAppendingPathComponent:@"attachments/"];
     [[NSFileManager defaultManager] removeItemAtURL:sharedcontainer error:nil];
     
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"imageService":@"IRCCloud", @"uploadsAvailable":@(NO), @"browser":[SFSafariViewController class]?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"uploadsAvailable":@(NO), @"browser":[SFSafariViewController class]?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES)}];
     if (@available(iOS 14, *)) {
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * ([NSProcessInfo processInfo].macCatalystApp ? 1.0 : 0.8))}];
     } else {
@@ -162,6 +162,12 @@ extern NSURL *__logfile;
             [[NSUserDefaults standardUserDefaults] setObject:@"Chrome" forKey:@"browser"];
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"useChrome"];
     }
+    
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
     
     self->_conn = [NetworkConnection sharedInstance];
 #ifdef DEBUG
@@ -204,15 +210,6 @@ extern NSURL *__logfile;
     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"photoSize"] forKey:@"photoSize"];
     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
     [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"uploadsAvailable"] forKey:@"uploadsAvailable"];
-    [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] forKey:@"imageService"];
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"])
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_access_token"] forKey:@"imgur_access_token"];
-    else
-        [d removeObjectForKey:@"imgur_access_token"];
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"])
-        [d setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_refresh_token"] forKey:@"imgur_refresh_token"];
-    else
-        [d removeObjectForKey:@"imgur_refresh_token"];
     [d synchronize];
     
     self.splashViewController = [[UIStoryboard storyboardWithName:@"MainStoryboard" bundle:nil] instantiateViewControllerWithIdentifier:@"SplashViewController"];

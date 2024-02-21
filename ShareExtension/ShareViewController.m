@@ -58,22 +58,18 @@
                     i = output.attachments.firstObject;
                 
                 NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
-                    if([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
-                        NSLog(@"Uploading image to IRCCloud");
-                        self->_item = item;
-                        if([i hasItemConformingToTypeIdentifier:@"public.png"])
-                            [self->_fileUploader uploadPNG:item];
-                        else
-                            [self->_fileUploader uploadImage:item];
-                        if(!self->_filename)
-                            self->_filename = self->_fileUploader.originalFilename;
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [self reloadConfigurationItems];
-                            [self validateContent];
-                        }];
-                    } else {
-                        self->_uploadStarted = YES;
-                    }
+                    NSLog(@"Uploading image to IRCCloud");
+                    self->_item = item;
+                    if([i hasItemConformingToTypeIdentifier:@"public.png"])
+                        [self->_fileUploader uploadPNG:item];
+                    else
+                        [self->_fileUploader uploadImage:item];
+                    if(!self->_filename)
+                        self->_filename = self->_fileUploader.originalFilename;
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [self reloadConfigurationItems];
+                        [self validateContent];
+                    }];
                 };
                 
                 NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
@@ -81,16 +77,14 @@
                             self->_fileUploader.originalFilename = [[item pathComponents] lastObject];
                         [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
                     } else {
-                        if([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                            NSLog(@"Uploading file to IRCCloud");
-                            [i hasItemConformingToTypeIdentifier:@"public.movie"]?[self->_fileUploader uploadVideo:item]:[self->_fileUploader uploadFile:item];
-                            if(!self->_filename)
-                                self->_filename = self->_fileUploader.originalFilename;
-                            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                [self reloadConfigurationItems];
-                                [self validateContent];
-                            }];
-                        }
+                        NSLog(@"Uploading file to IRCCloud");
+                        [i hasItemConformingToTypeIdentifier:@"public.movie"]?[self->_fileUploader uploadVideo:item]:[self->_fileUploader uploadFile:item];
+                        if(!self->_filename)
+                            self->_filename = self->_fileUploader.originalFilename;
+                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                            [self reloadConfigurationItems];
+                            [self validateContent];
+                        }];
                     }
                 };
                 
@@ -150,8 +144,6 @@
 #endif
     IRCCLOUD_HOST = [d objectForKey:@"host"];
     IRCCLOUD_PATH = [d objectForKey:@"path"];
-    self->_uploader = [[ImageUploader alloc] init];
-    self->_uploader.delegate = self;
     self->_fileUploader = [[FileUploader alloc] init];
     self->_fileUploader.delegate = self;
     [[NSUserDefaults standardUserDefaults] setObject:[d objectForKey:@"cacheVersion"] forKey:@"cacheVersion"];
@@ -256,13 +248,14 @@
                 i = output.attachments.firstObject;
 
             NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
-                NSLog(@"Uploading image to imgur");
-                self->_uploader.bid = self->_buffer.bid;
-                self->_uploader.msg = self.contentText;
-                [self->_uploader upload:item];
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
-                }];
+                self->_fileUploader.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
+                [self->_fileUploader setFilename:self->_filename message:self.contentText];
+                [self->_fileUploader uploadImage:item];
+                if(!self->_fileUploader.finished) {
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
+                    }];
+                }
             };
             
             NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
@@ -326,7 +319,7 @@
             NSExtensionItem *output = [input copy];
             output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
             
-            if(output.attachments.count && (([[d objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"]) || [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.movie"])) {
+            if(output.attachments.count && ([output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"] || [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.movie"])) {
                 SLComposeSheetConfigurationItem *filenameConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
                 filenameConfigItem.title = @"Filename";
                 if(self->_filename)
@@ -449,44 +442,6 @@
 }
 
 -(void)fileUploadWasCancelled {
-}
-
--(void)imageUploadProgress:(float)progress {
-}
-
--(void)imageUploadDidFail {
-    NSLog(@"Image upload failed");
-    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Unable to upload photo to imgur. Please try again later." preferredStyle:UIAlertControllerStyleAlert];
-    [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        [self cancel];
-        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
-    }]];
-    [self presentViewController:c animated:YES completion:nil];
-}
-
--(void)imageUploadNotAuthorized {
-    NSLog(@"Image upload not authorized");
-    UIAlertController *c = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"Unable to authorize your imgur account. Check your imgur username and password and try again." preferredStyle:UIAlertControllerStyleAlert];
-    [c addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action) {
-        [self cancel];
-        [self.extensionContext completeRequestReturningItems:nil completionHandler:nil];
-    }]];
-    [self presentViewController:c animated:YES completion:nil];
-}
-
--(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
-    if([[d objectForKey:@"success"] intValue] == 1) {
-        NSLog(@"Image upload successful");
-        NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
-        if(self.contentText.length)
-            [self->_conn say:[NSString stringWithFormat:@"%@ %@", self.contentText, link] to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
-        else
-            [self->_conn say:link to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
-    } else {
-        NSLog(@"Image upload failed");
-    }
-    [self->_conn disconnect];
-    AudioServicesPlaySystemSound(self->_sound);
 }
 
 -(void)spamSelected:(int)cid {

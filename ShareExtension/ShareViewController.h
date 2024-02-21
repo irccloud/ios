@@ -10,15 +10,13 @@
 #import <Social/Social.h>
 #import "BuffersTableView.h"
 #import "NetworkConnection.h"
-#import "ImageUploader.h"
 #import "FileUploader.h"
 
-@interface ShareViewController : SLComposeServiceViewController<BuffersTableViewDelegate,ImageUploaderDelegate,FileUploaderDelegate,UITextFieldDelegate,UITextViewDelegate> {
+@interface ShareViewController : SLComposeServiceViewController<BuffersTableViewDelegate,FileUploaderDelegate,UITextFieldDelegate,UITextViewDelegate> {
     NetworkConnection *_conn;
     BuffersTableView *_buffersView;
     UIViewController *_splash;
     Buffer *_buffer;
-    ImageUploader *_uploader;
     FileUploader *_fileUploader;
     SystemSoundID _sound;
     NSString *_filename;

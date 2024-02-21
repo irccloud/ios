@@ -39,7 +39,6 @@
 #import "DisplayOptionsViewController.h"
 #import "WhoListTableViewController.h"
 #import "NamesListTableViewController.h"
-#import "ImgurLoginViewController.h"
 #import <objc/message.h>
 #import "config.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
@@ -596,34 +595,22 @@ NSArray *_sortedChannels;
     
     id imageHandler = ^(UIImage *item, NSError *error) {
         if(item) {
-            if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) {
-                CLS_LOG(@"Uploading dropped image to IRCCloud");
-                [u uploadImage:item];
-            } else {
-                CLS_LOG(@"Uploading dropped image to imgur");
-                ImageUploader *img = [[ImageUploader alloc] init];
-                img.delegate = self;
-                img.bid = self->_buffer.bid;
-                [img upload:item];
-            }
+            CLS_LOG(@"Uploading dropped image to IRCCloud");
+            [u uploadImage:item];
         } else {
             CLS_LOG(@"Unable to handle dropped image: %@", error);
         }
     };
     
     if([i hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
-        if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
-            [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
-        } else {
-            [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
-                if(url) {
-                    CLS_LOG(@"Uploading dropped file to IRCCloud");
-                    [i hasItemConformingToTypeIdentifier:@"public.movie"]?[u uploadVideo:url]:[u uploadFile:url];
-                } else {
-                    CLS_LOG(@"Unable to handle dropped file: %@", error);
-                }
-            }];
-        }
+        [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
+            if(url) {
+                CLS_LOG(@"Uploading dropped file to IRCCloud");
+                [i hasItemConformingToTypeIdentifier:@"public.movie"]?[u uploadVideo:url]:[u uploadFile:url];
+            } else {
+                CLS_LOG(@"Unable to handle dropped file: %@", error);
+            }
+        }];
     } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
         [i loadInPlaceFileRepresentationForTypeIdentifier:@"public.movie" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
             if(url) {
@@ -638,15 +625,13 @@ NSArray *_sortedChannels;
     }
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"] || ![i hasItemConformingToTypeIdentifier:@"public.image"]) {
-            UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-            [self presentViewController:nc animated:YES completion:nil];
-        }
+        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+        [self presentViewController:nc animated:YES completion:nil];
     }];
 }
 
@@ -4653,78 +4638,55 @@ NSArray *_sortedChannels;
             else if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(mediaURL.path))
                 UISaveVideoAtPathToSavedPhotosAlbum(mediaURL.path, nil, nil, nil);
         }
-        if((!img || [[[NSUserDefaults standardUserDefaults] objectForKey:@"imageService"] isEqualToString:@"IRCCloud"]) && [[NSUserDefaults standardUserDefaults] boolForKey:@"uploadsAvailable"]) {
-            FileUploader *u = [[FileUploader alloc] init];
-            u.delegate = self;
-            u.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
-            u.msgid = self->_msgid;
-            fvc = [[FileMetadataViewController alloc] initWithUploader:u];
-            if(picker == nil || picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
-                [fvc showCancelButton];
-            }
-            
-            if(refURL) {
+        FileUploader *u = [[FileUploader alloc] init];
+        u.delegate = self;
+        u.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
+        u.msgid = self->_msgid;
+        fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+        if(picker == nil || picker.sourceType == UIImagePickerControllerSourceTypeCamera) {
+            [fvc showCancelButton];
+        }
+        
+        if(refURL) {
 #if !TARGET_OS_MACCATALYST
-                CLS_LOG(@"Loading metadata from asset library");
-                ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
-                    ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
-                    CLS_LOG(@"Got filename: %@", imageRep.filename);
-                    u.originalFilename = imageRep.filename;
-                    if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
-                        CLS_LOG(@"Uploading file URL");
-                        u.originalFilename = [u.originalFilename stringByReplacingOccurrencesOfString:@".MOV" withString:@".MP4"];
-                        [u uploadVideo:[info objectForKey:UIImagePickerControllerMediaURL]];
-                        [fvc viewWillAppear:NO];
-                    } else if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
-                        CLS_LOG(@"Uploading file data");
-                        NSMutableData *data = [[NSMutableData alloc] initWithCapacity:(NSUInteger)imageRep.size];
-                        uint8_t buffer[4096];
-                        long long len = 0;
-                        while(len < imageRep.size) {
-                            long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
-                            [data appendBytes:buffer length:(NSUInteger)i];
-                            len += i;
-                        }
-                        [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
-                        [fvc viewWillAppear:NO];
-                    } else {
-                        CLS_LOG(@"Uploading UIImage");
-                        [u uploadImage:img];
-                        [fvc viewWillAppear:NO];
-                    }
-                    if(imageRep.fullScreenImage) {
-                        UIImage *thumbnail = [FileUploader image:[UIImage imageWithCGImage:imageRep.fullScreenImage] scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [fvc setImage:thumbnail];
-                        }];
-                    }
-                };
-                
-                ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
-                [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:^(NSError *e) {
-                    CLS_LOG(@"Error getting asset: %@", e);
-                    if(img) {
-                        [u uploadImage:img];
-                        UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [fvc setImage:thumbnail];
-                        }];
-                    } else if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
-                        [u uploadVideo:mediaURL];
-                    } else {
-                        [u uploadFile:mediaURL];
-                    }
+            CLS_LOG(@"Loading metadata from asset library");
+            ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
+                ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
+                CLS_LOG(@"Got filename: %@", imageRep.filename);
+                u.originalFilename = imageRep.filename;
+                if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
+                    CLS_LOG(@"Uploading file URL");
+                    u.originalFilename = [u.originalFilename stringByReplacingOccurrencesOfString:@".MOV" withString:@".MP4"];
+                    [u uploadVideo:[info objectForKey:UIImagePickerControllerMediaURL]];
                     [fvc viewWillAppear:NO];
-                }];
-#endif
-            } else if([info objectForKey:@"gifData"]) {
-                CLS_LOG(@"Uploading GIF from Pasteboard");
-                [u uploadFile:[NSString stringWithFormat:@"%li.GIF", time(NULL)] UTI:@"image/gif" data:[info objectForKey:@"gifData"]];
-                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [fvc setImage:img];
-                }];
-            } else {
-                CLS_LOG(@"no asset library URL, uploading image data instead");
+                } else if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
+                    CLS_LOG(@"Uploading file data");
+                    NSMutableData *data = [[NSMutableData alloc] initWithCapacity:(NSUInteger)imageRep.size];
+                    uint8_t buffer[4096];
+                    long long len = 0;
+                    while(len < imageRep.size) {
+                        long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
+                        [data appendBytes:buffer length:(NSUInteger)i];
+                        len += i;
+                    }
+                    [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
+                    [fvc viewWillAppear:NO];
+                } else {
+                    CLS_LOG(@"Uploading UIImage");
+                    [u uploadImage:img];
+                    [fvc viewWillAppear:NO];
+                }
+                if(imageRep.fullScreenImage) {
+                    UIImage *thumbnail = [FileUploader image:[UIImage imageWithCGImage:imageRep.fullScreenImage] scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [fvc setImage:thumbnail];
+                    }];
+                }
+            };
+            
+            ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
+            [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:^(NSError *e) {
+                CLS_LOG(@"Error getting asset: %@", e);
                 if(img) {
                     [u uploadImage:img];
                     UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
@@ -4736,16 +4698,28 @@ NSArray *_sortedChannels;
                 } else {
                     [u uploadFile:mediaURL];
                 }
-            }
+                [fvc viewWillAppear:NO];
+            }];
+#endif
+        } else if([info objectForKey:@"gifData"]) {
+            CLS_LOG(@"Uploading GIF from Pasteboard");
+            [u uploadFile:[NSString stringWithFormat:@"%li.GIF", time(NULL)] UTI:@"image/gif" data:[info objectForKey:@"gifData"]];
+            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                [fvc setImage:img];
+            }];
         } else {
-            [self _showConnectingView];
-            self->_connectingStatus.text = @"Uploading";
-            self->_connectingProgress.progress = 0;
-            self->_connectingProgress.hidden = YES;
-            ImageUploader *u = [[ImageUploader alloc] init];
-            u.delegate = self;
-            u.bid = self->_buffer.bid;
-            [u upload:img];
+            CLS_LOG(@"no asset library URL, uploading image data instead");
+            if(img) {
+                [u uploadImage:img];
+                UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [fvc setImage:thumbnail];
+                }];
+            } else if([[info objectForKey:UIImagePickerControllerMediaType] isEqualToString:@"public.movie"]) {
+                [u uploadVideo:mediaURL];
+            } else {
+                [u uploadFile:mediaURL];
+            }
         }
     }
     
@@ -4852,82 +4826,6 @@ NSArray *_sortedChannels;
 -(void)fileUploadWasCancelled {
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         CLS_LOG(@"File upload was cancelled");
-        [self _hideConnectingView];
-    }];
-}
-
--(void)imageUploadProgress:(float)progress {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        self->_connectingProgress.hidden = NO;
-        [self->_connectingProgress setProgress:progress animated:YES];
-    }];
-}
-
--(void)imageUploadDidFail {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Upload Failed" message:@"An error occured while uploading the photo. Please try again." preferredStyle:UIAlertControllerStyleAlert];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
-        [self presentViewController:alert animated:YES completion:nil];
-        [self _hideConnectingView];
-    }];
-}
-
--(void)imageUploadNotAuthorized {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_token_type"];
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_expires_in"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-        [self _hideConnectingView];
-        SettingsViewController *svc = [[SettingsViewController alloc] initWithStyle:UITableViewStyleGrouped];
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:svc];
-        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-        [nc pushViewController:[[ImgurLoginViewController alloc] init] animated:NO];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationPageSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        if(self.presentedViewController)
-            [self dismissViewControllerAnimated:NO completion:nil];
-        [self presentViewController:nc animated:YES completion:nil];
-    }];
-}
-
--(void)imageUploadDidFinish:(NSDictionary *)d bid:(int)bid {
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        if([[d objectForKey:@"success"] intValue] == 1) {
-            NSString *link = [[[d objectForKey:@"data"] objectForKey:@"link"] stringByReplacingOccurrencesOfString:@"http://" withString:@"https://"];
-            Buffer *b = self->_buffer;
-            if(bid == self->_buffer.bid) {
-                if(self->_message.text.length == 0) {
-                    self->_message.text = link;
-                } else {
-                    if(![self->_message.text hasSuffix:@" "])
-                        self->_message.text = [self->_message.text stringByAppendingString:@" "];
-                    self->_message.text = [self->_message.text stringByAppendingString:link];
-                }
-            } else {
-                b = [[BuffersDataSource sharedInstance] getBuffer:bid];
-                if(b) {
-                    if(b.draft.length == 0) {
-                        b.draft = link;
-                    } else {
-                        if(![b.draft hasSuffix:@" "])
-                            b.draft = [b.draft stringByAppendingString:@" "];
-                        b.draft = [b.draft stringByAppendingString:link];
-                    }
-                }
-            }
-            if([UIApplication sharedApplication].applicationState != UIApplicationStateActive) {
-                [[NotificationsDataSource sharedInstance] alert:@"Your image has been uploaded and is ready to send" title:nil category:nil userInfo:@{@"d":@[@(b.cid), @(b.bid), @(-1)]}];
-            }
-        } else {
-            CLS_LOG(@"imgur upload failed: %@", d);
-            [self imageUploadDidFail];
-            return;
-        }
         [self _hideConnectingView];
     }];
 }

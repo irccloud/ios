@@ -58,7 +58,6 @@
 		22103508197EFC6200AB414F /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
 		22103509197EFC6200AB414F /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
 		2210350A197EFC6200AB414F /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
-		2210350B197EFC6200AB414F /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		2210350C197EFC6200AB414F /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		2210350D197EFC6200AB414F /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		2210350E197EFC6200AB414F /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
@@ -206,8 +205,6 @@
 		22324FE0177DE51A008B6912 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22324FDF177DE51A008B6912 /* SystemConfiguration.framework */; };
 		2232ABD6230C1D66007431B5 /* UITableViewController+HeaderColorFix.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */; };
 		2232ABD7230C1D66007431B5 /* UITableViewController+HeaderColorFix.m in Sources */ = {isa = PBXBuildFile; fileRef = 2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */; };
-		223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
-		223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		2236193828B5435F0077C850 /* Intents.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2236193728B5435F0077C850 /* Intents.framework */; };
 		2236193A28B54D970077C850 /* IntentsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2236193928B54D970077C850 /* IntentsUI.framework */; };
 		2236193B28B54DAC0077C850 /* IntentsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2236193928B54D970077C850 /* IntentsUI.framework */; };
@@ -624,7 +621,6 @@
 		22D9779A215BC910005C2713 /* LinksListTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 221D4B851E1BE2F700D403E6 /* LinksListTableViewController.m */; };
 		22D9779B215BC910005C2713 /* NotificationsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B2036D1B5FE3BE0058078D /* NotificationsDataSource.m */; };
 		22D9779D215BC910005C2713 /* HandshakeHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285016D831A800498507 /* HandshakeHeader.m */; };
-		22D977A0215BC910005C2713 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22D977A1215BC910005C2713 /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 229323FC1E8945D700ADAA22 /* TSKPinFailureReport.m */; };
 		22D977A7215BC910005C2713 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
 		22D977A9215BC910005C2713 /* MutableQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4285216D831A800498507 /* MutableQueue.m */; };
@@ -684,7 +680,6 @@
 		22D9780A215BC910005C2713 /* UIExpandingTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A31725AAEA003C0684 /* UIExpandingTextView.m */; };
 		22D9780D215BC910005C2713 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
 		22D9780F215BC910005C2713 /* PastebinViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22C2E0561B0E2E4800387B4B /* PastebinViewController.m */; };
-		22D97811215BC910005C2713 /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		22D97812215BC910005C2713 /* TSKNSURLSessionDelegateProxy.m in Sources */ = {isa = PBXBuildFile; fileRef = 229324051E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m */; };
 		22D97813215BC910005C2713 /* UIExpandingTextViewInternal.m in Sources */ = {isa = PBXBuildFile; fileRef = 22D430A51725AAEA003C0684 /* UIExpandingTextViewInternal.m */; };
 		22D97814215BC910005C2713 /* OnePasswordExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 22A363B119D0884D00500478 /* OnePasswordExtension.m */; };
@@ -872,7 +867,6 @@
 		22DB25001982DF2B0008728E /* BuffersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5FD16DA8928007BE535 /* BuffersDataSource.m */; };
 		22DB25011982DF2B0008728E /* ChannelsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F60116DBC021007BE535 /* ChannelsDataSource.m */; };
 		22DB25021982DF2B0008728E /* EventsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22F9EE1B16DE6F21004615C0 /* EventsDataSource.m */; };
-		22DB25031982DF2B0008728E /* ImageUploader.m in Sources */ = {isa = PBXBuildFile; fileRef = 223581C2191AD79B00A4B124 /* ImageUploader.m */; };
 		22DB25041982DF2B0008728E /* IRCCloudJSONObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4288516D846BF00498507 /* IRCCloudJSONObject.m */; };
 		22DB25051982DF2B0008728E /* NetworkConnection.m in Sources */ = {isa = PBXBuildFile; fileRef = 22B4284716D7E36300498507 /* NetworkConnection.m */; };
 		22DB25061982DF2B0008728E /* ServersDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 2236F5F916DA765C007BE535 /* ServersDataSource.m */; };
@@ -904,8 +898,6 @@
 		22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
 		22DB8D701C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
 		22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
-		22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
-		22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */; };
 		22E54AE01D10593B00891FE4 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
 		22E54AE11D10593B00891FE4 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
 		22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
@@ -1190,8 +1182,6 @@
 		22324FDF177DE51A008B6912 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		2232ABD4230C1D66007431B5 /* UITableViewController+HeaderColorFix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UITableViewController+HeaderColorFix.h"; sourceTree = "<group>"; };
 		2232ABD5230C1D66007431B5 /* UITableViewController+HeaderColorFix.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UITableViewController+HeaderColorFix.m"; sourceTree = "<group>"; };
-		223581C1191AD79B00A4B124 /* ImageUploader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUploader.h; sourceTree = "<group>"; };
-		223581C2191AD79B00A4B124 /* ImageUploader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUploader.m; sourceTree = "<group>"; };
 		2236193728B5435F0077C850 /* Intents.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Intents.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/Library/Frameworks/Intents.framework; sourceTree = DEVELOPER_DIR; };
 		2236193928B54D970077C850 /* IntentsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IntentsUI.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.3.sdk/System/iOSSupport/System/Library/Frameworks/IntentsUI.framework; sourceTree = DEVELOPER_DIR; };
 		2236BD621BAA5E0900015753 /* FontAwesome.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.otf; sourceTree = "<group>"; };
@@ -1602,8 +1592,6 @@
 		22DB253D1982E2890008728E /* IRCEnterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = IRCEnterprise.entitlements; path = ../IRCEnterprise.entitlements; sourceTree = "<group>"; };
 		22DB8D6E1C441C3000302271 /* YouTubeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YouTubeViewController.h; sourceTree = "<group>"; };
 		22DB8D6F1C441C3000302271 /* YouTubeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YouTubeViewController.m; sourceTree = "<group>"; };
-		22E442A3192AB85B00A6C687 /* ImgurLoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImgurLoginViewController.h; sourceTree = "<group>"; };
-		22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImgurLoginViewController.m; sourceTree = "<group>"; };
 		22E54ADE1D10593B00891FE4 /* AvatarsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AvatarsDataSource.h; sourceTree = "<group>"; };
 		22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AvatarsDataSource.m; sourceTree = "<group>"; };
 		22E9C0A71C9AF27800013456 /* OpenInFirefoxControllerObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInFirefoxControllerObjC.h; path = OpenInFirefoxClient/OpenInFirefoxControllerObjC.h; sourceTree = SOURCE_ROOT; };
@@ -2169,10 +2157,6 @@
 				222C80B51E48ABB200A243E7 /* ImageCache.m */,
 				2223C6A71768D7150032544B /* ImageViewController.h */,
 				2223C6A81768D7150032544B /* ImageViewController.m */,
-				223581C1191AD79B00A4B124 /* ImageUploader.h */,
-				223581C2191AD79B00A4B124 /* ImageUploader.m */,
-				22E442A3192AB85B00A6C687 /* ImgurLoginViewController.h */,
-				22E442A4192AB85B00A6C687 /* ImgurLoginViewController.m */,
 				22B4288416D846BF00498507 /* IRCCloudJSONObject.h */,
 				22B4288516D846BF00498507 /* IRCCloudJSONObject.m */,
 				223C407A1C60FE880081B02B /* IRCCloudSafariViewController.h */,
@@ -3702,7 +3686,6 @@
 				22103509197EFC6200AB414F /* ChannelsDataSource.m in Sources */,
 				229324671E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				2210350A197EFC6200AB414F /* EventsDataSource.m in Sources */,
-				2210350B197EFC6200AB414F /* ImageUploader.m in Sources */,
 				2210350C197EFC6200AB414F /* IRCCloudJSONObject.m in Sources */,
 				229324611E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				229324131E8945D700ADAA22 /* assert.c in Sources */,
@@ -3888,7 +3871,6 @@
 				221D4B871E1BE2F700D403E6 /* LinksListTableViewController.m in Sources */,
 				22B2036F1B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				225D974A18AA995900065087 /* HandshakeHeader.m in Sources */,
-				22E442A6192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
 				2293245A1E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				22E9C0AC1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */,
 				225D974B18AA995900065087 /* MutableQueue.m in Sources */,
@@ -3951,7 +3933,6 @@
 				225D976418AA995900065087 /* UIExpandingTextView.m in Sources */,
 				22E54AE11D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
 				22C2E0591B0E2E4800387B4B /* PastebinViewController.m in Sources */,
-				223581C4191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				229324721E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				225D976518AA995900065087 /* UIExpandingTextViewInternal.m in Sources */,
 				22A363B519D0884D00500478 /* OnePasswordExtension.m in Sources */,
@@ -4008,7 +3989,6 @@
 				221D4B861E1BE2F700D403E6 /* LinksListTableViewController.m in Sources */,
 				22B2036E1B5FE3BE0058078D /* NotificationsDataSource.m in Sources */,
 				22B4286A16D831A800498507 /* HandshakeHeader.m in Sources */,
-				22E442A5192AB85B00A6C687 /* ImgurLoginViewController.m in Sources */,
 				229324591E8945D700ADAA22 /* TSKPinFailureReport.m in Sources */,
 				22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */,
 				22B4286C16D831A800498507 /* MutableQueue.m in Sources */,
@@ -4071,7 +4051,6 @@
 				22D430A61725AAEA003C0684 /* UIExpandingTextView.m in Sources */,
 				22E54AE01D10593B00891FE4 /* AvatarsDataSource.m in Sources */,
 				22C2E0581B0E2E4800387B4B /* PastebinViewController.m in Sources */,
-				223581C3191AD79B00A4B124 /* ImageUploader.m in Sources */,
 				229324711E8945D700ADAA22 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				22D430A81725AAEA003C0684 /* UIExpandingTextViewInternal.m in Sources */,
 				22A363B419D0884D00500478 /* OnePasswordExtension.m in Sources */,
@@ -4144,7 +4123,6 @@
 				22D9779D215BC910005C2713 /* HandshakeHeader.m in Sources */,
 				22D97957215BC979005C2713 /* FLEXNetworkSettingsTableViewController.m in Sources */,
 				22D97972215BC979005C2713 /* FLEXArgumentInputViewFactory.m in Sources */,
-				22D977A0215BC910005C2713 /* ImgurLoginViewController.m in Sources */,
 				22D977A1215BC910005C2713 /* TSKPinFailureReport.m in Sources */,
 				22D9794F215BC979005C2713 /* FLEXDictionaryExplorerViewController.m in Sources */,
 				22D9797D215BC979005C2713 /* FLEXSystemLogTableViewController.m in Sources */,
@@ -4253,7 +4231,6 @@
 				22D97997215BC979005C2713 /* FLEXResources.m in Sources */,
 				22D9780F215BC910005C2713 /* PastebinViewController.m in Sources */,
 				22D97961215BC979005C2713 /* FLEXManager.m in Sources */,
-				22D97811215BC910005C2713 /* ImageUploader.m in Sources */,
 				22D97812215BC910005C2713 /* TSKNSURLSessionDelegateProxy.m in Sources */,
 				22D97813215BC910005C2713 /* UIExpandingTextViewInternal.m in Sources */,
 				22D97814215BC910005C2713 /* OnePasswordExtension.m in Sources */,
@@ -4336,7 +4313,6 @@
 				22DB25011982DF2B0008728E /* ChannelsDataSource.m in Sources */,
 				229324681E8945D700ADAA22 /* vendor_identifier.m in Sources */,
 				22DB25021982DF2B0008728E /* EventsDataSource.m in Sources */,
-				22DB25031982DF2B0008728E /* ImageUploader.m in Sources */,
 				22DB25041982DF2B0008728E /* IRCCloudJSONObject.m in Sources */,
 				229324621E8945D700ADAA22 /* TSKReportsRateLimiter.m in Sources */,
 				229324141E8945D700ADAA22 /* assert.c in Sources */,
