@@ -86,6 +86,7 @@
 -(void)setActiveScene:(UIWindow *)window;
 -(UIScene *)sceneForWindow:(UIWindow *)window API_AVAILABLE(ios(13.0));
 -(void)closeWindow:(UIWindow *)window;
+-(BOOL)isOnVisionOS;
 @end
 
 API_AVAILABLE(ios(13.0))

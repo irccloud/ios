@@ -136,7 +136,7 @@ extern NSURL *__logfile;
     sharedcontainer = [sharedcontainer URLByAppendingPathComponent:@"attachments/"];
     [[NSFileManager defaultManager] removeItemAtURL:sharedcontainer error:nil];
     
-    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"uploadsAvailable":@(NO), @"browser":[SFSafariViewController class]?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES)}];
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"uploadsAvailable":@(NO), @"browser":([SFSafariViewController class] && !((AppDelegate *)([UIApplication sharedApplication].delegate)).isOnVisionOS)?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES)}];
     if (@available(iOS 14, *)) {
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * ([NSProcessInfo processInfo].macCatalystApp ? 1.0 : 0.8))}];
     } else {
@@ -979,6 +979,15 @@ extern NSURL *__logfile;
             }
         }
     }
+}
+
+-(BOOL)isOnVisionOS { //From: https://medium.com/@timonus/low-hanging-fruit-for-ios-apps-running-on-visionos-08a85db0fb31
+    static BOOL isOnVisionOSDevice = NO;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        isOnVisionOSDevice = (NSClassFromString(@"UIWindowSceneGeometryPreferencesVision") != nil);
+    });
+    return isOnVisionOSDevice;
 }
 @end
 

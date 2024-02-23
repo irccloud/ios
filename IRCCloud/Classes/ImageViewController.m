@@ -228,7 +228,7 @@
         if([[OpenInFirefoxControllerObjC sharedInstance] openInFirefox:self->_url])
             return;
     }
-    if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Safari"] && [SFSafariViewController class] && [self->_url.scheme hasPrefix:@"http"]) {
+    if(![[[NSUserDefaults standardUserDefaults] objectForKey:@"browser"] isEqualToString:@"Safari"] && ([SFSafariViewController class] && !((AppDelegate *)([UIApplication sharedApplication].delegate)).isOnVisionOS) && [self->_url.scheme hasPrefix:@"http"]) {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             UIApplication *app = [UIApplication sharedApplication];
             AppDelegate *appDelegate = (AppDelegate *)app.delegate;

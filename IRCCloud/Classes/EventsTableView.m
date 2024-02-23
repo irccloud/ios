@@ -312,7 +312,7 @@ extern UIImage *__socketClosedBackgroundImage;
         player.modalPresentationStyle = UIModalPresentationCurrentContext;
         player.preferredContentSize = self.view.window.bounds.size;
         return player;
-    } else if([SFSafariViewController class] && [url.scheme hasPrefix:@"http"]) {
+    } else if(([SFSafariViewController class] && !((AppDelegate *)([UIApplication sharedApplication].delegate)).isOnVisionOS) && [url.scheme hasPrefix:@"http"]) {
         previewingContext.sourceRect = cell.frame;
         IRCCloudSafariViewController *s = [[IRCCloudSafariViewController alloc] initWithURL:url];
         s.modalPresentationStyle = UIModalPresentationCurrentContext;

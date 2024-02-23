@@ -41,7 +41,7 @@
     if (self) {
         self.navigationItem.title = @"Browser";
         self->_browsers = [[NSMutableArray alloc] init];
-        if([SFSafariViewController class])
+        if([SFSafariViewController class] && !((AppDelegate *)([UIApplication sharedApplication].delegate)).isOnVisionOS)
             [self->_browsers addObject:@"IRCCloud"];
         [self->_browsers addObject:@"Safari"];
         if([[OpenInChromeController sharedInstance] isChromeInstalled])
