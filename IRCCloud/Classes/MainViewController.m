@@ -3648,6 +3648,7 @@ NSArray *_sortedChannels;
                 if(self->_msgid) {
                     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(_closeThread)];
                     self.slidingViewController.underRightViewController = nil;
+                    self->_usersView.view.hidden = YES;
                 } else if([self->_buffer.type isEqualToString:@"channel"] && [[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid]) {
                     self.navigationItem.rightBarButtonItem = self->_usersButtonItem;
                     if(self.slidingViewController.underRightViewController == nil) {
