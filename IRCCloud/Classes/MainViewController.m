@@ -420,7 +420,7 @@ NSArray *_sortedChannels;
     [self->_uploadsBtn setImage:[[UIImage imageNamed:@"upload_arrow"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate] forState:UIControlStateNormal];
     [self->_uploadsBtn addTarget:self action:@selector(uploadsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     [self->_uploadsBtn sizeToFit];
-    self->_uploadsBtn.frame = CGRectMake(9,10,_uploadsBtn.frame.size.width + 16, _uploadsBtn.frame.size.height + 16);
+    self->_uploadsBtn.frame = CGRectMake(((AppDelegate *)([UIApplication sharedApplication].delegate)).isOnVisionOS ? 16 : 6,6,_uploadsBtn.frame.size.width + 24, _uploadsBtn.frame.size.height + 24);
     self->_uploadsBtn.accessibilityLabel = @"Uploads";
     [self->_bottomBar addSubview:self->_uploadsBtn];
 
@@ -486,7 +486,7 @@ NSArray *_sortedChannels;
     [self->_bottomBar addSubview:_typingIndicator];
 
     [self->_bottomBar addConstraints:@[
-                             [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:50.0f],
+        [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeLeading multiplier:1.0f constant:((AppDelegate *)([UIApplication sharedApplication].delegate)).isOnVisionOS ? 68.0f : 50.0f],
                              [NSLayoutConstraint constraintWithItem:self->_message attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeTop multiplier:1.0f constant:12.0f],
                              [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:self->_message attribute:NSLayoutAttributeLeading multiplier:1.0f constant:0],
                              [NSLayoutConstraint constraintWithItem:self->_typingIndicator attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:self->_bottomBar attribute:NSLayoutAttributeBottom multiplier:1.0f constant:-6.0f],
@@ -2564,9 +2564,9 @@ NSArray *_sortedChannels;
     CGFloat messageWidth;
     
     if(self->_message.text.length > 0) {
-        messageWidth = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - 16;
+        messageWidth = self->_eventsViewWidthConstraint.constant - _sendBtn.frame.size.width - _message.frame.origin.x - _uploadsBtn.frame.origin.x - 16;
     } else {
-        messageWidth = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - 16;
+        messageWidth = self->_eventsViewWidthConstraint.constant - _settingsBtn.frame.size.width - _message.frame.origin.x - _uploadsBtn.frame.origin.x - 16;
     }
     messageWidth -= self.slidingViewController.view.window.safeAreaInsets.right;
 
