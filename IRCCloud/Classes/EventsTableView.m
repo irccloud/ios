@@ -75,13 +75,13 @@ extern UIImage *__socketClosedBackgroundImage;
     IBOutlet UIView *_lastSeenEIDBackground;
     IBOutlet UILabel *_lastSeenEID;
     IBOutlet UIControl *_replyButton;
-    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter,*_replyXOffset,*_avatarTop;
+    IBOutlet NSLayoutConstraint *_messageOffsetLeft,*_messageOffsetRight,*_messageOffsetTop,*_messageOffsetBottom,*_timestampWidth,*_avatarOffset,*_nicknameOffset,*_lastSeenEIDOffset,*_avatarWidth,*_avatarHeight,*_replyCenter,*_replyXOffset,*_avatarTop,*_rightTimestampOffset;
 }
 @property (readonly) UILabel *timestampLeft, *timestampRight, *accessory, *lastSeenEID, *reply, *datestamp;
 @property (readonly) LinkLabel *message, *nickname;
 @property (readonly) UIImageView *avatar;
 @property (readonly) UIView *quoteBorder, *codeBlockBackground, *topBorder, *bottomBorder, *lastSeenEIDBackground, *socketClosedBar;
-@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter, *replyXOffset, *avatarTop;
+@property (readonly) NSLayoutConstraint *messageOffsetLeft, *messageOffsetRight, *messageOffsetTop, *messageOffsetBottom, *timestampWidth, *avatarOffset, *nicknameOffset, *lastSeenEIDOffset, *avatarWidth, *avatarHeight, *replyCenter, *replyXOffset, *avatarTop, *rightTimestampOffset;
 @property (readonly) UIControl *replyButton;
 @property (strong) NSURL *largeAvatarURL;
 
@@ -2742,6 +2742,10 @@ extern UIImage *__socketClosedBackgroundImage;
     cell.messageOffsetLeft.constant = (__timeLeftPref ? __timestampWidth : 6) + (__compact ? 6 : 10) + 10;
     cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 16);
     cell.messageOffsetBottom.constant = __compact ? 0 : 4;
+    
+    if (@available(iOS 13.0, *)) {
+        cell.rightTimestampOffset.constant = [NSProcessInfo processInfo].macCatalystApp ? 24 : 8;
+    }
 
     cell.quoteBorder.hidden = !e.isQuoted;
     cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];

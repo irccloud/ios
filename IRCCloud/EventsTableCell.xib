@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="15701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15703"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -38,10 +38,10 @@
                         </constraints>
                     </view>
                     <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FYg-pz-vsM">
-                        <rect key="frame" x="150" y="0.0" width="128.5" height="45"/>
+                        <rect key="frame" x="150" y="0.0" width="128" height="45"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New Messages" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2Cd-th-WEc">
-                                <rect key="frame" x="6" y="0.0" width="116.5" height="45"/>
+                                <rect key="frame" x="6" y="0.0" width="116" height="45"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -94,7 +94,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="right" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9ZM-5c-yUP">
-                        <rect key="frame" x="356" y="2" width="66" height="0.0"/>
+                        <rect key="frame" x="354" y="2" width="66" height="0.0"/>
                         <fontDescription key="fontDescription" type="system" pointSize="17"/>
                         <nil key="textColor"/>
                         <nil key="highlightedColor"/>
@@ -172,7 +172,7 @@
                     <constraint firstItem="fOD-UD-tHL" firstAttribute="firstBaseline" secondItem="V3s-xQ-nVF" secondAttribute="firstBaseline" id="hup-Wf-qD2"/>
                     <constraint firstItem="c4u-g2-2uu" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" id="jtU-1T-0IB"/>
                     <constraint firstItem="9ZM-5c-yUP" firstAttribute="width" secondItem="fOD-UD-tHL" secondAttribute="width" id="lA1-AB-LS1"/>
-                    <constraint firstAttribute="trailing" secondItem="9ZM-5c-yUP" secondAttribute="trailing" constant="6" id="mfo-0I-29z"/>
+                    <constraint firstAttribute="trailing" secondItem="9ZM-5c-yUP" secondAttribute="trailing" constant="8" id="mfo-0I-29z"/>
                     <constraint firstItem="V3s-xQ-nVF" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="110" id="nTv-tZ-edl"/>
                     <constraint firstItem="WPz-RI-MPI" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="bottom" id="nsU-HK-2Wm"/>
                     <constraint firstItem="oeb-cI-59G" firstAttribute="top" secondItem="V3s-xQ-nVF" secondAttribute="top" constant="2" id="qPn-0k-p7r"/>
@@ -215,6 +215,7 @@
                 <outlet property="_replyButton" destination="LfV-F3-NEI" id="sev-gg-kJs"/>
                 <outlet property="_replyCenter" destination="c8G-Dm-16A" id="Rw4-qp-IN7"/>
                 <outlet property="_replyXOffset" destination="gEz-B6-BGn" id="ThU-3N-seU"/>
+                <outlet property="_rightTimestampOffset" destination="mfo-0I-29z" id="FdX-bb-Gz3"/>
                 <outlet property="_socketClosedBar" destination="WPz-RI-MPI" id="ntm-fR-kM1"/>
                 <outlet property="_timestampLeft" destination="fOD-UD-tHL" id="zah-YF-oz2"/>
                 <outlet property="_timestampRight" destination="9ZM-5c-yUP" id="74i-dE-FoC"/>
