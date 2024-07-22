@@ -31,7 +31,6 @@
 #import "IRCCloudSafariViewController.h"
 #import "AvatarsDataSource.h"
 #import "ImageCache.h"
-@import FirebasePerformance;
 
 int __timestampWidth;
 BOOL __24hrPref = NO;
@@ -2033,11 +2032,6 @@ extern UIImage *__socketClosedBackgroundImage;
         if(self->_conn.state == kIRCCloudStateConnected)
             [[NetworkConnection sharedInstance] cancelIdleTimer]; //This may take a while
         
-        FIRTrace *trace;
-#ifdef CRASHLYTICS_TOKEN
-        if([FIROptions defaultOptions])
-            trace = [FIRPerformance startTraceWithName:@"loadBacklog"];
-#endif
         UIFont *f = __monospacePref?[ColorFormatter monoTimestampFont]:[ColorFormatter timestampFont];
         __timestampWidth = [@"88:88" sizeWithAttributes:@{NSFontAttributeName:f}].width;
         if(__secondsPref)
@@ -2067,7 +2061,6 @@ extern UIImage *__socketClosedBackgroundImage;
                 } else {
                     [self insertEvent:e backlog:YES nextIsGrouped:NO];
                 }
-                [trace incrementMetric:@"insertEvent" byInt:1];
                 [uuids setObject:@(YES) forKey:e.UUID];
             }
             for(NSString *uuid in _rowCache.allKeys) {
@@ -2082,7 +2075,6 @@ extern UIImage *__socketClosedBackgroundImage;
             if(e.formattedMsg && !e.formatted) {
                 [self _format:e];
                 [self tableView:self.tableView heightForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
-                [trace incrementMetric:@"format" byInt:1];
             }
             row++;
         }
@@ -2150,7 +2142,6 @@ extern UIImage *__socketClosedBackgroundImage;
         self->_backlogFailedView.frame = self->_headerView.frame = CGRectMake(0,0,_headerView.frame.size.width, 60);
         
         [self->_tableView reloadData];
-        [trace stop];
         
         if(events.count)
             self->_earliestEid = ((Event *)[events objectAtIndex:0]).eid;

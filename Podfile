@@ -11,7 +11,7 @@ pod 'GoogleUtilities/NSData+zlib'
 pod 'GoogleUtilities/Network'
 pod 'GoogleUtilities/Reachability'
 pod 'GoogleUtilities/UserDefaults'
-pod 'Firebase/Crashlytics', '10.5.0'
+pod 'Firebase/Crashlytics'
 pod 'SSZipArchive'
 
 target 'IRCCloud' do
@@ -21,7 +21,6 @@ target 'IRCCloud' do
   # Pods for IRCCloud
   pod 'youtube-ios-player-helper'
   pod 'Firebase/Messaging'
-  pod 'Firebase/Performance'
 
   target 'IRCCloudUnitTests' do
     inherit! :search_paths
@@ -37,7 +36,6 @@ target 'IRCCloud Enterprise' do
   # Pods for IRCCloud Enterprise
   pod 'youtube-ios-player-helper'
   pod 'Firebase/Messaging'
-  pod 'Firebase/Performance'
 
 end
 
@@ -48,7 +46,6 @@ target 'IRCCloud FLEX' do
   # Pods for IRCCloud FLEX
   pod 'youtube-ios-player-helper'
   pod 'Firebase/Messaging'
-  pod 'Firebase/Performance'
 
 end
 

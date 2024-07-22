@@ -27,9 +27,6 @@
 #import "TrustKit.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 @import Firebase;
-#ifndef EXTENSION
-@import FirebasePerformance;
-#endif
 
 NSURL *__logfile;
 NSOperationQueue *__logQueue;
@@ -91,13 +88,6 @@ NSString *IRCCLOUD_PATH = @"/";
 NSLock *__serializeLock = nil;
 NSLock *__userInfoLock = nil;
 volatile BOOL __socketPaused = NO;
-
-#ifndef EXTENSION
-@interface NetworkConnection (Firebase) {
-}
-@property FIRHTTPMetric *httpMetric;
-@end
-#endif
 
 @interface OOBFetcher : NSObject<NSURLSessionDataDelegate> {
     SBJson5Parser *_parser;
@@ -214,15 +204,7 @@ volatile BOOL __socketPaused = NO;
 }
 -(void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data {
     if(!self->_cancelled) {
-#ifndef EXTENSION
-        FIRTrace *trace;
-        if([FIROptions defaultOptions])
-            trace = [FIRPerformance startTraceWithName:@"parseOOB"];
-#endif
         [self->_parser parse:data];
-#ifndef EXTENSION
-        [trace stop];
-#endif
     } else {
         CLS_LOG(@"Ignoring data for cancelled OOB fetcher");
     }
@@ -2064,16 +2046,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
                 }
                 
                 CLS_LOG(@"Connecting: %@", url);
-#ifndef EXTENSION
-                self.httpMetric = [[FIRHTTPMetric alloc] initWithURL:[NSURL URLWithString:[url stringByReplacingOccurrencesOfString:@"wss://" withString:@"https://"]] HTTPMethod:FIRHTTPMethodGET];
-#endif
                 WebSocketConnectConfig* config = [WebSocketConnectConfig configWithURLString:url origin:[NSString stringWithFormat:@"https://%@", [result objectForKey:@"socket_host"]] protocols:nil
                                                                                      headers:[@[[HandshakeHeader headerWithValue:_userAgent forKey:@"User-Agent"]] mutableCopy]
                                                                            verifySecurityKey:YES extensions:@[@"x-webkit-deflate-frame"]];
                 self->_socket = [WebSocket webSocketWithConfig:config delegate:self];
-#ifndef EXTENSION
-                [self.httpMetric start];
-#endif
                 [self->_socket performSelectorOnMainThread:@selector(open) withObject:nil waitUntilDone:YES];
             } else {
                 CLS_LOG(@"Unable to load configuration");
@@ -2140,10 +2116,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
         self->_idleInterval = 20;
         self->_reconnectTimestamp = -1;
         [self _sendRequest:@"auth" args:@{@"cookie":self.session} handler:nil];
-#ifndef EXTENSION
-        [self.httpMetric setResponseCode:200];
-        [self.httpMetric stop];
-#endif
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self _postConnectivityChange];
         }];
@@ -2864,15 +2836,6 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
   [__userInfoLock unlock];
   
 }
-
-#ifndef EXTENSION
--(FIRHTTPMetric *)httpMetric {
-    return self->_httpMetric;
-}
--(void)setHttpMetric:(FIRHTTPMetric *)metric {
-    self->_httpMetric = metric;
-}
-#endif
 
 -(void)sendFeedbackReport:(UIViewController *)delegate {
     CLS_LOG(@"Feedback Requested");
