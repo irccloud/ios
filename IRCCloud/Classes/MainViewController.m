@@ -2040,6 +2040,15 @@ NSArray *_sortedChannels;
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     
     self.slidingViewController.view.autoresizesSubviews = NO;
+    
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"imgur_removed"]) {
+        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Imgur Uploading Unavailable" message:@"Uploading images to imgur is no longer available due to limitations in imgur's API.\n\nNew images will be stored on IRCCloud, and your existing images will remain available on imgur.\n\nImages from imgur can still be shared by using the 'share' button in an external application." preferredStyle:UIAlertControllerStyleAlert];
+        [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
+        [self presentViewController:alert animated:YES completion:nil];
+        
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_removed"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    }
 }
 
 - (void)didReceiveMemoryWarning {

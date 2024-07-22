@@ -163,6 +163,8 @@ extern NSURL *__logfile;
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"useChrome"];
     }
     
+    if([[[NSUserDefaults standardUserDefaults] objectForKey:@"imgur_account_username"] length])
+        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"imgur_removed"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_access_token"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_refresh_token"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_account_username"];
