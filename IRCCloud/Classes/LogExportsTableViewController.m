@@ -599,7 +599,8 @@
                     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Download" message:[[NSUserDefaults standardUserDefaults] boolForKey:@"iCloudLogs"]?@"Are you sure you want to delete this download?  It will be removed from your device and all other devices that are syncing with iCloud Drive.":@"Are you sure you want to delete this download from your device?" preferredStyle:UIAlertControllerStyleAlert];
                     
                     [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-                        [self->_downloadingURLs setObject:@(0) forKey:url];
+                        if(url)
+                            [self->_downloadingURLs setObject:@(0) forKey:url];
                         [self.tableView reloadData];
                         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                             NSFileCoordinator *coordinator = [[NSFileCoordinator alloc] initWithFilePresenter:nil];
@@ -611,7 +612,8 @@
                                 [self refresh:[NSKeyedUnarchiver unarchivedObjectOfClass:NSDictionary.class fromData:[[NSUserDefaults standardUserDefaults] objectForKey:@"logs_cache"] error:&error]];
                                 if(error)
                                     CLS_LOG(@"Error: %@", error);
-                                [self->_downloadingURLs removeObjectForKey:url];
+                                if(url)
+                                    [self->_downloadingURLs removeObjectForKey:url];
                                 [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
                                 [self performSelectorOnMainThread:@selector(refresh) withObject:nil waitUntilDone:YES];
                             }];
