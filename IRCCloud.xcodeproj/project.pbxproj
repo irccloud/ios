@@ -1124,6 +1124,7 @@
 		2200DB4D18B81BEB00343583 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		22032A6D1884529700BE4A10 /* NickCompletionView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NickCompletionView.h; sourceTree = "<group>"; };
 		22032A6E1884529700BE4A10 /* NickCompletionView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NickCompletionView.m; sourceTree = "<group>"; };
+		220E79AB2D0A095C00414B0F /* VERSION */ = {isa = PBXFileReference; lastKnownFileType = text; name = VERSION; path = "build-scripts/VERSION"; sourceTree = SOURCE_ROOT; };
 		221034E7197EFBAF00AB414F /* ShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		221034EA197EFBAF00AB414F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		221034EB197EFBAF00AB414F /* ShareViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShareViewController.h; sourceTree = "<group>"; };
@@ -2070,6 +2071,7 @@
 		228A057616D3DABA0029769C /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				220E79AB2D0A095C00414B0F /* VERSION */,
 				228B909229E5980F001CBACB /* ace-modes.js */,
 				228B908F29E597D9001CBACB /* emocode-data.js */,
 				2263D39F290A979500692EEC /* StringScore */,
