@@ -1331,7 +1331,11 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     [self _postRequest:@"/chat/signup" args:@{@"realname":realname, @"email":email, @"password":password, @"token":token} handler:handler];
 }
 
--(void)requestPassword:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler {
+-(void)requestPasswordReset:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler {
+    return [self _postRequest:@"/chat/request-password-reset" args:@{@"email":email, @"mobile":@"1", @"token":token} handler:handler];
+}
+
+-(void)requestAccessLink:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler {
     return [self _postRequest:@"/chat/request-access-link" args:@{@"email":email, @"mobile":@"1", @"token":token} handler:handler];
 }
 

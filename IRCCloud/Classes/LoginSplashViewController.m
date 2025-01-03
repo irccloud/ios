@@ -92,6 +92,11 @@
         [l sizeToFit];
     }
 
+    for(UILabel *l in resetPasswordHint.subviews) {
+        l.font = sourceSansPro;
+        [l sizeToFit];
+    }
+
     for(UILabel *l in TOSHint.subviews) {
         l.font = sourceSansPro;
         [l sizeToFit];
@@ -410,6 +415,7 @@
     else
         enterpriseHint.alpha = 1;
     forgotPasswordHint.alpha = 1;
+    resetPasswordHint.alpha = 1;
     TOSHint.alpha = 0;
     forgotPasswordLogin.alpha = 0;
     forgotPasswordSignup.alpha = 0;
@@ -432,6 +438,7 @@
     loginHint.alpha = 1;
     signupHint.alpha = 0;
     forgotPasswordHint.alpha = 0;
+    resetPasswordHint.alpha = 0;
     TOSHint.alpha = 1;
     forgotPasswordLogin.alpha = 0;
     forgotPasswordSignup.alpha = 0;
@@ -451,6 +458,7 @@
     password.alpha = 0;
     signupHint.alpha = 0;
     forgotPasswordHint.alpha = 0;
+    resetPasswordHint.alpha = 0;
     enterpriseHint.alpha = 0;
     
     forgotPasswordLogin.alpha = 1;
@@ -462,6 +470,16 @@
     if(sender)
         [UIView commitAnimations];
     [self _updateFieldPositions];
+    _requestingReset = NO;
+    [sendAccessLink setTitle:@"Request access link" forState:UIControlStateNormal];
+    [enterEmailAddressHint setText:@"Just enter the email address you signed up with and we'll send you a link to log straight in."];
+}
+
+-(void)resetPasswordHintPressed:(id)sender {
+    [self forgotPasswordHintPressed:sender];
+    _requestingReset = YES;
+    [sendAccessLink setTitle:@"Request password reset" forState:UIControlStateNormal];
+    [enterEmailAddressHint setText:@"Just enter the email address you signed up with and we'll send you a link to reset your password."];
 }
 
 -(void)_accessLinkRequestFailed {
@@ -470,7 +488,7 @@
     self->loadingView.alpha = 0;
     [UIView commitAnimations];
     [self->activity stopAnimating];
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Request Failed" message:@"Unable to request an access link.  Please try again later." preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Request Failed" message:self->_requestingReset?@"Unable to request a password reset.  Please try again later.":@"Unable to request an access link.  Please try again later." preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alert animated:YES completion:nil];
 }
@@ -481,28 +499,46 @@
     loginView.alpha = 0;
     loadingView.alpha = 1;
     [UIView commitAnimations];
-    [status setText:@"Requesting Access Link"];
+    [status setText:self->_requestingReset?@"Requesting Password Reset":@"Requesting Access Link"];
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     [activity startAnimating];
     activity.hidden = NO;
     NSString *user = [username.text stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceCharacterSet];
     [[NetworkConnection sharedInstance] requestAuthTokenWithHandler:^(IRCCloudJSONObject *result) {
         if([[result objectForKey:@"success"] intValue] == 1) {
-            [[NetworkConnection sharedInstance] requestPassword:user token:[result objectForKey:@"token"] handler:^(IRCCloudJSONObject *result) {
-                if([[result objectForKey:@"success"] intValue] == 1) {
-                    [UIView beginAnimations:nil context:nil];
-                    self->loginView.alpha = 1;
-                    self->loadingView.alpha = 0;
-                    [UIView commitAnimations];
-                    [self->activity stopAnimating];
-                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Sent" message:@"We've sent you an access link.  Check your email and follow the instructions to sign in." preferredStyle:UIAlertControllerStyleAlert];
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
-                    [self presentViewController:alert animated:YES completion:nil];
-                    [self loginHintPressed:nil];
-                } else {
-                    [self _accessLinkRequestFailed];
-                }
-            }];
+            if(self->_requestingReset) {
+                [[NetworkConnection sharedInstance] requestPasswordReset:user token:[result objectForKey:@"token"] handler:^(IRCCloudJSONObject *result) {
+                    if([[result objectForKey:@"success"] intValue] == 1) {
+                        [UIView beginAnimations:nil context:nil];
+                        self->loginView.alpha = 1;
+                        self->loadingView.alpha = 0;
+                        [UIView commitAnimations];
+                        [self->activity stopAnimating];
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Sent" message:@"We've sent you a password reset link.  Check your email and follow the instructions to sign in." preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
+                        [self loginHintPressed:nil];
+                    } else {
+                        [self _accessLinkRequestFailed];
+                    }
+                }];
+            } else {
+                [[NetworkConnection sharedInstance] requestAccessLink:user token:[result objectForKey:@"token"] handler:^(IRCCloudJSONObject *result) {
+                    if([[result objectForKey:@"success"] intValue] == 1) {
+                        [UIView beginAnimations:nil context:nil];
+                        self->loginView.alpha = 1;
+                        self->loadingView.alpha = 0;
+                        [UIView commitAnimations];
+                        [self->activity stopAnimating];
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Sent" message:@"We've sent you an access link.  Check your email and follow the instructions to sign in." preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
+                        [self loginHintPressed:nil];
+                    } else {
+                        [self _accessLinkRequestFailed];
+                    }
+                }];
+            }
         } else {
             [self _accessLinkRequestFailed];
         }
@@ -660,6 +696,7 @@
                         self->username.alpha = 1;
                         self->password.alpha = 1;
                         self->forgotPasswordHint.alpha = 1;
+                        self->resetPasswordHint.alpha = 1;
                     }
                     if(self->signupHint.enabled)
                         self->signupHint.alpha = 1;

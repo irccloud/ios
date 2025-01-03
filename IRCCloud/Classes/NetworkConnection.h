@@ -279,6 +279,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(void)POSTheartbeat:(int)selectedBuffer cids:(NSArray *)cids bids:(NSArray *)bids lastSeenEids:(NSArray *)lastSeenEids handler:(IRCCloudAPIResultHandler)handler;
 -(void)registerAPNs:(NSData *)token fcm:(NSString *)fcm handler:(IRCCloudAPIResultHandler)handler;
 -(void)unregisterAPNs:(NSData *)token fcm:(NSString *)fcm session:(NSString *)session handler:(IRCCloudAPIResultHandler)handler;
--(void)requestPassword:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler;
+-(void)requestAccessLink:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler;
+-(void)requestPasswordReset:(NSString *)email token:(NSString *)token handler:(IRCCloudAPIResultHandler)handler;
 -(void)finalizeUpload:(NSString *)uploadID filename:(NSString *)filename originalFilename:(NSString *)originalFilename avatar:(BOOL)avatar orgId:(int)orgId cid:(int)cid handler:(IRCCloudAPIResultHandler)handler;
 @end

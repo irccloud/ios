@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="20037" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="QPs-Li-UDL">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="QPs-Li-UDL">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="20020"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -438,16 +438,16 @@
                                         </connections>
                                     </button>
                                     <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Eug-wi-F8f" customClass="UIControl">
-                                        <rect key="frame" x="254" y="173" width="260" height="32"/>
+                                        <rect key="frame" x="254" y="173" width="260" height="24"/>
                                         <subviews>
                                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="150" placeholderIntrinsicHeight="infinite" text="Forgotten your password?" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="150" translatesAutoresizingMaskIntoConstraints="NO" id="OFl-cz-MMm">
-                                                <rect key="frame" x="0.0" y="0.0" width="150" height="32"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="150" height="24"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <color key="textColor" red="0.61176470589999998" green="0.78039215689999997" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="85" placeholderIntrinsicHeight="infinite" text="Get an access link" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="85" translatesAutoresizingMaskIntoConstraints="NO" id="cfc-xP-d4G">
-                                                <rect key="frame" x="173" y="0.0" width="85" height="32"/>
+                                                <rect key="frame" x="173" y="0.0" width="85" height="24"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 <nil key="highlightedColor"/>
@@ -461,11 +461,42 @@
                                             <constraint firstItem="OFl-cz-MMm" firstAttribute="height" secondItem="Eug-wi-F8f" secondAttribute="height" id="Fjd-u1-DUv"/>
                                             <constraint firstItem="cfc-xP-d4G" firstAttribute="height" secondItem="Eug-wi-F8f" secondAttribute="height" id="UCU-G4-WAl"/>
                                             <constraint firstItem="OFl-cz-MMm" firstAttribute="leading" secondItem="Eug-wi-F8f" secondAttribute="leading" id="bmM-2h-mDQ"/>
-                                            <constraint firstAttribute="height" constant="32" id="gvO-hw-bta"/>
+                                            <constraint firstAttribute="height" constant="24" id="gvO-hw-bta"/>
                                             <constraint firstAttribute="trailing" secondItem="cfc-xP-d4G" secondAttribute="trailing" constant="2" id="hDi-ap-Bza"/>
                                         </constraints>
                                         <connections>
                                             <action selector="forgotPasswordHintPressed:" destination="thh-5b-esU" eventType="touchUpInside" id="wTF-LU-FjN"/>
+                                        </connections>
+                                    </view>
+                                    <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wHq-8E-O6Q" userLabel="Reset Password Hint" customClass="UIControl">
+                                        <rect key="frame" x="302" y="197" width="164" height="24"/>
+                                        <subviews>
+                                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="24" placeholderIntrinsicHeight="infinite" text="or" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="24" translatesAutoresizingMaskIntoConstraints="NO" id="1qy-Ki-Hbf">
+                                                <rect key="frame" x="0.0" y="0.0" width="24" height="24"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <color key="textColor" red="0.61176470589999998" green="0.78039215689999997" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" placeholderIntrinsicWidth="180" placeholderIntrinsicHeight="infinite" text="request a password reset" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="85" translatesAutoresizingMaskIntoConstraints="NO" id="6U8-qM-cR3">
+                                                <rect key="frame" x="-18" y="0.0" width="180" height="24"/>
+                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                                <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="164" id="2ws-V3-gBY"/>
+                                            <constraint firstAttribute="trailing" secondItem="6U8-qM-cR3" secondAttribute="trailing" constant="2" id="7nB-71-2vi"/>
+                                            <constraint firstAttribute="height" constant="24" id="Rh9-i2-F2y"/>
+                                            <constraint firstItem="6U8-qM-cR3" firstAttribute="centerY" secondItem="wHq-8E-O6Q" secondAttribute="centerY" id="VTf-d5-n8V"/>
+                                            <constraint firstItem="1qy-Ki-Hbf" firstAttribute="height" secondItem="wHq-8E-O6Q" secondAttribute="height" id="WpQ-RN-7PV"/>
+                                            <constraint firstItem="1qy-Ki-Hbf" firstAttribute="leading" secondItem="wHq-8E-O6Q" secondAttribute="leading" id="Z7r-LG-SWA"/>
+                                            <constraint firstItem="1qy-Ki-Hbf" firstAttribute="centerY" secondItem="wHq-8E-O6Q" secondAttribute="centerY" id="qwk-Me-06i"/>
+                                            <constraint firstItem="6U8-qM-cR3" firstAttribute="height" secondItem="wHq-8E-O6Q" secondAttribute="height" id="vjL-ne-lWS"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="resetPasswordHintPressed:" destination="thh-5b-esU" eventType="touchUpInside" id="ZqH-JY-eBM"/>
                                         </connections>
                                     </view>
                                     <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Q3h-ZU-20z">
@@ -564,6 +595,8 @@
                                     <constraint firstItem="YDn-hm-4nv" firstAttribute="centerX" secondItem="mJM-f8-v0Q" secondAttribute="centerX" id="4ns-Uy-wp9"/>
                                     <constraint firstItem="Q3h-ZU-20z" firstAttribute="top" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="11" id="5hI-DE-UYi"/>
                                     <constraint firstItem="5kc-v2-8O4" firstAttribute="centerY" secondItem="J5j-oJ-a2d" secondAttribute="centerY" id="6Z0-Ok-c1Q"/>
+                                    <constraint firstItem="wHq-8E-O6Q" firstAttribute="centerX" secondItem="mJM-f8-v0Q" secondAttribute="centerX" id="AoW-zr-ajF"/>
+                                    <constraint firstItem="wHq-8E-O6Q" firstAttribute="top" secondItem="Eug-wi-F8f" secondAttribute="bottom" id="B3o-Y3-MwX"/>
                                     <constraint firstItem="U1F-cw-qxd" firstAttribute="top" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="133" id="CgG-Qp-sEM"/>
                                     <constraint firstItem="Eug-wi-F8f" firstAttribute="centerX" secondItem="mJM-f8-v0Q" secondAttribute="centerX" id="GyJ-pd-xqL"/>
                                     <constraint firstItem="82t-Dd-vQq" firstAttribute="centerX" secondItem="mJM-f8-v0Q" secondAttribute="centerX" id="L1L-aE-nOh"/>
@@ -663,6 +696,7 @@
                         <outlet property="notAProblem" destination="Q3h-ZU-20z" id="42p-Fp-PY9"/>
                         <outlet property="password" destination="J5j-oJ-a2d" id="Ie0-Ot-ZcS"/>
                         <outlet property="passwordYOffset" destination="boR-1r-hxJ" id="w1h-St-8s4"/>
+                        <outlet property="resetPasswordHint" destination="wHq-8E-O6Q" id="rTR-al-VVr"/>
                         <outlet property="sendAccessLink" destination="EZC-Qj-aeF" id="4Ri-tb-boK"/>
                         <outlet property="sendAccessLinkYOffset" destination="lU0-8i-LIL" id="QIv-Su-Fim"/>
                         <outlet property="signup" destination="U1F-cw-qxd" id="9hf-ud-oph"/>

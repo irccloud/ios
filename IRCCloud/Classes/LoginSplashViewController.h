@@ -50,6 +50,7 @@
     IBOutlet UIControl *signupHint;
     IBOutlet UIControl *loginHint;
     IBOutlet UIControl *forgotPasswordHint;
+    IBOutlet UIControl *resetPasswordHint;
     IBOutlet UIControl *TOSHint;
     IBOutlet UIControl *enterpriseLearnMore;
     IBOutlet UIControl *forgotPasswordLogin;
@@ -65,6 +66,7 @@
     CGSize _kbSize;
     NSURL *_accessLink;
     BOOL _gotCredentialsFromPasswordManager;
+    BOOL _requestingReset;
     NSString *_authURL;
 }
 @property NSURL *accessLink;
@@ -74,6 +76,7 @@
 -(IBAction)loginHintPressed:(id)sender;
 -(IBAction)signupHintPressed:(id)sender;
 -(IBAction)forgotPasswordHintPressed:(id)sender;
+-(IBAction)resetPasswordHintPressed:(id)sender;
 -(IBAction)TOSHintPressed:(id)sender;
 -(IBAction)nextButtonPressed:(id)sender;
 -(IBAction)enterpriseLearnMorePressed:(id)sender;
