@@ -152,7 +152,7 @@
         for(NSString *tag in tags) {
             if([tag isEqualToString:@"*"] || [tag isEqualToString:tagName])
                 denied = YES;
-            if([tag isEqualToString:[NSString stringWithFormat:@"~%@", tagName]])
+            if([tag isEqualToString:[NSString stringWithFormat:@"-%@", tagName]])
                 denied = NO;
         }
         return denied;
