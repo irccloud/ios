@@ -2677,22 +2677,19 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 
 -(void)_logout:(NSString *)session {
 #ifndef EXTENSION
-    [[FIRMessaging messaging] tokenWithCompletion:^(NSString *token, NSError *error) {
-        if (error != nil) {
-            NSLog(@"Error fetching FIRMessaging token: %@", error);
-        } else if([[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]) {
-            [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] fcm:token session:session handler:^(IRCCloudJSONObject *result) {
-                CLS_LOG(@"Unregister result: %@", result);
-            }];
-        }
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
-        [[FIRMessaging messaging] deleteDataWithCompletion:^(NSError *error) {
-            if(error)
-                CLS_LOG(@"Unable to delete Firebase ID: %@", error);
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]) {
+        [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] fcm:[[NSUserDefaults standardUserDefaults] objectForKey:@"FCM"] session:session handler:^(IRCCloudJSONObject *result) {
+            CLS_LOG(@"Unregister result: %@", result);
         }];
-        IRCCLOUD_HOST = @"api.irccloud.com";
-        [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
+    }
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"APNs"];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"FCM"];
+    [[FIRMessaging messaging] deleteDataWithCompletion:^(NSError *error) {
+        if(error)
+            CLS_LOG(@"Unable to delete Firebase ID: %@", error);
     }];
+    IRCCLOUD_HOST = @"api.irccloud.com";
+    [self _postRequest:@"/chat/logout" args:@{@"session":session} handler:nil];
 #endif
 }
 

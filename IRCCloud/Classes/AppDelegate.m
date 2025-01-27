@@ -348,19 +348,21 @@ extern NSURL *__logfile;
 
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)devToken {
     NSData *oldToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"];
-    
+    NSString *oldFcmToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"FCM"];
+
     [[FIRMessaging messaging] tokenWithCompletion:^(NSString *token, NSError *error) {
         if (error != nil || !token) {
             CLS_LOG(@"Error fetching FIRMessaging token: %@", error);
         } else {
             //CLS_LOG(@"FCM Token: %@", result.token);
-            if(self->_conn.session && oldToken && ![devToken isEqualToData:oldToken]) {
+            if(self->_conn.session && oldToken && (![devToken isEqualToData:oldToken] || ![oldFcmToken isEqualToString:token])) {
               CLS_LOG(@"Unregistering old APNs token");
-                [self->_conn unregisterAPNs:oldToken fcm:token session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
+                [self->_conn unregisterAPNs:oldToken fcm:oldFcmToken session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
                   CLS_LOG(@"Unregistration result: %@", result);
               }];
             }
             [[NSUserDefaults standardUserDefaults] setObject:devToken forKey:@"APNs"];
+            [[NSUserDefaults standardUserDefaults] setObject:token forKey:@"FCM"];
             [self->_conn registerAPNs:devToken fcm:token handler:^(IRCCloudJSONObject *result) {
               CLS_LOG(@"Registration result: %@", result);
             }];
