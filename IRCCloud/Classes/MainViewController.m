@@ -979,6 +979,8 @@ NSArray *_sortedChannels;
                     msg = [NSString stringWithFormat:@"You cannot change your nick to %@ while banned on %@", [o objectForKey:@"proposed_nick"], [o objectForKey:@"channel"]];
                 else if([type isEqualToString:@"cannot_send_to_chan"])
                     msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"channel"], [o objectForKey:@"msg"]];
+                else if([type isEqualToString:@"cant_send_to_user"])
+                    msg = [NSString stringWithFormat:@"%@: %@", [o objectForKey:@"nick"], [o objectForKey:@"msg"]];
                 else if([type isEqualToString:@"user_on_channel"])
                     msg = [NSString stringWithFormat:@"%@ is already a member of %@", [o objectForKey:@"nick"], [o objectForKey:@"channel"]];
                 else if([type isEqualToString:@"nickname_in_use"])
