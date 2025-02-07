@@ -355,7 +355,7 @@ extern NSURL *__logfile;
             CLS_LOG(@"Error fetching FIRMessaging token: %@", error);
         } else {
             //CLS_LOG(@"FCM Token: %@", result.token);
-            if(self->_conn.session && oldToken && (![devToken isEqualToData:oldToken] || ![oldFcmToken isEqualToString:token])) {
+            if(self->_conn.session && oldToken && oldFcmToken &&(![devToken isEqualToData:oldToken] || ![oldFcmToken isEqualToString:token])) {
               CLS_LOG(@"Unregistering old APNs token");
                 [self->_conn unregisterAPNs:oldToken fcm:oldFcmToken session:self->_conn.session handler:^(IRCCloudJSONObject *result) {
                   CLS_LOG(@"Unregistration result: %@", result);
