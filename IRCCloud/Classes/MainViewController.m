@@ -2673,8 +2673,12 @@ NSArray *_sortedChannels;
         
         if([_buffer.type isEqualToString:@"channel"] && ![[ChannelsDataSource sharedInstance] channelForBuffer:self->_buffer.bid])
             disableTypingStatus = YES;
+        
+        if(self->_lastTypingTime > 0 && [NSDate date].timeIntervalSince1970 - self->_lastTypingTime < 3)
+            disableTypingStatus = YES;
 
         if(!disableTypingStatus && !self->_typingTimer) {
+            self->_lastTypingTime = [NSDate date].timeIntervalSince1970;
             self->_typingTimer = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(sendTyping) userInfo:nil repeats:NO];
         }
     }
@@ -3131,6 +3135,7 @@ NSArray *_sortedChannels;
     [self performSelectorInBackground:@selector(_updateUnreadIndicator) withObject:nil];
     [self updateSuggestions:NO];
     [self _updateTypingIndicatorTimer];
+    self->_lastTypingTime = 0;
     
     if([[ServersDataSource sharedInstance] getServer:self->_buffer.cid].isSlack) {
         [UIMenuController sharedMenuController].menuItems = @[];

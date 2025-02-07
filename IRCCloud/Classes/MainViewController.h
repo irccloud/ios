@@ -126,6 +126,7 @@
     NSTimer *_typingIndicatorTimer;
     UILabel *_typingIndicator;
     NSTimer *_typingTimer;
+    NSTimeInterval _lastTypingTime;
 }
 @property (assign) int cidToOpen;
 @property (assign) int bidToOpen;
