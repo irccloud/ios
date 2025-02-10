@@ -439,6 +439,10 @@ volatile BOOL __socketPaused = NO;
             server.slack = [[object objectForKey:@"slack"] intValue];
         else
             server.slack = 0;
+        if([[object objectForKey:@"account"] isKindOfClass:[NSString class]])
+            server.account = [object objectForKey:@"account"];
+        else
+            server.account = nil;
         if(!backlog && !self->_resuming)
             [self postObject:server forEvent:kIRCEventMakeServer];
     };
@@ -1190,7 +1194,7 @@ volatile BOOL __socketPaused = NO;
             if(msgId.length) {
                 Event *e = [[EventsDataSource sharedInstance] message:msgId buffer:object.bid];
                 if(e) {
-                    if(object.eid >= e.lastEditEID) {
+                    if(object.eid >= e.lastEditEID && [e hasSameAccount:[object objectForKey:@"from_account"]]) {
                         if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class]) {
                             e.msg = [entities objectForKey:@"edit_text"];
                             e.edited = YES;

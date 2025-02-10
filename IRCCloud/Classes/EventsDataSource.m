@@ -151,6 +151,7 @@
         decodeObjectOfClass(NSString.class, self->_msgid);
         decodeBool(self->_edited);
         decodeDouble(self->_lastEditEID);
+        decodeObjectOfClass(NSString.class, self->_account);
 
         if(self->_rowType == ROW_TIMESTAMP)
             self->_bgColor = [UIColor timestampBackgroundColor];
@@ -216,6 +217,7 @@
     encodeObject(self->_msgid);
     encodeBool(self->_edited);
     encodeDouble(self->_lastEditEID);
+    encodeObject(self->_account);
 
     if(self->_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
         encodeObject(self->_bgColor);
@@ -332,6 +334,9 @@
         self->_cachedAvatarSize = size;
 #endif
     return _cachedAvatarURL;
+}
+-(BOOL)hasSameAccount:(NSString *)account {
+    return self->_account && ![self->_account isEqualToString:@"*"] && [self->_account isEqualToString:account];
 }
 @end
 
@@ -1168,6 +1173,15 @@
         event.msgid = [object objectForKey:@"msgid"];
     else
         event.msgid = nil;
+
+    if([[object objectForKey:@"target_account"] isKindOfClass:[NSString class]])
+        event.account = [object objectForKey:@"target_account"];
+    else if([[object objectForKey:@"from_account"] isKindOfClass:[NSString class]])
+        event.account = [object objectForKey:@"from_account"];
+    else if([[object objectForKey:@"account"] isKindOfClass:[NSString class]])
+        event.account = [object objectForKey:@"account"];
+    else
+        event.account = nil;
 
     void (^formatter)(Event *event, IRCCloudJSONObject *object) = [self->_formatterMap objectForKey:object.type];
     if(formatter)

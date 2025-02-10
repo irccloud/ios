@@ -110,7 +110,7 @@
 }
 @property (assign) int cid, bid, rowType, reqId, childEventCount, replyCount;
 @property (assign) NSTimeInterval eid, groupEid, serverTime, parent, lastEditEID;
-@property (copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick, *msgid, *formattedPrefix;
+@property (copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick, *msgid, *formattedPrefix, *account;
 @property (assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock, hasReply, isReply, edited, collapsed, hasReplyRow;
 @property (copy) NSDictionary *ops,*entities;
 @property (strong) UIColor *color, *bgColor;
@@ -129,6 +129,7 @@
 -(Event *)copy;
 -(NSURL *)avatar:(int)size;
 -(NSString *)reply;
+-(BOOL)hasSameAccount:(NSString *)account;
 @end
 
 @interface EventsDataSource : NSObject {

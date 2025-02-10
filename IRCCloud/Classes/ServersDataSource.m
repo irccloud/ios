@@ -82,6 +82,7 @@
     encodeInt(self->_orgId);
     encodeObject(self->_avatar);
     encodeInt(self->_avatars_supported);
+    encodeObject(self->_account);
 }
 -(id)initWithCoder:(NSCoder *)aDecoder {
     self = [super init];
@@ -119,6 +120,7 @@
         decodeInt(self->_orgId);
         decodeObjectOfClass(NSString.class, self->_avatar);
         decodeInt(self->_avatars_supported);
+        decodeObjectOfClass(NSString.class, self->_account);
         self->_ignore = [[Ignore alloc] init];
         [self->_ignore setIgnores:self->_ignores];
     }

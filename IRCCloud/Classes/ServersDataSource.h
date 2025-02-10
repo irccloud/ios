@@ -51,6 +51,7 @@
     int _avatars_supported;
     int _slack;
     NSArray *_caps;
+    NSString *_account;
     NSMutableDictionary *_collapsed;
     BOOL _blocksEdits;
     BOOL _blocksReplies;
@@ -59,7 +60,7 @@
     BOOL _blocksTyping;
 }
 @property (assign) int cid, port, ssl, order, deferred_archives, orgId, avatars_supported, slack;
-@property (copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname, *ircserver, *avatar, *avatarURL, *from;
+@property (copy) NSString *name, *hostname, *nick, *status, *realname, *server_pass, *nickserv_pass, *join_commands, *away, *usermask, *mode, *CHANTYPES, *MODE_OPER, *MODE_OWNER, *MODE_ADMIN, *MODE_OP, *MODE_HALFOP, *MODE_VOICED, *server_realname, *ircserver, *avatar, *avatarURL, *from, *account;
 @property (copy) NSDictionary *fail_info, *PREFIX;
 @property (copy) NSDictionary *isupport;
 @property (copy) NSArray *caps;
