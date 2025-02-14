@@ -2681,7 +2681,7 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 
 -(void)_logout:(NSString *)session {
 #ifndef EXTENSION
-    if([[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"]) {
+    if([[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] && [[NSUserDefaults standardUserDefaults] objectForKey:@"FCM"]) {
         [self unregisterAPNs:[[NSUserDefaults standardUserDefaults] objectForKey:@"APNs"] fcm:[[NSUserDefaults standardUserDefaults] objectForKey:@"FCM"] session:session handler:^(IRCCloudJSONObject *result) {
             CLS_LOG(@"Unregister result: %@", result);
         }];
