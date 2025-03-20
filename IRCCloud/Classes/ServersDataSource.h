@@ -75,6 +75,7 @@
 -(BOOL)clientTagDeny:(NSString *)tagName;
 -(BOOL)hasMessageTags;
 -(BOOL)hasLabels;
+-(BOOL)hasRedaction;
 @end
 
 @interface ServersDataSource : NSObject {

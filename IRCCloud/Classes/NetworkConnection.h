@@ -260,6 +260,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(int)deleteMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to handler:(IRCCloudAPIResultHandler)handler;
 -(int)editMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to msg:(NSString *)msg handler:(IRCCloudAPIResultHandler)handler;
 -(int)typing:(NSString *)value cid:(int)cid to:(NSString *)to handler:(IRCCloudAPIResultHandler)handler;
+-(int)redact:(NSString *)msgId cid:(int)cid to:(NSString *)to reason:(NSString *)reason handler:(IRCCloudAPIResultHandler)handler;
 
 //GET
 -(void)requestConfigurationWithHandler:(IRCCloudAPIResultHandler)handler;

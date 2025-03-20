@@ -559,6 +559,13 @@ volatile BOOL __socketPaused = NO;
                 [self postObject:object forEvent:kIRCEventNickChange];
         }
     };
+        
+    void (^pendingEdit)(IRCCloudJSONObject *object, BOOL backlog) = ^(IRCCloudJSONObject *object, BOOL backlog) {
+        @synchronized (self) {
+            [self->_pendingEdits addObject:object];
+        }
+        [self _processPendingEdits:backlog];
+    };
     
     NSMutableDictionary *parserMap = @{
                    @"idle":ignored, @"end_of_backlog":ignored, @"oob_skipped":ignored, @"num_invites":ignored, @"user_account":ignored, @"twitch_hosttarget_start":ignored, @"twitch_hosttarget_stop":ignored, @"twitch_usernotice":ignored,
@@ -1057,12 +1064,8 @@ volatile BOOL __socketPaused = NO;
                                [self postObject:object forEvent:kIRCEventAvatarChange];
                        }
                    },
-                   @"empty_msg": ^(IRCCloudJSONObject *object, BOOL backlog) {
-                       @synchronized (self) {
-                           [self->_pendingEdits addObject:object];
-                       }
-                       [self _processPendingEdits:backlog];
-                   },
+                   @"empty_msg": pendingEdit,
+                   @"redact": pendingEdit,
                    @"watch_status": ^(IRCCloudJSONObject *object, BOOL backlog) {
                        NSMutableDictionary *d = object.dictionary.mutableCopy;
                        [d setObject:@([[NSDate date] timeIntervalSince1970] * 1000000) forKey:@"eid"];
@@ -1122,7 +1125,7 @@ volatile BOOL __socketPaused = NO;
                                 @"chan_open",@"knock_on_chan",@"knock_disabled",@"cannotknock",@"ownmode",
                                 @"nossl",@"redirect_error",@"invalid_flood",@"join_flood",@"metadata_limit",
                                 @"metadata_targetinvalid",@"metadata_nomatchingkey",@"metadata_keyinvalid",
-                                @"metadata_keynotset",@"metadata_keynopermission",@"metadata_toomanysubs",@"invalid_nick"]) {
+                                @"metadata_keynotset",@"metadata_keynopermission",@"metadata_toomanysubs",@"invalid_nick",@"fail"]) {
             [parserMap setObject:alert forKey:type];
         }
         
@@ -1170,46 +1173,67 @@ volatile BOOL __socketPaused = NO;
         self->_pendingEdits = [[NSMutableArray alloc] init];
     }
     for(IRCCloudJSONObject *object in pending) {
-        NSDictionary *entities = [object objectForKey:@"entities"];
-        //NSLog(@"empty_msg entities: %@", entities);
-        if([entities objectForKey:@"delete"]) {
-            BOOL found = NO;
-            NSString *msgId = [entities objectForKey:@"delete"];
-            if(msgId.length) {
-                Event *e = [[EventsDataSource sharedInstance] message:msgId buffer:object.bid];
-                if(e) {
-                    [[EventsDataSource sharedInstance] removeEvent:e.eid buffer:e.bid];
-                    found = YES;
+        NSString *type = object.type;
+        
+        if([type isEqualToString:@"empty_msg"]) {
+            NSDictionary *entities = [object objectForKey:@"entities"];
+            //NSLog(@"empty_msg entities: %@", object);
+            if([entities objectForKey:@"delete"]) {
+                BOOL found = NO;
+                NSString *msgId = [entities objectForKey:@"delete"];
+                if(msgId.length) {
+                    Event *e = [[EventsDataSource sharedInstance] message:msgId buffer:object.bid];
+                    if(e && [e hasSameAccount:[object objectForKey:@"from_account"]]) {
+                        e.deleted = YES;
+                        found = YES;
+                    }
+                }
+                if(found) {
+                    if(!backlog && !self->_resuming)
+                        [self postObject:object forEvent:kIRCEventMessageChanged];
+                } else {
+                    [self->_pendingEdits addObject:object];
+                }
+            } else if([entities objectForKey:@"edit"]) {
+                BOOL found = NO;
+                NSString *msgId = [entities objectForKey:@"edit"];
+                if(msgId.length) {
+                    Event *e = [[EventsDataSource sharedInstance] message:msgId buffer:object.bid];
+                    if(e) {
+                        if(object.eid >= e.lastEditEID && [e hasSameAccount:[object objectForKey:@"from_account"]]) {
+                            if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class]) {
+                                e.msg = [entities objectForKey:@"edit_text"];
+                                e.edited = YES;
+                                NSMutableDictionary *d = e.entities.mutableCopy;
+                                [d removeObjectForKey:@"mentions"];
+                                [d removeObjectForKey:@"mention_data"];
+                                e.entities = d;
+                            }
+                            NSMutableDictionary *d = e.entities.mutableCopy;
+                            [d setValuesForKeysWithDictionary:entities];
+                            e.entities = d;
+                            e.lastEditEID = object.eid;
+                            e.formatted = nil;
+                            e.formattedMsg = nil;
+                        }
+                        found = YES;
+                    }
+                }
+                if(found) {
+                    if(!backlog && !self->_resuming)
+                        [self postObject:object forEvent:kIRCEventMessageChanged];
+                } else {
+                    [self->_pendingEdits addObject:object];
                 }
             }
-            if(found) {
-                if(!backlog && !self->_resuming)
-                    [self postObject:object forEvent:kIRCEventMessageChanged];
-            } else {
-                [self->_pendingEdits addObject:object];
-            }
-        } else if([entities objectForKey:@"edit"]) {
+        } else if([type isEqualToString:@"redact"]) {
             BOOL found = NO;
-            NSString *msgId = [entities objectForKey:@"edit"];
+            NSString *msgId = [object objectForKey:@"redact_msgid"];
             if(msgId.length) {
                 Event *e = [[EventsDataSource sharedInstance] message:msgId buffer:object.bid];
                 if(e) {
-                    if(object.eid >= e.lastEditEID && [e hasSameAccount:[object objectForKey:@"from_account"]]) {
-                        if([[entities objectForKey:@"edit_text"] isKindOfClass:NSString.class]) {
-                            e.msg = [entities objectForKey:@"edit_text"];
-                            e.edited = YES;
-                            NSMutableDictionary *d = e.entities.mutableCopy;
-                            [d removeObjectForKey:@"mentions"];
-                            [d removeObjectForKey:@"mention_data"];
-                            e.entities = d;
-                        }
-                        NSMutableDictionary *d = e.entities.mutableCopy;
-                        [d setValuesForKeysWithDictionary:entities];
-                        e.entities = d;
-                        e.lastEditEID = object.eid;
-                        e.formatted = nil;
-                        e.formattedMsg = nil;
-                    }
+                    e.redacted = YES;
+                    e.redactedReason = [object objectForKey:@"reason"];
                     found = YES;
                 }
             }
@@ -1861,6 +1885,10 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 
 -(int)editMessage:(NSString *)msgId cid:(int)cid to:(NSString *)to msg:(NSString *)msg handler:(IRCCloudAPIResultHandler)resultHandler {
     return [self _sendRequest:@"edit-message" args:@{@"cid":@(cid), @"to":to, @"msgid":msgId, @"edit":msg} handler:resultHandler];
+}
+
+-(int)redact:(NSString *)msgId cid:(int)cid to:(NSString *)to reason:(NSString *)reason handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"redact-message" args:@{@"cid":@(cid), @"to":to, @"msgid":msgId, @"reason":reason} handler:resultHandler];
 }
 
 -(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)resultHandler {

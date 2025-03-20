@@ -107,11 +107,14 @@
     BOOL _edited;
     BOOL _collapsed;
     NSTimeInterval _lastEditEID;
+    BOOL _deleted;
+    BOOL _redacted;
+    NSString *_redactedReason;
 }
 @property (assign) int cid, bid, rowType, reqId, childEventCount, replyCount;
 @property (assign) NSTimeInterval eid, groupEid, serverTime, parent, lastEditEID;
-@property (copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick, *msgid, *formattedPrefix, *account;
-@property (assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock, hasReply, isReply, edited, collapsed, hasReplyRow;
+@property (copy) NSString *timestamp, *type, *msg, *hostmask, *from, *fromMode, *nick, *oldNick, *server, *diff, *groupMsg, *targetMode, *formattedMsg, *to, *command, *day, *chan, *realname, *accessibilityLabel, *accessibilityValue, *avatar, *avatarURL, *fromNick, *msgid, *formattedPrefix, *account, *redactedReason;
+@property (assign) BOOL isHighlight, isSelf, toChan, toBuffer, linkify, pending, monospace, isHeader, isEmojiOnly, isQuoted, isCodeBlock, hasReply, isReply, edited, collapsed, hasReplyRow, deleted, redacted;
 @property (copy) NSDictionary *ops,*entities;
 @property (strong) UIColor *color, *bgColor;
 @property (copy) NSAttributedString *formatted, *formattedNick, *formattedRealname, *formattedPadded;

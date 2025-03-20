@@ -74,6 +74,7 @@
     UISwitch *_muteNotifications;
     UISwitch *_noColor;
     UISwitch *_disableTypingStatus;
+    UISwitch *_showDeleted;
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;

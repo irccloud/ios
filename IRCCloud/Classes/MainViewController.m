@@ -1050,6 +1050,8 @@ NSArray *_sortedChannels;
                     msg = [NSString stringWithFormat:@"Metadata key subscription limit reached, keys after and including '%@' are not subscribed", [o objectForKey:@"key"]];
                 else if([[o objectForKey:@"message"] isEqualToString:@"invalid_nick"])
                     msg = @"Invalid nickname";
+                else if([type isEqualToString:@"fail"])
+                    msg = [NSString stringWithFormat:@"FAIL: %@: %@: %@: %@", [o objectForKey:@"command"], [o objectForKey:@"code"], [o objectForKey:@"description"], [o objectForKey:@"context"]];
                 else
                     msg = [o objectForKey:@"msg"];
 
@@ -4030,14 +4032,16 @@ NSArray *_sortedChannels;
             [alert addAction:[UIAlertAction actionWithTitle:@"Close Preview" style:UIAlertActionStyleDefault handler:handler]];
         if(self->_selectedEvent.msg.length || self->_selectedEvent.groupMsg.length)
             [alert addAction:[UIAlertAction actionWithTitle:@"Copy Message" style:UIAlertActionStyleDefault handler:handler]];
-        if(!server.blocksReplies && !_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
-            [alert addAction:[UIAlertAction actionWithTitle:@"Reply" style:UIAlertActionStyleDefault handler:handler]];
-        }
-        if(!server.blocksEdits && server.hasLabels && [self->_selectedEvent hasSameAccount:server.account] && _selectedEvent.msgid.length && self->_selectedEvent.chan) {
-            [alert addAction:[UIAlertAction actionWithTitle:@"Edit Message" style:UIAlertActionStyleDefault handler:handler]];
-        }
-        if(!server.blocksDeletes && server.hasLabels && self->_selectedEvent.isSelf && _selectedEvent.msgid.length) {
-            [alert addAction:[UIAlertAction actionWithTitle:@"Delete Message" style:UIAlertActionStyleDefault handler:handler]];
+        if(!self->_selectedEvent.deleted && !self->_selectedEvent.redacted) {
+            if(!server.blocksReplies && !_msgid && _selectedEvent.msgid && ([self->_selectedEvent.type isEqualToString:@"buffer_msg"] || [self->_selectedEvent.type isEqualToString:@"buffer_me_msg"] || [self->_selectedEvent.type isEqualToString:@"notice"])) {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Reply" style:UIAlertActionStyleDefault handler:handler]];
+            }
+            if(!server.blocksEdits && server.hasLabels && [self->_selectedEvent hasSameAccount:server.account] && _selectedEvent.msgid.length && self->_selectedEvent.chan) {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Edit Message" style:UIAlertActionStyleDefault handler:handler]];
+            }
+            if((!server.blocksDeletes || server.hasRedaction) && server.hasLabels && self->_selectedEvent.isSelf && _selectedEvent.msgid.length) {
+                [alert addAction:[UIAlertAction actionWithTitle:@"Delete Message" style:UIAlertActionStyleDefault handler:handler]];
+            }
         }
     }
     if(self->_selectedUser) {
@@ -4994,22 +4998,47 @@ NSArray *_sortedChannels;
     } else if([action isEqualToString:@"Delete Message"]) {
         [self dismissKeyboard];
         [self.view.window endEditing:YES];
+
+        Server *s = [[ServersDataSource sharedInstance] getServer:_buffer.cid];
         
-        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Delete Message" message:@"Are you sure you want to delete this message?" preferredStyle:UIAlertControllerStyleAlert];
-        
-        [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
-        [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
-            [[NetworkConnection sharedInstance] deleteMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan handler:^(IRCCloudJSONObject *result) {
-                if(![[result objectForKey:@"success"] boolValue]) {
-                    CLS_LOG(@"Error deleting message: %@", result);
-                    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to delete message, please try again." preferredStyle:UIAlertControllerStyleAlert];
-                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
-                    [self presentViewController:alert animated:YES completion:nil];
-                }
+        if(s && s.hasRedaction) {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Are you sure you want to delete this message?" preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                [[NetworkConnection sharedInstance] redact:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan reason:((UITextField *)[alert.textFields objectAtIndex:0]).text handler:^(IRCCloudJSONObject *result) {
+                    if(![[result objectForKey:@"success"] boolValue]) {
+                        CLS_LOG(@"Error redacting message: %@", result);
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to delete message, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
+                    }
+                }];
+            }]];
+            
+            [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+                textField.placeholder = @"Reason (optional)";
+                textField.tintColor = [UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor blackColor];
             }];
-        }]];
-        
-        [self presentViewController:alert animated:YES completion:nil];
+            
+            [self presentViewController:alert animated:YES completion:nil];
+        } else {
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"%@ (%@:%i)", s.name, s.hostname, s.port] message:@"Are you sure you want to delete this message?" preferredStyle:UIAlertControllerStyleAlert];
+            
+            [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *action) {
+                [[NetworkConnection sharedInstance] deleteMessage:self->_selectedEvent.msgid cid:self->_selectedEvent.cid to:self->_selectedEvent.chan handler:^(IRCCloudJSONObject *result) {
+                    if(![[result objectForKey:@"success"] boolValue]) {
+                        CLS_LOG(@"Error deleting message: %@", result);
+                        UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to delete message, please try again." preferredStyle:UIAlertControllerStyleAlert];
+                        [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                        [self presentViewController:alert animated:YES completion:nil];
+                    }
+                }];
+            }]];
+            
+            [self presentViewController:alert animated:YES completion:nil];
+        }
     } else if([action isEqualToString:@"Edit Message"]) {
         [self dismissKeyboard];
         [self.view.window endEditing:YES];

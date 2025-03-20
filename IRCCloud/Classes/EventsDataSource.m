@@ -152,6 +152,9 @@
         decodeBool(self->_edited);
         decodeDouble(self->_lastEditEID);
         decodeObjectOfClass(NSString.class, self->_account);
+        decodeBool(self->_deleted);
+        decodeBool(self->_redacted);
+        decodeObjectOfClass(NSString.class, self->_redactedReason);
 
         if(self->_rowType == ROW_TIMESTAMP)
             self->_bgColor = [UIColor timestampBackgroundColor];
@@ -218,6 +221,9 @@
     encodeBool(self->_edited);
     encodeDouble(self->_lastEditEID);
     encodeObject(self->_account);
+    encodeBool(self->_deleted);
+    encodeBool(self->_redacted);
+    encodeObject(self->_redactedReason);
 
     if(self->_rowType != ROW_TIMESTAMP && _rowType != ROW_LASTSEENEID)
         encodeObject(self->_bgColor);

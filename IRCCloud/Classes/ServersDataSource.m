@@ -166,6 +166,10 @@
     return [self->_caps containsObject:@"message-tags"];
 }
 
+-(BOOL)hasRedaction {
+    return [self->_caps containsObject:@"draft/message-redaction"];
+}
+
 -(BOOL)hasLabels {
     return [self->_caps containsObject:@"labeled-response"] ||  [self->_caps containsObject:@"draft/labeled-response"] ||  [self->_caps containsObject:@"draft/labeled-response-0.2"];
 }

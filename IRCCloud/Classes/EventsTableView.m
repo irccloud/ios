@@ -54,6 +54,7 @@ BOOL __replyCollapsePref = NO;
 BOOL __colorizeMentionsPref = NO;
 BOOL __notificationsMuted = NO;
 BOOL __noColor = NO;
+BOOL __showDeleted = NO;
 int __smallAvatarHeight;
 int __largeAvatarHeight = 32;
 
@@ -807,6 +808,9 @@ extern UIImage *__socketClosedBackgroundImage;
             return;
         }
         
+        if(!__showDeleted && (event.deleted || event.redacted))
+            return;
+        
         NSTimeInterval eid = event.eid;
         NSString *type = event.type;
         if([type hasPrefix:@"you_"]) {
@@ -1013,6 +1017,12 @@ extern UIImage *__socketClosedBackgroundImage;
                 
                 if(event.edited)
                     eventmsg = [eventmsg stringByAppendingFormat:@" %c%@(edited)%c", COLOR_RGB, [UIColor collapsedRowTextColor].toHexString, COLOR_RGB];
+
+                if(event.deleted || event.redacted)
+                    if(event.redactedReason.length)
+                        eventmsg = [NSString stringWithFormat:@"%c%@(deleted: %@)%c %@", COLOR_RGB, [UIColor collapsedRowTextColor].toHexString, event.redactedReason, COLOR_RGB, eventmsg];
+                    else
+                        eventmsg = [NSString stringWithFormat:@"%c%@(deleted)%c %@", COLOR_RGB, [UIColor collapsedRowTextColor].toHexString, COLOR_RGB, eventmsg];
 
                 if(!__disableCodeBlockPref && eventmsg) {
                     static NSRegularExpression *_pattern = nil;
@@ -1799,6 +1809,7 @@ extern UIImage *__socketClosedBackgroundImage;
             __disableCodeBlockPref = [[prefs objectForKey:@"chat-nocodeblock"] boolValue];
             __disableQuotePref = [[prefs objectForKey:@"chat-noquote"] boolValue];
             __avatarImages = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
+            __showDeleted = [[prefs objectForKey:@"chat-deleted-show"] boolValue];
 
             __hideJoinPartPref = [[prefs objectForKey:@"hideJoinPart"] boolValue];
             if(__hideJoinPartPref) {
