@@ -915,6 +915,9 @@ extern NSURL *__logfile;
 - (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder {
     [super buildMenuWithBuilder:builder];
     
+    if(!builder)
+        return;
+    
     if (@available(iOS 14.0, *)) {
         if([NSProcessInfo processInfo].macCatalystApp) {
             NSArray *formatting = @[
