@@ -54,10 +54,17 @@
     if(s) {
         Ignore *ignore = s.ignore;
         NSString *from = self->_fromNick;
-        if(!from.length)
-            from = self->_nick;
+        if(![from isKindOfClass:NSString.class])
+            from = nil;
         
-        if(from != nil && self->_hostmask != nil && [ignore match:[NSString stringWithFormat:@"%@!%@",from,self->_hostmask]])
+        NSString *hostmask = self->_hostmask;
+        if(![hostmask isKindOfClass:NSString.class])
+            hostmask = nil;
+        
+        if(!from.length)
+            from = [self->_nick isKindOfClass:NSString.class]?self->_nick:nil;
+        
+        if(from != nil && hostmask != nil && [ignore match:[NSString stringWithFormat:@"%@!%@",from,hostmask]])
             return NO;
     }
     
