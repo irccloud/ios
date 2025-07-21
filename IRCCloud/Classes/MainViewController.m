@@ -553,6 +553,11 @@ NSArray *_sortedChannels;
     _rightBorder.backgroundColor = [UIColor iPadBordersColor];
     [self.navigationController.view addSubview:_rightBorder];
     self.navigationController.view.clipsToBounds = NO;
+    
+    if (@available(iOS 17, *)) {
+        self.view.keyboardLayoutGuide.usesBottomSafeArea = YES;
+        self.view.keyboardLayoutGuide.followsUndockedKeyboard = YES;
+    }
     [self applyTheme];
 }
 
@@ -1830,10 +1835,31 @@ NSArray *_sortedChannels;
             //Not registered yet
         }
     }
-    CGSize size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
-    CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
-    int height = [UIScreen mainScreen].bounds.size.height - origin.y;
-    height -= self.slidingViewController.view.window.safeAreaInsets.bottom / 2;
+    
+    CGSize size;
+    int height;
+    
+    if (@available(iOS 17, *)) {
+        if ([UIScreen mainScreen].focusedView == nil || [UIScreen mainScreen].bounds.size.height == self.view.window.bounds.size.height || [UIScreen mainScreen].focusedView.window == self.view.window) {
+            size = self.view.keyboardLayoutGuide.layoutFrame.size;
+            height = size.height;
+            if (size.width < self.view.window.frame.size.width)
+                height += self.slidingViewController.view.window.safeAreaInsets.bottom;
+        } else {
+            height = 0;
+            size = CGSizeZero;
+        }
+    } else {
+        size = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
+        CGPoint origin = [[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].origin;
+        height = [UIScreen mainScreen].bounds.size.height - origin.y;
+        height -= self.slidingViewController.view.window.safeAreaInsets.bottom / 2;
+    }
+    
+    if (height > self.view.bounds.size.height - 72) {
+        height = self.view.bounds.size.height - 72;
+    }
+
     if(height != self->_kbSize.height) {
         self->_kbSize = size;
         self->_kbSize.height = height;
@@ -3359,7 +3385,7 @@ NSArray *_sortedChannels;
     BOOL scrolledUp = _buffer.scrolledUp;
     [UIApplication sharedApplication].statusBarHidden = self.prefersStatusBarHidden;
     
-    if(self.slidingViewController.view.window.safeAreaInsets.top != self.slidingViewController.view.safeAreaInsets.top) {
+    if(self.view.window.bounds.size.height == [UIScreen mainScreen].bounds.size.height && self.slidingViewController.view.window.safeAreaInsets.top != self.slidingViewController.view.safeAreaInsets.top) {
         NSLog(@"Insets mismatch");
         UIWindow *w = self.slidingViewController.view.window;
         w.rootViewController = nil;

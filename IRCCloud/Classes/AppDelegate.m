@@ -918,7 +918,7 @@ extern NSURL *__logfile;
 - (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder {
     [super buildMenuWithBuilder:builder];
     
-    if(!builder)
+    if(!builder || ![builder menuForIdentifier:UIMenuFont])
         return;
     
     if (@available(iOS 14.0, *)) {
@@ -1083,5 +1083,8 @@ extern NSURL *__logfile;
         }
 #endif
     }
+    
+    [self.window becomeKeyWindow];
+    [self.window becomeFirstResponder];
 }
 @end

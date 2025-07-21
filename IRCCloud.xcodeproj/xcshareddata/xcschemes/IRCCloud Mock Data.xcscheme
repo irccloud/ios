@@ -90,11 +90,11 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-theme ash"
-            isEnabled = "YES">
+            isEnabled = "NO">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-theme dusk"
-            isEnabled = "NO">
+            isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-mono"
