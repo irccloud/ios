@@ -922,14 +922,25 @@ extern NSURL *__logfile;
         return;
     
     if (@available(iOS 14.0, *)) {
-        NSArray *formatting = @[
-            [builder commandForAction:@selector(toggleBoldface:) propertyList:nil],
-            [builder commandForAction:@selector(toggleItalics:) propertyList:nil],
-            [builder commandForAction:@selector(toggleUnderline:) propertyList:nil],
-            [UICommand commandWithTitle:@"Text Color" image:nil action:@selector(chooseFGColor) propertyList:nil],
-            [UICommand commandWithTitle:@"Background Color" image:nil action:@selector(chooseBGColor) propertyList:nil],
-            [UICommand commandWithTitle:@"Reset Colors" image:nil action:@selector(resetColors) propertyList:nil],
-        ];
+        NSMutableArray *formatting = [[NSMutableArray alloc] init];
+        UICommand *toggleBoldface = [builder commandForAction:@selector(toggleBoldface:) propertyList:nil];
+        UICommand *toggleItalics = [builder commandForAction:@selector(toggleItalics:) propertyList:nil];
+        UICommand *toggleUnderline = [builder commandForAction:@selector(toggleUnderline:) propertyList:nil];
+        
+        if (toggleBoldface)
+            [formatting addObject:toggleBoldface];
+        
+        if (toggleItalics)
+            [formatting addObject:toggleItalics];
+        
+        if (toggleUnderline)
+            [formatting addObject:toggleUnderline];
+        
+        [formatting addObject:[UICommand commandWithTitle:@"Text Color" image:nil action:@selector(chooseFGColor) propertyList:nil]];
+        
+        [formatting addObject:[UICommand commandWithTitle:@"Background Color" image:nil action:@selector(chooseBGColor) propertyList:nil]];
+        
+        [formatting addObject:[UICommand commandWithTitle:@"Reset Colors" image:nil action:@selector(resetColors) propertyList:nil]];
         
         [builder replaceMenuForIdentifier:UIMenuFont withMenu:[[builder menuForIdentifier:UIMenuFont] menuByReplacingChildren:formatting]];
         
