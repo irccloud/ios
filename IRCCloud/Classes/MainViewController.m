@@ -1840,7 +1840,7 @@ NSArray *_sortedChannels;
     int height;
     
     if (@available(iOS 17, *)) {
-        if ([UIScreen mainScreen].focusedView == nil || [UIScreen mainScreen].bounds.size.height == self.view.window.bounds.size.height || [UIScreen mainScreen].focusedView.window == self.view.window) {
+        if ([UIScreen mainScreen].focusedView == nil || [UIScreen mainScreen].bounds.size.height == self.view.window.bounds.size.height || [UIScreen mainScreen].focusedView.window == self.view.window || self.view.window.frame.size.width == self.view.keyboardLayoutGuide.layoutFrame.size.width) {
             size = self.view.keyboardLayoutGuide.layoutFrame.size;
             height = size.height;
             if (size.width < self.view.window.frame.size.width)
