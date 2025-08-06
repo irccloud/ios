@@ -1037,6 +1037,18 @@ extern NSURL *__logfile;
     [((UINavigationController *)self.slideViewController.topViewController) setViewControllers:@[self.mainViewController]];
     self.slideViewController.topViewController.view.backgroundColor = [UIColor blackColor];
     self.slideViewController.view.accessibilityIgnoresInvertColors = YES;
+    
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(sceneTapped:)];
+    tap.delegate = self;
+    [self.window addGestureRecognizer: tap];
+}
+
+- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveEvent:(UIEvent *)event {
+    [_appDelegate setActiveScene:self.window];
+    return NO;
+}
+
+-(void)sceneTapped:(id)sender {
 }
 
 -(void)sceneDidEnterBackground:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
@@ -1060,6 +1072,7 @@ extern NSURL *__logfile;
 }
 
 -(void)sceneWillEnterForeground:(UIScene *)scene API_AVAILABLE(ios(13.0)) {
+    [_appDelegate setActiveScene:self.window];
     self.window.overrideUserInterfaceStyle = UIUserInterfaceStyleUnspecified;
 
     if(self.window.rootViewController == self.splashViewController) {

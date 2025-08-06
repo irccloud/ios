@@ -90,7 +90,7 @@
 @end
 
 API_AVAILABLE(ios(13.0))
-@interface SceneDelegate : NSObject <UIWindowSceneDelegate> {
+@interface SceneDelegate : NSObject <UIWindowSceneDelegate, UIGestureRecognizerDelegate> {
     AppDelegate *_appDelegate;
     UIScene *_scene;
 }
