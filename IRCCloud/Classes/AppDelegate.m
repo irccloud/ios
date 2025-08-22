@@ -952,6 +952,10 @@ extern NSURL *__logfile;
                 [UIKeyCommand commandWithTitle:@"Preferences…" image:nil action:@selector(showSettings) input:@"," modifierFlags:UIKeyModifierCommand propertyList:nil],
             ]]];
 
+            [builder replaceMenuForIdentifier:UIMenuView withMenu:[[builder menuForIdentifier:UIMenuView] menuByReplacingChildren:@[
+                [builder menuForIdentifier:UIMenuFullscreen],
+            ]]];
+
             [builder replaceMenuForIdentifier:UIMenuFormat withMenu:[[builder menuForIdentifier:UIMenuFormat] menuByReplacingChildren:formatting]];
 
             [builder replaceMenuForIdentifier:UIMenuFile withMenu:[[builder menuForIdentifier:UIMenuFile] menuByReplacingChildren:@[
