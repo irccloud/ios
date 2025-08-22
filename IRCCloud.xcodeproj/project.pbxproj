@@ -5141,6 +5141,7 @@
 				);
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
@@ -5175,6 +5176,7 @@
 				);
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
@@ -5624,6 +5626,7 @@
 				);
 				GCC_PREFIX_HEADER = "IRCCloud/IRCCloud-Prefix.pch";
 				INFOPLIST_FILE = "IRCCloud/IRCCloud-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.business";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(PROJECT_DIR)/IRCCloud\"",
