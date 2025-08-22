@@ -955,6 +955,7 @@ extern NSURL *__logfile;
             [builder replaceMenuForIdentifier:UIMenuFormat withMenu:[[builder menuForIdentifier:UIMenuFormat] menuByReplacingChildren:formatting]];
 
             [builder replaceMenuForIdentifier:UIMenuFile withMenu:[[builder menuForIdentifier:UIMenuFile] menuByReplacingChildren:@[
+                [builder menuForIdentifier:UIMenuNewScene],
                 [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
                     [UICommand commandWithTitle:@"Upload a File…" image:nil action:@selector(chooseFile) propertyList:nil],
                     [UICommand commandWithTitle:@"New Text Snippet…" image:nil action:@selector(startPastebin) propertyList:nil]
