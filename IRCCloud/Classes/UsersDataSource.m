@@ -130,6 +130,7 @@
         [NSKeyedArchiver setClassName:@"IRCCloud.User" forClass:User.class];
         [NSKeyedUnarchiver setClass:User.class forClassName:@"IRCCloud.User"];
 
+#ifndef EXTENSION
         if([[[NSUserDefaults standardUserDefaults] objectForKey:@"cacheVersion"] isEqualToString:[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"]]) {
             NSString *cacheFile = [[NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, YES) objectAtIndex:0] stringByAppendingPathComponent:@"users"];
             
@@ -148,6 +149,7 @@
                 [[EventsDataSource sharedInstance] clear];
             }
         }
+#endif
         if(!_users)
             self->_users = [[NSMutableDictionary alloc] init];
     }

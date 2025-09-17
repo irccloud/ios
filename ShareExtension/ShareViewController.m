@@ -159,7 +159,14 @@
         }
         [self->_conn connect:YES];
     }
-    [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    if (@available(iOS 15.0, *)) {
+        [self.navigationController.navigationBar setStandardAppearance:[UINavigationBar appearance].standardAppearance];
+        [self.navigationController.navigationBar setScrollEdgeAppearance:[UINavigationBar appearance].scrollEdgeAppearance];
+        [self.navigationController.navigationBar setCompactAppearance:[UINavigationBar appearance].compactAppearance];
+        [self.navigationController.navigationBar setCompactScrollEdgeAppearance:[UINavigationBar appearance].compactScrollEdgeAppearance];
+    } else {
+        [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+    }
     self.title = @"IRCCloud";
     self->_sound = 1001;
     self.textView.returnKeyType = UIReturnKeySend;
