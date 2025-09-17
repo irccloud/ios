@@ -944,7 +944,7 @@ extern NSURL *__logfile;
         
         [builder replaceMenuForIdentifier:UIMenuFont withMenu:[[builder menuForIdentifier:UIMenuFont] menuByReplacingChildren:formatting]];
         
-        if(builder.system == UIMenuSystem.mainSystem) {
+        if(builder.system == UIMenuSystem.mainSystem && [builder menuForIdentifier:UIMenuPreferences]) {
             [builder removeMenuForIdentifier:UIMenuServices];
             [builder removeMenuForIdentifier:UIMenuToolbar];
             
