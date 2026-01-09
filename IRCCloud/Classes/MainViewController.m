@@ -1574,7 +1574,7 @@ NSArray *_sortedChannels;
                     }
                 }
             }
-            b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
+            /*b = [[BuffersDataSource sharedInstance] getBuffer:e.bid];
             if(b && !b.scrolledUp && [[EventsDataSource sharedInstance] highlightStateForBuffer:b.bid lastSeenEid:b.last_seen_eid type:b.type] == 0 && [[EventsDataSource sharedInstance] sizeOfBuffer:b.bid] > 200 && [self->_eventsView.tableView numberOfRowsInSection:0] > 100) {
                 [[EventsDataSource sharedInstance] pruneEventsForBuffer:b.bid maxSize:100];
                 if(b.bid == self->_buffer.bid) {
@@ -1583,7 +1583,7 @@ NSArray *_sortedChannels;
                     [[ImageCache sharedInstance] clear];
                     [self->_eventsView refresh];
                 }
-            }
+            }*/
             break;
         case kIRCEventHeartbeatEcho:
         {
@@ -3030,6 +3030,8 @@ NSArray *_sortedChannels;
     }
 
     if(changed) {
+        [[EventsDataSource sharedInstance] pruneEventsForBuffer:bid maxSize:500];
+
         [self resetColors];
         self->_msgid = self->_eventsView.msgid = nil;
         if(self->_defaultTextareaFont) {

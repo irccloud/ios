@@ -223,11 +223,13 @@
     
     NSArray *users = [[UsersDataSource sharedInstance] usersForBuffer:self->_buffer.bid];
     if(users.count > 1000) {
-        NSMutableDictionary *disableNickSuggestions = [[[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"] mutableCopy];
-        if(![disableNickSuggestions objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]]) {
+        NSMutableDictionary *disableNickSuggestions = [[NSUserDefaults standardUserDefaults] objectForKey:@"disable-nick-suggestions"];
+        if(![[disableNickSuggestions objectForKey:[NSString stringWithFormat:@"%i",_buffer.bid]] intValue]) {
+            disableNickSuggestions = disableNickSuggestions.mutableCopy;
             CLS_LOG(@"Channel has %lu members, disabling auto nick suggestions", (unsigned long)users.count);
-            [disableNickSuggestions setObject:@YES forKey:[NSString stringWithFormat:@"%i",_buffer.bid]];
+            [disableNickSuggestions setObject:@1 forKey:[NSString stringWithFormat:@"%i",_buffer.bid]];
             [[NSUserDefaults standardUserDefaults] setObject:disableNickSuggestions forKey:@"disable-nick-suggestions"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
         }
     }
     
