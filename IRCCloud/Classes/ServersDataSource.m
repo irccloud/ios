@@ -377,8 +377,8 @@
             b.chantypes = server.CHANTYPES;
         }
         
-        server.blocksTyping = [server clientTagDeny:@"typing"] && [server clientTagDeny:@"draft/typing"];
-        server.blocksReplies = [server clientTagDeny:@"draft/reply"];
+        server.blocksTyping = [server clientTagDeny:@"typing"] || [server clientTagDeny:@"draft/typing"];
+        server.blocksReplies = [server clientTagDeny:@"reply"] || [server clientTagDeny:@"draft/reply"];
         server.blocksReactions = server.blocksReplies || [server clientTagDeny:@"draft/react"];
         server.blocksEdits = [server clientTagDeny:@"draft/edit"] || [server clientTagDeny:@"draft/edit-text"];
         server.blocksDeletes = [server clientTagDeny:@"draft/delete"];
