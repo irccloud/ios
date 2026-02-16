@@ -378,7 +378,7 @@
         }
         
         server.blocksTyping = [server clientTagDeny:@"typing"];
-        server.blocksReplies = [server clientTagDeny:@"reply"] || [server clientTagDeny:@"draft/reply"];
+        server.blocksReplies = [server clientTagDeny:@"reply"] && [server clientTagDeny:@"draft/reply"];
         server.blocksReactions = server.blocksReplies || [server clientTagDeny:@"draft/react"];
         server.blocksEdits = [server clientTagDeny:@"draft/edit"] || [server clientTagDeny:@"draft/edit-text"];
         server.blocksDeletes = [server clientTagDeny:@"draft/delete"];
