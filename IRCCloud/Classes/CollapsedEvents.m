@@ -638,7 +638,7 @@
                     }
                 } else if(self->_showChan && e.type != kCollapsedEventNetSplit && e.type != kCollapsedEventConnectionStatus && e.type != kCollapsedEventNickChange) {
                     if(groupcount == 0) {
-                        [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO displayName:nil]];
+                        [message appendString:[self formatNick:e.nick mode:(e.type == kCollapsedEventMode)?e.targetMode:e.fromMode colorize:NO defaultColor:[UIColor collapsedRowNickColor].toHexString bold:NO displayName:nil]];
                         [message appendString:[self was:e]];
                         switch(e.type) {
                             case kCollapsedEventJoin:
