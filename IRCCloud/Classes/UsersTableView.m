@@ -314,10 +314,8 @@
     lp.delegate = self;
     [self.tableView addGestureRecognizer:lp];
     
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp)
-            [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
-    }
+    if([NSProcessInfo processInfo].macCatalystApp)
+        [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
     
     self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     self.view.backgroundColor = [UIColor usersDrawerBackgroundColor];

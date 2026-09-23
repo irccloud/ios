@@ -14,7 +14,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import <MobileCoreServices/MobileCoreServices.h>
+#import <MobileCoreServices/UTType.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import "NetworkConnection.h"
 #import "NotificationService.h"
 #import "ColorFormatter.h"
@@ -30,7 +31,7 @@
 
 - (void)didReceiveNotificationRequest:(UNNotificationRequest *)request withContentHandler:(void (^)(UNNotificationContent * _Nonnull))contentHandler {
     NSURL *attachment = nil;
-    NSString *typeHint = (NSString *)kUTTypeJPEG;
+    NSString *typeHint = UTTypeJPEG.identifier;
     self.contentHandler = contentHandler;
     self.bestAttemptContent = [request.content mutableCopy];
     
@@ -85,19 +86,19 @@
             }];
             return;
         } else if([d boolForKey:@"thirdPartyNotificationPreviews"]) {
-            NSDictionary *extensions = @{@"png":(NSString *)kUTTypePNG,
-                                         @"jpg":(NSString *)kUTTypeJPEG,
-                                         @"jpeg":(NSString *)kUTTypeJPEG,
-                                         @"gif":(NSString *)kUTTypeGIF,
-                                         @"m4v":(NSString *)kUTTypeMPEG4,
-                                         @"mp4":(NSString *)kUTTypeMPEG4,
-                                         @"mov":(NSString *)kUTTypeMPEG4,
-                                         @"m4a":(NSString *)kUTTypeMPEG4Audio,
-                                         @"mp3":(NSString *)kUTTypeMP3,
-                                         @"wav":(NSString *)kUTTypeWaveformAudio,
-                                         @"avi":(NSString *)kUTTypeAVIMovie,
-                                         @"aif":(NSString *)kUTTypeAudioInterchangeFileFormat,
-                                         @"aiff":(NSString *)kUTTypeAudioInterchangeFileFormat
+            NSDictionary *extensions = @{@"png":UTTypePNG.identifier,
+                                         @"jpg":UTTypeJPEG.identifier,
+                                         @"jpeg":UTTypeJPEG.identifier,
+                                         @"gif":UTTypeGIF.identifier,
+                                         @"m4v":UTTypeAppleProtectedMPEG4Video.identifier,
+                                         @"mp4":UTTypeAppleProtectedMPEG4Video.identifier,
+                                         @"mov":UTTypeAppleProtectedMPEG4Video.identifier,
+                                         @"m4a":UTTypeMPEG4Audio.identifier,
+                                         @"mp3":UTTypeMP3.identifier,
+                                         @"wav":UTTypeWAV.identifier,
+                                         @"avi":UTTypeAVI.identifier,
+                                         @"aif":UTTypeAIFF.identifier,
+                                         @"aiff":UTTypeAIFF.identifier
                                          };
             NSArray *links;
             [ColorFormatter format:request.content.body defaultColor:[UIColor blackColor] mono:NO linkify:YES server:nil links:&links];

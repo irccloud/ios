@@ -300,8 +300,8 @@
         [UIView animateWithDuration:0.5f animations:^{
             ivc.view.alpha = 1;
         } completion:^(BOOL finished){
-            [UIApplication sharedApplication].statusBarHidden = YES;
         }];
+        [ivc setNeedsStatusBarAppearanceUpdate];
     }
 }
 

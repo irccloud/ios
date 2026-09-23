@@ -15,7 +15,7 @@
 //  limitations under the License.
 
 #import <AVFoundation/AVFoundation.h>
-#import <MobileCoreServices/MobileCoreServices.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <IntentsUI/IntentsUI.h>
 #import "SendMessageIntentHandler.h"
 #import "AvatarsDataSource.h"
@@ -163,14 +163,12 @@
 }
 
 -(void)resolveContentForSendMessage:(INSendMessageIntent *)intent withCompletion:(void (^)(INStringResolutionResult * _Nonnull))completion {
-    if (@available(iOS 14.0, *)) {
-        if(intent.attachments.count > 1) {
-            completion([INStringResolutionResult unsupported]);
-            return;
-        } else if(intent.attachments.count == 1) {
-            completion([INStringResolutionResult successWithResolvedString:intent.content]);
-            return;
-        }
+    if(intent.attachments.count > 1) {
+        completion([INStringResolutionResult unsupported]);
+        return;
+    } else if(intent.attachments.count == 1) {
+        completion([INStringResolutionResult successWithResolvedString:intent.content]);
+        return;
     }
 
     if(intent.content.length)
@@ -196,29 +194,27 @@
     __block int code = INSendMessageIntentResponseCodeSuccess;
     __block int responseCount = 0;
 
-    if(@available(iOS 14.0, *)) {
-        if(intent.attachments.count) {
-            NSMutableArray *to = [[NSMutableArray alloc] init];
-            for(INPerson *person in intent.recipients) {
-                NSString *ident = [person.customIdentifier substringFromIndex:11];
-                NSUInteger sep = [ident rangeOfString:@"/"].location;
-                [to addObject:@{@"cid":@([ident substringToIndex:sep].intValue), @"to":[ident substringFromIndex:sep + 1]}];
-            }
-            _completion = completion;
-            
-            INSendMessageAttachment *attachment = intent.attachments.firstObject;
-            INFile *file = attachment.audioMessageFile ? attachment.audioMessageFile : attachment.file;
-            if(file && file.data && file.data.length) {
-                _fileUploader = [[FileUploader alloc] init];
-                _fileUploader.delegate = self;
-                _fileUploader.to = to;
-                [_fileUploader setFilename:file.filename message:intent.content];
-                [_fileUploader uploadFile:file.filename UTI:CFBridgingRelease(UTTypeCopyPreferredTagWithClass((__bridge CFStringRef _Nonnull)(file.typeIdentifier), kUTTagClassMIMEType)) data:file.data];
-            } else {
-                _completion([[INSendMessageIntentResponse alloc] initWithCode:INSendMessageIntentResponseCodeFailure userActivity:nil]);
-            }
-            return;
+    if(intent.attachments.count) {
+        NSMutableArray *to = [[NSMutableArray alloc] init];
+        for(INPerson *person in intent.recipients) {
+            NSString *ident = [person.customIdentifier substringFromIndex:11];
+            NSUInteger sep = [ident rangeOfString:@"/"].location;
+            [to addObject:@{@"cid":@([ident substringToIndex:sep].intValue), @"to":[ident substringFromIndex:sep + 1]}];
         }
+        _completion = completion;
+        
+        INSendMessageAttachment *attachment = intent.attachments.firstObject;
+        INFile *file = attachment.audioMessageFile ? attachment.audioMessageFile : attachment.file;
+        if(file && file.data && file.data.length) {
+            _fileUploader = [[FileUploader alloc] init];
+            _fileUploader.delegate = self;
+            _fileUploader.to = to;
+            [_fileUploader setFilename:file.filename message:intent.content];
+            [_fileUploader uploadFile:file.filename UTI:[UTType typeWithIdentifier:file.typeIdentifier].preferredMIMEType data:file.data];
+        } else {
+            _completion([[INSendMessageIntentResponse alloc] initWithCode:INSendMessageIntentResponseCodeFailure userActivity:nil]);
+        }
+        return;
     }
     
     for(INPerson *person in intent.recipients) {

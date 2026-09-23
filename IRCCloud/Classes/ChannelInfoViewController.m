@@ -14,8 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import <MobileCoreServices/UTCoreTypes.h>
-#import <MobileCoreServices/UTType.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import "ChannelInfoViewController.h"
 #import "ColorFormatter.h"
 #import "NetworkConnection.h"
@@ -227,18 +226,18 @@
             [msg insertAttributedString:[ColorFormatter format:[[NSString alloc] initWithData:[[UIPasteboard generalPasteboard] valueForPasteboardType:@"IRC formatting type"] encoding:NSUTF8StringEncoding] defaultColor:self->_topicEdit.textColor mono:NO linkify:NO server:nil links:nil] atIndex:self->_topicEdit.selectedRange.location];
             
             [self->_topicEdit setAttributedText:msg];
-        } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
+        } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeRTF.identifier]) {
             NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
             if(self->_topicEdit.selectedRange.length > 0)
                 [msg deleteCharactersInRange:self->_topicEdit.selectedRange];
-            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_topicEdit.font.pointSize] atIndex:self->_topicEdit.selectedRange.location];
+            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeRTF.identifier] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_topicEdit.font.pointSize] atIndex:self->_topicEdit.selectedRange.location];
             
             [self->_topicEdit setAttributedText:msg];
-        } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD]) {
+        } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeFlatRTFD.identifier]) {
             NSMutableAttributedString *msg = self->_topicEdit.attributedText.mutableCopy;
             if(self->_topicEdit.selectedRange.length > 0)
                 [msg deleteCharactersInRange:self->_topicEdit.selectedRange];
-            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_topicEdit.font.pointSize] atIndex:self->_topicEdit.selectedRange.location];
+            [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeFlatRTFD.identifier] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_topicEdit.font.pointSize] atIndex:self->_topicEdit.selectedRange.location];
             
             [self->_topicEdit setAttributedText:msg];
         } else if([[UIPasteboard generalPasteboard] valueForPasteboardType:@"Apple Web Archive pasteboard type"]) {

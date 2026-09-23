@@ -243,10 +243,8 @@
         
         switch(section) {
             case 0:
-                if (@available(iOS 14.0, *)) {
-                    if([NSProcessInfo processInfo].macCatalystApp) {
-                        return 3;
-                    }
+                if([NSProcessInfo processInfo].macCatalystApp) {
+                    return 3;
                 }
                 return [[NSFileManager defaultManager] ubiquityIdentityToken]?4:3;
             case 1:
@@ -640,11 +638,9 @@
 }
 
 -(void)download:(NSURL *)url {
-    if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp) {
-            [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
-            return;
-        }
+    if([NSProcessInfo processInfo].macCatalystApp) {
+        [[UIApplication sharedApplication] openURL:url options:@{UIApplicationOpenURLOptionUniversalLinksOnly:@NO} completionHandler:nil];
+        return;
     }
     
     if([self->_downloadingURLs objectForKey:url.absoluteString]) {

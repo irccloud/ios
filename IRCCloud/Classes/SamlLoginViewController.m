@@ -37,21 +37,15 @@
         }
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
-    self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleMedium];
     self->_activity.hidesWhenStopped = YES;
     [self->_activity startAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
 
     WKWebViewConfiguration *config = [[WKWebViewConfiguration alloc] init];
-    if (@available(iOS 14.0, *)) {
-        WKWebpagePreferences *prefs = [[WKWebpagePreferences alloc] init];
-        prefs.allowsContentJavaScript = YES;
-        config.defaultWebpagePreferences = prefs;
-    } else {
-        WKPreferences *prefs = [[WKPreferences alloc] init];
-        prefs.javaScriptEnabled = YES;
-        config.preferences = prefs;
-    }
+    WKWebpagePreferences *prefs = [[WKWebpagePreferences alloc] init];
+    prefs.allowsContentJavaScript = YES;
+    config.defaultWebpagePreferences = prefs;
 
     self->_webView = [[WKWebView alloc] initWithFrame:CGRectMake(0,0,self.view.frame.size.width, self.view.frame.size.height) configuration:config];
     self->_webView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
@@ -63,24 +57,20 @@
 -(void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
     [self.view endEditing:YES];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
 -(void)webView:(WKWebView *)webView didFailNavigation:(WKNavigation *)navigation withError:(NSError *)error {
     CLS_LOG(@"Error: %@", error);
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 }
 
 -(void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:self->_activity];
     [self->_activity startAnimating];
 }
 
 -(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonPressed:)];
 }
@@ -121,7 +111,6 @@
 
 - (void)cancelButtonPressed:(id)sender {
     [self->_webView stopLoading];
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 

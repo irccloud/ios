@@ -17,6 +17,7 @@
 #import <CoreTelephony/CTTelephonyNetworkInfo.h>
 #import <MessageUI/MFMailComposeViewController.h>
 #import <MobileCoreServices/UTCoreTypes.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <Intents/Intents.h>
 #import <IntentsUI/IntentsUI.h>
 #import "NetworkConnection.h"
@@ -348,10 +349,8 @@ volatile BOOL __socketPaused = NO;
 #endif
         
     NSString *model = [UIDevice currentDevice].model;
-    if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp) {
-            model = @"Mac";
-        }
+    if([NSProcessInfo processInfo].macCatalystApp) {
+        model = @"Mac";
     }
 
     _userAgent = [NSString stringWithFormat:@"%@/%@ (%@; %@; %@ %@)", app, version, model, [[[NSUserDefaults standardUserDefaults] objectForKey: @"AppleLanguages"] objectAtIndex:0], [UIDevice currentDevice].systemName, [UIDevice currentDevice].systemVersion];
@@ -1550,66 +1549,62 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 }
 
 -(void)_donateSendIntent:(NSString *)message to:(NSString *)to cid:(int)cid  image:(INImage *)img {
-    if (@available(iOS 14.0, *)) {
-        INPerson *person = [[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:to type:INPersonHandleTypeUnknown] nameComponents:nil displayName:to image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to]];
+    INPerson *person = [[INPerson alloc] initWithPersonHandle:[[INPersonHandle alloc] initWithValue:to type:INPersonHandleTypeUnknown] nameComponents:nil displayName:to image:img contactIdentifier:nil customIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to]];
 
-        INSendMessageIntent *intent = [[INSendMessageIntent alloc] initWithRecipients:@[person] outgoingMessageType:INOutgoingMessageTypeOutgoingMessageText content:nil speakableGroupName:nil conversationIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to] serviceName:nil sender:nil attachments:nil];
-        
-        INInteraction *interaction = [[INInteraction alloc] initWithIntent:intent response:nil];
-        [interaction donateInteractionWithCompletion:^(NSError *error) {
-            if(error) {
-                NSLog(@"Intent donation failed: %@", error);
-            }
-        }];
-    }
+    INSendMessageIntent *intent = [[INSendMessageIntent alloc] initWithRecipients:@[person] outgoingMessageType:INOutgoingMessageTypeOutgoingMessageText content:nil speakableGroupName:nil conversationIdentifier:[NSString stringWithFormat:@"irccloud://%i/%@", cid, to] serviceName:nil sender:nil attachments:nil];
+    
+    INInteraction *interaction = [[INInteraction alloc] initWithIntent:intent response:nil];
+    [interaction donateInteractionWithCompletion:^(NSError *error) {
+        if(error) {
+            NSLog(@"Intent donation failed: %@", error);
+        }
+    }];
 }
 
 -(void)_donateSendIntent:(NSString *)message to:(NSString *)to cid:(int)cid {
-    if (@available(iOS 14.0, *)) {
-        if(!to || !to.length || [to isEqualToString:@"*"])
-            return;
+    if(!to || !to.length || [to isEqualToString:@"*"])
+        return;
+    
+    Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:to server:cid];
+    if(b) {
+        Avatar *a = [[Avatar alloc] init];
+        a.nick = a.displayName = to;
         
-        Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:to server:cid];
-        if(b) {
-            Avatar *a = [[Avatar alloc] init];
-            a.nick = a.displayName = to;
-            
-            if([b.type isEqualToString:@"channel"]) {
-                [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:YES]]];
-            } else {
-                NSURL *url = [[AvatarsDataSource sharedInstance] URLforBid:b.bid];
-                if(!url) {
-                    User *u = [[UsersDataSource sharedInstance] getUser:to cid:cid];
-                    if(u) {
-                        Event *e = [[Event alloc] init];
-                        e.cid = cid;
-                        e.bid = b.bid;
-                        e.hostmask = u.hostmask;
-                        e.from = to;
-                        e.type = @"buffer_msg";
-                        
-                        url = [e avatar:512];
-                    }
+        if([b.type isEqualToString:@"channel"]) {
+            [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:YES]]];
+        } else {
+            NSURL *url = [[AvatarsDataSource sharedInstance] URLforBid:b.bid];
+            if(!url) {
+                User *u = [[UsersDataSource sharedInstance] getUser:to cid:cid];
+                if(u) {
+                    Event *e = [[Event alloc] init];
+                    e.cid = cid;
+                    e.bid = b.bid;
+                    e.hostmask = u.hostmask;
+                    e.from = to;
+                    e.type = @"buffer_msg";
+                    
+                    url = [e avatar:512];
                 }
-                
-                if(url) {
-                    UIImage *img = [[ImageCache sharedInstance] imageForURL:url];
-                    if(img) {
-                        [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithURL:[[ImageCache sharedInstance] pathForURL:url]]];
-                        return;
-                    } else if([[ImageCache sharedInstance] isValidURL:url]) {
-                        [[ImageCache sharedInstance] fetchURL:url completionHandler:^(BOOL success) {
-                            if(success) {
-                                [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithURL:[[ImageCache sharedInstance] pathForURL:url]]];
-                            } else {
-                                [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:NO]]];
-                            }
-                        }];
-                        return;
-                    }
-                }
-                [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:NO]]];
             }
+            
+            if(url) {
+                UIImage *img = [[ImageCache sharedInstance] imageForURL:url];
+                if(img) {
+                    [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithURL:[[ImageCache sharedInstance] pathForURL:url]]];
+                    return;
+                } else if([[ImageCache sharedInstance] isValidURL:url]) {
+                    [[ImageCache sharedInstance] fetchURL:url completionHandler:^(BOOL success) {
+                        if(success) {
+                            [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithURL:[[ImageCache sharedInstance] pathForURL:url]]];
+                        } else {
+                            [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:NO]]];
+                        }
+                    }];
+                    return;
+                }
+            }
+            [self _donateSendIntent:message to:to cid:cid image:[INImage imageWithUIImage:[a getImage:512 isSelf:NO isChannel:NO]]];
         }
     }
 }
@@ -2415,10 +2410,8 @@ if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
 #ifdef EXTENSION
     return NO;
 #else
-    if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp) {
-            return YES;
-        }
+    if([NSProcessInfo processInfo].macCatalystApp) {
+        return YES;
     }
     return [UIApplication sharedApplication].applicationState != UIApplicationStateBackground;
 #endif
@@ -2923,7 +2916,7 @@ Network type: %@\n",
             [alert addAction:[UIAlertAction actionWithTitle:@"Close" style:UIAlertActionStyleCancel handler:nil]];
             [alert addAction:[UIAlertAction actionWithTitle:@"Copy to Clipboard" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
                 UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                [pb setValue:report forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                [pb setValue:report forPasteboardType:UTTypeUTF8PlainText.identifier];
             }]];
             [delegate presentViewController:alert animated:YES completion:nil];
         }

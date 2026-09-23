@@ -137,16 +137,10 @@ extern NSURL *__logfile;
     [[NSFileManager defaultManager] removeItemAtURL:sharedcontainer error:nil];
     
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"bgTimeout":@(30), @"autoCaps":@(YES), @"host":IRCCLOUD_HOST, @"saveToCameraRoll":@(YES), @"photoSize":@(1024), @"notificationSound":@(YES), @"tabletMode":@(YES), @"uploadsAvailable":@(NO), @"browser":([SFSafariViewController class] && !((AppDelegate *)([UIApplication sharedApplication].delegate)).isOnVisionOS)?@"IRCCloud":@"Safari", @"warnBeforeLaunchingBrowser":@(NO), @"imageViewer":@(YES), @"videoViewer":@(YES), @"inlineWifiOnly":@(NO), @"iCloudLogs":@(NO), @"clearFormattingAfterSending":@(YES)}];
-    if (@available(iOS 14, *)) {
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * ([NSProcessInfo processInfo].macCatalystApp ? 1.0 : 0.8))}];
-    } else {
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * 0.8)}];
-    }
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"fontSize":@([UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody].pointSize * ([NSProcessInfo processInfo].macCatalystApp ? 1.0 : 0.8))}];
 
-    if (@available(iOS 13, *)) {
-        if([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark)
-            [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"theme":@"automatic"}];
-    }
+    if([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark)
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"theme":@"automatic"}];
     
     if([[NSUserDefaults standardUserDefaults] objectForKey:@"path"]) {
         IRCCLOUD_HOST = [[NSUserDefaults standardUserDefaults] objectForKey:@"host"];
@@ -263,9 +257,7 @@ extern NSURL *__logfile;
     }];
     
     [[ImageCache sharedInstance] performSelectorInBackground:@selector(prune) withObject:nil];
-    if (@available(iOS 14.0, *)) {
-        [UIMenuSystem.mainSystem setNeedsRebuild];
-    }
+    [UIMenuSystem.mainSystem setNeedsRebuild];
 
 #if TARGET_IPHONE_SIMULATOR
 #ifdef FLEX
@@ -443,14 +435,14 @@ extern NSURL *__logfile;
         NSTimeInterval eid = [[[notification.request.content.userInfo objectForKey:@"d"] objectAtIndex:2] doubleValue];
         Buffer *b = [[BuffersDataSource sharedInstance] getBuffer:bid];
         if(self->_mainViewController.buffer.bid != bid && eid > b.last_seen_eid) {
-            completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
+            completionHandler(UNNotificationPresentationOptionBanner + UNNotificationPresentationOptionSound);
             return;
         }
     } else if([notification.request.content.userInfo objectForKey:@"view_logs"]) {
         if([UIApplication sharedApplication].applicationState == UIApplicationStateActive && [self->_mainViewController.presentedViewController isKindOfClass:[UINavigationController class]] && [((UINavigationController *)_mainViewController.presentedViewController).topViewController isKindOfClass:[LogExportsTableViewController class]])
             completionHandler(UNNotificationPresentationOptionNone);
         else
-            completionHandler(UNNotificationPresentationOptionAlert + UNNotificationPresentationOptionSound);
+            completionHandler(UNNotificationPresentationOptionBanner + UNNotificationPresentationOptionSound);
     }
     completionHandler(UNNotificationPresentationOptionNone);
 }
@@ -597,7 +589,6 @@ extern NSURL *__logfile;
                 [[NetworkConnection sharedInstance] connect:NO];
 
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [UIApplication sharedApplication].statusBarHidden = self.mainViewController.prefersStatusBarHidden;
                 self.slideViewController.view.alpha = 1;
                 if(self.window.rootViewController != self.slideViewController) {
                     if([self.window.rootViewController isKindOfClass:ImageViewController.class])
@@ -609,6 +600,7 @@ extern NSURL *__logfile;
                     self.mainViewController.ignoreVisibilityChanges = NO;
                     if(fromLoginView)
                         [self.loginSplashViewController hideLoginView];
+                    [self.mainViewController setNeedsStatusBarAppearanceUpdate];
                     [UIView animateWithDuration:0.5f animations:^{
                         v.alpha = 0;
                     } completion:^(BOOL finished){
@@ -624,7 +616,7 @@ extern NSURL *__logfile;
         } else if(self.window.rootViewController != self.slideViewController) {
             if([self.window.rootViewController isKindOfClass:ImageViewController.class])
                 self.mainViewController.ignoreVisibilityChanges = YES;
-            [UIApplication sharedApplication].statusBarHidden = self.mainViewController.prefersStatusBarHidden;
+            [self.mainViewController setNeedsStatusBarAppearanceUpdate];
             self.slideViewController.view.alpha = 1;
             [self.window.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
             self.window.rootViewController = self.slideViewController;
@@ -881,16 +873,14 @@ extern NSURL *__logfile;
 }
 
 -(void)setActiveScene:(UIWindow *)window {
-    if (@available(iOS 13.0, *)) {
-        for(SceneDelegate *d in _activeScenes) {
-            if(d.window == window) {
-                self.window = d.window;
-                self.splashViewController = d.splashViewController;
-                self.loginSplashViewController = d.loginSplashViewController;
-                self.mainViewController = d.mainViewController;
-                self.slideViewController = d.slideViewController;
-                break;
-            }
+    for(SceneDelegate *d in _activeScenes) {
+        if(d.window == window) {
+            self.window = d.window;
+            self.splashViewController = d.splashViewController;
+            self.loginSplashViewController = d.loginSplashViewController;
+            self.mainViewController = d.mainViewController;
+            self.slideViewController = d.slideViewController;
+            break;
         }
     }
 }
@@ -905,12 +895,10 @@ extern NSURL *__logfile;
 }
 
 -(void)closeWindow:(UIWindow *)window {
-    if (@available(iOS 13.0, *)) {
-        for(UISceneSession *session in [UIApplication sharedApplication].openSessions) {
-            if([session.scene.delegate isKindOfClass:SceneDelegate.class] && ((SceneDelegate *)session.scene.delegate).window == window) {
-                [UIApplication.sharedApplication requestSceneSessionDestruction:session options:nil errorHandler:nil];
-                break;
-            }
+    for(UISceneSession *session in [UIApplication sharedApplication].openSessions) {
+        if([session.scene.delegate isKindOfClass:SceneDelegate.class] && ((SceneDelegate *)session.scene.delegate).window == window) {
+            [UIApplication.sharedApplication requestSceneSessionDestruction:session options:nil errorHandler:nil];
+            break;
         }
     }
 }
@@ -921,87 +909,85 @@ extern NSURL *__logfile;
     if(!builder || ![builder menuForIdentifier:UIMenuFont])
         return;
     
-    if (@available(iOS 14.0, *)) {
-        NSMutableArray *formatting = [[NSMutableArray alloc] init];
-        UICommand *toggleBoldface = [builder commandForAction:@selector(toggleBoldface:) propertyList:nil];
-        UICommand *toggleItalics = [builder commandForAction:@selector(toggleItalics:) propertyList:nil];
-        UICommand *toggleUnderline = [builder commandForAction:@selector(toggleUnderline:) propertyList:nil];
+    NSMutableArray *formatting = [[NSMutableArray alloc] init];
+    UICommand *toggleBoldface = [builder commandForAction:@selector(toggleBoldface:) propertyList:nil];
+    UICommand *toggleItalics = [builder commandForAction:@selector(toggleItalics:) propertyList:nil];
+    UICommand *toggleUnderline = [builder commandForAction:@selector(toggleUnderline:) propertyList:nil];
+    
+    if (toggleBoldface)
+        [formatting addObject:toggleBoldface];
+    
+    if (toggleItalics)
+        [formatting addObject:toggleItalics];
+    
+    if (toggleUnderline)
+        [formatting addObject:toggleUnderline];
+    
+    [formatting addObject:[UICommand commandWithTitle:@"Text Color" image:nil action:@selector(chooseFGColor) propertyList:nil]];
+    
+    [formatting addObject:[UICommand commandWithTitle:@"Background Color" image:nil action:@selector(chooseBGColor) propertyList:nil]];
+    
+    [formatting addObject:[UICommand commandWithTitle:@"Reset Colors" image:nil action:@selector(resetColors) propertyList:nil]];
+    
+    [builder replaceMenuForIdentifier:UIMenuFont withMenu:[[builder menuForIdentifier:UIMenuFont] menuByReplacingChildren:formatting]];
+    
+    if(builder.system == UIMenuSystem.mainSystem && [builder menuForIdentifier:UIMenuPreferences]) {
+        [builder removeMenuForIdentifier:UIMenuServices];
+        [builder removeMenuForIdentifier:UIMenuToolbar];
         
-        if (toggleBoldface)
-            [formatting addObject:toggleBoldface];
-        
-        if (toggleItalics)
-            [formatting addObject:toggleItalics];
-        
-        if (toggleUnderline)
-            [formatting addObject:toggleUnderline];
-        
-        [formatting addObject:[UICommand commandWithTitle:@"Text Color" image:nil action:@selector(chooseFGColor) propertyList:nil]];
-        
-        [formatting addObject:[UICommand commandWithTitle:@"Background Color" image:nil action:@selector(chooseBGColor) propertyList:nil]];
-        
-        [formatting addObject:[UICommand commandWithTitle:@"Reset Colors" image:nil action:@selector(resetColors) propertyList:nil]];
-        
-        [builder replaceMenuForIdentifier:UIMenuFont withMenu:[[builder menuForIdentifier:UIMenuFont] menuByReplacingChildren:formatting]];
-        
-        if(builder.system == UIMenuSystem.mainSystem && [builder menuForIdentifier:UIMenuPreferences]) {
-            [builder removeMenuForIdentifier:UIMenuServices];
-            [builder removeMenuForIdentifier:UIMenuToolbar];
-            
-            [builder replaceMenuForIdentifier:UIMenuPreferences withMenu:[[builder menuForIdentifier:UIMenuPreferences] menuByReplacingChildren:@[
-                [UIKeyCommand commandWithTitle:@"Preferences…" image:nil action:@selector(showSettings) input:@"," modifierFlags:UIKeyModifierCommand propertyList:nil],
-            ]]];
+        [builder replaceMenuForIdentifier:UIMenuPreferences withMenu:[[builder menuForIdentifier:UIMenuPreferences] menuByReplacingChildren:@[
+            [UIKeyCommand commandWithTitle:@"Preferences…" image:nil action:@selector(showSettings) input:@"," modifierFlags:UIKeyModifierCommand propertyList:nil],
+        ]]];
 
-            [builder replaceMenuForIdentifier:UIMenuView withMenu:[[builder menuForIdentifier:UIMenuView] menuByReplacingChildren:@[
-                [builder menuForIdentifier:UIMenuFullscreen],
-            ]]];
+        [builder replaceMenuForIdentifier:UIMenuView withMenu:[[builder menuForIdentifier:UIMenuView] menuByReplacingChildren:@[
+            [builder menuForIdentifier:UIMenuFullscreen],
+        ]]];
 
-            [builder replaceMenuForIdentifier:UIMenuFormat withMenu:[[builder menuForIdentifier:UIMenuFormat] menuByReplacingChildren:formatting]];
+        [builder replaceMenuForIdentifier:UIMenuFormat withMenu:[[builder menuForIdentifier:UIMenuFormat] menuByReplacingChildren:formatting]];
 
-            [builder replaceMenuForIdentifier:UIMenuFile withMenu:[[builder menuForIdentifier:UIMenuFile] menuByReplacingChildren:@[
-                [builder menuForIdentifier:UIMenuNewScene],
-                [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
-                    [UICommand commandWithTitle:@"Upload a File…" image:nil action:@selector(chooseFile) propertyList:nil],
-                    [UICommand commandWithTitle:@"New Text Snippet…" image:nil action:@selector(startPastebin) propertyList:nil]
-                ]],
-                [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
-                    [UICommand commandWithTitle:@"Add a Network…" image:nil action:@selector(addNetwork) propertyList:nil],
-                    [UICommand commandWithTitle:@"Edit Connection…" image:nil action:@selector(editConnection) propertyList:nil]
-                ]],
-                [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
-                    [UIKeyCommand commandWithTitle:@"Select Next in List" image:nil action:@selector(selectNext) input:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand propertyList:nil],
-                    [UIKeyCommand commandWithTitle:@"Select Previous in List" image:nil action:@selector(selectPrevious) input:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand propertyList:nil],
-                    [UIKeyCommand commandWithTitle:@"Select Next Unread in List" image:nil action:@selector(selectNextUnread) input:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
-                    [UIKeyCommand commandWithTitle:@"Select Previous Unread in List" image:nil action:@selector(selectPreviousUnread) input:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
-                ]],
-                [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
-                    [UIKeyCommand commandWithTitle:@"Mark Current As Read" image:nil action:@selector(markAsRead) input:@"r" modifierFlags:UIKeyModifierCommand propertyList:nil],
-                    [UIKeyCommand commandWithTitle:@"Mark All As Read" image:nil action:@selector(markAllAsRead) input:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
-                ]],
-                [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
-                    [UICommand commandWithTitle:@"Download Logs…" image:nil action:@selector(downloadLogs) propertyList:nil],
-                ]],
-                [builder menuForIdentifier:UIMenuClose],
-                [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
-                    [UICommand commandWithTitle:@"Logout" image:nil action:@selector(logout) propertyList:nil]
-                ]],
-            ]]];
+        [builder replaceMenuForIdentifier:UIMenuFile withMenu:[[builder menuForIdentifier:UIMenuFile] menuByReplacingChildren:@[
+            [builder menuForIdentifier:UIMenuNewScene],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UICommand commandWithTitle:@"Upload a File…" image:nil action:@selector(chooseFile) propertyList:nil],
+                [UICommand commandWithTitle:@"New Text Snippet…" image:nil action:@selector(startPastebin) propertyList:nil]
+            ]],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UICommand commandWithTitle:@"Add a Network…" image:nil action:@selector(addNetwork) propertyList:nil],
+                [UICommand commandWithTitle:@"Edit Connection…" image:nil action:@selector(editConnection) propertyList:nil]
+            ]],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UIKeyCommand commandWithTitle:@"Select Next in List" image:nil action:@selector(selectNext) input:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand propertyList:nil],
+                [UIKeyCommand commandWithTitle:@"Select Previous in List" image:nil action:@selector(selectPrevious) input:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand propertyList:nil],
+                [UIKeyCommand commandWithTitle:@"Select Next Unread in List" image:nil action:@selector(selectNextUnread) input:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
+                [UIKeyCommand commandWithTitle:@"Select Previous Unread in List" image:nil action:@selector(selectPreviousUnread) input:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
+            ]],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UIKeyCommand commandWithTitle:@"Mark Current As Read" image:nil action:@selector(markAsRead) input:@"r" modifierFlags:UIKeyModifierCommand propertyList:nil],
+                [UIKeyCommand commandWithTitle:@"Mark All As Read" image:nil action:@selector(markAllAsRead) input:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift propertyList:nil],
+            ]],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UICommand commandWithTitle:@"Download Logs…" image:nil action:@selector(downloadLogs) propertyList:nil],
+            ]],
+            [builder menuForIdentifier:UIMenuClose],
+            [UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+                [UICommand commandWithTitle:@"Logout" image:nil action:@selector(logout) propertyList:nil]
+            ]],
+        ]]];
 
-            [builder insertSiblingMenu:[UIMenu menuWithTitle:@"Go" children:@[
-                [UIKeyCommand commandWithTitle:@"Jump To Channel" image:nil action:@selector(jumpToChannel) input:@"k" modifierFlags:UIKeyModifierCommand propertyList:nil],
-                [UICommand commandWithTitle:@"File Uploads" image:nil action:@selector(showUploads) propertyList:nil],
-                [UICommand commandWithTitle:@"Text Snippets" image:nil action:@selector(showPastebins) propertyList:nil]
-            ]] afterMenuForIdentifier:UIMenuView];
-            
-            [builder insertChildMenu:[UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
-                [UICommand commandWithTitle:@"Send Feedback" image:nil action:@selector(sendFeedback) propertyList:nil],
-                [UICommand commandWithTitle:@"Join #feedback Channel" image:nil action:@selector(joinFeedback) propertyList:nil],
-                [UICommand commandWithTitle:@"Become A Beta Tester" image:nil action:@selector(joinBeta) propertyList:nil],
-                [UICommand commandWithTitle:@"FAQ" image:nil action:@selector(FAQ) propertyList:nil],
-                [UICommand commandWithTitle:@"Version History" image:nil action:@selector(versionHistory) propertyList:nil],
-                [UICommand commandWithTitle:@"Open-Source Licenses" image:nil action:@selector(openSourceLicenses) propertyList:nil],
-            ]] atStartOfMenuForIdentifier:UIMenuHelp];
-        }
+        [builder insertSiblingMenu:[UIMenu menuWithTitle:@"Go" children:@[
+            [UIKeyCommand commandWithTitle:@"Jump To Channel" image:nil action:@selector(jumpToChannel) input:@"k" modifierFlags:UIKeyModifierCommand propertyList:nil],
+            [UICommand commandWithTitle:@"File Uploads" image:nil action:@selector(showUploads) propertyList:nil],
+            [UICommand commandWithTitle:@"Text Snippets" image:nil action:@selector(showPastebins) propertyList:nil]
+        ]] afterMenuForIdentifier:UIMenuView];
+        
+        [builder insertChildMenu:[UIMenu menuWithTitle:@"" image:nil identifier:nil options:UIMenuOptionsDisplayInline children:@[
+            [UICommand commandWithTitle:@"Send Feedback" image:nil action:@selector(sendFeedback) propertyList:nil],
+            [UICommand commandWithTitle:@"Join #feedback Channel" image:nil action:@selector(joinFeedback) propertyList:nil],
+            [UICommand commandWithTitle:@"Become A Beta Tester" image:nil action:@selector(joinBeta) propertyList:nil],
+            [UICommand commandWithTitle:@"FAQ" image:nil action:@selector(FAQ) propertyList:nil],
+            [UICommand commandWithTitle:@"Version History" image:nil action:@selector(versionHistory) propertyList:nil],
+            [UICommand commandWithTitle:@"Open-Source Licenses" image:nil action:@selector(openSourceLicenses) propertyList:nil],
+        ]] atStartOfMenuForIdentifier:UIMenuHelp];
     }
 }
 

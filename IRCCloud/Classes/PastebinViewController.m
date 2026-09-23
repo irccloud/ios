@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import <MobileCoreServices/UTCoreTypes.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <SafariServices/SafariServices.h>
 #import <Twitter/Twitter.h>
 #import "PastebinViewController.h"
@@ -49,7 +49,7 @@
     return @[
                               [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                                   UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                                  [pb setValue:self->_url forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                                  [pb setValue:self->_url forPasteboardType:UTTypeUTF8PlainText.identifier];
                               }],
                               [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                                   UIApplication *app = [UIApplication sharedApplication];
@@ -114,12 +114,12 @@
     
     if([UIColor isDarkTheme]) {
         self.navigationController.view.backgroundColor = [UIColor navBarColor];
-        self->_activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleWhite;
+        self->_activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
         [self->_toolbar setBackgroundImage:[UIColor navBarBackgroundImage] forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
         [self->_toolbar setTintColor:[UIColor navBarSubheadingColor]];
     } else {
         self.navigationController.view.backgroundColor = [UIColor navBarColor];
-        self->_activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+        self->_activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
     }
 }
 
@@ -137,7 +137,6 @@
 
 -(void)_fetch {
     if([self->_url hasPrefix:[NSString stringWithFormat:@"https://%@/pastebin/", IRCCLOUD_HOST]] || [self->_url hasPrefix:@"https://www.irccloud.com/pastebin/"]) {
-        [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
         [[NSURLCache sharedURLCache] removeAllCachedResponses];
         NSString *url = [[NetworkConnection sharedInstance].pasteURITemplate relativeStringWithVariables:@{@"id":self->_pasteID, @"type":@"json"} error:nil];
         url = [url stringByReplacingOccurrencesOfString:@"https://www.irccloud.com/" withString:[NSString stringWithFormat:@"https://%@/", IRCCLOUD_HOST]];
@@ -235,16 +234,13 @@
     if(([error.domain isEqualToString:@"WebKitErrorDomain"] && error.code == 102) || ([error.domain isEqualToString:NSURLErrorDomain] && error.code == NSURLErrorCancelled))
         return;
     CLS_LOG(@"Error: %@", error);
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
     [self->_activity stopAnimating];
 }
 
 -(void)webView:(WKWebView *)webView didCommitNavigation:(WKNavigation *)navigation {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
 }
 
 -(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
 }
 
 -(void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler {

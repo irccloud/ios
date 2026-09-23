@@ -255,13 +255,9 @@ UITraitCollection *__currentTraitCollection;
 
 +(void)setTheme:(NSString *)theme {
     if([theme isEqualToString:@"automatic"]) {
-        if (@available(iOS 13, *)) {
-            if(!__currentTraitCollection)
-                __currentTraitCollection = [UITraitCollection currentTraitCollection];
-            theme = (__currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) ? @"midnight" : @"dawn";
-        } else {
-            theme = @"dawn";
-        }
+        if(!__currentTraitCollection)
+            __currentTraitCollection = [UITraitCollection currentTraitCollection];
+        theme = (__currentTraitCollection.userInterfaceStyle == UIUserInterfaceStyleDark) ? @"midnight" : @"dawn";
     }
 
     CLS_LOG(@"Setting theme: %@", theme);
@@ -486,19 +482,15 @@ UITraitCollection *__currentTraitCollection;
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
         [[UINavigationBar appearance] setTintColor:[UIColor colorWithRed:0 green:0.478 blue:1 alpha:1]];
-        if (@available(iOS 13.0, *)) {
-            UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
-            a.backgroundImage = [self navBarBackgroundImage];
-            a.titleTextAttributes = @{NSForegroundColorAttributeName: [self navBarHeadingColor]};
-            [[UINavigationBar appearance] setStandardAppearance:a];
-            if (@available(iOS 15.0, *)) {
-                [[UINavigationBar appearance] setCompactAppearance:a];
+        UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+        a.backgroundImage = [self navBarBackgroundImage];
+        a.titleTextAttributes = @{NSForegroundColorAttributeName: [self navBarHeadingColor]};
+        [[UINavigationBar appearance] setStandardAppearance:a];
+        [[UINavigationBar appearance] setCompactAppearance:a];
 #if !TARGET_OS_MACCATALYST
-                [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
+        [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
 #endif
-            }
-            [[UINavigationBar appearance] setScrollEdgeAppearance:a];
-        }
+        [[UINavigationBar appearance] setScrollEdgeAppearance:a];
         
         __mIRCColors_FG[0] = [UIColor colorFromHexString:@"FFFFFF"]; //white
         __mIRCColors_FG[1] = [UIColor blackColor]; //black
@@ -776,19 +768,15 @@ UITraitCollection *__currentTraitCollection;
         [[UINavigationBar appearance] setBackgroundImage:[self navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
         [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName: [self navBarHeadingColor]}];
         [[UINavigationBar appearance] setTintColor:[UIColor navBarSubheadingColor]];
-        if (@available(iOS 13.0, *)) {
-            UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
-            a.backgroundImage = [self navBarBackgroundImage];
-            a.titleTextAttributes = @{NSForegroundColorAttributeName: [self navBarHeadingColor]};
-            [[UINavigationBar appearance] setStandardAppearance:a];
-            if (@available(iOS 15.0, *)) {
-                [[UINavigationBar appearance] setCompactAppearance:a];
+        UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+        a.backgroundImage = [self navBarBackgroundImage];
+        a.titleTextAttributes = @{NSForegroundColorAttributeName: [self navBarHeadingColor]};
+        [[UINavigationBar appearance] setStandardAppearance:a];
+        [[UINavigationBar appearance] setCompactAppearance:a];
 #if !TARGET_OS_MACCATALYST
-                [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
+        [[UINavigationBar appearance] setCompactScrollEdgeAppearance:a];
 #endif
-            }
-            [[UINavigationBar appearance] setScrollEdgeAppearance:a];
-        }
+        [[UINavigationBar appearance] setScrollEdgeAppearance:a];
     }
     
     __timestampBackgroundImage = nil;
@@ -1283,7 +1271,7 @@ UITraitCollection *__currentTraitCollection;
     return __timestampBottomBorderColor;
 }
 +(UIActivityIndicatorViewStyle)activityIndicatorViewStyle {
-    return __color_theme_is_dark?UIActivityIndicatorViewStyleWhite:UIActivityIndicatorViewStyleGray;
+    return UIActivityIndicatorViewStyleMedium;
 }
 +(UIColor *)expandCollapseIndicatorColor {
     return __expandCollapseIndicatorColor;

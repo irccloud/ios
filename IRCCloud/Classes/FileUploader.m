@@ -15,7 +15,6 @@
 //  limitations under the License.
 
 #import <AVFoundation/AVFoundation.h>
-#import <MobileCoreServices/MobileCoreServices.h>
 #import "FileUploader.h"
 #import "NSData+Base64.h"
 #import "config.h"
@@ -58,9 +57,6 @@
 }
 
 -(void)cancel {
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
     CLS_LOG(@"File upload cancelled");
     self->_cancelled = YES;
     self->_msg = self->_filename = self->_originalFilename = self->_mimeType = nil;
@@ -185,12 +181,9 @@
     
     if(wrapper.regularFile) {
         if(!_mimeType) {
-            CFStringRef extension = (__bridge CFStringRef)[file pathExtension];
-            CFStringRef UTI = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, extension, NULL);
-            self->_mimeType = CFBridgingRelease(UTTypeCopyPreferredTagWithClass(UTI, kUTTagClassMIMEType));
+            self->_mimeType = [UTType typeWithFilenameExtension:file.pathExtension].preferredMIMEType;
             if(!_mimeType)
                 self->_mimeType = @"application/octet-stream";
-            CFRelease(UTI);
         }
         
         if(!_originalFilename)
@@ -448,9 +441,6 @@
 
     CLS_LOG(@"Uploading %@ with boundary %@ (%lu bytes)", _originalFilename, _boundary, (unsigned long)_body.length);
     
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(YES) waitUntilDone:YES];
-#endif
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"https://%@/chat/%@", IRCCLOUD_HOST, _avatar?@"upload-avatar":@"upload"]] cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:60];
     [request setHTTPShouldHandleCookies:NO];
     [request setValue:[NSString stringWithFormat:@"multipart/form-data; boundary=%@", _boundary] forHTTPHeaderField:@"Content-Type"];
@@ -506,9 +496,6 @@
 }
 
 -(void)connectionDidFinishLoading {
-#ifndef EXTENSION
-    [[UIApplication sharedApplication] performSelectorOnMainThread:@selector(setNetworkActivityIndicatorVisible:) withObject:@(NO) waitUntilDone:YES];
-#endif
     if(self->_cancelled) {
         CLS_LOG(@"Upload finished but it was cancelled");
         return;
@@ -601,7 +588,6 @@
                     NSURLSession *session = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.defaultSessionConfiguration delegate:self delegateQueue:NSOperationQueue.mainQueue];
                     self->_task = [session dataTaskWithRequest:request];
                     [self->_task resume];
-                    [UIApplication sharedApplication].networkActivityIndicatorVisible = YES;
                 }];
                 return;
             }

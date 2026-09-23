@@ -322,9 +322,7 @@
         NSMutableDictionary *pinnedNames = [[NSMutableDictionary alloc] init];
         
 #ifndef EXTENSION
-        if (@available(iOS 13, *)) {
-            [data addObject:@{@"type":@TYPE_FILTER}];
-        }
+        [data addObject:@{@"type":@TYPE_FILTER}];
 #endif
 
         if(self->_filter.length) {
@@ -832,10 +830,8 @@
     swipe.direction = UISwipeGestureRecognizerDirectionRight;
     [self.tableView addGestureRecognizer:swipe];
     
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp)
-            [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
-    }
+    if([NSProcessInfo processInfo].macCatalystApp)
+        [self.tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
     
 #ifndef EXTENSION
     if(!_delegate) {
@@ -961,7 +957,7 @@
 
 - (void)scrollToSelectedBuffer {
     if(self->_selectedRow != -1) {
-        NSArray *a = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.scrollIndicatorInsets)];
+        NSArray *a = [self.tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(self.tableView.bounds, self.tableView.verticalScrollIndicatorInsets)];
         if(a.count) {
             if([[a objectAtIndex:0] row] > self->_selectedRow || [[a lastObject] row] < self->_selectedRow)
                 [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_selectedRow inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:NO];
@@ -1379,7 +1375,7 @@
         cell.type = [[row objectForKey:@"type"] intValue];
         cell.label.text = [row objectForKey:@"name"];
         cell.activity.hidden = YES;
-        cell.activity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
+        cell.activity.activityIndicatorViewStyle = [UIColor isDarkTheme]?UIActivityIndicatorViewStyleMedium:[UIColor activityIndicatorViewStyle];
         cell.accessibilityValue = [row objectForKey:@"hint"];
         cell.highlightColor = [UIColor bufferHighlightColor];
         cell.border.backgroundColor = [UIColor bufferBorderColor];
@@ -1471,7 +1467,7 @@
                     if(!cell.activity.isAnimating)
                         [cell.activity startAnimating];
                     cell.activity.hidden = NO;
-                    cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleGray;
+                    cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
                 } else {
                     [cell.activity stopAnimating];
                     cell.activity.hidden = YES;
@@ -1521,7 +1517,7 @@
                     if(!cell.activity.isAnimating)
                         [cell.activity startAnimating];
                     cell.activity.hidden = NO;
-                    cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
+                    cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
                 } else {
                     [cell.activity stopAnimating];
                     cell.activity.hidden = YES;
@@ -1538,7 +1534,7 @@
                         if(!cell.activity.isAnimating)
                             [cell.activity startAnimating];
                         cell.activity.hidden = NO;
-                        cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
+                        cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
                     } else {
                         [cell.activity stopAnimating];
                         cell.activity.hidden = YES;
@@ -1594,7 +1590,7 @@
                 if(!cell.activity.isAnimating)
                     [cell.activity startAnimating];
                 cell.activity.hidden = NO;
-                cell.activity.activityIndicatorViewStyle = selected?UIActivityIndicatorViewStyleWhite:[UIColor activityIndicatorViewStyle];
+                cell.activity.activityIndicatorViewStyle = UIActivityIndicatorViewStyleMedium;
                 break;
         }
         return cell;

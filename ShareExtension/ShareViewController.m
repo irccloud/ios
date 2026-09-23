@@ -125,13 +125,9 @@
         AudioServicesPlaySystemSound(weakSelf.sound);
     };
     [UIColor setTheme:@"dawn"];
-    if (@available(iOS 13, *)) {
-        NSString *theme = [UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark?@"midnight":@"dawn";
-        [UIColor setTheme:theme];
-        self.view.window.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle = [theme isEqualToString:@"dawn"]?UIUserInterfaceStyleLight:UIUserInterfaceStyleDark;
-    } else {
-        [UIColor setTheme:@"dawn"];
-    }
+    NSString *theme = [UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark?@"midnight":@"dawn";
+    [UIColor setTheme:theme];
+    self.view.window.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle = [theme isEqualToString:@"dawn"]?UIUserInterfaceStyleLight:UIUserInterfaceStyleDark;
     [super viewDidLoad];
     self.textView.superview.superview.superview.superview.backgroundColor = [UIColor contentBackgroundColor];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -159,14 +155,10 @@
         }
         [self->_conn connect:YES];
     }
-    if (@available(iOS 15.0, *)) {
-        [self.navigationController.navigationBar setStandardAppearance:[UINavigationBar appearance].standardAppearance];
-        [self.navigationController.navigationBar setScrollEdgeAppearance:[UINavigationBar appearance].scrollEdgeAppearance];
-        [self.navigationController.navigationBar setCompactAppearance:[UINavigationBar appearance].compactAppearance];
-        [self.navigationController.navigationBar setCompactScrollEdgeAppearance:[UINavigationBar appearance].compactScrollEdgeAppearance];
-    } else {
-        [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-    }
+    [self.navigationController.navigationBar setStandardAppearance:[UINavigationBar appearance].standardAppearance];
+    [self.navigationController.navigationBar setScrollEdgeAppearance:[UINavigationBar appearance].scrollEdgeAppearance];
+    [self.navigationController.navigationBar setCompactAppearance:[UINavigationBar appearance].compactAppearance];
+    [self.navigationController.navigationBar setCompactScrollEdgeAppearance:[UINavigationBar appearance].compactScrollEdgeAppearance];
     self.title = @"IRCCloud";
     self->_sound = 1001;
     self.textView.returnKeyType = UIReturnKeySend;
@@ -182,23 +174,20 @@
 }
 
 - (void)backlogComplete:(NSNotification *)n {
-    if (@available(iOS 13.0, *)) {
-        if(self.extensionContext && [self.extensionContext.intent isKindOfClass:INSendMessageIntent.class]) {
-            INSendMessageIntent *intent = (INSendMessageIntent *)self.extensionContext.intent;
-            INPerson *person = intent.recipients.firstObject;
-            if(person && [person.customIdentifier hasPrefix:@"irccloud://"]) {
-                NSString *ident = [person.customIdentifier substringFromIndex:11];
-                NSUInteger sep = [ident rangeOfString:@"/"].location;
-                int cid = [ident substringToIndex:sep].intValue;
-                NSString *to = [ident substringFromIndex:sep + 1];
-                Buffer *b = [[Buffer alloc] init];
-                b.bid = -1;
-                b.cid = cid;
-                b.name = to;
-                self->_buffer = b;
-            }
+    if(self.extensionContext && [self.extensionContext.intent isKindOfClass:INSendMessageIntent.class]) {
+        INSendMessageIntent *intent = (INSendMessageIntent *)self.extensionContext.intent;
+        INPerson *person = intent.recipients.firstObject;
+        if(person && [person.customIdentifier hasPrefix:@"irccloud://"]) {
+            NSString *ident = [person.customIdentifier substringFromIndex:11];
+            NSUInteger sep = [ident rangeOfString:@"/"].location;
+            int cid = [ident substringToIndex:sep].intValue;
+            NSString *to = [ident substringFromIndex:sep + 1];
+            Buffer *b = [[Buffer alloc] init];
+            b.bid = -1;
+            b.cid = cid;
+            b.name = to;
+            self->_buffer = b;
         }
-    } else {
     }
     if(!self->_buffer)
         self->_buffer = [[BuffersDataSource sharedInstance] getBuffer:[[self->_conn.userInfo objectForKey:@"last_selected_bid"] intValue]];

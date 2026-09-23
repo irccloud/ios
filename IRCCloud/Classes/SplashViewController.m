@@ -24,7 +24,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    self->_logo.center = CGPointMake(self.view.center.x, 39 + [UIApplication sharedApplication].statusBarFrame.size.height);
+    self->_logo.center = CGPointMake(self.view.center.x, 39 + self.view.window.windowScene.statusBarManager.statusBarFrame.size.height);
 }
 
 -(UIStatusBarStyle)preferredStatusBarStyle {

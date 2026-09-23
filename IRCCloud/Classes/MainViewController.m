@@ -18,8 +18,7 @@
 #if !TARGET_OS_MACCATALYST
 #import <AssetsLibrary/AssetsLibrary.h>
 #endif
-#import <MobileCoreServices/UTCoreTypes.h>
-#import <MobileCoreServices/UTType.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <UserNotifications/UserNotifications.h>
 #import <Intents/Intents.h>
 #import "MainViewController.h"
@@ -261,27 +260,21 @@ NSArray *_sortedChannels;
 
 - (void)applyTheme {
     self->_currentTheme = [UIColor currentTheme];
-    if (@available(iOS 13, *)) {
-        self.view.window.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle = [self->_currentTheme isEqualToString:@"dawn"]?UIUserInterfaceStyleLight:UIUserInterfaceStyleDark;
-    }
+    self.view.window.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle = [self->_currentTheme isEqualToString:@"dawn"]?UIUserInterfaceStyleLight:UIUserInterfaceStyleDark;
     self.view.window.backgroundColor = [UIColor textareaBackgroundColor];
     self.view.backgroundColor = [UIColor contentBackgroundColor];
     self.slidingViewController.view.backgroundColor = self.navigationController.view.backgroundColor = [UIColor navBarColor];
     self->_bottomBar.backgroundColor = [UIColor contentBackgroundColor];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-    if (@available(iOS 13.0, *)) {
-        UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
-        a.backgroundImage = [UIColor navBarBackgroundImage];
-        a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
-        self.navigationController.navigationBar.standardAppearance = a;
-        self.navigationController.navigationBar.compactAppearance = a;
-        self.navigationController.navigationBar.scrollEdgeAppearance = a;
-        if (@available(iOS 15.0, *)) {
+    UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+    a.backgroundImage = [UIColor navBarBackgroundImage];
+    a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
+    self.navigationController.navigationBar.standardAppearance = a;
+    self.navigationController.navigationBar.compactAppearance = a;
+    self.navigationController.navigationBar.scrollEdgeAppearance = a;
 #if !TARGET_OS_MACCATALYST
-            self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+    self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
 #endif
-        }
-    }
     [self->_uploadsBtn setTintColor:[UIColor textareaBackgroundColor]];
     UIColor *c = ([NetworkConnection sharedInstance].state == kIRCCloudStateConnected)?([UIColor isDarkTheme]?[UIColor whiteColor]:[UIColor unreadBlueColor]):[UIColor textareaBackgroundColor];
     [self->_sendBtn setTitleColor:c forState:UIControlStateNormal];
@@ -378,9 +371,6 @@ NSArray *_sortedChannels;
                                              selector:@selector(didSwipe:)
                                                  name:ECSlidingViewUnderRightWillDisappear object:nil];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(statusBarFrameWillChange:)
-                                                 name:UIApplicationWillChangeStatusBarFrameNotification object:nil];
     [super viewDidLoad];
     [self addChildViewController:self->_eventsView];
     
@@ -581,7 +571,7 @@ NSArray *_sortedChannels;
     if(![u.originalFilename containsString:@"."] && ![UTI hasPrefix:@"dyn."]) {
         u.originalFilename = [u.originalFilename stringByAppendingPathExtension:[UTI componentsSeparatedByString:@"."].lastObject];
     }
-    u.mimeType = (__bridge_transfer NSString *)UTTypeCopyPreferredTagWithClass((__bridge CFStringRef _Nonnull)(UTI), kUTTagClassMIMEType);
+    u.mimeType = [UTType typeWithIdentifier:UTI].preferredMIMEType;
     FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
     u.metadatadelegate = fvc;
     [i loadPreviewImageWithOptions:nil completionHandler:^(UIImage *preview, NSError *error) {
@@ -1514,10 +1504,8 @@ NSArray *_sortedChannels;
                     if((e.isHighlight || [b.type isEqualToString:@"conversation"]) && !muted) {
                         self->_menuBtn.tintColor = [UIColor redColor];
                         self->_menuBtn.accessibilityValue = @"Unread highlights";
-                        if (@available(iOS 14.0, *)) {
-                            if([NSProcessInfo processInfo].macCatalystApp) {
-                                [self _updateUnreadIndicator];
-                            }
+                        if([NSProcessInfo processInfo].macCatalystApp) {
+                            [self _updateUnreadIndicator];
                         }
                     } else if(self->_menuBtn.accessibilityValue == nil) {
                         NSDictionary *prefs = [[NetworkConnection sharedInstance] prefs];
@@ -1540,11 +1528,9 @@ NSArray *_sortedChannels;
                         UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, @"New unread messages");
                         self->_menuBtn.tintColor = [UIColor unreadBlueColor];
                         self->_menuBtn.accessibilityValue = @"Unread messages";
-                        if (@available(iOS 14.0, *)) {
-                            if([NSProcessInfo processInfo].macCatalystApp) {
-                                self->_sceneTitleExtra = @"* ";
-                                [self _updateTitleArea];
-                            }
+                        if([NSProcessInfo processInfo].macCatalystApp) {
+                            self->_sceneTitleExtra = @"* ";
+                            [self _updateTitleArea];
                         }
                     }
                 }
@@ -1822,11 +1808,9 @@ NSArray *_sortedChannels;
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp) {
-            self->_kbSize = CGSizeMake(0,0);
-            return;
-        }
+    if([NSProcessInfo processInfo].macCatalystApp) {
+        self->_kbSize = CGSizeMake(0,0);
+        return;
     }
     if(self->_eventsView.topUnreadView.observationInfo) {
         @try {
@@ -1840,7 +1824,7 @@ NSArray *_sortedChannels;
     int height;
     
     if (@available(iOS 17, *)) {
-        if ([UIScreen mainScreen].focusedView == nil || [UIScreen mainScreen].bounds.size.height == self.view.window.bounds.size.height || [UIScreen mainScreen].focusedView.window == self.view.window || self.view.window.frame.size.width == self.view.keyboardLayoutGuide.layoutFrame.size.width) {
+        if (self.view.window.windowScene.focusSystem.focusedItem == nil || [UIScreen mainScreen].bounds.size.height == self.view.window.bounds.size.height ||  self.view.window.frame.size.width == self.view.keyboardLayoutGuide.layoutFrame.size.width) {
             size = self.view.keyboardLayoutGuide.layoutFrame.size;
             height = size.height;
             if (size.width < self.view.window.frame.size.width)
@@ -2027,10 +2011,8 @@ NSArray *_sortedChannels;
     [self->_eventsView.topUnreadView addObserver:self forKeyPath:@"alpha" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
     [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
     
-    if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp) {
-            [[UIMenuSystem mainSystem] setNeedsRebuild];
-        }
+    if([NSProcessInfo processInfo].macCatalystApp) {
+        [[UIMenuSystem mainSystem] setNeedsRebuild];
     }
 }
 
@@ -2847,12 +2829,10 @@ NSArray *_sortedChannels;
         self->_titleOffsetYConstraint.constant = 0;
     [self->_titleView setNeedsUpdateConstraints];
     
-    if (@available(iOS 13.0, *)) {
-        if(sceneTitle && self->_sceneTitleExtra.length)
-            sceneTitle = [self->_sceneTitleExtra stringByAppendingString:sceneTitle];
-        UIScene *scene = [(AppDelegate *)[UIApplication sharedApplication].delegate sceneForWindow:self.view.window];
-        scene.title = sceneTitle ? sceneTitle : @"IRCCloud";
-    }
+    if(sceneTitle && self->_sceneTitleExtra.length)
+        sceneTitle = [self->_sceneTitleExtra stringByAppendingString:sceneTitle];
+    UIScene *scene = [(AppDelegate *)[UIApplication sharedApplication].delegate sceneForWindow:self.view.window];
+    scene.title = sceneTitle ? sceneTitle : @"IRCCloud";
 }
 
 -(void)showJoinPrompt:(NSString *)channel server:(Server *)s {
@@ -3359,23 +3339,10 @@ NSArray *_sortedChannels;
 }
 
 -(BOOL)prefersStatusBarHidden {
-    if (@available(iOS 14.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp) {
-            return YES;
-        }
+    if([NSProcessInfo processInfo].macCatalystApp) {
+        return YES;
     }
-    return UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
-}
-
--(void)statusBarFrameWillChange:(NSNotification *)n {
-    if(self.slidingViewController.view.window.safeAreaInsets.bottom)
-        return;
-    CGRect newFrame = [[n.userInfo objectForKey:UIApplicationStatusBarFrameUserInfoKey] CGRectValue];
-    if(newFrame.size.width > 0 && newFrame.size.width == [UIApplication sharedApplication].statusBarFrame.size.width) {
-        [UIView animateWithDuration:0.25f animations:^{
-            [self updateLayout:newFrame.size.height];
-        }];
-    }
+    return UIInterfaceOrientationIsLandscape(self.view.window.windowScene.interfaceOrientation) && [UIDevice currentDevice].userInterfaceIdiom != UIUserInterfaceIdiomPad;
 }
 
 -(void)viewSafeAreaInsetsDidChange {
@@ -3385,7 +3352,7 @@ NSArray *_sortedChannels;
 
 -(void)updateLayout {
     BOOL scrolledUp = _buffer.scrolledUp;
-    [UIApplication sharedApplication].statusBarHidden = self.prefersStatusBarHidden;
+    [self setNeedsStatusBarAppearanceUpdate];
     
     if(self.view.window.bounds.size.height == [UIScreen mainScreen].bounds.size.height && self.slidingViewController.view.window.safeAreaInsets.top != self.slidingViewController.view.safeAreaInsets.top) {
         NSLog(@"Insets mismatch");
@@ -3398,7 +3365,7 @@ NSArray *_sortedChannels;
     if(self.slidingViewController.view.window.safeAreaInsets.bottom)
         [self updateLayout:0];
     else
-        [self updateLayout:[UIApplication sharedApplication].statusBarFrame.size.height];
+        [self updateLayout:self.view.window.windowScene.statusBarManager.statusBarFrame.size.height];
     CGPoint contentOffset = _eventsView.tableView.contentOffset;
     [self.slidingViewController adjustLayout];
     [self.slidingViewController.view layoutIfNeeded];
@@ -3428,10 +3395,8 @@ NSArray *_sortedChannels;
 
 -(void)transitionToSize:(CGSize)size {
     BOOL isCatalyst = NO;
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp)
-            isCatalyst = YES;
-    }
+    if([NSProcessInfo processInfo].macCatalystApp)
+        isCatalyst = YES;
     CLS_LOG(@"Transitioning to size: %f, %f", size.width, size.height);
     _ignoreInsetChanges = YES;
     CGPoint center = self.slidingViewController.view.window.center;
@@ -3544,7 +3509,7 @@ NSArray *_sortedChannels;
     [self.slidingViewController resetTopView];
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
     [coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext> context) {
-        [UIApplication sharedApplication].statusBarHidden = self.prefersStatusBarHidden;
+        [self setNeedsStatusBarAppearanceUpdate];
         [self transitionToSize:size];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext> context) {
         self->_eventActivity.alpha = 0;
@@ -3570,7 +3535,7 @@ NSArray *_sortedChannels;
         return;
     self->_bottomBarOffsetConstraint.constant = self->_kbSize.height;
     if(self.slidingViewController.view.window.safeAreaInsets.bottom) {
-        if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || _kbSize.height > 0)
+        if(UIInterfaceOrientationIsPortrait(self.view.window.windowScene.interfaceOrientation) || _kbSize.height > 0)
             self->_bottomBarOffsetConstraint.constant -= self.slidingViewController.view.window.safeAreaInsets.bottom/2;
         if(self.slidingViewController.view.window.safeAreaInsets.top >= 51) //iPhone 14 with Dynamic Island returns the wrong bottom safe area inset
             self->_bottomBarOffsetConstraint.constant -= 12;
@@ -3583,21 +3548,15 @@ NSArray *_sortedChannels;
         top += self->_eventsView.topUnreadView.frame.size.height;
     if(!_serverStatusBar.hidden)
         height += self->_serverStatusBar.bounds.size.height;
-    if(UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation))
+    if(UIInterfaceOrientationIsPortrait(self.view.window.windowScene.interfaceOrientation))
         height -= self.slidingViewController.view.window.safeAreaInsets.bottom/2;
     CGFloat diff = height - _eventsView.tableView.contentInset.bottom;
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
         CGFloat bottom = self->_kbSize.height + self.slidingViewController.view.window.safeAreaInsets.bottom;
-        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad && UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation))
+        if([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad && UIInterfaceOrientationIsLandscape(self.view.window.windowScene.interfaceOrientation))
             bottom += self.slidingViewController.view.window.safeAreaInsets.top;
-        if(@available(iOS 14, *)) {
-            self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
-            self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
-        } else if(@available(iOS 13, *)) {
-        } else {
-            self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
-            self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,bottom,0);
-        }
+        self->_buffersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
+        self->_usersView.tableView.scrollIndicatorInsets = UIEdgeInsetsMake(0,0,0,0);
         self->_buffersView.tableView.contentInset = UIEdgeInsetsZero;
         if(self->_buffersView.tableView.adjustedContentInset.bottom > 0) { //Sometimes iOS 11 automatically adds the keyboard padding even though I told it not to
             bottom -= self->_buffersView.tableView.adjustedContentInset.bottom;
@@ -3652,10 +3611,8 @@ NSArray *_sortedChannels;
 
 -(void)_updateUserListVisibility {
     BOOL isCatalyst = NO;
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp)
-            isCatalyst = YES;
-    }
+    if([NSProcessInfo processInfo].macCatalystApp)
+        isCatalyst = YES;
     /*if(![NSThread currentThread].isMainThread) {
         [self performSelectorOnMainThread:@selector(_updateUserListVisibility) withObject:nil waitUntilDone:YES];
         return;
@@ -3830,9 +3787,7 @@ NSArray *_sortedChannels;
     User *me = [[UsersDataSource sharedInstance] getUser:[[ServersDataSource sharedInstance] getServer:self->_buffer.cid].nick cid:self->_buffer.cid bid:self->_buffer.bid];
 
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    if (@available(iOS 13, *)) {
-        alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
-    }
+    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
 
     void (^handler)(UIAlertAction *action) = ^(UIAlertAction *a) {
         [self actionSheetActionClicked:a.title];
@@ -4035,15 +3990,13 @@ NSArray *_sortedChannels;
     NSString *title = @"";;
     Server *server = [[ServersDataSource sharedInstance] getServer:self->_buffer.cid];
     if(self->_selectedUser) {
-        if(!_buffer.serverIsSlack && ([self->_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait([UIApplication sharedApplication].statusBarOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)))
+        if(!_buffer.serverIsSlack && ([self->_selectedUser.hostmask isKindOfClass:[NSString class]] &&_selectedUser.hostmask.length && (UIInterfaceOrientationIsPortrait(self.view.window.windowScene.interfaceOrientation) || [[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)))
             title = [NSString stringWithFormat:@"%@\n(%@)",_selectedUser.display_name,[self->_selectedUser.hostmask stripIRCFormatting]];
         else
             title = self->_selectedUser.nick;
     }
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:title message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    if (@available(iOS 13, *)) {
-        alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
-    }
+    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
     
     void (^handler)(UIAlertAction *action) = ^(UIAlertAction *a) {
         [self actionSheetActionClicked:a.title];
@@ -4321,9 +4274,7 @@ NSArray *_sortedChannels;
     self->_selectedURL = nil;
     self->_selectedBuffer = [[BuffersDataSource sharedInstance] getBuffer:bid];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    if (@available(iOS 13, *)) {
-        alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
-    }
+    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
     if([self->_selectedBuffer.type isEqualToString:@"console"]) {
         Server *s = [[ServersDataSource sharedInstance] getServer:self->_selectedBuffer.cid];
         if([s.status isEqualToString:@"disconnected"]) {
@@ -4614,8 +4565,7 @@ NSArray *_sortedChannels;
 }
 
 -(void)chooseFile {
-    UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initWithDocumentTypes:@[(NSString *)kUTTypePackage, (NSString *)kUTTypeData]
-                                                                                                            inMode:UIDocumentPickerModeImport];
+    UIDocumentPickerViewController *documentPicker = [[UIDocumentPickerViewController alloc] initForOpeningContentTypes:@[UTTypePackage, UTTypeData] asCopy:YES];
     documentPicker.delegate = self;
     if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
         documentPicker.modalPresentationStyle = UIModalPresentationFormSheet;
@@ -4634,10 +4584,7 @@ NSArray *_sortedChannels;
 }
 
 - (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentsAtURLs:(NSArray<NSURL *> *)urls {
-    [self documentPicker:controller didPickDocumentAtURL:urls[0]];
-}
-
-- (void)documentPicker:(UIDocumentPickerViewController *)controller didPickDocumentAtURL:(NSURL *)url {
+    NSURL *url = urls[0];
     [UIColor setTheme];
     [self applyTheme];
     FileUploader *u = [[FileUploader alloc] init];
@@ -4923,15 +4870,11 @@ NSArray *_sortedChannels;
 
 -(void)uploadsButtonPressed:(id)sender {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    if (@available(iOS 13, *)) {
-        alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
-    }
+    alert.overrideUserInterfaceStyle = self.view.overrideUserInterfaceStyle;
 
     BOOL isCatalyst = NO;
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp)
-            isCatalyst = YES;
-    }
+    if([NSProcessInfo processInfo].macCatalystApp)
+        isCatalyst = YES;
     
     if(!isCatalyst) {
         if([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
@@ -5008,7 +4951,7 @@ NSArray *_sortedChannels;
         }
         irc = [irc stringByReplacingOccurrencesOfString:@"\u00a0" withString:@" "];
         NSAttributedString *msg = [ColorFormatter format:irc defaultColor:nil mono:NO linkify:NO server:nil links:nil];
-        pb.items = @[@{(NSString *)kUTTypeRTF:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],(NSString *)kUTTypeUTF8PlainText:msg.string,@"IRC formatting type":[irc dataUsingEncoding:NSUTF8StringEncoding]}];
+        pb.items = @[@{UTTypeRTF.identifier:[msg dataFromRange:NSMakeRange(0, msg.length) documentAttributes:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} error:nil],UTTypeUTF8PlainText.identifier:msg.string,@"IRC formatting type":[irc dataUsingEncoding:NSUTF8StringEncoding]}];
     } else if([action isEqualToString:@"Clear Backlog"]) {
         int bid = self->_selectedBuffer?_selectedBuffer.bid:self->_selectedEvent.bid;
         [[EventsDataSource sharedInstance] removeEventsForBuffer:bid];
@@ -5016,7 +4959,7 @@ NSArray *_sortedChannels;
             [self->_eventsView refresh];
     } else if([action isEqualToString:@"Copy URL"]) {
         UIPasteboard *pb = [UIPasteboard generalPasteboard];
-        [pb setValue:self->_selectedURL forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+        [pb setValue:self->_selectedURL forPasteboardType:UTTypeUTF8PlainText.identifier];
     } else if([action isEqualToString:@"Share URL"]) {
         [UIColor clearTheme];
         UIActivityViewController *activityController = [URLHandler activityControllerForItems:@[[NSURL URLWithString:self->_selectedURL]] type:@"URL"];
@@ -5219,7 +5162,7 @@ NSArray *_sortedChannels;
     if([action isEqualToString:@"Copy Hostmask"]) {
         UIPasteboard *pb = [UIPasteboard generalPasteboard];
         NSString *plaintext = [NSString stringWithFormat:@"%@!%@", _selectedUser.nick, _selectedUser.hostmask];
-        [pb setValue:plaintext forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+        [pb setValue:plaintext forPasteboardType:UTTypeUTF8PlainText.identifier];
     } else if([action isEqualToString:@"Send a Message"]) {
         Buffer *b = [[BuffersDataSource sharedInstance] getBufferWithName:self->_selectedUser.nick server:self->_buffer.cid];
         if(b) {
@@ -5445,9 +5388,9 @@ NSArray *_sortedChannels;
 
 -(void)paste:(id)sender {
     if([UIPasteboard generalPasteboard].hasImages && [UIPasteboard generalPasteboard].image && ![UIPasteboard generalPasteboard].hasURLs) {
-        if([UIPasteboard generalPasteboard].image && [[UIPasteboard generalPasteboard] containsPasteboardTypes:@[(__bridge NSString *)kUTTypeGIF]]) {
+        if([UIPasteboard generalPasteboard].image && [[UIPasteboard generalPasteboard] containsPasteboardTypes:@[UTTypeGIF.identifier]]) {
             UIImage *img = [UIPasteboard generalPasteboard].image;
-            NSData *gifData = [[UIPasteboard generalPasteboard] dataForPasteboardType:(__bridge NSString *)kUTTypeGIF];
+            NSData *gifData = [[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeGIF.identifier];
             if(img != nil && gifData != nil)
                 [self _imagePickerController:[UIImagePickerController new] didFinishPickingMediaWithInfo:@{UIImagePickerControllerOriginalImage:img, @"gifData":gifData}];
             return;
@@ -5494,20 +5437,20 @@ NSArray *_sortedChannels;
         [self->_message setAttributedText:msg];
         if(shouldMoveCursor)
             self->_message.selectedRange = NSMakeRange(msg.length, 0);
-    } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF]) {
+    } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeRTF.identifier]) {
         NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
         if(self->_message.selectedRange.length > 0)
             [msg deleteCharactersInRange:self->_message.selectedRange];
-        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeRTF] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
+        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeRTF.identifier] options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
         
         [self->_message setAttributedText:msg];
         if(shouldMoveCursor)
             self->_message.selectedRange = NSMakeRange(msg.length, 0);
-    } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD]) {
+    } else if([[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeFlatRTFD.identifier]) {
         NSMutableAttributedString *msg = self->_message.attributedText.mutableCopy;
         if(self->_message.selectedRange.length > 0)
             [msg deleteCharactersInRange:self->_message.selectedRange];
-        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:(NSString *)kUTTypeFlatRTFD] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
+        [msg insertAttributedString:[ColorFormatter stripUnsupportedAttributes:[[NSAttributedString alloc] initWithData:[[UIPasteboard generalPasteboard] dataForPasteboardType:UTTypeFlatRTFD.identifier] options:@{NSDocumentTypeDocumentAttribute: NSRTFDTextDocumentType} documentAttributes:nil error:nil] fontSize:self->_message.font.pointSize] atIndex:self->_message.internalTextView.selectedRange.location];
         
         [self->_message setAttributedText:msg];
         if(shouldMoveCursor)
@@ -5531,32 +5474,39 @@ NSArray *_sortedChannels;
     [(AppDelegate *)([UIApplication sharedApplication].delegate) launchURL:result.URL];
 }
 
+-(UIKeyCommand *)keyCommandWithInput:(NSString *) input
+                       modifierFlags:(UIKeyModifierFlags) modifierFlags
+                              action:(SEL) action
+                discoverabilityTitle:(NSString *) discoverabilityTitle {
+    UIKeyCommand *k = [UIKeyCommand keyCommandWithInput:input modifierFlags:modifierFlags action:action];
+    k.discoverabilityTitle = discoverabilityTitle;
+    return k;
+}
+
 -(NSArray<UIKeyCommand *> *)keyCommands {
     NSArray *commands = @[
-             [UIKeyCommand keyCommandWithInput:@"k" modifierFlags:UIKeyModifierCommand action:@selector(jumpToChannel) discoverabilityTitle:@"Jump to channel"],
-             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(selectPrevious) discoverabilityTitle:@"Switch to previous channel"],
-             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(selectNext) discoverabilityTitle:@"Switch to next channel"],
-             [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(selectPreviousUnread) discoverabilityTitle:@"Switch to previous unread channel"],
-             [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(selectNextUnread) discoverabilityTitle:@"Switch to next unread channel"],
+             [self keyCommandWithInput:@"k" modifierFlags:UIKeyModifierCommand action:@selector(jumpToChannel) discoverabilityTitle:@"Jump to channel"],
+             [self keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand action:@selector(selectPrevious) discoverabilityTitle:@"Switch to previous channel"],
+             [self keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand action:@selector(selectNext) discoverabilityTitle:@"Switch to next channel"],
+             [self keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(selectPreviousUnread) discoverabilityTitle:@"Switch to previous unread channel"],
+             [self keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(selectNextUnread) discoverabilityTitle:@"Switch to next unread channel"],
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate action:@selector(selectPrevious)],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate action:@selector(selectNext)],
              [UIKeyCommand keyCommandWithInput:UIKeyInputUpArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(selectPreviousUnread)],
              [UIKeyCommand keyCommandWithInput:UIKeyInputDownArrow modifierFlags:UIKeyModifierAlternate|UIKeyModifierShift action:@selector(selectNextUnread)],
-             [UIKeyCommand keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:) discoverabilityTitle:@"Complete nicknames and channels"],
-             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(markAsRead) discoverabilityTitle:@"Mark channel as read"],
-             [UIKeyCommand keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(markAllAsRead) discoverabilityTitle:@"Mark all channels as read"],
-             [UIKeyCommand keyCommandWithInput:@"b" modifierFlags:UIKeyModifierCommand action:@selector(toggleBoldface:) discoverabilityTitle:@"Bold"],
-             [UIKeyCommand keyCommandWithInput:@"i" modifierFlags:UIKeyModifierCommand action:@selector(toggleItalics:) discoverabilityTitle:@"Italic"],
-             [UIKeyCommand keyCommandWithInput:@"u" modifierFlags:UIKeyModifierCommand action:@selector(toggleUnderline:) discoverabilityTitle:@"Underline"],
+             [self keyCommandWithInput:@"\t" modifierFlags:0 action:@selector(onTabPressed:) discoverabilityTitle:@"Complete nicknames and channels"],
+             [self keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand action:@selector(markAsRead) discoverabilityTitle:@"Mark channel as read"],
+             [self keyCommandWithInput:@"r" modifierFlags:UIKeyModifierCommand|UIKeyModifierShift action:@selector(markAllAsRead) discoverabilityTitle:@"Mark all channels as read"],
+             [self keyCommandWithInput:@"b" modifierFlags:UIKeyModifierCommand action:@selector(toggleBoldface:) discoverabilityTitle:@"Bold"],
+             [self keyCommandWithInput:@"i" modifierFlags:UIKeyModifierCommand action:@selector(toggleItalics:) discoverabilityTitle:@"Italic"],
+             [self keyCommandWithInput:@"u" modifierFlags:UIKeyModifierCommand action:@selector(toggleUnderline:) discoverabilityTitle:@"Underline"],
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageUp" modifierFlags:0 action:@selector(onPgUpPressed:)],
              [UIKeyCommand keyCommandWithInput:@"UIKeyInputPageDown" modifierFlags:0 action:@selector(onPgDownPressed:)],
              ];
 
 #if !TARGET_OS_MACCATALYST
-    if (@available(iOS 15.0, *)) {
-        for(UIKeyCommand *c in commands) {
-            c.wantsPriorityOverSystemBehavior = YES;
-        }
+    for(UIKeyCommand *c in commands) {
+        c.wantsPriorityOverSystemBehavior = YES;
     }
 #endif
     return commands;

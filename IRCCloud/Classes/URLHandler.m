@@ -479,9 +479,7 @@
 {
 #ifndef EXTENSION
     BOOL isCatalyst = NO;
-    if (@available(iOS 13.0, *)) {
-        isCatalyst = [NSProcessInfo processInfo].macCatalystApp;
-    }
+    isCatalyst = [NSProcessInfo processInfo].macCatalystApp;
     UIApplication *app = [UIApplication sharedApplication];
     AppDelegate *appDelegate = (AppDelegate *)app.delegate;
     if(_window)
@@ -716,8 +714,6 @@
             UIApplication *app = [UIApplication sharedApplication];
             AppDelegate *appDelegate = (AppDelegate *)app.delegate;
             MainViewController *mainViewController = [appDelegate mainViewController];
-            [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
-            [UIApplication sharedApplication].statusBarHidden = NO;
             
             [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:url] animated:YES completion:nil];
         }];

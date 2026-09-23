@@ -15,7 +15,7 @@
 //  limitations under the License.
 
 #import <AVFoundation/AVFoundation.h>
-#import <MobileCoreServices/UTCoreTypes.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <SafariServices/SafariServices.h>
 #import "OpenInChromeController.h"
 #import "OpenInFirefoxControllerObjC.h"
@@ -41,7 +41,7 @@
     return @[
              [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                 [pb setValue:self->_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                 [pb setValue:self->_url.absoluteString forPasteboardType:UTTypeUTF8PlainText.identifier];
              }],
              [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIApplication *app = [UIApplication sharedApplication];
@@ -165,7 +165,7 @@
         }
     }
     
-    int margin = UIInterfaceOrientationIsLandscape([UIApplication sharedApplication].statusBarOrientation)?YTMARGIN:0;
+    int margin = UIInterfaceOrientationIsLandscape(self.view.window.windowScene.interfaceOrientation)?YTMARGIN:0;
     CGFloat width = self.view.bounds.size.width - margin;
     CGFloat height = (width / 16.0f) * 9.0f;
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
@@ -182,7 +182,7 @@
         CLS_LOG(@"Unable to extract video ID from URL: %@", _url);
     [self.view addSubview:self->_player];
     
-    self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    self->_activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
     self->_activity.center = self.view.center;
     self->_activity.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
     self->_activity.hidesWhenStopped = YES;

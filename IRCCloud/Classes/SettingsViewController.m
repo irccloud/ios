@@ -248,27 +248,21 @@
     self = [super initWithStyle:UITableViewStyleGrouped];
     if (self) {
         self.navigationItem.title = @"Theme";
-        if (@available(iOS 13, *)) {
-            self->_themes = @[@"Automatic", @"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
-        } else {
-            self->_themes = @[@"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
-        }
+        self->_themes = @[@"Automatic", @"Dawn", @"Dusk", @"Tropic", @"Emerald", @"Sand", @"Rust", @"Orchid", @"Ash", @"Midnight"];
 
         NSMutableArray *previews = [[NSMutableArray alloc] init];
         
-        if (@available(iOS 13, *)) {
-            UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
-            if([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark) {
-                v.backgroundColor = [UIColor blackColor];
-            } else {
-                v.backgroundColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
-            }
-            v.layer.borderColor = [UIColor blackColor].CGColor;
-            v.layer.borderWidth = 1.0f;
-            [previews addObject:v];
-        }
-        
         UIView *v = [[UIView alloc] initWithFrame:CGRectZero];
+        if([UITraitCollection currentTraitCollection].userInterfaceStyle == UIUserInterfaceStyleDark) {
+            v.backgroundColor = [UIColor blackColor];
+        } else {
+            v.backgroundColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
+        }
+        v.layer.borderColor = [UIColor blackColor].CGColor;
+        v.layer.borderWidth = 1.0f;
+        [previews addObject:v];
+        
+        v = [[UIView alloc] initWithFrame:CGRectZero];
         v.backgroundColor = [UIColor colorWithRed:0.851 green:0.906 blue:1 alpha:1];
         v.layer.borderColor = [UIColor blackColor].CGColor;
         v.layer.borderWidth = 1.0f;
@@ -379,19 +373,15 @@
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.view.backgroundColor = [UIColor navBarColor];
     self.navigationController.navigationBar.barStyle = [UIColor isDarkTheme]?UIBarStyleBlack:UIBarStyleDefault;
-    if (@available(iOS 13.0, *)) {
-        UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
-        a.backgroundImage = [UIColor navBarBackgroundImage];
-        a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
-        self.navigationController.navigationBar.standardAppearance = a;
-        self.navigationController.navigationBar.compactAppearance = a;
-        self.navigationController.navigationBar.scrollEdgeAppearance = a;
-        if (@available(iOS 15.0, *)) {
+    UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+    a.backgroundImage = [UIColor navBarBackgroundImage];
+    a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
+    self.navigationController.navigationBar.standardAppearance = a;
+    self.navigationController.navigationBar.compactAppearance = a;
+    self.navigationController.navigationBar.scrollEdgeAppearance = a;
 #if !TARGET_OS_MACCATALYST
-            self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+    self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
 #endif
-        }
-    }
 
     [self.navigationController setNeedsStatusBarAppearanceUpdate];
 }
@@ -589,19 +579,15 @@
     [v addSubview: self.navigationController.view];
     [self.navigationController.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
     self.navigationController.view.backgroundColor = [UIColor navBarColor];
-    if (@available(iOS 13.0, *)) {
-        UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
-        a.backgroundImage = [UIColor navBarBackgroundImage];
-        a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
-        self.navigationController.navigationBar.standardAppearance = a;
-        self.navigationController.navigationBar.compactAppearance = a;
-        self.navigationController.navigationBar.scrollEdgeAppearance = a;
-        if (@available(iOS 15.0, *)) {
+    UINavigationBarAppearance *a = [[UINavigationBarAppearance alloc] init];
+    a.backgroundImage = [UIColor navBarBackgroundImage];
+    a.titleTextAttributes = @{NSForegroundColorAttributeName: [UIColor navBarHeadingColor]};
+    self.navigationController.navigationBar.standardAppearance = a;
+    self.navigationController.navigationBar.compactAppearance = a;
+    self.navigationController.navigationBar.scrollEdgeAppearance = a;
 #if !TARGET_OS_MACCATALYST
-            self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
+    self.navigationController.navigationBar.compactScrollEdgeAppearance = a;
 #endif
-        }
-    }
     [self dismissViewControllerAnimated:YES completion:nil];
 //#endif
 }
@@ -656,9 +642,7 @@
 
 -(void)refresh {
     BOOL isCatalyst = NO;
-    if (@available(iOS 13.0, *)) {
-        isCatalyst = [NSProcessInfo processInfo].macCatalystApp;
-    }
+    isCatalyst = [NSProcessInfo processInfo].macCatalystApp;
     
     NSArray *account;
 #ifdef ENTERPRISE

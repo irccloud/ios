@@ -723,7 +723,6 @@ NSDictionary *__pastebinTypeMap = nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NSUInteger row = indexPath.row;
     NSString *identifier = [NSString stringWithFormat:@"pastecell-%li-%li", (long)indexPath.section, (long)indexPath.row];
     PastebinEditorCell *cell = [tableView dequeueReusableCellWithIdentifier:identifier];
     

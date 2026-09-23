@@ -15,7 +15,7 @@
 //  limitations under the License.
 
 #import <AVFoundation/AVFoundation.h>
-#import <MobileCoreServices/UTCoreTypes.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <Twitter/Twitter.h>
 #import <SafariServices/SafariServices.h>
 #import "ImageViewController.h"
@@ -53,7 +53,7 @@
     return @[
              [UIPreviewAction actionWithTitle:@"Copy URL" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  UIPasteboard *pb = [UIPasteboard generalPasteboard];
-                 [pb setValue:self->_url.absoluteString forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+                 [pb setValue:self->_url.absoluteString forPasteboardType:UTTypeUTF8PlainText.identifier];
              }],
              [UIPreviewAction actionWithTitle:@"Share" style:UIPreviewActionStyleDefault handler:^(UIPreviewAction * _Nonnull action, UIViewController * _Nonnull previewViewController) {
                  [UIColor clearTheme];
@@ -237,9 +237,6 @@
             [((AppDelegate *)[UIApplication sharedApplication].delegate) showMainView:NO];
             
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
-                [UIApplication sharedApplication].statusBarHidden = NO;
-                
                 [mainViewController.slidingViewController presentViewController:[[SFSafariViewController alloc] initWithURL:self->_url] animated:YES completion:nil];
             }];
         }];

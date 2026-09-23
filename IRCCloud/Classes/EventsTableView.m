@@ -225,10 +225,8 @@ extern UIImage *__socketClosedBackgroundImage;
     lp.delegate = self;
     [self->_tableView addGestureRecognizer:lp];
 
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp)
-            [self->_tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
-    }
+    if([NSProcessInfo processInfo].macCatalystApp)
+        [self->_tableView addInteraction:[[UIContextMenuInteraction alloc] initWithDelegate:self]];
 
     self->_topUnreadView.backgroundColor = [UIColor chatterBarColor];
     self->_bottomUnreadView.backgroundColor = [UIColor chatterBarColor];
@@ -360,7 +358,7 @@ extern UIImage *__socketClosedBackgroundImage;
             nc.modalPresentationStyle = UIModalPresentationCurrentContext;
         [self.slidingViewController presentViewController:nc animated:YES completion:nil];
     } else {
-        [UIApplication sharedApplication].statusBarStyle = UIStatusBarStyleDefault;
+        [viewControllerToCommit setNeedsStatusBarAppearanceUpdate];
         [self.slidingViewController presentViewController:viewControllerToCommit animated:YES completion:nil];
     }
 }
@@ -2746,9 +2744,7 @@ extern UIImage *__socketClosedBackgroundImage;
     cell.messageOffsetRight.constant = __timeLeftPref ? 6 : (__timestampWidth + 16);
     cell.messageOffsetBottom.constant = __compact ? 0 : 4;
     
-    if (@available(iOS 13.0, *)) {
-        cell.rightTimestampOffset.constant = [NSProcessInfo processInfo].macCatalystApp ? 24 : 8;
-    }
+    cell.rightTimestampOffset.constant = [NSProcessInfo processInfo].macCatalystApp ? 24 : 8;
 
     cell.quoteBorder.hidden = !e.isQuoted;
     cell.quoteBorder.backgroundColor = [UIColor quoteBorderColor];
@@ -3053,11 +3049,6 @@ extern UIImage *__socketClosedBackgroundImage;
     UITableView *tableView = self->_tableView;
     NSInteger firstRow = -1;
     NSInteger lastRow = -1;
-    if(@available(iOS 13, *)) {
-        //visibleCells resets the scroll position on iOS 13
-    } else {
-        [tableView visibleCells];
-    }
     NSArray *rows = [tableView indexPathsForRowsInRect:UIEdgeInsetsInsetRect(tableView.bounds, tableView.contentInset)];
     if(rows.count) {
         firstRow = [[rows objectAtIndex:0] row];

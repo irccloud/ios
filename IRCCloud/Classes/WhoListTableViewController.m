@@ -14,7 +14,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#import <MobileCoreServices/UTCoreTypes.h>
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import "WhoListTableViewController.h"
 #import "LinkTextView.h"
 #import "ColorFormatter.h"
@@ -149,7 +149,7 @@
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Copy hostmask" style:UIAlertActionStyleDefault handler:^(UIAlertAction *alert) {
         UIPasteboard *pb = [UIPasteboard generalPasteboard];
-        [pb setValue:[NSString stringWithFormat:@"%@!%@", [self->_selectedRow objectForKey:@"nick"], [self->_selectedRow objectForKey:@"usermask"]] forPasteboardType:(NSString *)kUTTypeUTF8PlainText];
+        [pb setValue:[NSString stringWithFormat:@"%@!%@", [self->_selectedRow objectForKey:@"nick"], [self->_selectedRow objectForKey:@"usermask"]] forPasteboardType:UTTypeUTF8PlainText.identifier];
     }]];
     [alert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     alert.popoverPresentationController.sourceRect = [self.tableView rectForRowAtIndexPath:indexPath];

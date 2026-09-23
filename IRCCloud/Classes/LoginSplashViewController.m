@@ -37,9 +37,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    if (@available(iOS 13, *)) {
-        self.view.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
-    }
+    self.view.overrideUserInterfaceStyle = UIUserInterfaceStyleLight;
     self->_kbSize = CGSizeZero;
 
     UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
@@ -367,10 +365,8 @@
 }
 
 -(void)keyboardWillShow:(NSNotification*)notification {
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp) {
-            return;
-        }
+    if([NSProcessInfo processInfo].macCatalystApp) {
+        return;
     }
     [UIView beginAnimations:nil context:NULL];
     [UIView setAnimationBeginsFromCurrentState:YES];

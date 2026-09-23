@@ -225,10 +225,8 @@ static NSString * const ServerHasSSLKey = @"ssl";
 //From: http://stackoverflow.com/a/13867108/1406639
 - (void)keyboardWillShow:(NSNotification *)aNotification
 {
-    if (@available(iOS 13.0, *)) {
-        if([NSProcessInfo processInfo].macCatalystApp) {
-            return;
-        }
+    if([NSProcessInfo processInfo].macCatalystApp) {
+        return;
     }
     if(keyboardShown)
         return;
