@@ -249,7 +249,7 @@ typedef void (^IRCCloudAPIResultHandler)(IRCCloudJSONObject *result);
 -(int)paste:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)handler;
 -(int)deletePaste:(NSString *)pasteID handler:(IRCCloudAPIResultHandler)handler;
 -(int)editPaste:(NSString *)pasteID name:(NSString *)name contents:(NSString *)contents extension:(NSString *)extension handler:(IRCCloudAPIResultHandler)handler;
--(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword handler:(IRCCloudAPIResultHandler)handler;
+-(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword email:(NSString *)email handler:(IRCCloudAPIResultHandler)handler;
 -(int)deleteAccount:(NSString *)password handler:(IRCCloudAPIResultHandler)handler;
 -(int)exportLog:(NSString *)timezone cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;
 -(int)renameChannel:(NSString *)name cid:(int)cid bid:(int)bid handler:(IRCCloudAPIResultHandler)handler;

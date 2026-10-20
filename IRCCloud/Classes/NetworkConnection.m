@@ -1729,8 +1729,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
     return [self _sendRequest:@"delete-connection" args:@{@"cid":@(cid)} handler:(IRCCloudAPIResultHandler)resultHandler];
 }
 
--(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword handler:(IRCCloudAPIResultHandler)resultHandler {
-    return [self _sendRequest:@"change-password" args:@{@"password":password,@"newPassword":newPassword} handler:resultHandler];
+-(int)changePassword:(NSString *)password newPassword:(NSString *)newPassword email:(NSString *)email handler:(IRCCloudAPIResultHandler)resultHandler {
+    return [self _sendRequest:@"change-password" args:@{@"password":password,@"newpassword":newPassword,@"email":email} handler:resultHandler];
 }
 
 -(int)deleteAccount:(NSString *)password handler:(IRCCloudAPIResultHandler)resultHandler {

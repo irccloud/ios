@@ -682,11 +682,22 @@
                             [spinny startAnimating];
                             self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:spinny];
 
-                            [[NetworkConnection sharedInstance] changePassword:[alert.textFields objectAtIndex:0].text newPassword:[alert.textFields objectAtIndex:0].text handler:^(IRCCloudJSONObject *result) {
+                            NSString *newPassword = [alert.textFields objectAtIndex:1].text;
+                            
+                            [[NetworkConnection sharedInstance] changePassword:[alert.textFields objectAtIndex:0].text newPassword:newPassword email:[[NetworkConnection sharedInstance].userInfo objectForKey:@"email"] handler:^(IRCCloudJSONObject *result) {
                                 if([[result objectForKey:@"success"] boolValue]) {
                                     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonPressed:)];
                                     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Password Changed" message:@"Your password has been successfully updated and all your other sessions have been logged out" preferredStyle:UIAlertControllerStyleAlert];
-                                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                                    [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:^(UIAlertAction *action){
+                                        if (@available(macCatalyst 14.0, *)) {
+                                            SecAddSharedWebCredential((CFStringRef)@"www.irccloud.com", (__bridge CFStringRef)[[NetworkConnection sharedInstance].userInfo objectForKey:@"email"], (__bridge CFStringRef)newPassword, ^(CFErrorRef error) {
+                                                if (error != NULL) {
+                                                    CLS_LOG(@"Unable to save shared credentials: %@", error);
+                                                    return;
+                                                }
+                                            });
+                                        }
+                                    }]];
                                     [self presentViewController:alert animated:YES completion:nil];
                                 } else {
                                     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error Changing Password" message:[self accountMsg:[result objectForKey:@"message"]] preferredStyle:UIAlertControllerStyleAlert];
