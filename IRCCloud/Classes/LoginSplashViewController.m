@@ -248,13 +248,11 @@
 }
 
 -(void)_promptForSWC {
-#if !TARGET_OS_MACCATALYST
     if (@available(macCatalyst 14.0, *)) {
         if(username.text.length == 0 && !_gotCredentialsFromPasswordManager && !_accessLink) {
             [_ac performRequests];
         }
     }
-#endif
 }
 
 -(void)_loginWithAccessLink {
