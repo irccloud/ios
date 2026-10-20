@@ -14,11 +14,11 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
+#import <AuthenticationServices/AuthenticationServices.h>
 #import <UIKit/UIKit.h>
 #import <MessageUI/MFMailComposeViewController.h>
 
-@interface LoginSplashViewController : UIViewController<UITextFieldDelegate, UIGestureRecognizerDelegate, MFMailComposeViewControllerDelegate> {
+@interface LoginSplashViewController : UIViewController<UITextFieldDelegate, UIGestureRecognizerDelegate, MFMailComposeViewControllerDelegate,ASAuthorizationControllerPresentationContextProviding,ASAuthorizationControllerDelegate> {
     IBOutlet UIImageView *logo;
     IBOutlet UILabel *IRC;
     IBOutlet UILabel *Cloud;
@@ -68,6 +68,7 @@
     BOOL _gotCredentialsFromPasswordManager;
     BOOL _requestingReset;
     NSString *_authURL;
+    ASAuthorizationController *_ac;
 }
 @property NSURL *accessLink;
 -(IBAction)loginButtonPressed:(id)sender;

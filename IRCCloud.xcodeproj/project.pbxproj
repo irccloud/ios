@@ -898,6 +898,7 @@
 		22DB25401982E3130008728E /* EnterpriseImages.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 22EEA94D18D0AC08007D5022 /* EnterpriseImages.xcassets */; };
 		22DB8D701C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
 		22DB8D711C441C3000302271 /* YouTubeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 22DB8D6F1C441C3000302271 /* YouTubeViewController.m */; };
+		22E25BD63087B3BB00F21C72 /* AuthenticationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22E25BD53087B3BB00F21C72 /* AuthenticationServices.framework */; };
 		22E54AE01D10593B00891FE4 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
 		22E54AE11D10593B00891FE4 /* AvatarsDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */; };
 		22E9C0AB1C9AF27800013456 /* OpenInFirefoxControllerObjC.m in Sources */ = {isa = PBXBuildFile; fileRef = 22E9C0A81C9AF27800013456 /* OpenInFirefoxControllerObjC.m */; };
@@ -1593,6 +1594,7 @@
 		22DB253D1982E2890008728E /* IRCEnterprise.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; name = IRCEnterprise.entitlements; path = ../IRCEnterprise.entitlements; sourceTree = "<group>"; };
 		22DB8D6E1C441C3000302271 /* YouTubeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YouTubeViewController.h; sourceTree = "<group>"; };
 		22DB8D6F1C441C3000302271 /* YouTubeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YouTubeViewController.m; sourceTree = "<group>"; };
+		22E25BD53087B3BB00F21C72 /* AuthenticationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AuthenticationServices.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/System/iOSSupport/System/Library/Frameworks/AuthenticationServices.framework; sourceTree = DEVELOPER_DIR; };
 		22E54ADE1D10593B00891FE4 /* AvatarsDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AvatarsDataSource.h; sourceTree = "<group>"; };
 		22E54ADF1D10593B00891FE4 /* AvatarsDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AvatarsDataSource.m; sourceTree = "<group>"; };
 		22E9C0A71C9AF27800013456 /* OpenInFirefoxControllerObjC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = OpenInFirefoxControllerObjC.h; path = OpenInFirefoxClient/OpenInFirefoxControllerObjC.h; sourceTree = SOURCE_ROOT; };
@@ -1757,6 +1759,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				22E25BD63087B3BB00F21C72 /* AuthenticationServices.framework in Frameworks */,
 				2236193A28B54D970077C850 /* IntentsUI.framework in Frameworks */,
 				2238763B1F70061C00943160 /* WebP.framework in Frameworks */,
 				2289EF781D787CC500DB285E /* Intents.framework in Frameworks */,
@@ -1995,6 +1998,7 @@
 		228A056E16D3DABA0029769C /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				22E25BD53087B3BB00F21C72 /* AuthenticationServices.framework */,
 				2236193928B54D970077C850 /* IntentsUI.framework */,
 				2236193728B5435F0077C850 /* Intents.framework */,
 				225BEDC2252CB27F0050A8CC /* CoreServices.framework */,

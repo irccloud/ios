@@ -14,7 +14,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-
 #import <QuartzCore/QuartzCore.h>
 #import "LoginSplashViewController.h"
 #import "UIColor+IRCCloud.h"
@@ -116,6 +115,7 @@
     username.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, username.frame.size.height)];
     username.rightViewMode = UITextFieldViewModeAlways;
     username.font = sourceSansPro;
+    username.textContentType = UITextContentTypeEmailAddress;
 #ifdef ENTERPRISE
     username.placeholder = @"Email or Username";
 #endif
@@ -124,6 +124,7 @@
     password.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, password.frame.size.height)];
     password.rightViewMode = UITextFieldViewModeAlways;
     password.font = sourceSansPro;
+    password.textContentType = UITextContentTypeNewPassword;
     host.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, host.frame.size.height)];
     host.leftViewMode = UITextFieldViewModeAlways;
     host.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 9, host.frame.size.height)];
@@ -160,6 +161,13 @@
     username.background = [UIImage imageNamed:@"login_top_input"];
     password.background = [UIImage imageNamed:@"login_bottom_input"];
     host.background = [UIImage imageNamed:@"login_only_input"];
+
+    
+    _ac = [[ASAuthorizationController alloc] initWithAuthorizationRequests:@[
+        [[[ASAuthorizationPasswordProvider alloc] init] createRequest]
+    ]];
+    _ac.presentationContextProvider = self;
+    _ac.delegate = self;
 
     [self transitionToSize:self.view.bounds.size];
 }
@@ -218,27 +226,32 @@
     }
 }
 
+- (nonnull ASPresentationAnchor)presentationAnchorForAuthorizationController:(nonnull ASAuthorizationController *)controller {
+    return self.view.window;
+}
+
+- (void)authorizationController:(ASAuthorizationController *) controller didCompleteWithAuthorization:(ASAuthorization *) authorization {
+    ASPasswordCredential *p = authorization.credential;
+    if (p && p.user.length && p.password.length) {
+        self->_gotCredentialsFromPasswordManager = YES;
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            [self->username setText:p.user];
+            [self->password setText:p.password];
+            [self loginHintPressed:nil];
+            [self loginButtonPressed:nil];
+        }];
+    }
+}
+
+- (void)authorizationController:(ASAuthorizationController *) controller didCompleteWithError:(NSError *) error {
+    CLS_LOG(@"Unable to request shared web credentials: %@ %@", error, error.localizedDescription);
+}
+
 -(void)_promptForSWC {
 #if !TARGET_OS_MACCATALYST
     if (@available(macCatalyst 14.0, *)) {
         if(username.text.length == 0 && !_gotCredentialsFromPasswordManager && !_accessLink) {
-            SecRequestSharedWebCredential(NULL, NULL, ^(CFArrayRef credentials, CFErrorRef error) {
-                if (error != NULL) {
-                    CLS_LOG(@"Unable to request shared web credentials: %@", error);
-                    return;
-                }
-                
-                if (CFArrayGetCount(credentials) > 0) {
-                    self->_gotCredentialsFromPasswordManager = YES;
-                    NSDictionary *credentialsDict = CFArrayGetValueAtIndex(credentials, 0);
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self->username setText:[credentialsDict objectForKey:(__bridge id)(kSecAttrAccount)]];
-                        [self->password setText:[credentialsDict objectForKey:(__bridge id)(kSecSharedPassword)]];
-                        [self loginHintPressed:nil];
-                        [self loginButtonPressed:nil];
-                    }];
-                }
-            });
+            [_ac performRequests];
         }
     }
 #endif
@@ -413,6 +426,8 @@
     notAProblem.alpha = 0;
     sendAccessLink.alpha = 0;
     enterEmailAddressHint.alpha = 0;
+    
+    password.textContentType = UITextContentTypePassword;
     [self transitionToSize:self.view.bounds.size];
 }
 
@@ -443,6 +458,8 @@
     notAProblem.alpha = 0;
     sendAccessLink.alpha = 0;
     enterEmailAddressHint.alpha = 0;
+    
+    password.textContentType = UITextContentTypeNewPassword;
     [self transitionToSize:self.view.bounds.size];
 }
 
@@ -600,14 +617,14 @@
             NSString *url = @"https://www.irccloud.com";
 #endif
             NSDictionary *newLoginDetails = @{
-                                              AppExtensionTitleKey: @"IRCCloud",
-                                              AppExtensionUsernameKey: self->username.text ? : @"",
-                                              AppExtensionPasswordKey: self->password.text ? : @"",
-                                              AppExtensionSectionTitleKey: @"IRCCloud",
-                                              AppExtensionFieldsKey: @{
-                                                      @"Name" : self->name.text ? : @""
-                                                      }
-                                              };
+                AppExtensionTitleKey: @"IRCCloud",
+                AppExtensionUsernameKey: self->username.text ? : @"",
+                AppExtensionPasswordKey: self->password.text ? : @"",
+                AppExtensionSectionTitleKey: @"IRCCloud",
+                AppExtensionFieldsKey: @{
+                    @"Name" : self->name.text ? : @""
+                }
+            };
             
             [[OnePasswordExtension sharedExtension] storeLoginForURLString:url loginDetails:newLoginDetails passwordGenerationOptions:nil forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
                 
