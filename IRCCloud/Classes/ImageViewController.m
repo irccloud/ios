@@ -389,10 +389,10 @@
             [self scrollViewDidZoom:self->_scrollView];
             
             [self->_progressView removeFromSuperview];
-            [UIView beginAnimations:nil context:nil];
-            [UIView setAnimationDuration:0.25];
-            self->_imageView.alpha = 1;
-            [UIView commitAnimations];
+            [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+                self->_imageView.alpha = 1;
+            } completion:^(BOOL finished) {
+            }];
         }];
     } else {
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{

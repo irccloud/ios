@@ -279,10 +279,11 @@
             self->forgotPasswordSignup.alpha = 0;
             [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
         } else {
-            [UIView beginAnimations:nil context:nil];
-            self->loginView.alpha = 1;
-            self->loadingView.alpha = 0;
-            [UIView commitAnimations];
+            [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+                self->loginView.alpha = 1;
+                self->loadingView.alpha = 0;
+            } completion:^(BOOL finished) {
+            }];
             UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:@"Invalid access link" preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
             [self presentViewController:alert animated:YES completion:nil];
@@ -368,25 +369,21 @@
     if([NSProcessInfo processInfo].macCatalystApp) {
         return;
     }
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationBeginsFromCurrentState:YES];
-    [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
-    [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
-    self->_kbSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
-    [self transitionToSize:self.view.bounds.size];
-    [self.view layoutIfNeeded];
-    [UIView commitAnimations];
+    [UIView animateWithDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue] delay:0 options:UIViewAnimationOptionBeginFromCurrentState|[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue] animations:^{
+        self->_kbSize = [self.view convertRect:[[notification.userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue] toView:nil].size;
+        [self transitionToSize:self.view.bounds.size];
+        [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
+    }];
 }
 
 -(void)keyboardWillBeHidden:(NSNotification*)notification {
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationBeginsFromCurrentState:YES];
-    [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
-    [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
-    self->_kbSize = CGSizeZero;
-    [self transitionToSize:self.view.bounds.size];
-    [self.view layoutIfNeeded];
-    [UIView commitAnimations];
+    [UIView animateWithDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue] delay:0 options:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue] animations:^{
+        self->_kbSize = CGSizeZero;
+        [self transitionToSize:self.view.bounds.size];
+        [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
+    }];
 }
 
 -(void)didReceiveMemoryWarning {
@@ -398,9 +395,7 @@
     [self loginButtonPressed:sender];
 }
 
--(IBAction)loginHintPressed:(id)sender {
-    if(sender)
-        [UIView beginAnimations:nil context:NULL];
+-(void)_loginHintPressed {
     name.alpha = 0;
     login.alpha = 1;
     password.alpha = 1;
@@ -419,14 +414,21 @@
     sendAccessLink.alpha = 0;
     enterEmailAddressHint.alpha = 0;
     [self transitionToSize:self.view.bounds.size];
-    if(sender)
-        [UIView commitAnimations];
+}
+
+-(IBAction)loginHintPressed:(id)sender {
+    if(sender) {
+        [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+            [self _loginHintPressed];
+        } completion:^(BOOL finished) {
+        }];
+    } else {
+        [self _loginHintPressed];
+    }
     [self textFieldChanged:name];
 }
 
--(IBAction)signupHintPressed:(id)sender {
-    if(sender)
-        [UIView beginAnimations:nil context:NULL];
+-(void)_signupHintPressed {
     name.alpha = 1;
     password.alpha = 1;
     login.alpha = 0;
@@ -442,14 +444,21 @@
     sendAccessLink.alpha = 0;
     enterEmailAddressHint.alpha = 0;
     [self transitionToSize:self.view.bounds.size];
-    if(sender)
-        [UIView commitAnimations];
+}
+
+-(IBAction)signupHintPressed:(id)sender {
+    if(sender) {
+        [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+            [self _signupHintPressed];
+        } completion:^(BOOL finished) {
+        }];
+    } else {
+        [self _signupHintPressed];
+    }
     [self textFieldChanged:username];
 }
 
--(IBAction)forgotPasswordHintPressed:(id)sender {
-    if(sender)
-        [UIView beginAnimations:nil context:NULL];
+-(void)_forgotPasswordHintPressed {
     login.alpha = 0;
     password.alpha = 0;
     signupHint.alpha = 0;
@@ -463,8 +472,17 @@
     notAProblem.alpha = 1;
     sendAccessLink.alpha = 1;
     enterEmailAddressHint.alpha = 1;
-    if(sender)
-        [UIView commitAnimations];
+}
+
+-(IBAction)forgotPasswordHintPressed:(id)sender {
+    if(sender) {
+        [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+            [self _forgotPasswordHintPressed];
+        } completion:^(BOOL finished) {
+        }];
+    } else {
+        [self _forgotPasswordHintPressed];
+    }
     [self _updateFieldPositions];
     _requestingReset = NO;
     [sendAccessLink setTitle:@"Request access link" forState:UIControlStateNormal];
@@ -479,10 +497,11 @@
 }
 
 -(void)_accessLinkRequestFailed {
-    [UIView beginAnimations:nil context:nil];
-    self->loginView.alpha = 1;
-    self->loadingView.alpha = 0;
-    [UIView commitAnimations];
+    [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+        self->loginView.alpha = 1;
+        self->loadingView.alpha = 0;
+    } completion:^(BOOL finished) {
+    }];
     [self->activity stopAnimating];
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Request Failed" message:self->_requestingReset?@"Unable to request a password reset.  Please try again later.":@"Unable to request an access link.  Please try again later." preferredStyle:UIAlertControllerStyleAlert];
     [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
@@ -491,10 +510,11 @@
 
 -(IBAction)sendAccessLinkButtonPressed:(id)sender {
     [username resignFirstResponder];
-    [UIView beginAnimations:nil context:nil];
-    loginView.alpha = 0;
-    loadingView.alpha = 1;
-    [UIView commitAnimations];
+    [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+        self->loginView.alpha = 0;
+        self->loadingView.alpha = 1;
+    } completion:^(BOOL finished) {
+    }];
     [status setText:self->_requestingReset?@"Requesting Password Reset":@"Requesting Access Link"];
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, status.text);
     [activity startAnimating];
@@ -505,10 +525,11 @@
             if(self->_requestingReset) {
                 [[NetworkConnection sharedInstance] requestPasswordReset:user token:[result objectForKey:@"token"] handler:^(IRCCloudJSONObject *result) {
                     if([[result objectForKey:@"success"] intValue] == 1) {
-                        [UIView beginAnimations:nil context:nil];
-                        self->loginView.alpha = 1;
-                        self->loadingView.alpha = 0;
-                        [UIView commitAnimations];
+                        [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+                            self->loginView.alpha = 1;
+                            self->loadingView.alpha = 0;
+                        } completion:^(BOOL finished) {
+                        }];
                         [self->activity stopAnimating];
                         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Sent" message:@"We've sent you a password reset link.  Check your email and follow the instructions to sign in." preferredStyle:UIAlertControllerStyleAlert];
                         [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
@@ -521,10 +542,11 @@
             } else {
                 [[NetworkConnection sharedInstance] requestAccessLink:user token:[result objectForKey:@"token"] handler:^(IRCCloudJSONObject *result) {
                     if([[result objectForKey:@"success"] intValue] == 1) {
-                        [UIView beginAnimations:nil context:nil];
-                        self->loginView.alpha = 1;
-                        self->loadingView.alpha = 0;
-                        [UIView commitAnimations];
+                        [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+                            self->loginView.alpha = 1;
+                            self->loadingView.alpha = 0;
+                        } completion:^(BOOL finished) {
+                        }];
                         [self->activity stopAnimating];
                         UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Email Sent" message:@"We've sent you an access link.  Check your email and follow the instructions to sign in." preferredStyle:UIAlertControllerStyleAlert];
                         [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
@@ -636,10 +658,11 @@
     [activity startAnimating];
     
     [host resignFirstResponder];
-    [UIView beginAnimations:nil context:nil];
-    loadingView.alpha = 1;
-    loginView.alpha = 0;
-    [UIView commitAnimations];
+    [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+        self->loadingView.alpha = 1;
+        self->loginView.alpha = 0;
+    } completion:^(BOOL finished) {
+    }];
     
     activity.hidden = NO;
     [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *result) {
@@ -701,10 +724,11 @@
                     self->login.alpha = 1;
                     [self transitionToSize:self.view.bounds.size];
                 }
-                [UIView beginAnimations:nil context:nil];
-                self->loginView.alpha = 1;
-                self->loadingView.alpha = 0;
-                [UIView commitAnimations];
+                [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+                    self->loginView.alpha = 1;
+                    self->loadingView.alpha = 0;
+                } completion:^(BOOL finished) {
+                }];
             }
         });
     }];
@@ -731,10 +755,11 @@
     }
     [username resignFirstResponder];
     [password resignFirstResponder];
-    [UIView beginAnimations:nil context:nil];
-    loginView.alpha = 0;
-    loadingView.alpha = 1;
-    [UIView commitAnimations];
+    [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+        self->loginView.alpha = 0;
+        self->loadingView.alpha = 1;
+    } completion:^(BOOL finished) {
+    }];
     if(name.alpha)
         [status setText:@"Creating Account"];
     else
@@ -753,10 +778,11 @@
     [[NetworkConnection sharedInstance] requestConfigurationWithHandler:^(IRCCloudJSONObject *config) {
         if(!config) {
             dispatch_async(dispatch_get_main_queue(), ^{
-                [UIView beginAnimations:nil context:nil];
-                self->loginView.alpha = 1;
-                self->loadingView.alpha = 0;
-                [UIView commitAnimations];
+                [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+                    self->loginView.alpha = 1;
+                    self->loadingView.alpha = 0;
+                } completion:^(BOOL finished) {
+                }];
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Communication Error" message:@"Unable to fetch configuration. Please try again shortly." preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Send Feedback" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
@@ -807,10 +833,11 @@
                         [((AppDelegate *)([UIApplication sharedApplication].delegate)) showMainView:YES];
                     } else {
                         CLS_LOG(@"Failure: %@", result);
-                        [UIView beginAnimations:nil context:nil];
-                        self->loginView.alpha = 1;
-                        self->loadingView.alpha = 0;
-                        [UIView commitAnimations];
+                        [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+                            self->loginView.alpha = 1;
+                            self->loadingView.alpha = 0;
+                        } completion:^(BOOL finished) {
+                        }];
                         NSString *message = self->name.alpha?@"Invalid email address or password. Please try again.":@"Unable to login to IRCCloud.  Please check your username and password, and try again shortly.";
                         if([[result objectForKey:@"message"] isEqualToString:@"auth"]
                            || [[result objectForKey:@"message"] isEqualToString:@"email"]
@@ -848,10 +875,11 @@
                     [[NetworkConnection sharedInstance] login:user password:pass token:[result objectForKey:@"token"] handler:handler];
             } else {
                 CLS_LOG(@"Failure: %@", result);
-                [UIView beginAnimations:nil context:nil];
-                self->loginView.alpha = 1;
-                self->loadingView.alpha = 0;
-                [UIView commitAnimations];
+                [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+                    self->loginView.alpha = 1;
+                    self->loadingView.alpha = 0;
+                } completion:^(BOOL finished) {
+                }];
                 NSString *message = @"Unable to communicate with the IRCCloud servers.  Please try again shortly.";
                 UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Login Failed" message:message preferredStyle:UIAlertControllerStyleAlert];
                 [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];

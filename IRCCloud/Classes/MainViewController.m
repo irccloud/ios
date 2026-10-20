@@ -1848,14 +1848,10 @@ NSArray *_sortedChannels;
         self->_kbSize = size;
         self->_kbSize.height = height;
 
-        [UIView beginAnimations:nil context:NULL];
-        [UIView setAnimationBeginsFromCurrentState:YES];
-        [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
-        [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
-
-        [self updateLayout];
-        
-        [UIView commitAnimations];
+        [UIView animateWithDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue] delay:0 options:UIViewAnimationOptionBeginFromCurrentState|[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue] animations:^{
+            [self updateLayout];
+        } completion:^(BOOL finished) {
+        }];
         [self expandingTextViewDidChange:self->_message];
         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
             [self->_buffersView scrollViewDidScroll:self->_buffersView.tableView];
@@ -1880,19 +1876,16 @@ NSArray *_sortedChannels;
     }
     self->_kbSize = CGSizeMake(0,0);
     
-    [UIView beginAnimations:nil context:NULL];
-    [UIView setAnimationBeginsFromCurrentState:YES];
-    [UIView setAnimationCurve:[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue]];
-    [UIView setAnimationDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue]];
+    [UIView animateWithDuration:[[notification.userInfo objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue] delay:0 options:UIViewAnimationOptionBeginFromCurrentState|[[notification.userInfo objectForKey:UIKeyboardAnimationCurveUserInfoKey] intValue] animations:^{
+        [self.slidingViewController updateUnderLeftLayout];
+        [self.slidingViewController updateUnderRightLayout];
+        [self updateLayout];
 
-    [self.slidingViewController updateUnderLeftLayout];
-    [self.slidingViewController updateUnderRightLayout];
-    [self updateLayout];
-
-    [self->_buffersView scrollViewDidScroll:self->_buffersView.tableView];
-    self->_nickCompletionView.alpha = 0;
-    self->_updateSuggestionsTask.atMention = NO;
-    [UIView commitAnimations];
+        [self->_buffersView scrollViewDidScroll:self->_buffersView.tableView];
+        self->_nickCompletionView.alpha = 0;
+        self->_updateSuggestionsTask.atMention = NO;
+    } completion:^(BOOL finished) {
+    }];
     if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
         [UIApplication sharedApplication].idleTimerDisabled = YES;
     [self->_eventsView.tableView.layer addObserver:self forKeyPath:@"bounds" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:NULL];
@@ -2553,7 +2546,7 @@ NSArray *_sortedChannels;
     
 #ifdef DEBUG
     if([[NSProcessInfo processInfo].arguments containsObject:@"-ui_testing"]) {
-        typing = @"ike and kira are typing";
+        typing = @"ike and kira are typing".mutableCopy;
     }
 #endif
     
@@ -2652,10 +2645,11 @@ NSArray *_sortedChannels;
         expandingTextView.internalTextView.typingAttributes = self->_currentMessageAttributes;
     self->_textIsChanging = NO;
     [self.view layoutIfNeeded];
-    [UIView beginAnimations:nil context:nil];
-    [self _updateMessageWidth];
-    [self.view layoutIfNeeded];
-    [UIView commitAnimations];
+    [UIView animateWithDuration:0.2 delay:0 options:0 animations:^{
+        [self _updateMessageWidth];
+        [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
+    }];
     if(self->_nickCompletionView.alpha == 1) {
         [self updateSuggestions:NO];
     } else {

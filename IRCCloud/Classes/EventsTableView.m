@@ -666,10 +666,10 @@ extern UIImage *__socketClosedBackgroundImage;
         case kIRCEventHeartbeatEcho:
             [self updateUnread];
             if(self->_maxEid <= self->_buffer.last_seen_eid) {
-                [UIView beginAnimations:nil context:nil];
-                [UIView setAnimationDuration:0.1];
-                self->_topUnreadView.alpha = 0;
-                [UIView commitAnimations];
+                [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+                    self->_topUnreadView.alpha = 0;
+                } completion:^(BOOL finished) {
+                }];
             }
             break;
         case kIRCEventMakeBuffer:
@@ -1464,10 +1464,10 @@ extern UIImage *__socketClosedBackgroundImage;
     }
     if(msg.length) {
         self->_bottomUnreadLabel.text = msg;
-        [UIView beginAnimations:nil context:nil];
-        [UIView setAnimationDuration:0.1];
-        self->_bottomUnreadView.alpha = 1;
-        [UIView commitAnimations];
+        [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+            self->_bottomUnreadView.alpha = 1;
+        } completion:^(BOOL finished) {
+        }];
     }
 }
 
@@ -2218,10 +2218,10 @@ extern UIImage *__socketClosedBackgroundImage;
                 Event *e = ((self->_lastSeenEidPos+1) < self->_data.count)?[self->_data objectAtIndex:self->_lastSeenEidPos+1]:nil;
                 if(e && ((self->_lastSeenEidPos > 0 && firstRow > self->_lastSeenEidPos) || self->_lastSeenEidPos == 0) && e.eid >= self->_buffer.last_seen_eid) {
                     if(self->_topUnreadView.alpha == 0) {
-                        [UIView beginAnimations:nil context:nil];
-                        [UIView setAnimationDuration:0.1];
-                        self->_topUnreadView.alpha = 1;
-                        [UIView commitAnimations];
+                        [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+                            self->_topUnreadView.alpha = 1;
+                        } completion:^(BOOL finished) {
+                        }];
                     }
                     [self updateTopUnread:firstRow];
                 } else if(lastRow < self->_lastSeenEidPos) {
@@ -2233,18 +2233,18 @@ extern UIImage *__socketClosedBackgroundImage;
                         }
                     }
                 } else {
-                    [UIView beginAnimations:nil context:nil];
-                    [UIView setAnimationDuration:0.1];
-                    self->_topUnreadView.alpha = 0;
-                    [UIView commitAnimations];
+                    [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+                        self->_topUnreadView.alpha = 0;
+                    } completion:^(BOOL finished) {
+                    }];
                 }
                 self->_requestingBacklog = NO;
             } else if(self->_earliestEid > self->_buffer.last_seen_eid) {
                 if(self->_topUnreadView.alpha == 0) {
-                    [UIView beginAnimations:nil context:nil];
-                    [UIView setAnimationDuration:0.1];
-                    self->_topUnreadView.alpha = 1;
-                    [UIView commitAnimations];
+                    [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+                        self->_topUnreadView.alpha = 1;
+                    } completion:^(BOOL finished) {
+                    }];
                 }
                 [self updateTopUnread:-1];
             }
@@ -2979,10 +2979,10 @@ extern UIImage *__socketClosedBackgroundImage;
 
 -(IBAction)dismissButtonPressed:(id)sender {
     if(self->_topUnreadView.alpha) {
-        [UIView beginAnimations:nil context:nil];
-        [UIView setAnimationDuration:0.1];
-        self->_topUnreadView.alpha = 0;
-        [UIView commitAnimations];
+        [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+            self->_topUnreadView.alpha = 0;
+        } completion:^(BOOL finished) {
+        }];
         [self sendHeartbeat];
     }
 }
@@ -2994,10 +2994,10 @@ extern UIImage *__socketClosedBackgroundImage;
             self->_buffer.scrolledUp = YES;
         }
         if(self->_lastSeenEidPos > 0) {
-            [UIView beginAnimations:nil context:nil];
-            [UIView setAnimationDuration:0.1];
-            self->_topUnreadView.alpha = 0;
-            [UIView commitAnimations];
+            [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+                self->_topUnreadView.alpha = 0;
+            } completion:^(BOOL finished) {
+            }];
             [self->_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_lastSeenEidPos+1 inSection:0] atScrollPosition: UITableViewScrollPositionTop animated: YES];
             [self scrollViewDidScroll:self->_tableView];
             [self sendHeartbeat];
@@ -3011,10 +3011,10 @@ extern UIImage *__socketClosedBackgroundImage;
 
 -(IBAction)bottomUnreadBarClicked:(id)sender {
     if(self->_bottomUnreadView.alpha) {
-        [UIView beginAnimations:nil context:nil];
-        [UIView setAnimationDuration:0.1];
-        self->_bottomUnreadView.alpha = 0;
-        [UIView commitAnimations];
+        [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+            self->_bottomUnreadView.alpha = 0;
+        } completion:^(BOOL finished) {
+        }];
         if(self->_data.count) {
             [self->_tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:self->_data.count - 1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
         }
@@ -3089,10 +3089,10 @@ extern UIImage *__socketClosedBackgroundImage;
             CGRect frame = [tableView convertRect:[tableView rectForRowAtIndexPath:[NSIndexPath indexPathForRow:self->_data.count - 1 inSection:0]] toView:tableView.superview];
             
             if(frame.origin.y + frame.size.height <= tableView.frame.origin.y + tableView.frame.size.height - tableView.contentInset.bottom + 4 + (FONT_SIZE / 2)) {
-                [UIView beginAnimations:nil context:nil];
-                [UIView setAnimationDuration:0.1];
-                self->_bottomUnreadView.alpha = 0;
-                [UIView commitAnimations];
+                [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+                    self->_bottomUnreadView.alpha = 0;
+                } completion:^(BOOL finished) {
+                }];
                 self->_newMsgs = 0;
                 self->_newHighlights = 0;
                 self->_buffer.scrolledUp = NO;
@@ -3108,10 +3108,10 @@ extern UIImage *__socketClosedBackgroundImage;
             
             if(self->_lastSeenEidPos >= 0) {
                 if(self->_lastSeenEidPos > 0 && firstRow < _lastSeenEidPos + 1) {
-                    [UIView beginAnimations:nil context:nil];
-                    [UIView setAnimationDuration:0.1];
-                    self->_topUnreadView.alpha = 0;
-                    [UIView commitAnimations];
+                    [UIView animateWithDuration:0.1 delay:0 options:0 animations:^{
+                        self->_topUnreadView.alpha = 0;
+                    } completion:^(BOOL finished) {
+                    }];
                     [self sendHeartbeat];
                 } else {
                     [self updateTopUnread:firstRow];

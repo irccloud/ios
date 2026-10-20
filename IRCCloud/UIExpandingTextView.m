@@ -223,6 +223,27 @@
     minimumNumberOfLines = m;
 }
 
+- (void)_resize:(NSInteger)newHeight
+{
+    if ([delegate respondsToSelector:@selector(expandingTextView:willChangeHeight:)])
+    {
+        [delegate expandingTextView:self willChangeHeight:(newHeight+ kTextInsetBottom)];
+    }
+    
+    /* Resize the frame */
+    CGRect r = self.frame;
+    r.size.height = (newHeight<maximumHeight)?newHeight:maximumHeight + kTextInsetBottom;
+    self.frame = r;
+    r.origin.y = 0;
+    r.origin.x = 0;
+    r.size.height -= 8;
+    textViewBackgroundImage.frame = r;
+    r.origin.x -= 4;
+    r.size.width += 4;
+    internalTextView.frame = CGRectInset(r, kTextInsetX, 0);
+    internalTextView.contentInset = UIEdgeInsetsMake(-1,0,-1,0);
+}
+
 - (void)textViewDidChange:(UITextView *)textView
 {
     if(textView.text.length == 0) {
@@ -254,35 +275,17 @@
 
         if(animateHeightChange)
         {
-            [UIView beginAnimations:nil context:nil];
-            [UIView setAnimationDelegate:self];
-            [UIView setAnimationDidStopSelector:@selector(growDidStop)];
-            [UIView setAnimationBeginsFromCurrentState:YES];
+            [UIView animateWithDuration:0.2 delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
+                [self _resize:newHeight];
+            } completion:^(BOOL finished) {
+                [self growDidStop];
+            }];
+        } else {
+            [self _resize:newHeight];
         }
         
-        if ([delegate respondsToSelector:@selector(expandingTextView:willChangeHeight:)]) 
-        {
-            [delegate expandingTextView:self willChangeHeight:(newHeight+ kTextInsetBottom)];
-        }
         
-        /* Resize the frame */
-        CGRect r = self.frame;
-        r.size.height = (newHeight<maximumHeight)?newHeight:maximumHeight + kTextInsetBottom;
-        self.frame = r;
-        r.origin.y = 0;
-        r.origin.x = 0;
-        r.size.height -= 8;
-        textViewBackgroundImage.frame = r;
-        r.origin.x -= 4;
-        r.size.width += 4;
-        internalTextView.frame = CGRectInset(r, kTextInsetX, 0);
-        internalTextView.contentInset = UIEdgeInsetsMake(-1,0,-1,0);
-        
-        if(animateHeightChange)
-        {
-            [UIView commitAnimations];
-        }
-        else if ([delegate respondsToSelector:@selector(expandingTextView:didChangeHeight:)]) 
+        if(!animateHeightChange && [delegate respondsToSelector:@selector(expandingTextView:didChangeHeight:)])
         {
             [delegate expandingTextView:self didChangeHeight:(newHeight+ kTextInsetBottom)];
         }
