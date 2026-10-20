@@ -61,8 +61,6 @@
     IBOutlet UILabel *enterEmailAddressHint;
     IBOutlet UIView *notAProblem;
     
-    IBOutlet UIButton *OnePassword;
-    
     CGSize _kbSize;
     NSURL *_accessLink;
     BOOL _gotCredentialsFromPasswordManager;
@@ -85,5 +83,4 @@
 -(IBAction)hideKeyboard:(id)sender;
 -(void)hideLoginView;
 -(UIImageView *)logo;
--(IBAction)onePasswordButtonPressed:(id)sender;
 @end

@@ -18,7 +18,6 @@
 #import "LoginSplashViewController.h"
 #import "UIColor+IRCCloud.h"
 #import "AppDelegate.h"
-#import "OnePasswordExtension.h"
 #import "UIDevice+UIDevice_iPhone6Hax.h"
 #import "SamlLoginViewController.h"
 @import Firebase;
@@ -344,8 +343,6 @@
     nextYOffset.constant = 16 + 39 + 32;
     loginYOffset.constant = signupYOffset.constant = 16 + ((offset + 2) * 39) + 15;
     sendAccessLinkYOffset.constant = 16 + 81;
-    
-    OnePassword.hidden = self->_authURL || (login.alpha != 1 && signup.alpha != 1) || ![[OnePasswordExtension sharedExtension] isAppExtensionAvailable];
 }
 
 -(UIImageView *)logo {
@@ -576,78 +573,6 @@
             [self _accessLinkRequestFailed];
         }
     }];
-}
-
--(IBAction)onePasswordButtonPressed:(id)sender {
-    self->_gotCredentialsFromPasswordManager = YES;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if(self->login.alpha) {
-#ifdef ENTERPRISE
-            NSString *url = [NSString stringWithFormat:@"https://%@", host.text];
-#else
-            NSString *url = @"https://www.irccloud.com";
-#endif
-            [[OnePasswordExtension sharedExtension] findLoginForURLString:url forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
-                if (!loginDict) {
-                    if (error.code != AppExtensionErrorCodeCancelledByUser) {
-                        CLS_LOG(@"Error invoking 1Password App Extension for find login: %@", error);
-                    }
-                    return;
-                }
-                
-                self->loginView.alpha = 0;
-                if([loginDict[AppExtensionUsernameKey] length])
-                    self->username.text = loginDict[AppExtensionUsernameKey];
-                self->password.text = loginDict[AppExtensionPasswordKey];
-                self->enterpriseHint.alpha = 0;
-                self->host.alpha = 0;
-                self->hostHint.alpha = 0;
-                self->next.alpha = 0;
-                self->enterpriseLearnMore.alpha = 0;
-                self->username.alpha = 1;
-                [self loginHintPressed:nil];
-                [self loginButtonPressed:nil];
-            }];
-        } else {
-#ifdef ENTERPRISE
-            NSString *url = [NSString stringWithFormat:@"https://%@", host.text];
-#else
-            NSString *url = @"https://www.irccloud.com";
-#endif
-            NSDictionary *newLoginDetails = @{
-                AppExtensionTitleKey: @"IRCCloud",
-                AppExtensionUsernameKey: self->username.text ? : @"",
-                AppExtensionPasswordKey: self->password.text ? : @"",
-                AppExtensionSectionTitleKey: @"IRCCloud",
-                AppExtensionFieldsKey: @{
-                    @"Name" : self->name.text ? : @""
-                }
-            };
-            
-            [[OnePasswordExtension sharedExtension] storeLoginForURLString:url loginDetails:newLoginDetails passwordGenerationOptions:nil forViewController:self sender:sender completion:^(NSDictionary *loginDict, NSError *error) {
-                
-                if (!loginDict) {
-                    if (error.code != AppExtensionErrorCodeCancelledByUser) {
-                        CLS_LOG(@"Failed to use 1Password App Extension to save a new Login: %@", error);
-                    }
-                    return;
-                }
-                if(((NSString *)loginDict[AppExtensionReturnedFieldsKey][@"Name"]).length)
-                    self->name.text = (NSString *)(loginDict[AppExtensionReturnedFieldsKey][@"Name"]);
-                if([loginDict[AppExtensionUsernameKey] length])
-                    self->username.text = loginDict[AppExtensionUsernameKey];
-                self->password.text = loginDict[AppExtensionPasswordKey] ? : @"";
-                
-                self->enterpriseHint.alpha = 0;
-                self->host.alpha = 0;
-                self->hostHint.alpha = 0;
-                self->next.alpha = 0;
-                self->enterpriseLearnMore.alpha = 0;
-                self->username.alpha = 1;
-                [self signupHintPressed:nil];
-            }];
-        }
-    });
 }
 
 -(IBAction)TOSHintPressed:(id)sender {

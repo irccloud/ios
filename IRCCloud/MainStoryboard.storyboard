@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="QPs-Li-UDL">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24127" targetRuntime="iOS.CocoaTouch.iPad" propertyAccessControl="none" useAutolayout="YES" colorMatched="YES" initialViewController="QPs-Li-UDL">
     <device id="ipad9_7" orientation="portrait" layout="fullscreen" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -424,19 +424,6 @@
                                             <action selector="sendAccessLinkButtonPressed:" destination="thh-5b-esU" eventType="touchUpInside" id="Q9V-th-RNU"/>
                                         </connections>
                                     </button>
-                                    <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5kc-v2-8O4">
-                                        <rect key="frame" x="493.5" y="60" width="27" height="27"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="27" id="RM6-I3-gqg"/>
-                                            <constraint firstAttribute="width" constant="27" id="ppl-VP-Ghb"/>
-                                        </constraints>
-                                        <state key="normal" image="onepassword-button">
-                                            <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                        </state>
-                                        <connections>
-                                            <action selector="onePasswordButtonPressed:" destination="thh-5b-esU" eventType="touchUpInside" id="lqz-Yg-kDD"/>
-                                        </connections>
-                                    </button>
                                     <view autoresizesSubviews="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Eug-wi-F8f" customClass="UIControl">
                                         <rect key="frame" x="254" y="173" width="260" height="24"/>
                                         <subviews>
@@ -594,7 +581,6 @@
                                 <constraints>
                                     <constraint firstItem="YDn-hm-4nv" firstAttribute="centerX" secondItem="mJM-f8-v0Q" secondAttribute="centerX" id="4ns-Uy-wp9"/>
                                     <constraint firstItem="Q3h-ZU-20z" firstAttribute="top" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="11" id="5hI-DE-UYi"/>
-                                    <constraint firstItem="5kc-v2-8O4" firstAttribute="centerY" secondItem="J5j-oJ-a2d" secondAttribute="centerY" id="6Z0-Ok-c1Q"/>
                                     <constraint firstItem="wHq-8E-O6Q" firstAttribute="centerX" secondItem="mJM-f8-v0Q" secondAttribute="centerX" id="AoW-zr-ajF"/>
                                     <constraint firstItem="wHq-8E-O6Q" firstAttribute="top" secondItem="Eug-wi-F8f" secondAttribute="bottom" id="B3o-Y3-MwX"/>
                                     <constraint firstItem="U1F-cw-qxd" firstAttribute="top" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="133" id="CgG-Qp-sEM"/>
@@ -623,7 +609,6 @@
                                     <constraint firstItem="YDn-hm-4nv" firstAttribute="top" secondItem="mJM-f8-v0Q" secondAttribute="top" constant="16" id="ntI-JY-ChK"/>
                                     <constraint firstItem="82t-Dd-vQq" firstAttribute="top" secondItem="EZC-Qj-aeF" secondAttribute="bottom" constant="6" id="ozg-Vq-8r5"/>
                                     <constraint firstItem="zZw-jo-Si9" firstAttribute="centerX" secondItem="mJM-f8-v0Q" secondAttribute="centerX" id="qUd-mJ-Ix1"/>
-                                    <constraint firstItem="5kc-v2-8O4" firstAttribute="trailing" secondItem="J5j-oJ-a2d" secondAttribute="trailing" constant="-6" id="y1g-Vp-Q6I"/>
                                 </constraints>
                             </view>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="Version" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="lSc-2u-RsF">
@@ -670,7 +655,6 @@
                     <connections>
                         <outlet property="Cloud" destination="KFZ-UT-EG5" id="LZA-ai-RJn"/>
                         <outlet property="IRC" destination="Hgu-D2-Mph" id="LcZ-3w-dic"/>
-                        <outlet property="OnePassword" destination="5kc-v2-8O4" id="XXw-dF-zJv"/>
                         <outlet property="TOSHint" destination="jub-VI-17w" id="nzX-hN-aYD"/>
                         <outlet property="activity" destination="4IH-UP-pdU" id="mjR-L6-tQv"/>
                         <outlet property="enterEmailAddressHint" destination="82t-Dd-vQq" id="a7b-m9-Lnl"/>
@@ -721,7 +705,7 @@
                         <viewControllerLayoutGuide type="bottom" id="9R7-ni-VzZ"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="cMl-aC-QBW">
-                        <rect key="frame" x="0.0" y="0.0" width="768" height="954"/>
+                        <rect key="frame" x="0.0" y="0.0" width="768" height="950"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cZW-xP-lCa" userLabel="Borders">
@@ -1171,7 +1155,6 @@
         <image name="login_logo" width="48" height="48"/>
         <image name="login_only_input" width="288" height="38"/>
         <image name="login_top_input" width="288" height="39"/>
-        <image name="onepassword-button" width="27" height="27"/>
         <image name="signup_button" width="288" height="40"/>
     </resources>
 </document>
