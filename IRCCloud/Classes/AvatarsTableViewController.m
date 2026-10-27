@@ -177,7 +177,7 @@
         
         if (results.count) {
             NSItemProvider *p = results.firstObject.itemProvider;
-            if (p && [p hasItemConformingToTypeIdentifier:@"public.image"]) {
+            if (p && [p hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
                 [p loadFileRepresentationForTypeIdentifier:p.registeredTypeIdentifiers.firstObject completionHandler:^(NSURL *url, NSError *error) {
                     if (url) {
                         [self imagePicked:[UIImage imageWithContentsOfFile:url.path]];

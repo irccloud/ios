@@ -6,6 +6,7 @@
 //  Copyright (c) 2014 IRCCloud, Ltd. All rights reserved.
 //
 
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <Intents/Intents.h>
 #import "ShareViewController.h"
@@ -30,7 +31,7 @@
             if(output.attachments.count) {
                 NSItemProvider *i = nil;
                 for(NSItemProvider *p in output.attachments) {
-                    if([p hasItemConformingToTypeIdentifier:@"public.url"] && ![p hasItemConformingToTypeIdentifier:@"public.file-url"]) {
+                    if([p hasItemConformingToTypeIdentifier:UTTypeURL.identifier] && ![p hasItemConformingToTypeIdentifier:UTTypeFileURL.identifier]) {
                         NSLog(@"Attachment has a public URL");
                         i = p;
                         break;
@@ -38,7 +39,7 @@
                 }
                 if(!i) {
                     for(NSItemProvider *p in output.attachments) {
-                        if(([p hasItemConformingToTypeIdentifier:@"public.file-url"] && ![p hasItemConformingToTypeIdentifier:@"public.image"]) || [p hasItemConformingToTypeIdentifier:@"public.movie"]) {
+                        if(([p hasItemConformingToTypeIdentifier:UTTypeFileURL.identifier] && ![p hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) || [p hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]) {
                             NSLog(@"Attachment is file URL");
                             i = p;
                             break;
@@ -47,7 +48,7 @@
                 }
                 if(!i) {
                     for(NSItemProvider *p in output.attachments) {
-                        if([p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                        if([p hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
                             NSLog(@"Attachment is image");
                             i = p;
                             break;
@@ -60,7 +61,7 @@
                 NSItemProviderCompletionHandler imageHandler = ^(UIImage *item, NSError *error) {
                     NSLog(@"Uploading image to IRCCloud");
                     self->_item = item;
-                    if([i hasItemConformingToTypeIdentifier:@"public.png"])
+                    if([i hasItemConformingToTypeIdentifier:UTTypePNG.identifier])
                         [self->_fileUploader uploadPNG:item];
                     else
                         [self->_fileUploader uploadImage:item];
@@ -73,12 +74,12 @@
                 };
                 
                 NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
-                    if([i hasItemConformingToTypeIdentifier:@"public.image"] && ![item.pathExtension.lowercaseString isEqualToString:@"gif"] && ![item.pathExtension.lowercaseString isEqualToString:@"png"]) {
+                    if([i hasItemConformingToTypeIdentifier:UTTypeImage.identifier] && ![item.pathExtension.lowercaseString isEqualToString:@"gif"] && ![item.pathExtension.lowercaseString isEqualToString:@"png"]) {
                             self->_fileUploader.originalFilename = [[item pathComponents] lastObject];
-                        [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                        [i loadItemForTypeIdentifier:UTTypeImage.identifier options:nil completionHandler:imageHandler];
                     } else {
                         NSLog(@"Uploading file to IRCCloud");
-                        [i hasItemConformingToTypeIdentifier:@"public.movie"]?[self->_fileUploader uploadVideo:item]:[self->_fileUploader uploadFile:item];
+                        [i hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]?[self->_fileUploader uploadVideo:item]:[self->_fileUploader uploadFile:item];
                         if(!self->_filename)
                             self->_filename = self->_fileUploader.originalFilename;
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
@@ -88,16 +89,16 @@
                     }
                 };
                 
-                if([i hasItemConformingToTypeIdentifier:@"public.file-url"]) {
-                    [i loadItemForTypeIdentifier:@"public.file-url" options:nil completionHandler:urlHandler];
-                } else if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
+                if([i hasItemConformingToTypeIdentifier:UTTypeFileURL.identifier]) {
+                    [i loadItemForTypeIdentifier:UTTypeFileURL.identifier options:nil completionHandler:urlHandler];
+                } else if([i hasItemConformingToTypeIdentifier:UTTypeURL.identifier]) {
                     self->_fileUploader = nil;
                     [self reloadConfigurationItems];
                     [self validateContent];
-                } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
-                    [i loadItemForTypeIdentifier:@"public.movie" options:nil completionHandler:urlHandler];
-                } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                    [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                } else if([i hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]) {
+                    [i loadItemForTypeIdentifier:UTTypeMovie.identifier options:nil completionHandler:urlHandler];
+                } else if([i hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
+                    [i loadItemForTypeIdentifier:UTTypeImage.identifier options:nil completionHandler:imageHandler];
                 } else {
                     self->_uploadStarted = YES;
                 }
@@ -227,14 +228,14 @@
         } else {
             NSItemProvider *i = nil;
             for(NSItemProvider *p in output.attachments) {
-                if([p hasItemConformingToTypeIdentifier:@"public.url"] && ![p hasItemConformingToTypeIdentifier:@"public.file-url"]) {
+                if([p hasItemConformingToTypeIdentifier:UTTypeURL.identifier] && ![p hasItemConformingToTypeIdentifier:UTTypeFileURL.identifier]) {
                     i = p;
                     break;
                 }
             }
             if(!i) {
                 for(NSItemProvider *p in output.attachments) {
-                    if([p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                    if([p hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
                         i = p;
                         break;
                     }
@@ -255,8 +256,8 @@
             };
             
             NSItemProviderCompletionHandler urlHandler = ^(NSURL *item, NSError *error) {
-                if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                    [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
+                if([item.scheme isEqualToString:@"file"] && [i hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
+                    [i loadItemForTypeIdentifier:UTTypeImage.identifier options:nil completionHandler:imageHandler];
                 } else {
                     if(self.contentText.length)
                         [self->_conn say:[NSString stringWithFormat:@"%@ %@",self.contentText,item.absoluteString] to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
@@ -265,13 +266,13 @@
                 }
             };
             
-            if([i hasItemConformingToTypeIdentifier:@"public.url"]) {
-                [i loadItemForTypeIdentifier:@"public.url" options:nil completionHandler:urlHandler];
-            } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
-                [i loadItemForTypeIdentifier:@"public.movie" options:nil completionHandler:urlHandler];
-            } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
-                [i loadItemForTypeIdentifier:@"public.image" options:nil completionHandler:imageHandler];
-            } else if([i hasItemConformingToTypeIdentifier:@"public.plain-text"]) {
+            if([i hasItemConformingToTypeIdentifier:UTTypeURL.identifier]) {
+                [i loadItemForTypeIdentifier:UTTypeURL.identifier options:nil completionHandler:urlHandler];
+            } else if([i hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]) {
+                [i loadItemForTypeIdentifier:UTTypeMovie.identifier options:nil completionHandler:urlHandler];
+            } else if([i hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
+                [i loadItemForTypeIdentifier:UTTypeImage.identifier options:nil completionHandler:imageHandler];
+            } else if([i hasItemConformingToTypeIdentifier:UTTypePlainText.identifier]) {
                 [self->_conn say:self.contentText to:self->_buffer.name cid:self->_buffer.cid handler:self->_resultHandler];
             } else {
                 NSLog(@"Unknown attachment type: %@", output.attachments.firstObject);
@@ -315,7 +316,7 @@
             NSExtensionItem *output = [input copy];
             output.attributedContentText = [[NSAttributedString alloc] initWithString:self.contentText attributes:nil];
             
-            if(output.attachments.count && ([output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.image"] || [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.movie"])) {
+            if(output.attachments.count && ([output.attachments.firstObject hasItemConformingToTypeIdentifier:UTTypeImage.identifier] || [output.attachments.firstObject hasItemConformingToTypeIdentifier:UTTypeMovie.identifier])) {
                 SLComposeSheetConfigurationItem *filenameConfigItem = [[SLComposeSheetConfigurationItem alloc] init];
                 filenameConfigItem.title = @"Filename";
                 if(self->_filename)
@@ -342,7 +343,7 @@
                 
                 if(!self->_uploadStarted) {
                     SLComposeSheetConfigurationItem *exporting = [[SLComposeSheetConfigurationItem alloc] init];
-                    exporting.title = [output.attachments.firstObject hasItemConformingToTypeIdentifier:@"public.movie"]?@"Exporting Video":@"Resizing Photo";
+                    exporting.title = [output.attachments.firstObject hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]?@"Exporting Video":@"Resizing Photo";
                     exporting.valuePending = YES;
 
                     return @[filenameConfigItem, bufferConfigItem, exporting];

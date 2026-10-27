@@ -15,9 +15,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-#if !TARGET_OS_MACCATALYST
-#import <AssetsLibrary/AssetsLibrary.h>
-#endif
 #import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <UserNotifications/UserNotifications.h>
 #import <Intents/Intents.h>
@@ -552,7 +549,7 @@ NSArray *_sortedChannels;
 }
 
 -(BOOL)dropInteraction:(UIDropInteraction *)interaction canHandleSession:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
-    return session.items.count == 1 && [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", @"public.image", @"public.movie"]];
+    return session.items.count == 1 && [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", UTTypeImage.identifier, UTTypeMovie.identifier]];
 }
 
 -(UIDropProposal *)dropInteraction:(UIDropInteraction *)interaction sessionDidUpdate:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
@@ -601,13 +598,13 @@ NSArray *_sortedChannels;
         [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
             if(url) {
                 CLS_LOG(@"Uploading dropped file to IRCCloud");
-                [i hasItemConformingToTypeIdentifier:@"public.movie"]?[u uploadVideo:url]:[u uploadFile:url];
+                [i hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]?[u uploadVideo:url]:[u uploadFile:url];
             } else {
                 CLS_LOG(@"Unable to handle dropped file: %@", error);
             }
         }];
-    } else if([i hasItemConformingToTypeIdentifier:@"public.movie"]) {
-        [i loadInPlaceFileRepresentationForTypeIdentifier:@"public.movie" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
+    } else if([i hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]) {
+        [i loadInPlaceFileRepresentationForTypeIdentifier:UTTypeMovie.identifier completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
             if(url) {
                 CLS_LOG(@"Uploading dropped movie to IRCCloud");
                 [u uploadVideo:url];
@@ -615,7 +612,7 @@ NSArray *_sortedChannels;
                 CLS_LOG(@"Unable to handle dropped movie: %@", error);
             }
         }];
-    } else if([i hasItemConformingToTypeIdentifier:@"public.image"]) {
+    } else if([i hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
         [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
     }
     
@@ -4718,18 +4715,20 @@ NSArray *_sortedChannels;
                 if (url) {
                     u.originalFilename = url.lastPathComponent;
                     
-                    if ([p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                    if ([p hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
                         UIImage *img = [UIImage imageWithContentsOfFile:url.path];
                         UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                        if ([p hasItemConformingToTypeIdentifier:@"public.png"])
+                        if ([p hasItemConformingToTypeIdentifier:UTTypePNG.identifier])
                             [u uploadPNG:img];
+                        else if ([p hasItemConformingToTypeIdentifier:UTTypeGIF.identifier])
+                            [u uploadFile:url];
                         else
                             [u uploadImage:img];
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                             [fvc setImage:thumbnail];
                             [fvc viewWillAppear:NO];
                         }];
-                    } else if ([p hasItemConformingToTypeIdentifier:@"public.movie"]) {
+                    } else if ([p hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]) {
                         if (@available(iOS 16.0, *)) {
                             AVAssetImageGenerator *generator = [AVAssetImageGenerator assetImageGeneratorWithAsset:[AVURLAsset assetWithURL:url]];
                             generator.appliesPreferredTrackTransform = YES;
