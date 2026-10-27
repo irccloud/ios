@@ -4721,7 +4721,10 @@ NSArray *_sortedChannels;
                     if ([p hasItemConformingToTypeIdentifier:@"public.image"]) {
                         UIImage *img = [UIImage imageWithContentsOfFile:url.path];
                         UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                        [u uploadImage:img];
+                        if ([p hasItemConformingToTypeIdentifier:@"public.png"])
+                            [u uploadPNG:img];
+                        else
+                            [u uploadImage:img];
                         [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                             [fvc setImage:thumbnail];
                             [fvc viewWillAppear:NO];
