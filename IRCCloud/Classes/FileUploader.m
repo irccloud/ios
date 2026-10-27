@@ -571,7 +571,7 @@
 
     CLS_LOG(@"HTTP request completed with status code %i", (int)((NSHTTPURLResponse *)task.response).statusCode);
     
-    if(error) {
+    if(error && !self->_cancelled) {
 #ifndef EXTENSION
         if([error.domain isEqualToString:NSURLErrorDomain]) {
             if(error.code == NSURLErrorUnknown || error.code == NSURLErrorBackgroundSessionWasDisconnected) {

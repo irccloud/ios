@@ -557,90 +557,8 @@ NSArray *_sortedChannels;
 }
 
 -(void)dropInteraction:(UIDropInteraction *)interaction performDrop:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
-    NSItemProvider *i = session.items.firstObject.itemProvider;
     
-    FileUploader *u = [[FileUploader alloc] init];
-    u.delegate = self;
-    u.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
-    u.msgid = self->_msgid;
-    NSString *UTI = i.registeredTypeIdentifiers.lastObject;
-    u.originalFilename = i.suggestedName;
-    if(![u.originalFilename containsString:@"."] && ![UTI hasPrefix:@"dyn."]) {
-        u.originalFilename = [u.originalFilename stringByAppendingPathExtension:[UTI componentsSeparatedByString:@"."].lastObject];
-    }
-    u.mimeType = [UTType typeWithIdentifier:UTI].preferredMIMEType;
-    FileMetadataViewController *fvc = [[FileMetadataViewController alloc] initWithUploader:u];
-    u.metadatadelegate = fvc;
-    [i loadPreviewImageWithOptions:nil completionHandler:^(UIImage *preview, NSError *error) {
-        if(preview) {
-            [fvc setImage:preview];
-        } else if([i canLoadObjectOfClass:UIImage.class]) {
-            [i loadObjectOfClass:UIImage.class completionHandler:^(UIImage *item, NSError *error) {
-                if(item) {
-                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [fvc setImage:item];
-                    }];
-                }
-            }];
-        }
-    }];
-    
-    if([i hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
-        [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
-            if(url) {
-                CLS_LOG(@"Uploading dropped file to IRCCloud");
-                [i hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]?[u uploadVideo:url]:[u uploadFile:url];
-            } else {
-                CLS_LOG(@"Unable to handle dropped file: %@", error);
-            }
-        }];
-    } else if([i hasItemConformingToTypeIdentifier:UTTypeGIF.identifier]) {
-        [i loadInPlaceFileRepresentationForTypeIdentifier:UTTypeGIF.identifier completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
-            if(url) {
-                CLS_LOG(@"Uploading dropped GIF to IRCCloud");
-                [u uploadFile:url];
-            } else {
-                CLS_LOG(@"Unable to handle dropped file: %@", error);
-            }
-        }];
-    } else if([i hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]) {
-        [i loadInPlaceFileRepresentationForTypeIdentifier:UTTypeMovie.identifier completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
-            if(url) {
-                CLS_LOG(@"Uploading dropped movie to IRCCloud");
-                [u uploadVideo:url];
-            } else {
-                CLS_LOG(@"Unable to handle dropped movie: %@", error);
-            }
-        }];
-    } else if([i hasItemConformingToTypeIdentifier:UTTypePNG.identifier]) {
-        [i loadObjectOfClass:UIImage.class completionHandler:^(UIImage *item, NSError *error) {
-            if(item) {
-                CLS_LOG(@"Uploading dropped PNG to IRCCloud");
-                [u uploadPNG:item];
-            } else {
-                CLS_LOG(@"Unable to handle dropped image: %@", error);
-            }
-        }];
-    } else if([i hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
-        [i loadObjectOfClass:UIImage.class completionHandler:^(UIImage *item, NSError *error) {
-            if(item) {
-                CLS_LOG(@"Uploading dropped image to IRCCloud");
-                [u uploadImage:item];
-            } else {
-                CLS_LOG(@"Unable to handle dropped image: %@", error);
-            }
-        }];
-    }
-    
-    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-        UINavigationController *nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-            nc.modalPresentationStyle = UIModalPresentationFormSheet;
-        else
-            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        [self presentViewController:nc animated:YES completion:nil];
-    }];
+    [self _uploadItemProvider:session.items.firstObject.itemProvider];
 }
 
 - (UIViewController *)previewingContext:(id<UIViewControllerPreviewing>)previewingContext viewControllerForLocation:(CGPoint)location {
@@ -4712,85 +4630,99 @@ NSArray *_sortedChannels;
     [self _hideConnectingView];
 }
 
+-(void)_uploadItemProvider:(NSItemProvider *)p {
+    FileMetadataViewController *fvc = nil;
+
+    if (p) {
+        FileUploader *u = [[FileUploader alloc] init];
+        u.delegate = self;
+        u.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
+        u.msgid = self->_msgid;
+        fvc = [[FileMetadataViewController alloc] initWithUploader:u];
+        [fvc showCancelButton];
+        u.metadatadelegate = fvc;
+
+        [p loadFileRepresentationForTypeIdentifier:p.registeredTypeIdentifiers.firstObject completionHandler:^(NSURL *url, NSError *error) {
+            if (url) {
+                u.originalFilename = url.lastPathComponent;
+                
+                if([p hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
+                    [p loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
+                        if(url) {
+                            CLS_LOG(@"Uploading dropped file to IRCCloud");
+                            [p hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]?[u uploadVideo:url]:[u uploadFile:url];
+                        } else {
+                            CLS_LOG(@"Unable to handle dropped file: %@", error);
+                        }
+                    }];
+                } else if ([p hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
+                    UIImage *img = [UIImage imageWithContentsOfFile:url.path];
+                    UIImage *thumbnail = [p hasItemConformingToTypeIdentifier:UTTypeGIF.identifier]?[YYImage imageWithContentsOfFile:url.path]:[FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
+                    if ([p hasItemConformingToTypeIdentifier:UTTypePNG.identifier])
+                        [u uploadPNG:img];
+                    else if ([p hasItemConformingToTypeIdentifier:UTTypeGIF.identifier])
+                        [u uploadFile:url];
+                    else
+                        [u uploadImage:img];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [fvc setImage:thumbnail];
+                        [fvc viewWillAppear:NO];
+                    }];
+                } else if ([p hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]) {
+                    if (@available(iOS 16.0, *)) {
+                        AVAssetImageGenerator *generator = [AVAssetImageGenerator assetImageGeneratorWithAsset:[AVURLAsset assetWithURL:url]];
+                        generator.appliesPreferredTrackTransform = YES;
+                        [generator generateCGImageAsynchronouslyForTime:kCMTimeZero completionHandler:^(CGImageRef image, CMTime actualTime, NSError * error) {
+                            if(image) {
+                                UIImage *thumbnail = [UIImage imageWithCGImage:image];
+                                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                                    [fvc setImage:thumbnail];
+                                    [fvc viewWillAppear:NO];
+                                }];
+                            } else {
+                                CLS_LOG("%@ %@", error, error.localizedDescription);
+                            }
+                        }];
+                    }
+                    [u uploadVideo:url];
+                } else {
+                    CLS_LOG(@"File is not an image or movie, uploading raw file: %@ %@", url, p.registeredTypeIdentifiers);
+                    [u uploadFile:url];
+                }
+            }
+        }];
+    }
+    
+    UINavigationController *nc = nil;
+    
+    if(fvc) {
+        nc = [[UINavigationController alloc] initWithRootViewController:fvc];
+        [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
+        if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
+            nc.modalPresentationStyle = UIModalPresentationFormSheet;
+        else
+            nc.modalPresentationStyle = UIModalPresentationCurrentContext;
+    }
+    
+    if(self.presentedViewController) {
+        [self dismissViewControllerAnimated:YES completion:^{
+            if(nc)
+                [self presentViewController:nc animated:YES completion:nil];
+        }];
+    } else if(nc) {
+        [self presentViewController:nc animated:YES completion:nil];
+    }
+    
+    if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
+        [UIApplication sharedApplication].idleTimerDisabled = YES;
+}
+
 -(void)_picker:(PHPickerViewController *)picker didFinishPicking:(NSArray<PHPickerResult *> *)results {
     [UIColor setTheme];
     [self applyTheme];
-    FileMetadataViewController *fvc = nil;
 
     if (results.count) {
-        NSItemProvider *p = results.firstObject.itemProvider;
-        if (p) {
-            FileUploader *u = [[FileUploader alloc] init];
-            u.delegate = self;
-            u.to = @[@{@"cid":@(self->_buffer.cid), @"to":self->_buffer.name}];
-            u.msgid = self->_msgid;
-            fvc = [[FileMetadataViewController alloc] initWithUploader:u];
-            [fvc showCancelButton];
-
-            [p loadFileRepresentationForTypeIdentifier:p.registeredTypeIdentifiers.firstObject completionHandler:^(NSURL *url, NSError *error) {
-                if (url) {
-                    u.originalFilename = url.lastPathComponent;
-                    
-                    if ([p hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
-                        UIImage *img = [UIImage imageWithContentsOfFile:url.path];
-                        UIImage *thumbnail = [FileUploader image:img scaledCopyOfSize:CGSizeMake(2048, 2048)];
-                        if ([p hasItemConformingToTypeIdentifier:UTTypePNG.identifier])
-                            [u uploadPNG:img];
-                        else if ([p hasItemConformingToTypeIdentifier:UTTypeGIF.identifier])
-                            [u uploadFile:url];
-                        else
-                            [u uploadImage:img];
-                        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                            [fvc setImage:thumbnail];
-                            [fvc viewWillAppear:NO];
-                        }];
-                    } else if ([p hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]) {
-                        if (@available(iOS 16.0, *)) {
-                            AVAssetImageGenerator *generator = [AVAssetImageGenerator assetImageGeneratorWithAsset:[AVURLAsset assetWithURL:url]];
-                            generator.appliesPreferredTrackTransform = YES;
-                            [generator generateCGImageAsynchronouslyForTime:kCMTimeZero completionHandler:^(CGImageRef image, CMTime actualTime, NSError * error) {
-                                if(image) {
-                                    UIImage *thumbnail = [UIImage imageWithCGImage:image];
-                                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                                        [fvc setImage:thumbnail];
-                                        [fvc viewWillAppear:NO];
-                                    }];
-                                } else {
-                                    CLS_LOG("%@ %@", error, error.localizedDescription);
-                                }
-                            }];
-                        }
-                        [u uploadVideo:url];
-                    } else {
-                        CLS_LOG(@"File is not an image or movie, uploading raw file: %@ %@", url, p.registeredTypeIdentifiers);
-                        [u uploadFile:url];
-                    }
-                }
-            }];
-        }
-        
-        UINavigationController *nc = nil;
-        
-        if(fvc) {
-            nc = [[UINavigationController alloc] initWithRootViewController:fvc];
-            [nc.navigationBar setBackgroundImage:[UIColor navBarBackgroundImage] forBarMetrics:UIBarMetricsDefault];
-            if([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad && ![[UIDevice currentDevice] isBigPhone])
-                nc.modalPresentationStyle = UIModalPresentationFormSheet;
-            else
-                nc.modalPresentationStyle = UIModalPresentationCurrentContext;
-        }
-        
-        if(self.presentedViewController) {
-            [self dismissViewControllerAnimated:YES completion:^{
-                if(nc)
-                    [self presentViewController:nc animated:YES completion:nil];
-            }];
-        } else if(nc) {
-            [self presentViewController:nc animated:YES completion:nil];
-        }
-        
-        if([[NSUserDefaults standardUserDefaults] boolForKey:@"keepScreenOn"])
-            [UIApplication sharedApplication].idleTimerDisabled = YES;
+        [self _uploadItemProvider:results.firstObject.itemProvider];
     }
 }
 

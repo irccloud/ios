@@ -131,7 +131,7 @@
     }
     self->_msg.text = ((AppDelegate *)[UIApplication sharedApplication].delegate).mainViewController.buffer.draft;
     
-    self->_imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
+    self->_imageView = [[YYAnimatedImageView alloc] initWithFrame:CGRectZero];
     self->_imageView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self->_imageView.contentMode = UIViewContentModeScaleAspectFit;
     self->_imageView.accessibilityIgnoresInvertColors = YES;

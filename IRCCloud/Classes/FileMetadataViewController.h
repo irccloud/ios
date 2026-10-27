@@ -17,13 +17,14 @@
 
 #import <UIKit/UIKit.h>
 #import "FileUploader.h"
+#import "YYImage.h"
 
 @interface FileMetadataViewController : UITableViewController<UITextFieldDelegate,UITextViewDelegate,FileUploaderMetadataDelegate> {
     UITextField *_filename;
     UITextView *_msg;
     NSString *_metadata;
     FileUploader *_uploader;
-    UIImageView *_imageView;
+    YYAnimatedImageView *_imageView;
     CGFloat _imageHeight;
     BOOL _done;
     NSString *_url;
