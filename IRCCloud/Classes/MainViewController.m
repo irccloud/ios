@@ -4727,7 +4727,7 @@ NSArray *_sortedChannels;
                             [fvc viewWillAppear:NO];
                         }];
                     } else if ([p hasItemConformingToTypeIdentifier:@"public.movie"]) {
-                        if (@available(macCatalyst 16.0, *)) {
+                        if (@available(iOS 16.0, *)) {
                             AVAssetImageGenerator *generator = [AVAssetImageGenerator assetImageGeneratorWithAsset:[AVURLAsset assetWithURL:url]];
                             generator.appliesPreferredTrackTransform = YES;
                             [generator generateCGImageAsynchronouslyForTime:kCMTimeZero completionHandler:^(CGImageRef image, CMTime actualTime, NSError * error) {

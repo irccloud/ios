@@ -790,9 +790,7 @@
     }
     
     NSMutableArray *photos = [[NSMutableArray alloc] init];
-    if(!isCatalyst) {
-        [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":self->_saveToCameraRoll}];
-    }
+    [photos addObject:@{@"title":@"Save to Camera Roll", @"accessory":self->_saveToCameraRoll}];
     [photos addObject:@{@"title":@"Image Size", @"value":imageSize, @"selected":^{[self.navigationController pushViewController:[[PhotoSizeViewController alloc] init] animated:YES];}}];
 
     NSMutableArray *notifications = [[NSMutableArray alloc] init];
