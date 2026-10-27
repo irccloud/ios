@@ -4530,11 +4530,28 @@ NSArray *_sortedChannels;
     u.msgid = self->_msgid;
     [u uploadFile:url];
     
-    if([u.mimeType hasPrefix:@"image/"]) {
+    if([u.mimeType hasPrefix:@"video/"]) {
+        if (@available(iOS 16.0, *)) {
+            AVAssetImageGenerator *generator = [AVAssetImageGenerator assetImageGeneratorWithAsset:[AVURLAsset assetWithURL:url]];
+            generator.appliesPreferredTrackTransform = YES;
+            [generator generateCGImageAsynchronouslyForTime:kCMTimeZero completionHandler:^(CGImageRef image, CMTime actualTime, NSError * error) {
+                if(image) {
+                    UIImage *thumbnail = [UIImage imageWithCGImage:image];
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [fvc setImage:thumbnail];
+                        [fvc viewWillAppear:NO];
+                    }];
+                } else {
+                    CLS_LOG("%@ %@", error, error.localizedDescription);
+                }
+            }];
+        }
+    } else if([u.mimeType hasPrefix:@"image/"]) {
         NSData *d = [NSData dataWithContentsOfURL:url];
-        UIImage *thumbnail = [UIImage imageWithData:d];
+        YYImage *thumbnail = [YYImage imageWithData:d];
         if(thumbnail) {
-            thumbnail = [FileUploader image:thumbnail scaledCopyOfSize:CGSizeMake(2048, 2048)];
+            if (thumbnail.animatedImageType != YYImageTypeGIF)
+                thumbnail = (YYImage *)[FileUploader image:thumbnail scaledCopyOfSize:CGSizeMake(2048, 2048)];
             [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                 [fvc setImage:thumbnail];
                 [fvc viewWillAppear:YES];
