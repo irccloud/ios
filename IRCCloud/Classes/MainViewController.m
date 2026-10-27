@@ -585,20 +585,20 @@ NSArray *_sortedChannels;
         }
     }];
     
-    id imageHandler = ^(UIImage *item, NSError *error) {
-        if(item) {
-            CLS_LOG(@"Uploading dropped image to IRCCloud");
-            [u uploadImage:item];
-        } else {
-            CLS_LOG(@"Unable to handle dropped image: %@", error);
-        }
-    };
-    
     if([i hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
         [i loadInPlaceFileRepresentationForTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File" completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
             if(url) {
                 CLS_LOG(@"Uploading dropped file to IRCCloud");
                 [i hasItemConformingToTypeIdentifier:UTTypeMovie.identifier]?[u uploadVideo:url]:[u uploadFile:url];
+            } else {
+                CLS_LOG(@"Unable to handle dropped file: %@", error);
+            }
+        }];
+    } else if([i hasItemConformingToTypeIdentifier:UTTypeGIF.identifier]) {
+        [i loadInPlaceFileRepresentationForTypeIdentifier:UTTypeGIF.identifier completionHandler:^(NSURL *url, BOOL isInPlace, NSError *error) {
+            if(url) {
+                CLS_LOG(@"Uploading dropped GIF to IRCCloud");
+                [u uploadFile:url];
             } else {
                 CLS_LOG(@"Unable to handle dropped file: %@", error);
             }
@@ -612,8 +612,24 @@ NSArray *_sortedChannels;
                 CLS_LOG(@"Unable to handle dropped movie: %@", error);
             }
         }];
+    } else if([i hasItemConformingToTypeIdentifier:UTTypePNG.identifier]) {
+        [i loadObjectOfClass:UIImage.class completionHandler:^(UIImage *item, NSError *error) {
+            if(item) {
+                CLS_LOG(@"Uploading dropped PNG to IRCCloud");
+                [u uploadPNG:item];
+            } else {
+                CLS_LOG(@"Unable to handle dropped image: %@", error);
+            }
+        }];
     } else if([i hasItemConformingToTypeIdentifier:UTTypeImage.identifier]) {
-        [i loadObjectOfClass:UIImage.class completionHandler:imageHandler];
+        [i loadObjectOfClass:UIImage.class completionHandler:^(UIImage *item, NSError *error) {
+            if(item) {
+                CLS_LOG(@"Uploading dropped image to IRCCloud");
+                [u uploadImage:item];
+            } else {
+                CLS_LOG(@"Unable to handle dropped image: %@", error);
+            }
+        }];
     }
     
     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
