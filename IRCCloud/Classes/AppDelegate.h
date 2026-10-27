@@ -68,7 +68,7 @@
     NSMutableSet *_activeScenes;
 }
 
-@property (strong) UIWindow *window;
+@property (nonatomic,strong) UIWindow *window;
 
 @property (strong) LoginSplashViewController *loginSplashViewController;
 @property (strong) MainViewController *mainViewController;
@@ -94,7 +94,7 @@ API_AVAILABLE(ios(13.0))
     AppDelegate *_appDelegate;
     UIScene *_scene;
 }
-@property (strong) UIWindow *window;
+@property (nonatomic,strong) UIWindow *window;
 @property (strong) UIScene *scene;
 
 @property (strong) LoginSplashViewController *loginSplashViewController;

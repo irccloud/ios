@@ -114,18 +114,46 @@
 -(void)_choosePhoto:(UIImagePickerControllerSourceType)sourceType {
     [self->_uploader cancel];
     self->_uploader = nil;
-    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-    picker.sourceType = sourceType;
-    picker.allowsEditing = YES;
-    picker.delegate = (id)self;
-    [UIColor clearTheme];
     if(sourceType == UIImagePickerControllerSourceTypeCamera) {
+        UIImagePickerController *picker = [[UIImagePickerController alloc] init];
+        picker.sourceType = sourceType;
+        picker.allowsEditing = YES;
+        picker.delegate = (id)self;
+        [UIColor clearTheme];
         picker.modalPresentationStyle = UIModalPresentationFullScreen;
         [self presentViewController:picker animated:YES completion:nil];
     } else {
+        PHPickerConfiguration *config = [[PHPickerConfiguration alloc] init];
+        config.filter = [PHPickerFilter imagesFilter];
+        PHPickerViewController *picker = [[PHPickerViewController alloc] initWithConfiguration:config];
+        picker.delegate = self;
         picker.modalPresentationStyle = UIModalPresentationPopover;
         picker.popoverPresentationController.barButtonItem = self.navigationItem.rightBarButtonItem;
         [self presentViewController:picker animated:YES completion:nil];
+    }
+}
+
+-(void)imagePicked:(UIImage *)img {
+    if(img) {
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            UIActivityIndicatorView *activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
+            [activity startAnimating];
+            self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:activity];
+        }];
+        self->_failed = NO;
+        FileUploader *u = [[FileUploader alloc] init];
+        u.delegate = self;
+        u.avatar = YES;
+        if(self->_server) {
+            if(self->_server.orgId) {
+                u.orgId = self->_server.orgId;
+            } else {
+                u.cid = self->_server.cid;
+            }
+        } else {
+            u.orgId = -1;
+        }
+        [u uploadImage:img];
     }
 }
 
@@ -134,80 +162,27 @@
         [UIColor setTheme];
         [picker dismissViewControllerAnimated:YES completion:nil];
         
-        NSURL *refURL = [info valueForKey:UIImagePickerControllerReferenceURL];
-        NSURL *mediaURL = [info valueForKey:UIImagePickerControllerMediaURL];
         UIImage *img = [info objectForKey:UIImagePickerControllerEditedImage];
         if(!img)
             img = [info objectForKey:UIImagePickerControllerOriginalImage];
         
-        CLS_LOG(@"Image file chosen: %@ %@", refURL, mediaURL);
-        if(img || refURL || mediaURL) {
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                UIActivityIndicatorView *activity = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:[UIColor activityIndicatorViewStyle]];
-                [activity startAnimating];
-                self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithCustomView:activity];
-            }];
-            if(picker.sourceType == UIImagePickerControllerSourceTypeCamera && [[NSUserDefaults standardUserDefaults] boolForKey:@"saveToCameraRoll"]) {
-                if(img)
-                    UIImageWriteToSavedPhotosAlbum(img, nil, nil, nil);
-                else if(UIVideoAtPathIsCompatibleWithSavedPhotosAlbum(mediaURL.path))
-                    UISaveVideoAtPathToSavedPhotosAlbum(mediaURL.path, nil, nil, nil);
-            }
-            self->_failed = NO;
-            FileUploader *u = [[FileUploader alloc] init];
-            u.delegate = self;
-            u.avatar = YES;
-            if(self->_server) {
-                if(self->_server.orgId) {
-                    u.orgId = self->_server.orgId;
-                } else {
-                    u.cid = self->_server.cid;
-                }
-            } else {
-                u.orgId = -1;
-            }
-            
-            if(refURL) {
-#if !TARGET_OS_MACCATALYST
-                CLS_LOG(@"Loading metadata from asset library");
-                ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *imageAsset) {
-                    ALAssetRepresentation *imageRep = [imageAsset defaultRepresentation];
-                    CLS_LOG(@"Got filename: %@", imageRep.filename);
-                    u.originalFilename = imageRep.filename;
-                    if([imageRep.filename.lowercaseString hasSuffix:@".gif"] || [imageRep.filename.lowercaseString hasSuffix:@".png"]) {
-                        CLS_LOG(@"Uploading file data");
-                        NSMutableData *data = [[NSMutableData alloc] initWithCapacity:(NSUInteger)imageRep.size];
-                        uint8_t buffer[4096];
-                        long long len = 0;
-                        while(len < imageRep.size) {
-                            long long i = [imageRep getBytes:buffer fromOffset:len length:4096 error:nil];
-                            [data appendBytes:buffer length:(NSUInteger)i];
-                            len += i;
-                        }
-                        [u uploadFile:imageRep.filename UTI:imageRep.UTI data:data];
-                    } else {
-                        CLS_LOG(@"Uploading UIImage");
-                        [u uploadImage:img];
-                    }
-                };
-                
-                ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
-                [assetslibrary assetForURL:refURL resultBlock:resultblock failureBlock:^(NSError *e) {
-                    CLS_LOG(@"Error getting asset: %@", e);
-                    if(img) {
-                        [u uploadImage:img];
-                    } else {
-                        [u uploadFile:mediaURL];
+        [self imagePicked:img];
+    }];
+}
+
+-(void)picker:(PHPickerViewController *)picker didFinishPicking:(NSArray<PHPickerResult *> *)results {
+    [picker dismissViewControllerAnimated:YES completion:^{
+        [UIColor setTheme];
+        [picker dismissViewControllerAnimated:YES completion:nil];
+        
+        if (results.count) {
+            NSItemProvider *p = results.firstObject.itemProvider;
+            if (p && [p hasItemConformingToTypeIdentifier:@"public.image"]) {
+                [p loadFileRepresentationForTypeIdentifier:p.registeredTypeIdentifiers.firstObject completionHandler:^(NSURL *url, NSError *error) {
+                    if (url) {
+                        [self imagePicked:[UIImage imageWithContentsOfFile:url.path]];
                     }
                 }];
-#endif
-            } else {
-                CLS_LOG(@"no asset library URL, uploading image data instead");
-                if(img) {
-                    [u uploadImage:img];
-                } else {
-                    [u uploadFile:mediaURL];
-                }
             }
         }
     }];

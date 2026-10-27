@@ -15,10 +15,11 @@
 //  limitations under the License.
 
 #import <UIKit/UIKit.h>
+#import <PhotosUI/PhotosUI.h>
 #import "NetworkConnection.h"
 #import "FileUploader.h"
 
-@interface AvatarsTableViewController : UITableViewController<UIImagePickerControllerDelegate,FileUploaderDelegate> {
+@interface AvatarsTableViewController : UITableViewController<UIImagePickerControllerDelegate,PHPickerViewControllerDelegate,FileUploaderDelegate> {
     NSArray *_avatars;
     Server *_server;
     FileUploader *_uploader;

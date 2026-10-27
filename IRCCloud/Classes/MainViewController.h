@@ -18,6 +18,7 @@
 #import <UIKit/UIKit.h>
 #import <AudioToolbox/AudioToolbox.h>
 #import <MessageUI/MFMailComposeViewController.h>
+#import <PhotosUI/PhotosUI.h>
 #import "BuffersTableView.h"
 #import "UsersTableView.h"
 #import "EventsTableView.h"
@@ -47,7 +48,7 @@
 
 @end
 
-@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,UINavigationBarDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate,IRCColorPickerViewDelegate,UIDropInteractionDelegate
+@interface MainViewController : UIViewController<FilesTableViewDelegate,NickCompletionViewDelegate,BuffersTableViewDelegate,UIExpandingTextViewDelegate,EventsTableViewDelegate,UsersTableViewDelegate,UITextFieldDelegate,UIImagePickerControllerDelegate,PHPickerViewControllerDelegate,UINavigationBarDelegate,FileUploaderDelegate,UIDocumentPickerDelegate,NSUserActivityDelegate,UIPopoverPresentationControllerDelegate,UIViewControllerPreviewingDelegate,UIGestureRecognizerDelegate,MFMailComposeViewControllerDelegate,LinkLabelDelegate,IRCColorPickerViewDelegate,UIDropInteractionDelegate
 > {
     IBOutlet EventsTableView *_eventsView;
     IBOutlet UIView *_connectingView;
