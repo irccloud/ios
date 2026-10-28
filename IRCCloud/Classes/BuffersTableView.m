@@ -1917,8 +1917,10 @@
 }
 
 -(void)focusSearchText {
-    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
-    [self->_searchText becomeFirstResponder];
+    if ([self.tableView numberOfRowsInSection:0] > 0) {
+        [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionTop animated:NO];
+        [self->_searchText becomeFirstResponder];
+    }
 }
 
 @end

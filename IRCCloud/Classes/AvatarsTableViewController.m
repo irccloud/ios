@@ -295,8 +295,9 @@
 
     NSMutableArray *data = [[NSMutableArray alloc] init];
     for(Server *s in [ServersDataSource sharedInstance].getServers) {
-        if([s.avatar isKindOfClass:NSString.class] && s.avatar.length && ![s.avatar isEqualToString:[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"]]) {
-            NSURL *url = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":s.avatar, @"modifiers":[NSString stringWithFormat:@"w%i", (int)(64 * [UIScreen mainScreen].scale)]} error:nil]];
+        NSString *avatar = s.avatar;
+        if([avatar isKindOfClass:NSString.class] && avatar.length && ![avatar isEqualToString:[[NetworkConnection sharedInstance].userInfo objectForKey:@"avatar"]]) {
+            NSURL *url = [NSURL URLWithString:[[NetworkConnection sharedInstance].avatarURITemplate relativeStringWithVariables:@{@"id":avatar, @"modifiers":[NSString stringWithFormat:@"w%i", (int)(64 * [UIScreen mainScreen].scale)]} error:nil]];
             if(url) {
                 if(![[ImageCache sharedInstance] imageForURL:url]) {
                     [[ImageCache sharedInstance] fetchURL:url completionHandler:^(BOOL success) {
@@ -308,7 +309,7 @@
                     }];
                 }
                 [data addObject:@{@"label":[NSString stringWithFormat:@"%@ on %@", s.nick, s.name.length?s.name:s.hostname],
-                                  @"id":s.avatar,
+                                  @"id":avatar,
                                   @"url":url,
                                   @"orgId":@(s.orgId),
                                   @"cid":@(s.cid)

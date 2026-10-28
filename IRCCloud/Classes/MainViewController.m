@@ -2465,12 +2465,14 @@ NSArray *_sortedChannels;
         typing = [[NSMutableString alloc] init];
         int i = 0;
         for (NSString *from in self->_buffer.typingIndicators.allKeys) {
-            if (++i == count)
-                [typing appendString:@"and "];
-            [typing appendString:from];
-            if(count != 2 && i > 0 && i < count)
-                [typing appendString:@","];
-            [typing appendString:@" "];
+            if (from) {
+                if (++i == count)
+                    [typing appendString:@"and "];
+                [typing appendString:from];
+                if(count != 2 && i > 0 && i < count)
+                    [typing appendString:@","];
+                [typing appendString:@" "];
+            }
         }
         [typing appendString:@"are typing"];
     }
