@@ -75,6 +75,7 @@
     UISwitch *_noColor;
     UISwitch *_disableTypingStatus;
     UISwitch *_showDeleted;
+    UISwitch *_sendOnEnter;
     NSString *_version;
     UISlider *_fontSize;
     NSString *_oldTheme;

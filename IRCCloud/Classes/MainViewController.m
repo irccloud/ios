@@ -455,7 +455,6 @@ NSArray *_sortedChannels;
     
     self->_message = [[UIExpandingTextView alloc] initWithFrame:CGRectZero];
     self->_message.delegate = self;
-    self->_message.returnKeyType = UIReturnKeySend;
     self->_message.autoresizesSubviews = NO;
     self->_message.translatesAutoresizingMaskIntoConstraints = NO;
     //    _message.internalTextView.font = self->_defaultTextareaFont = [UIFont fontWithDescriptor:[UIFontDescriptor preferredFontDescriptorWithTextStyle:UIFontTextStyleBody] size:FONT_SIZE];
@@ -1985,6 +1984,11 @@ NSArray *_sortedChannels;
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"imgur_removed"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     }
+
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"sendOnEnter"])
+        self->_message.returnKeyType = UIReturnKeySend;
+    else
+        self->_message.returnKeyType = UIReturnKeyDefault;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -2642,8 +2646,9 @@ NSArray *_sortedChannels;
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
-    [self sendButtonPressed:expandingTextView];
-    return NO;
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"sendOnEnter"])
+        [self sendButtonPressed:expandingTextView];
+    return YES;
 }
 
 -(void)expandingTextView:(UIExpandingTextView *)expandingTextView willChangeHeight:(float)height {

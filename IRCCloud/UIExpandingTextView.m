@@ -258,7 +258,11 @@
     if(!textView.font)
         return;
     
-    NSInteger newHeight = ceil([textView.text boundingRectWithSize:CGSizeMake(internalTextView.bounds.size.width - 12, maximumHeight) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:textView.font} context:nil].size.height) + 17;
+    NSString *text = textView.text;
+    if ([text hasSuffix:@"\n"])
+        text = [text stringByAppendingString:@"|W|"];
+    
+    NSInteger newHeight = ceil([text boundingRectWithSize:CGSizeMake(internalTextView.bounds.size.width - 12, maximumHeight) options:NSStringDrawingUsesLineFragmentOrigin|NSStringDrawingUsesFontLeading attributes:@{NSFontAttributeName:textView.font} context:nil].size.height) + 17;
     
 	if(newHeight < minimumHeight || !internalTextView.hasText)
     {

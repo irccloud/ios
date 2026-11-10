@@ -520,6 +520,7 @@
         [[NSUserDefaults standardUserDefaults] setBool:self->_clearFormattingAfterSending.isOn forKey:@"clearFormattingAfterSending"];
         [[NSUserDefaults standardUserDefaults] setBool:self->_avatarImages.isOn forKey:@"avatarImages"];
         [[NSUserDefaults standardUserDefaults] setBool:!_hiddenMembers.isOn forKey:@"hiddenMembers"];
+        [[NSUserDefaults standardUserDefaults] setBool:self->_sendOnEnter.isOn forKey:@"sendOnEnter"];
         [[NSUserDefaults standardUserDefaults] synchronize];
     
 #ifdef ENTERPRISE
@@ -783,6 +784,7 @@
         [device addObject:@{@"title":@"Always show channel members", @"accessory":self->_hiddenMembers}];
     }
     [device addObject:@{@"title":@"Ask To Post A Snippet", @"accessory":self->_pastebin}];
+    [device addObject:@{@"title":@"Return key sends message", @"accessory":self->_sendOnEnter}];
     if(!isCatalyst) {
         [device addObject:@{@"title":@"Open Images in Browser", @"accessory":self->_imageViewer}];
         [device addObject:@{@"title":@"Open Videos in Browser", @"accessory":self->_videoViewer}];
@@ -956,6 +958,7 @@
     self->_noColor = [[UISwitch alloc] init];
     self->_disableTypingStatus = [[UISwitch alloc] init];
     self->_showDeleted = [[UISwitch alloc] init];
+    self->_sendOnEnter = [[UISwitch alloc] init];
 
     self->_highlights = [[UITextView alloc] initWithFrame:CGRectZero];
     self->_highlights.text = @"";
@@ -1226,6 +1229,7 @@
     self->_thirdPartyNotificationPreviews.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"thirdPartyNotificationPreviews"];
     self->_clearFormattingAfterSending.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"clearFormattingAfterSending"];
     self->_avatarImages.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"avatarImages"];
+    self->_sendOnEnter.on = [[NSUserDefaults standardUserDefaults] boolForKey:@"sendOnEnter"];
 }
 
 -(void)hideJoinPartToggled:(id)sender {
