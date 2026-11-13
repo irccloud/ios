@@ -548,7 +548,7 @@ NSArray *_sortedChannels;
 }
 
 -(BOOL)dropInteraction:(UIDropInteraction *)interaction canHandleSession:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
-    return session.items.count == 1 && [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", UTTypeImage.identifier, UTTypeMovie.identifier]];
+    return session.items.count == 1 && [session hasItemsConformingToTypeIdentifiers:@[@"com.apple.DocumentManager.uti.FPItem.File", UTTypeContent.identifier]];
 }
 
 -(UIDropProposal *)dropInteraction:(UIDropInteraction *)interaction sessionDidUpdate:(id<UIDropSession>)session __attribute__((availability(ios,introduced=11))) {
@@ -4666,7 +4666,21 @@ NSArray *_sortedChannels;
         [fvc showCancelButton];
         u.metadatadelegate = fvc;
 
-        [p loadFileRepresentationForTypeIdentifier:p.registeredTypeIdentifiers.firstObject completionHandler:^(NSURL *url, NSError *error) {
+        NSString *preferredType = UTTypeContent.identifier;
+        if ([p hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
+            preferredType = @"com.apple.DocumentManager.uti.FPItem.File";
+        } else if ([p hasItemConformingToTypeIdentifier:UTTypeContent.identifier]) {
+            preferredType = UTTypeContent.identifier;
+        } else {
+            CLS_LOG(@"No supported content types available: %@", p.registeredTypeIdentifiers);
+            
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Unsupported Content Type" message:@"Unable to export a file, image, or video from selected item. Please select a different item." preferredStyle:UIAlertControllerStyleAlert];
+            [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+            [self presentViewController:alert animated:YES completion:nil];
+            return;
+        }
+
+        [p loadFileRepresentationForTypeIdentifier:preferredType completionHandler:^(NSURL *url, NSError *error) {
             if (url) {
                 u.originalFilename = url.lastPathComponent;
                 
@@ -4711,8 +4725,17 @@ NSArray *_sortedChannels;
                     [u uploadVideo:url];
                 } else {
                     CLS_LOG(@"File is not an image or movie, uploading raw file: %@ %@", url, p.registeredTypeIdentifiers);
+                    [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                        [fvc viewWillAppear:NO];
+                    }];
                     [u uploadFile:url];
                 }
+            } else {
+                CLS_LOG(@"Unable to export a file representation of selected item: %@ (%@)", error.localizedDescription, p.registeredTypeIdentifiers);
+                
+                UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error" message:@"Unable to export file." preferredStyle:UIAlertControllerStyleAlert];
+                [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
+                [self presentViewController:alert animated:YES completion:nil];
             }
         }];
     }
