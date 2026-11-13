@@ -4667,14 +4667,13 @@ NSArray *_sortedChannels;
         u.metadatadelegate = fvc;
 
         NSString *preferredType = UTTypeContent.identifier;
-        if ([p hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"]) {
+        if ([p hasItemConformingToTypeIdentifier:@"com.apple.DocumentManager.uti.FPItem.File"])
             preferredType = @"com.apple.DocumentManager.uti.FPItem.File";
-        } else if ([p hasItemConformingToTypeIdentifier:UTTypeContent.identifier]) {
-            preferredType = UTTypeContent.identifier;
-        } else {
+        
+        if (![p hasItemConformingToTypeIdentifier:preferredType]) {
             CLS_LOG(@"No supported content types available: %@", p.registeredTypeIdentifiers);
             
-            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Unsupported Content Type" message:@"Unable to export a file, image, or video from selected item. Please select a different item." preferredStyle:UIAlertControllerStyleAlert];
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Unsupported Content" message:@"Unable to export a file, image, or video from selected item. Please select a different item." preferredStyle:UIAlertControllerStyleAlert];
             [alert addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
             [self presentViewController:alert animated:YES completion:nil];
             return;
