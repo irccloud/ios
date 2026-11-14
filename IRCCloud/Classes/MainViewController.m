@@ -2646,8 +2646,10 @@ NSArray *_sortedChannels;
 }
 
 -(BOOL)expandingTextViewShouldReturn:(UIExpandingTextView *)expandingTextView {
-    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"sendOnEnter"])
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"sendOnEnter"]) {
         [self sendButtonPressed:expandingTextView];
+        return NO;
+    }
     return YES;
 }
 
